@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Calmsey
 
-## Getting Started
+## Features
 
-First, run the development server:
+### Multi-language Support
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Dynamic language routing (`/`, `/id`)
+- Content translation management
+- Language-specific URLs and SEO
+
+### Content Management
+
+- Article creation and editing
+- Category hierarchy management
+- Tag system
+- Media management
+- Menu configuration
+
+### SEO Optimized
+
+- Dynamic sitemaps
+- Meta tags and Open Graph
+- Clean URL structure
+- hreflang implementation
+
+### User Experience
+
+- Responsive design
+- Fast page loads with SSR/SSG
+- Smooth language switching
+- Mobile-friendly navigation
+
+## Deployment Checklist
+
+1. **Environment Variables**
+
+   ```bash
+   DATABASE_URL=
+   NEXTAUTH_URL=
+   NEXTAUTH_SECRET=
+   ```
+
+2. **Database Setup**
+
+   ```bash
+   npm run db:push
+   npm run db:seed
+   ```
+
+3. **Build and Deploy**
+
+   ```bash
+   npm run build
+   npm start
+   ```
+
+4. **SEO Configuration**
+   - Update domain in `sitemap.ts` and `robots.ts`
+   - Configure Google Analytics
+   - Set up Search Console
+
+## Project Structure
+
+```text
+src/
+├── app/
+│   ├── [lang]/          # Language-specific routes
+│   │   ├── articles/    # Article pages
+│   │   ├── [...slug]/   # Dynamic category pages
+│   │   └── contact/     # Contact page
+│   ├── admin/           # Admin panel
+│   └── api/             # API routes
+├── components/
+│   ├── public/          # Public components
+│   └── admin/           # Admin components
+└── lib/
+    ├── public-api.ts    # Public API functions
+    ├── prisma.ts        # Database client
+    └── utils.ts         # Utilities
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

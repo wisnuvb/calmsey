@@ -1,0 +1,665 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(VIEWER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // CMS relations
+  articles Article[]
+  media    Media[]
+  pages    Page[]
+
+  // Template relations
+  templates       Template[]
+  templateReviews TemplateReview[]
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// CMS Models
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  AUTHOR
+  VIEWER
+}
+
+// Language support
+model Language {
+  id        String   @id // e.g., "en", "id", "zh"
+  name      String // e.g., "English", "Indonesian", "Chinese"
+  flag      String? // URL to flag icon
+  isDefault Boolean  @default(false)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  articleTranslations     ArticleTranslation[]
+  categoryTranslations    CategoryTranslation[]
+  siteContentTranslations SiteContentTranslation[]
+  menuItemTranslations    MenuItemTranslation[]
+  pageTranslation         PageTranslation[]
+  pageSectionTranslation  PageSectionTranslation[]
+
+  @@map("languages")
+}
+
+// Main article table (language-agnostic)
+model Article {
+  id            String        @id @default(cuid())
+  slug          String        @unique // Base slug, will be combined with language
+  status        ArticleStatus @default(DRAFT)
+  featuredImage String?
+  publishedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  authorId     String
+  author       User                 @relation(fields: [authorId], references: [id])
+  translations ArticleTranslation[]
+  categories   ArticleCategory[]
+  articleTag   ArticleTag[]
+
+  @@map("articles")
+}
+
+// Article translations for each language
+model ArticleTranslation {
+  id             String   @id @default(cuid())
+  title          String
+  content        String   @db.LongText
+  excerpt        String?  @db.Text
+  seoTitle       String?
+  seoDescription String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  articleId  String
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  languageId String
+  language   Language @relation(fields: [languageId], references: [id])
+
+  // Ensure one translation per language per article
+  @@unique([articleId, languageId])
+  @@map("article_translations")
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// Category system (also supports multi-language)
+model Category {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  parentId  String? // For nested categories
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Self-referencing relation for nested categories
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+
+  // Relations
+  translations CategoryTranslation[]
+  articles     ArticleCategory[]
+  menuItems    MenuItem[] // For dynamic menus
+
+  @@unique([slug, parentId], name: "unique_category_slug_parent")
+  @@map("categories")
+}
+
+model CategoryTranslation {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  languageId String
+  language   Language @relation(fields: [languageId], references: [id])
+
+  @@unique([categoryId, languageId])
+  @@map("category_translations")
+}
+
+// Junction table for article-category relationship
+model ArticleCategory {
+  articleId  String
+  categoryId String
+
+  article  Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, categoryId])
+  @@map("article_categories")
+}
+
+// Site settings and configuration
+model SiteSetting {
+  id        String      @id @default(cuid())
+  key       String      @unique
+  value     String      @db.LongText
+  type      SettingType @default(TEXT)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@map("site_settings")
+}
+
+enum SettingType {
+  TEXT
+  NUMBER
+  BOOLEAN
+  JSON
+  IMAGE
+}
+
+// Navigation/Menu system
+model Menu {
+  id        String   @id @default(cuid())
+  key       String   @unique // e.g., "main-navigation", "footer-links"
+  name      String // e.g., "Main Navigation", "Footer Links"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  items MenuItem[]
+
+  @@map("menus")
+}
+
+model MenuItem {
+  id       String     @id @default(cuid())
+  parentId String? // For nested menu items
+  order    Int        @default(0)
+  url      String? // External URL or null for category/custom
+  target   MenuTarget @default(SELF)
+  type     MenuType   @default(CUSTOM)
+  isActive Boolean    @default(true)
+
+  // For dynamic menus
+  articleCategoryId String? // Existing field
+  pageId            String? // ✅ TAMBAHKAN FIELD INI
+
+  // Role-based visibility (empty means visible to all)
+  isVisibleToAll Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Self-referencing relation for nested items
+  parent   MenuItem?  @relation("MenuHierarchy", fields: [parentId], references: [id])
+  children MenuItem[] @relation("MenuHierarchy")
+
+  // Relations
+  menuId   String
+  menu     Menu      @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [articleCategoryId], references: [id])
+  page     Page?     @relation(fields: [pageId], references: [id]) // ✅ TAMBAHKAN RELATION INI
+
+  // Translations
+  translations MenuItemTranslation[]
+
+  // Role-based visibility (junction table)
+  visibleToRoles MenuItemRole[]
+
+  @@map("menu_items")
+}
+
+model MenuItemTranslation {
+  id    String @id @default(cuid())
+  title String
+
+  // Relations
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  languageId String
+  language   Language @relation(fields: [languageId], references: [id])
+
+  @@unique([menuItemId, languageId])
+  @@map("menu_item_translations")
+}
+
+// Junction table for menu item role-based visibility
+model MenuItemRole {
+  menuItemId String
+  role       Role
+
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@id([menuItemId, role])
+  @@map("menu_item_roles")
+}
+
+enum MenuType {
+  CUSTOM // Custom URL
+  CATEGORY // Article category
+  PAGE // Static page
+  HOME // Homepage
+}
+
+enum MenuTarget {
+  SELF // _self
+  BLANK // _blank
+}
+
+// Site content translations (for static content like headers, footers, etc.)
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique // e.g., "header.navigation", "footer.copyright"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  translations SiteContentTranslation[]
+
+  @@map("site_contents")
+}
+
+model SiteContentTranslation {
+  id        String   @id @default(cuid())
+  value     String   @db.LongText
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  contentId  String
+  content    SiteContent @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  languageId String
+  language   Language    @relation(fields: [languageId], references: [id])
+
+  @@unique([contentId, languageId])
+  @@map("site_content_translations")
+}
+
+// Media/File management
+model Media {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  alt          String?
+  caption      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  uploadedById String
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id])
+
+  @@map("media")
+}
+
+model ContactSubmission {
+  id        String           @id @default(cuid())
+  name      String
+  email     String
+  message   String           @db.Text
+  status    SubmissionStatus @default(UNREAD)
+  createdAt DateTime         @default(now())
+
+  @@map("contact_submissions")
+}
+
+model Tag {
+  id       String       @id @default(cuid())
+  name     String       @unique
+  articles ArticleTag[]
+
+  @@map("tags")
+}
+
+enum SubmissionStatus {
+  UNREAD
+  READ
+  RESOLVED
+  CLOSED
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@map("article_tags")
+}
+
+// Page system (untuk static pages)
+model Page {
+  id            String       @id @default(cuid())
+  slug          String       @unique // URL slug untuk page
+  status        PageStatus   @default(DRAFT)
+  template      PageTemplate @default(BASIC) // Template yang digunakan
+  featuredImage String?
+  publishedAt   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  authorId     String
+  author       User              @relation(fields: [authorId], references: [id])
+  translations PageTranslation[]
+  sections     PageSection[]
+  menuItems    MenuItem[] // Pages yang dijadikan menu
+
+  @@map("pages")
+}
+
+// Page translations untuk multi-language
+model PageTranslation {
+  id             String   @id @default(cuid())
+  title          String
+  content        String   @db.LongText
+  excerpt        String?  @db.Text
+  seoTitle       String?
+  seoDescription String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  pageId     String
+  page       Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  languageId String
+  language   Language @relation(fields: [languageId], references: [id])
+
+  // Ensure one translation per language per page
+  @@unique([pageId, languageId])
+  @@map("page_translations")
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PageTemplate {
+  BASIC // Basic page layout
+  FULL_WIDTH // Full width layout
+  LANDING // Landing page template
+  CONTACT // Contact page template
+  ABOUT // About page template
+  CUSTOM // Custom template
+}
+
+// Page Sections untuk flexible content
+model PageSection {
+  id       String          @id @default(cuid())
+  type     PageSectionType
+  order    Int             @default(0)
+  isActive Boolean         @default(true)
+
+  // Enhanced Settings - Store as JSON
+  layoutSettings     String? @db.LongText // Layout & positioning
+  styleSettings      String? @db.LongText // Background, colors, typography
+  responsiveSettings String? @db.LongText // Responsive behavior
+  animationSettings  String? @db.LongText // Animations & effects
+  contentSettings    String? @db.LongText // Section-specific content settings
+  customSettings     String? @db.LongText // Custom CSS/JS, advanced options
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  pageId       String
+  page         Page                     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  translations PageSectionTranslation[]
+
+  @@map("page_sections")
+}
+
+model PageSectionTranslation {
+  id String @id @default(cuid())
+
+  // Content fields
+  title    String? // Section title
+  subtitle String? // Section subtitle  
+  content  String  @db.LongText // Main content (HTML/Markdown)
+  metadata String? @db.LongText // Additional content data (JSON)
+
+  // SEO & Accessibility
+  altText String? // Alt text for images
+  caption String? // Captions
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  sectionId  String
+  section    PageSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  languageId String
+  language   Language    @relation(fields: [languageId], references: [id])
+
+  @@unique([sectionId, languageId])
+  @@map("page_section_translations")
+}
+
+enum PageSectionType {
+  // Layout Sections
+  CONTAINER // Wrapper dengan custom styling
+  GRID // CSS Grid layout
+  FLEXBOX // Flexbox layout
+  COLUMNS // Multi-column layout
+
+  // Content Sections
+  HERO // Hero dengan parallax, video bg
+  RICH_TEXT // Advanced rich text editor
+  IMAGE // Single image dengan advanced options
+  IMAGE_GALLERY // Lightbox, carousel, masonry
+  VIDEO_EMBED // YouTube, Vimeo, custom
+  SLIDER_CAROUSEL // Advanced slider
+
+  // Interactive Sections
+  CONTACT_FORM // Dynamic form builder
+  SUBSCRIPTION_FORM // Newsletter signup
+  ACCORDION // FAQ, collapsible content
+  TABS // Tabbed content
+  MODAL_TRIGGER // Popup/modal triggers
+  BUTTON_GROUP // CTA button groups
+
+  // Dynamic Content
+  ARTICLE_LIST // Dynamic article feeds
+  CATEGORY_SHOWCASE // Category listings
+  FEATURED_CONTENT // Featured articles/content
+  SEARCH_INTERFACE // Search functionality
+
+  // Social & Engagement
+  TESTIMONIALS // Customer testimonials
+  TEAM_SHOWCASE // Team member cards
+  SOCIAL_FEED // Social media integration
+  COUNTDOWN // Countdown timer
+  PRICING_TABLE // Pricing comparisons
+
+  // Advanced Components
+  TIMELINE // Event timeline
+  STATS_COUNTER // Animated statistics
+  PROGRESS_BAR // Progress indicators
+  CHART_DISPLAY // Data visualization
+  MAP_EMBED // Interactive maps
+
+  // Custom & Extensions
+  CUSTOM_HTML // Raw HTML/CSS/JS
+  EMBED_CODE // Third-party embeds
+  WIDGET_AREA // Reusable widget slots
+  SPACER // Spacing/divider element
+}
+
+// New: Template System Models
+model Template {
+  id          String           @id @default(cuid())
+  name        String
+  description String?          @db.Text
+  category    TemplateCategory
+  subcategory String?
+
+  // Template Metadata
+  version    String             @default("1.0.0")
+  tags       String?            @db.Text // JSON array of tags
+  difficulty TemplateDifficulty @default(BEGINNER)
+
+  // Template Data
+  previewImage  String? // Main preview image
+  previewImages String? @db.Text // JSON array of preview images
+  templateData  String  @db.LongText // Complete template JSON
+
+  // Assets & Files
+  hasAssets Boolean @default(false)
+  assetPath String? // Path to uploaded assets
+
+  // Status & Permissions
+  status     TemplateStatus @default(DRAFT)
+  isPublic   Boolean        @default(false)
+  isFeatured Boolean        @default(false)
+
+  // Analytics
+  downloadCount Int    @default(0)
+  viewCount     Int    @default(0)
+  rating        Float? // Average rating
+  ratingCount   Int    @default(0)
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  authorId String
+  author   User             @relation(fields: [authorId], references: [id])
+  reviews  TemplateReview[]
+
+  @@map("templates")
+}
+
+model TemplateReview {
+  id       String  @id @default(cuid())
+  rating   Int // 1-5 stars
+  comment  String? @db.Text
+  isPublic Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  templateId String
+  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([templateId, userId]) // One review per user per template
+  @@map("template_reviews")
+}
+
+// Template Enums
+enum TemplateCategory {
+  HOMEPAGE
+  ABOUT_PAGE
+  SERVICE_PAGE
+  CONTACT_PAGE
+  PORTFOLIO
+  BLOG_LISTING
+  BLOG_SINGLE
+  HERO_SECTIONS
+  CONTENT_BLOCKS
+  FOOTER_VARIANTS
+  HEADER_VARIANTS
+  CARD_DESIGNS
+  FORM_LAYOUTS
+  FULL_WEBSITE
+  INDUSTRY_SPECIFIC
+}
+
+enum TemplateDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum TemplateStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  REJECTED
+  PUBLISHED
+  ARCHIVED
+}
