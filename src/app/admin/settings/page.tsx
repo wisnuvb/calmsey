@@ -1,4 +1,3 @@
-// src/app/admin/settings/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,10 +9,8 @@ import {
   PhotoIcon,
   BellIcon,
   CloudArrowUpIcon,
-  KeyIcon,
   DocumentTextIcon,
   CheckIcon,
-  XMarkIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
@@ -188,11 +185,7 @@ export default function SettingsPage() {
       {/* Tab Content */}
       <div className="mt-6">
         {activeTab === "general" && (
-          <GeneralSettings
-            settings={settings.siteSettings}
-            onUpdate={updateSetting}
-            getSetting={getSetting}
-          />
+          <GeneralSettings onUpdate={updateSetting} getSetting={getSetting} />
         )}
         {activeTab === "languages" && (
           <LanguageSettings
@@ -225,11 +218,9 @@ export default function SettingsPage() {
 
 // General Settings Component
 function GeneralSettings({
-  settings,
   onUpdate,
   getSetting,
 }: {
-  settings: SiteSetting[];
   onUpdate: (key: string, value: string) => void;
   getSetting: (key: string) => string;
 }) {
@@ -388,7 +379,7 @@ function LanguageSettings({
   languages: Language[];
   onUpdate: (languages: Language[]) => void;
 }) {
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const toggleLanguage = (languageId: string) => {
     const updatedLanguages = languages.map((lang) =>
@@ -405,6 +396,12 @@ function LanguageSettings({
     onUpdate(updatedLanguages);
   };
 
+  const filteredLanguages = languages.filter(
+    (language) =>
+      language.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      language.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <div className="flex items-center justify-between mb-6">
@@ -413,50 +410,151 @@ function LanguageSettings({
         </h3>
       </div>
 
-      <div className="space-y-4">
-        {languages.map((language) => (
-          <div
-            key={language.id}
-            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
-          >
-            <div className="flex items-center gap-2">
-              {language.flag}
-              <div>
-                <h4 className="text-sm font-medium text-gray-900">
-                  {language.name}
-                  {language.isDefault && (
-                    <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      Default
-                    </span>
-                  )}
-                </h4>
-                <p className="text-sm text-gray-500">
-                  Language ID: {language.id}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => setDefaultLanguage(language.id)}
-                disabled={language.isDefault}
-                className="text-sm text-blue-600 hover:text-blue-900 disabled:text-gray-400"
-              >
-                Set Default
-              </button>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={language.isDefault}
-                  onChange={() => toggleLanguage(language.id)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
+      {/* Search Field */}
+      <div className="mb-6">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search languages..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg
+              className="h-5 w-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
           </div>
-        ))}
+        </div>
       </div>
+
+      {/* Table Container */}
+      <div className="overflow-hidden border border-gray-200 rounded-lg">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            {/* Sticky Header */}
+            <thead className="bg-gray-50 sticky top-0 z-10">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Language
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Language ID
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Default
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredLanguages.map((language) => (
+                <tr key={language.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <span className="text-lg mr-3">{language.flag}</span>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {language.name}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 font-mono">
+                      {language.id}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        language.isActive
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {language.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    {language.isDefault && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Default
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <div className="flex items-center justify-center space-x-3">
+                      <button
+                        onClick={() => setDefaultLanguage(language.id)}
+                        disabled={language.isDefault}
+                        className={`text-sm px-3 py-1 rounded-md transition-colors ${
+                          language.isDefault
+                            ? "text-gray-400 cursor-not-allowed"
+                            : "text-blue-600 hover:text-blue-900 hover:bg-blue-50"
+                        }`}
+                      >
+                        Set Default
+                      </button>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={language.isActive}
+                          onChange={() => toggleLanguage(language.id)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Empty State */}
+      {filteredLanguages.length === 0 && (
+        <div className="text-center py-8">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No languages found
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {searchTerm
+              ? "Try adjusting your search terms."
+              : "No languages available."}
+          </p>
+        </div>
+      )}
 
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
         <div className="flex">
@@ -469,7 +567,7 @@ function LanguageSettings({
               • Default language will be used as fallback for missing
               translations
             </p>
-            <p>• Inactive languages won't be available on the frontend</p>
+            <p>• Inactive languages won&apos; t be available on the frontend</p>
             <p>• At least one language must remain active</p>
           </div>
         </div>
@@ -570,7 +668,7 @@ function EmailSettings({
       } else {
         alert("Failed to send test email");
       }
-    } catch (error) {
+    } catch {
       alert("Failed to send test email");
     } finally {
       setTestingEmail(false);
@@ -847,7 +945,7 @@ function BackupSettings() {
       } else {
         alert("Failed to create backup");
       }
-    } catch (error) {
+    } catch {
       alert("Failed to create backup");
     } finally {
       setBackupInProgress(false);
@@ -871,7 +969,7 @@ function BackupSettings() {
       } else {
         alert("Failed to download backup");
       }
-    } catch (error) {
+    } catch {
       alert("Failed to download backup");
     }
   };

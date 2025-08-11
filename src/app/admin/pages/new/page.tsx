@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import PageBuilder, { PageSection } from "@/components/admin/PageBuilder";
+import { PageSection } from "@/components/admin/PageBuilder";
 
 export default function NewPagePage() {
   const router = useRouter();
@@ -55,7 +55,7 @@ export default function NewPagePage() {
           translations: [
             {
               title: pageData.title,
-              content: "", // Will be built from sections
+              content: "",
               excerpt: pageData.excerpt,
               seoTitle: pageData.seoTitle,
               seoDescription: pageData.seoDescription,
@@ -241,9 +241,6 @@ export default function NewPagePage() {
           </div>
         </div>
       </div>
-
-      {/* Page Builder */}
-      <PageBuilder initialSections={sections} onSave={setSections} />
     </div>
   );
 }
