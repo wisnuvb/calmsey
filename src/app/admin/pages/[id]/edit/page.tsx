@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import PageBuilder, { PageSection } from "@/components/admin/PageBuilder";
+import { PageBuilderWithBrandkit } from "@/components/page-builder/PageBuilderWithBrandkit";
 
 interface PageData {
   id: string;
@@ -254,10 +255,16 @@ export default function EditPagePage() {
       </div>
 
       {/* Page Builder */}
-      <PageBuilder
+      {/* <PageBuilder
         pageId={pageId}
         initialSections={sections}
         onSave={handleSave}
+      /> */}
+      <PageBuilderWithBrandkit
+        pageId={pageId}
+        onSectionSelect={() => {}}
+        onSectionsChange={() => {}}
+        sections={[]}
       />
     </div>
   );

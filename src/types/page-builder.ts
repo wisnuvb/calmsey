@@ -104,29 +104,29 @@ export interface SpacingValue {
 // ===== STYLE SETTINGS =====
 export interface StyleSettings {
   // Background
-  background: BackgroundSettings;
+  background?: BackgroundSettings;
 
   // Border & Shape
-  border: BorderSettings;
-  borderRadius: number;
-  boxShadow: ShadowSettings[];
+  border?: BorderSettings;
+  borderRadius?: number;
+  boxShadow?: ShadowSettings[];
 
   // Typography
-  typography: TypographySettings;
+  typography?: TypographySettings;
 
   // Colors
-  textColor: string;
-  linkColor: string;
-  linkHoverColor: string;
+  textColor?: string;
+  linkColor?: string;
+  linkHoverColor?: string;
 
   // Effects
-  opacity: number;
-  transform: TransformSettings;
-  filter: FilterSettings;
+  opacity?: number;
+  transform?: TransformSettings;
+  filter?: FilterSettings;
 
   // Visibility
-  visibility: "visible" | "hidden";
-  display: "block" | "none" | "flex" | "grid" | "inline-block";
+  visibility?: "visible" | "hidden";
+  display?: "block" | "none" | "flex" | "grid" | "inline-block";
 }
 
 export interface BackgroundSettings {

@@ -127,6 +127,68 @@ export interface BrandkitTypography {
     extrabold: number;
     black: number;
   };
+  textStyles: {
+    h1: {
+      fontSize: string;
+      lineHeight: string;
+      fontWeight: number;
+      letterSpacing: string;
+    };
+    h2: {
+      fontSize: string;
+      lineHeight: string;
+      fontWeight: number;
+      letterSpacing: string;
+    };
+    h3: {
+      fontSize: string;
+      lineHeight: string;
+      fontWeight: number;
+      letterSpacing: string;
+    };
+    h4: {
+      fontSize: string;
+      lineHeight: string;
+      fontWeight: number;
+      letterSpacing: string;
+    };
+    h5: {
+      fontSize: string;
+      lineHeight: string;
+      fontWeight: number;
+      letterSpacing: string;
+    };
+    h6: {
+      fontSize: string;
+      lineHeight: string;
+      fontWeight: number;
+      letterSpacing: string;
+    };
+    body: {
+      fontSize: string;
+      lineHeight: string;
+      fontWeight: number;
+      letterSpacing: string;
+    };
+    caption: {
+      fontSize: string;
+      lineHeight: string;
+      fontWeight: number;
+      letterSpacing: string;
+    };
+    button: {
+      fontSize: string;
+      lineHeight: string;
+      fontWeight: number;
+      letterSpacing: string;
+    };
+    link: {
+      fontSize: string;
+      lineHeight: string;
+      fontWeight: number;
+      letterSpacing: string;
+    };
+  };
 }
 
 export interface BrandkitSpacing {
@@ -174,6 +236,24 @@ export interface BrandkitSpacing {
     lg: string; // 1024px
     xl: string; // 1280px
     "2xl": string; // 1536px
+  };
+  components: {
+    button: {
+      padding: string;
+      margin: string;
+    };
+    card: {
+      padding: string;
+      margin: string;
+    };
+    form: {
+      padding: string;
+      margin: string;
+    };
+    navigation: {
+      padding: string;
+      margin: string;
+    };
   };
 }
 
@@ -229,6 +309,7 @@ export interface Brandkit {
     id: string;
     name: string;
   };
+  authorId: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -305,6 +386,23 @@ export interface StylePresetData {
       delay: number;
     };
   };
+
+  // Custom CSS
+  customCSS?: string;
+
+  // Styles
+  styles?: {
+    background?: string;
+    textColor?: string;
+    borderColor?: string;
+    boxShadow?: string;
+  };
+}
+
+export interface StylePreset {
+  name: string;
+  description: string;
+  styleData: StylePresetData;
 }
 
 interface SpacingValue {
@@ -318,7 +416,7 @@ interface SpacingValue {
 // Default brandkit for new installations
 export const DEFAULT_BRANDKIT: Omit<
   Brandkit,
-  "id" | "author" | "createdAt" | "updatedAt"
+  "id" | "author" | "authorId" | "createdAt" | "updatedAt"
 > = {
   name: "Default Theme",
   description: "Default brandkit for getting started",
@@ -450,6 +548,68 @@ export const DEFAULT_BRANDKIT: Omit<
       extrabold: 800,
       black: 900,
     },
+    textStyles: {
+      h1: {
+        fontSize: "2.5rem",
+        lineHeight: "3rem",
+        fontWeight: 700,
+        letterSpacing: "-0.02em",
+      },
+      h2: {
+        fontSize: "2rem",
+        lineHeight: "2.5rem",
+        fontWeight: 700,
+        letterSpacing: "-0.02em",
+      },
+      h3: {
+        fontSize: "1.5rem",
+        lineHeight: "2rem",
+        fontWeight: 700,
+        letterSpacing: "-0.02em",
+      },
+      h4: {
+        fontSize: "1.25rem",
+        lineHeight: "1.75rem",
+        fontWeight: 700,
+        letterSpacing: "-0.02em",
+      },
+      h5: {
+        fontSize: "1rem",
+        lineHeight: "1.5rem",
+        fontWeight: 700,
+        letterSpacing: "-0.02em",
+      },
+      h6: {
+        fontSize: "0.875rem",
+        lineHeight: "1.25rem",
+        fontWeight: 700,
+        letterSpacing: "-0.02em",
+      },
+      body: {
+        fontSize: "1rem",
+        lineHeight: "1.5rem",
+        fontWeight: 400,
+        letterSpacing: "0.01em",
+      },
+      caption: {
+        fontSize: "0.875rem",
+        lineHeight: "1.25rem",
+        fontWeight: 400,
+        letterSpacing: "0.01em",
+      },
+      button: {
+        fontSize: "0.875rem",
+        lineHeight: "1.25rem",
+        fontWeight: 500,
+        letterSpacing: "0.02em",
+      },
+      link: {
+        fontSize: "0.875rem",
+        lineHeight: "1.25rem",
+        fontWeight: 500,
+        letterSpacing: "0.02em",
+      },
+    },
   },
   spacing: {
     baseUnit: 4,
@@ -496,6 +656,24 @@ export const DEFAULT_BRANDKIT: Omit<
       lg: "1024px",
       xl: "1280px",
       "2xl": "1536px",
+    },
+    components: {
+      button: {
+        padding: "0.5rem 1rem",
+        margin: "0.5rem 0",
+      },
+      card: {
+        padding: "0.5rem 1rem",
+        margin: "0.5rem 0",
+      },
+      form: {
+        padding: "0.5rem 1rem",
+        margin: "0.5rem 0",
+      },
+      navigation: {
+        padding: "0.5rem 1rem",
+        margin: "0.5rem 0",
+      },
     },
   },
   assets: {

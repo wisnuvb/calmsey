@@ -1,8 +1,8 @@
 // src/components/public/ArticleCard.tsx
 import Link from "next/link";
 import { PublicArticle, SupportedLanguage } from "@/lib/public-api";
-import { formatDate } from "@/lib/utils";
 import Image from "next/image";
+import { formatDate } from "date-fns";
 
 interface ArticleCardProps {
   article: PublicArticle;
