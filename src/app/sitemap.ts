@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { PublicAPI, SUPPORTED_LANGUAGES } from "@/lib/public-api";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://turningtidesfacility.org"; // Replace with your domain
+  const baseUrl = "https://calmsey.com"; // Replace with your domain
 
   const sitemap: MetadataRoute.Sitemap = [];
 

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/lib/template-system/template-utils.ts
-import { Template, PageSection, TemplateAsset } from "@/types/page-builder";
+import { Template } from "@/types/page-builder";
 
 export class TemplateUtils {
   /**
@@ -71,17 +70,7 @@ export class TemplateUtils {
    * Clean template for export (remove sensitive data)
    */
   static cleanTemplateForExport(template: Template): Partial<Template> {
-    const {
-      id,
-      author,
-      createdAt,
-      updatedAt,
-      downloadCount,
-      viewCount,
-      rating,
-      ratingCount,
-      ...cleanTemplate
-    } = template;
+    const { ...cleanTemplate } = template;
 
     return {
       ...cleanTemplate,
@@ -589,13 +578,3 @@ export class TemplateFormatters {
     return this.formatDate(date);
   }
 }
-
-// Export all utilities
-// export {
-//   TemplateUtils,
-//   TEMPLATE_CONFIG,
-//   TEMPLATE_ERRORS,
-//   TEMPLATE_SUCCESS_MESSAGES,
-//   TemplateValidators,
-//   TemplateFormatters,
-// };

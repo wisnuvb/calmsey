@@ -7,6 +7,7 @@ import {
 import { PublicHeader } from "@/components/public/Header";
 import { PublicFooter } from "@/components/public/Footer";
 import { LanguageProvider } from "@/components/public/LanguageProvider";
+import SessionProvider from "@/components/providers/SessionProvider";
 
 interface LanguageLayoutProps {
   children: React.ReactNode;
@@ -28,12 +29,14 @@ export default async function LanguageLayout({
   }
 
   return (
-    <LanguageProvider language={lang}>
-      <div className="min-h-screen flex flex-col">
-        <PublicHeader language={lang} />
-        <main className="flex-1">{children}</main>
-        <PublicFooter language={lang} />
-      </div>
-    </LanguageProvider>
+    <SessionProvider>
+      <LanguageProvider language={lang}>
+        <div className="min-h-screen flex flex-col">
+          <PublicHeader language={lang} />
+          <main className="flex-1">{children}</main>
+          <PublicFooter language={lang} />
+        </div>
+      </LanguageProvider>
+    </SessionProvider>
   );
 }

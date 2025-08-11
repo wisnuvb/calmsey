@@ -3,7 +3,7 @@ import { useMediaUpload } from "./useMediaUpload";
 import { useMediaSelection } from "./useMediaSelection";
 import { useMediaDelete } from "./useMediaDelete";
 import { useDragAndDrop } from "./useDragAndDrop";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 type ViewMode = "grid" | "list";
 
@@ -32,21 +32,24 @@ export function useMedia(options: UseMediaOptions = {}) {
     autoFetch,
   });
 
+  // Wrap callbacks with useCallback
+  const handleUploadSuccess = useCallback(() => {
+    mediaFiles.refreshMediaFiles();
+    setShowUploadModal(false);
+  }, [mediaFiles]);
+
+  const handleDeleteSuccess = useCallback(() => {
+    mediaFiles.refreshMediaFiles();
+  }, [mediaFiles]);
+
   const mediaUpload = useMediaUpload({
-    onSuccess: () => {
-      mediaFiles.refreshMediaFiles();
-      setShowUploadModal(false);
-    },
+    onSuccess: handleUploadSuccess,
   });
 
   const mediaSelection = useMediaSelection();
 
   const mediaDelete = useMediaDelete({
-    onSuccess: () => {
-      mediaFiles.refreshMediaFiles();
-      // Remove this line that's causing the infinite loop
-      // mediaSelection.removeFromSelection;
-    },
+    onSuccess: handleDeleteSuccess,
   });
 
   const dragAndDrop = useDragAndDrop({

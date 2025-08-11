@@ -264,7 +264,6 @@ export interface DeviceSettings {
   layout?: Partial<LayoutSettings>;
   style?: Partial<StyleSettings>;
   visibility?: "visible" | "hidden";
-
   padding?: SpacingValue;
   margin?: SpacingValue;
   display?: "block" | "none" | "flex" | "grid" | "inline-block";
