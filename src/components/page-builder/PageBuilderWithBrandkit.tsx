@@ -98,6 +98,8 @@ export function PageBuilderWithBrandkit({
 
   const selectedSection = sections.find((s) => s.id === selectedSectionId);
 
+  console.log(sections);
+
   // Save to history
   const saveToHistory = (newSections: PageSection[]) => {
     const newHistory = history.slice(0, historyIndex + 1);
