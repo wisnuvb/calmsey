@@ -9,7 +9,7 @@ import {
   StylePresetData,
   DEFAULT_BRANDKIT,
 } from "@/types/brandkit";
-import { BrandkitAssetType, PresetCategory, StylePreset } from "@prisma/client";
+import { BrandkitAssetType, PresetCategory } from "@prisma/client";
 
 export interface BrandkitCreateInput {
   name: string;
@@ -20,6 +20,8 @@ export interface BrandkitCreateInput {
   assets: BrandkitAssets;
   authorId: string;
   isDefault?: boolean;
+  isPublic?: boolean;
+  isActive?: boolean;
 }
 
 export interface BrandkitUpdateInput {
@@ -30,6 +32,8 @@ export interface BrandkitUpdateInput {
   spacing?: BrandkitSpacing;
   assets?: BrandkitAssets;
   isActive?: boolean;
+  isPublic?: boolean;
+  isDefault?: boolean;
 }
 
 export interface StylePresetCreateInput {
@@ -41,6 +45,17 @@ export interface StylePresetCreateInput {
   brandkitId?: string;
   templateId?: string;
   authorId: string;
+}
+
+export interface BrandkitQueryOptions {
+  page?: number;
+  limit?: number;
+  category?: string;
+  authorId?: string;
+  search?: string;
+  isPublic?: boolean;
+  sortBy?: "createdAt" | "updatedAt" | "name" | "usageCount";
+  sortOrder?: "asc" | "desc";
 }
 
 export interface BrandkitAssetCreateInput {
@@ -62,46 +77,146 @@ export interface BrandkitFilterOptions {
   category?: string;
   tags?: string[];
   search?: string;
+  page?: number;
   limit?: number;
-  offset?: number;
+}
+
+export interface BrandkitQueryResult {
+  brandkits: Brandkit[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export class BrandkitDatabase {
   /**
-   * Create a new brandkit
+   * Create new brandkit
    */
-  static async createBrandkit(input: BrandkitCreateInput): Promise<Brandkit> {
+  static async createBrandkit(data: BrandkitCreateInput): Promise<Brandkit> {
     try {
-      // If this is being set as default, unset other defaults
-      if (input.isDefault) {
-        await prisma.brandkit.updateMany({
-          where: { isDefault: true },
-          data: { isDefault: false },
-        });
-      }
-
-      const dbBrandkit = await prisma.brandkit.create({
+      const brandkit = await prisma.brandkit.create({
         data: {
-          name: input.name,
-          description: input.description,
-          isDefault: input.isDefault || false,
-          colors: JSON.stringify(input.colors),
-          typography: JSON.stringify(input.typography),
-          spacing: JSON.stringify(input.spacing),
-          assets: JSON.stringify(input.assets),
-          authorId: input.authorId,
+          name: data.name,
+          description: data.description,
+          colors: JSON.stringify(data.colors),
+          typography: JSON.stringify(data.typography),
+          spacing: JSON.stringify(data.spacing),
+          isPublic: data.isPublic || false,
+          isDefault: data.isDefault || false,
+          authorId: data.authorId,
+          assets: JSON.stringify(data.assets),
+          isActive: data.isActive || true,
         },
         include: {
           author: {
-            select: { id: true, name: true },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          _count: {
+            select: {
+              pages: true,
+            },
           },
         },
       });
 
-      return this.mapDbBrandkitToBrandkit(dbBrandkit);
+      return this.transformDbBrandkit(brandkit);
     } catch (error) {
       throw new Error(
         `Failed to create brandkit: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }
+
+  /**
+   * Get all brandkits with filtering and pagination
+   */
+  static async getBrandkits(
+    options: BrandkitQueryOptions = {}
+  ): Promise<BrandkitQueryResult> {
+    const {
+      page = 1,
+      limit = 20,
+      authorId,
+      search,
+      isPublic,
+      sortBy = "updatedAt",
+      sortOrder = "desc",
+    } = options;
+
+    const skip = (page - 1) * limit;
+
+    // Build where clause
+    const where: any = {};
+
+    if (authorId) {
+      where.authorId = authorId;
+    }
+
+    if (typeof isPublic === "boolean") {
+      where.isPublic = isPublic;
+    }
+
+    if (search?.trim()) {
+      where.OR = [
+        { name: { contains: search.trim(), mode: "insensitive" } },
+        { description: { contains: search.trim(), mode: "insensitive" } },
+      ];
+    }
+
+    // Build order clause
+    const orderBy: any = {};
+    orderBy[sortBy] = sortOrder;
+
+    try {
+      const [brandkits, total] = await Promise.all([
+        prisma.brandkit.findMany({
+          where,
+          orderBy,
+          skip,
+          take: limit,
+          include: {
+            author: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+            _count: {
+              select: {
+                pages: true,
+              },
+            },
+          },
+        }),
+        prisma.brandkit.count({ where }),
+      ]);
+
+      const transformedBrandkits: Brandkit[] = brandkits.map(
+        this.mapDbBrandkitToBrandkit
+      );
+
+      return {
+        brandkits: transformedBrandkits,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      throw new Error(
+        `Failed to fetch brandkits: ${
           error instanceof Error ? error.message : "Unknown error"
         }`
       );
@@ -297,6 +412,481 @@ export class BrandkitDatabase {
         }`
       );
     }
+  }
+
+  /**
+   * Get default brandkits
+   */
+  static async getDefaultBrandkits(): Promise<Brandkit[]> {
+    try {
+      const brandkits = await prisma.brandkit.findMany({
+        where: { isDefault: true },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          _count: {
+            select: {
+              pages: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+      });
+
+      return brandkits.map(this.transformDbBrandkit);
+    } catch (error) {
+      throw new Error(
+        `Failed to fetch default brandkits: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }
+
+  /**
+   * Get user's brandkits
+   */
+  static async getUserBrandkits(userId: string): Promise<Brandkit[]> {
+    try {
+      const brandkits = await prisma.brandkit.findMany({
+        where: { authorId: userId },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          _count: {
+            select: {
+              pages: true,
+            },
+          },
+        },
+        orderBy: { updatedAt: "desc" },
+      });
+
+      return brandkits.map(this.transformDbBrandkit);
+    } catch (error) {
+      throw new Error(
+        `Failed to fetch user brandkits: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }
+
+  /**
+   * Duplicate brandkit
+   */
+  static async duplicateBrandkit(
+    brandkitId: string,
+    newName: string,
+    userId: string
+  ): Promise<Brandkit> {
+    try {
+      const original = await this.getBrandkitById(brandkitId);
+
+      if (!original) {
+        throw new Error("Brandkit not found or access denied");
+      }
+
+      const duplicated = await prisma.brandkit.create({
+        data: {
+          name: newName,
+          description: `Copy of ${original.name}`,
+          colors:
+            typeof original.colors === "string"
+              ? original.colors
+              : JSON.stringify(original.colors),
+          typography: original.typography
+            ? typeof original.typography === "string"
+              ? original.typography
+              : JSON.stringify(original.typography)
+            : "",
+          spacing: original.spacing
+            ? typeof original.spacing === "string"
+              ? original.spacing
+              : JSON.stringify(original.spacing)
+            : "",
+          isPublic: false, // Duplicates are private by default
+          isDefault: false, // Duplicates are never default
+          authorId: userId,
+          assets: JSON.stringify(original.assets),
+        },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          _count: {
+            select: {
+              pages: true,
+            },
+          },
+        },
+      });
+
+      return this.transformDbBrandkit(duplicated);
+    } catch (error) {
+      throw new Error(
+        `Failed to duplicate brandkit: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }
+
+  /**
+   * Search brandkits
+   */
+  static async searchBrandkits(
+    query: string,
+    userId?: string,
+    limit: number = 10
+  ): Promise<Brandkit[]> {
+    try {
+      const where: any = {
+        OR: [
+          { name: { contains: query, mode: "insensitive" } },
+          { description: { contains: query, mode: "insensitive" } },
+        ],
+      };
+
+      // Include user's own brandkits and public ones
+      if (userId) {
+        where.AND = {
+          OR: [{ authorId: userId }, { isPublic: true }],
+        };
+      } else {
+        where.isPublic = true;
+      }
+
+      const brandkits = await prisma.brandkit.findMany({
+        where,
+        take: limit,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          _count: {
+            select: {
+              pages: true,
+            },
+          },
+        },
+        orderBy: [{ isDefault: "desc" }, { updatedAt: "desc" }],
+      });
+
+      return brandkits.map(this.transformDbBrandkit);
+    } catch (error) {
+      throw new Error(
+        `Failed to search brandkits: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }
+
+  /**
+   * Get brandkit usage statistics
+   */
+  static async getBrandkitStats(brandkitId: string): Promise<{
+    totalPages: number;
+    publishedPages: number;
+    draftPages: number;
+    lastUsed?: Date;
+  }> {
+    try {
+      const stats = await prisma.page.aggregate({
+        where: { brandkitId },
+        _count: {
+          id: true,
+        },
+      });
+
+      const publishedCount = await prisma.page.count({
+        where: {
+          brandkitId,
+          status: "PUBLISHED",
+        },
+      });
+
+      const lastUsedPage = await prisma.page.findFirst({
+        where: { brandkitId },
+        orderBy: { updatedAt: "desc" },
+        select: { updatedAt: true },
+      });
+
+      return {
+        totalPages: stats._count.id,
+        publishedPages: publishedCount,
+        draftPages: stats._count.id - publishedCount,
+        lastUsed: lastUsedPage?.updatedAt,
+      };
+    } catch (error) {
+      throw new Error(
+        `Failed to get brandkit stats: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }
+
+  /**
+   * Transform database brandkit to application brandkit
+   */
+  private static transformDbBrandkit(dbBrandkit: any): Brandkit {
+    return {
+      id: dbBrandkit.id,
+      name: dbBrandkit.name,
+      description: dbBrandkit.description,
+      colors:
+        typeof dbBrandkit.colors === "string"
+          ? JSON.parse(dbBrandkit.colors)
+          : dbBrandkit.colors,
+      typography: dbBrandkit.typography
+        ? typeof dbBrandkit.typography === "string"
+          ? JSON.parse(dbBrandkit.typography)
+          : dbBrandkit.typography
+        : undefined,
+      spacing: dbBrandkit.spacing
+        ? typeof dbBrandkit.spacing === "string"
+          ? JSON.parse(dbBrandkit.spacing)
+          : dbBrandkit.spacing
+        : undefined,
+      isPublic: dbBrandkit.isPublic,
+      isDefault: dbBrandkit.isDefault,
+      authorId: dbBrandkit.authorId,
+      author: dbBrandkit.author,
+      usageCount: dbBrandkit._count?.pages || 0,
+      isActive: dbBrandkit.isActive,
+      version: dbBrandkit.version,
+      assets: JSON.parse(dbBrandkit.assets),
+      createdAt: dbBrandkit.createdAt,
+      updatedAt: dbBrandkit.updatedAt,
+    };
+  }
+
+  /**
+   * Create default brandkits for new installations
+   */
+  static async createDefaultBrandkits(
+    adminUserId: string
+  ): Promise<Brandkit[]> {
+    const defaultBrandkits = [
+      {
+        name: "Default Blue",
+        description: "Clean and professional blue color scheme",
+        colors: JSON.stringify({
+          primary: {
+            50: "#eff6ff",
+            100: "#dbeafe",
+            200: "#bfdbfe",
+            300: "#93c5fd",
+            400: "#60a5fa",
+            500: "#3b82f6",
+            600: "#2563eb",
+            700: "#1d4ed8",
+            800: "#1e40af",
+            900: "#1e3a8a",
+            950: "#172554",
+          },
+          secondary: {
+            50: "#f8fafc",
+            100: "#f1f5f9",
+            200: "#e2e8f0",
+            300: "#cbd5e1",
+            400: "#94a3b8",
+            500: "#64748b",
+            600: "#475569",
+            700: "#334155",
+            800: "#1e293b",
+            900: "#0f172a",
+            950: "#020617",
+          },
+          success: {
+            500: "#10b981",
+            600: "#059669",
+            700: "#047857",
+          },
+          warning: {
+            500: "#f59e0b",
+            600: "#d97706",
+            700: "#b45309",
+          },
+          error: {
+            500: "#ef4444",
+            600: "#dc2626",
+            700: "#b91c1c",
+          },
+          info: {
+            500: "#06b6d4",
+            600: "#0891b2",
+            700: "#0e7490",
+          },
+          neutral: {
+            50: "#fafafa",
+            100: "#f5f5f5",
+            200: "#e5e5e5",
+            300: "#d4d4d4",
+            400: "#a3a3a3",
+            500: "#737373",
+            600: "#525252",
+            700: "#404040",
+            800: "#262626",
+            900: "#171717",
+            950: "#0a0a0a",
+          },
+          background: {
+            primary: "#ffffff",
+            secondary: "#f8fafc",
+            tertiary: "#f1f5f9",
+            inverse: "#0f172a",
+          },
+          text: {
+            primary: "#111827",
+            secondary: "#6b7280",
+            tertiary: "#9ca3af",
+            inverse: "#ffffff",
+            link: "#2563eb",
+          },
+        }),
+        typography: JSON.stringify({
+          fontFamily: {
+            sans: ["Inter", "system-ui", "sans-serif"],
+            serif: ["Georgia", "serif"],
+            mono: ["Monaco", "monospace"],
+          },
+          fontSize: {
+            xs: "0.75rem",
+            sm: "0.875rem",
+            base: "1rem",
+            lg: "1.125rem",
+            xl: "1.25rem",
+            "2xl": "1.5rem",
+            "3xl": "1.875rem",
+            "4xl": "2.25rem",
+          },
+          fontWeight: {
+            normal: "400",
+            medium: "500",
+            semibold: "600",
+            bold: "700",
+          },
+        }),
+        spacing: JSON.stringify({
+          xs: "0.5rem",
+          sm: "1rem",
+          md: "1.5rem",
+          lg: "2rem",
+          xl: "3rem",
+          "2xl": "4rem",
+        }),
+        assets: JSON.stringify({
+          logos: [],
+          icons: [],
+          images: [],
+          fonts: [],
+        }),
+      },
+      {
+        name: "Modern Green",
+        description: "Fresh and modern green color palette",
+        colors: JSON.stringify({
+          primary: {
+            50: "#f0fdf4",
+            100: "#dcfce7",
+            200: "#bbf7d0",
+            300: "#86efac",
+            400: "#4ade80",
+            500: "#22c55e",
+            600: "#16a34a",
+            700: "#15803d",
+            800: "#166534",
+            900: "#14532d",
+            950: "#052e16",
+          },
+          // ... similar structure for other colors
+        }),
+        typography: JSON.stringify({
+          fontFamily: {
+            sans: ["Inter", "system-ui", "sans-serif"],
+            serif: ["Georgia", "serif"],
+            mono: ["Monaco", "monospace"],
+          },
+          fontSize: {
+            xs: "0.75rem",
+            sm: "0.875rem",
+            base: "1rem",
+            lg: "1.125rem",
+            xl: "1.25rem",
+            "2xl": "1.5rem",
+            "3xl": "1.875rem",
+            "4xl": "2.25rem",
+          },
+          fontWeight: {
+            normal: "400",
+            medium: "500",
+            semibold: "600",
+            bold: "700",
+          },
+        }),
+        spacing: JSON.stringify({
+          xs: "0.5rem",
+          sm: "1rem",
+          md: "1.5rem",
+          lg: "2rem",
+          xl: "3rem",
+          "2xl": "4rem",
+        }),
+        assets: JSON.stringify({
+          logos: [],
+          icons: [],
+          images: [],
+          fonts: [],
+        }),
+      },
+    ];
+
+    const createdBrandkits: Brandkit[] = [];
+
+    for (const brandkitData of defaultBrandkits) {
+      try {
+        const brandkit = await this.createBrandkit({
+          name: brandkitData.name,
+          description: brandkitData.description,
+          colors: JSON.parse(brandkitData.colors),
+          typography: JSON.parse(brandkitData.typography),
+          spacing: JSON.parse(brandkitData.spacing),
+          assets: JSON.parse(brandkitData.assets),
+          isPublic: true,
+          isDefault: true,
+          authorId: adminUserId,
+        });
+        createdBrandkits.push(brandkit);
+      } catch (error) {
+        console.error(
+          `Failed to create default brandkit ${brandkitData.name}:`,
+          error
+        );
+      }
+    }
+
+    return createdBrandkits;
   }
 
   /**
@@ -560,6 +1150,8 @@ export class BrandkitDatabase {
       authorId: dbBrandkit.authorId,
       author: dbBrandkit.author,
       version: dbBrandkit.version,
+      isPublic: dbBrandkit.isPublic,
+      usageCount: dbBrandkit._count?.pages || 0,
       createdAt: dbBrandkit.createdAt,
       updatedAt: dbBrandkit.updatedAt,
     };

@@ -320,6 +320,7 @@ export interface Brandkit {
   description?: string;
   isDefault: boolean;
   isActive: boolean;
+  isPublic: boolean;
   version: string;
   colors: BrandkitColors;
   typography: BrandkitTypography;
@@ -329,6 +330,7 @@ export interface Brandkit {
     id: string;
     name: string;
   };
+  usageCount: number;
   authorId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -436,12 +438,13 @@ interface SpacingValue {
 // Default brandkit for new installations
 export const DEFAULT_BRANDKIT: Omit<
   Brandkit,
-  "id" | "author" | "authorId" | "createdAt" | "updatedAt"
+  "id" | "author" | "authorId" | "createdAt" | "updatedAt" | "usageCount"
 > = {
   name: "Default Theme",
   description: "Default brandkit for getting started",
   isDefault: true,
   isActive: true,
+  isPublic: true,
   version: "1.0.0",
   colors: {
     primary: {

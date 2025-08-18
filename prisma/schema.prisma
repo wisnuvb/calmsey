@@ -425,6 +425,8 @@ model Page {
   translations PageTranslation[]
   sections     PageSection[]
   menuItems    MenuItem[] // Pages yang dijadikan menu
+  Brandkit     Brandkit?         @relation(fields: [brandkitId], references: [id], onDelete: SetNull)
+  brandkitId   String?
 
   @@map("pages")
 }
@@ -676,23 +678,26 @@ model Brandkit {
   id          String  @id @default(cuid())
   name        String
   description String? @db.Text
-  isDefault   Boolean @default(false)
-  isActive    Boolean @default(true)
 
-  // JSON data fields
+  // Metadata
+  isDefault Boolean @default(false)
+  isActive  Boolean @default(true)
+  isPublic  Boolean @default(false)
+
+  // JSON data (store as JSON)
   colors     String @db.LongText // BrandkitColors as JSON
   typography String @db.LongText // BrandkitTypography as JSON  
   spacing    String @db.LongText // BrandkitSpacing as JSON
   assets     String @db.LongText // BrandkitAssets as JSON
 
+  // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  authorId String
-  author   User   @relation("BrandkitAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-
-  // Usage relations
+  authorId       String
+  author         User            @relation("BrandkitAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  pages          Page[]
   templates      Template[]
   stylePresets   StylePreset[]
   brandkitAssets BrandkitAsset[]
