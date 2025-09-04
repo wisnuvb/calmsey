@@ -49,8 +49,9 @@ export default function ArticlesAdminPage() {
 
   const fetchLanguageCount = async () => {
     try {
-      const response = await fetch("/api/admin/languages");
+      const response = await fetch("/api/admin/languages?limit=1000");
       const data = await response.json();
+
       setAvailableLanguages(
         data.data?.filter((l: any) => l.isActive).length || 2
       );

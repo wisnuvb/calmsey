@@ -12,14 +12,14 @@ import {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { pageId: string } }
+  { params }: { params: Promise<{ pageId: string }> }
 ) {
   try {
     const authResult = await requireAuth(ROLE_EDITOR);
     if (!authResult.success) return authResult.response;
     const { session } = authResult;
 
-    const { pageId } = params;
+    const { pageId } = await params;
     const body = await request.json();
     const { brandkitId, sectionIds, options = {}, dryRun = false } = body;
 
@@ -61,13 +61,13 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { pageId: string } }
+  { params }: { params: Promise<{ pageId: string }> }
 ) {
   try {
     const authResult = await requireAuth(ROLE_VIEWER);
     if (!authResult.success) return authResult.response;
 
-    const { pageId } = params;
+    const { pageId } = await params;
     const brandkit = await PageBrandkitService.getPageBrandkit(pageId);
 
     return NextResponse.json({ brandkit });
@@ -82,14 +82,14 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { pageId: string } }
+  { params }: { params: Promise<{ pageId: string }> }
 ) {
   try {
     const authResult = await requireAuth(ROLE_EDITOR);
     if (!authResult.success) return authResult.response;
     const { session } = authResult;
 
-    const { pageId } = params;
+    const { pageId } = await params;
     const success = await PageBrandkitService.removeBrandkitFromPage(
       pageId,
       session?.user.id

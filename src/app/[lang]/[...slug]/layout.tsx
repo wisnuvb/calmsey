@@ -19,11 +19,13 @@ export async function generateStaticParams() {
 
 export default async function LanguageLayout({
   children,
-  params: { lang },
+  params,
 }: {
   children: React.ReactNode;
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }) {
+  const { lang } = await params;
+
   // Verify language exists
   const language = await prisma.language.findFirst({
     where: { id: lang, isActive: true },
@@ -32,21 +34,6 @@ export default async function LanguageLayout({
   if (!language) {
     notFound();
   }
-
-  // Fetch menu items for navigation
-  // const menuItems = await prisma.menuItem.findMany({
-  //   where: {
-  //     menu: { isActive: true },
-  //     isActive: true,
-  //   },
-  //   include: {
-  //     translations: {
-  //       where: { language: { code: lang } },
-  //     },
-  //     page: true,
-  //   },
-  //   orderBy: { order: "asc" },
-  // });
 
   return (
     <html lang={lang} className={inter.className}>

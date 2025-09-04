@@ -6,7 +6,6 @@ import {
   ROLE_AUTHOR,
   ROLE_EDITOR,
   ROLES,
-  session,
 } from "@/lib/auth-helpers";
 
 export async function GET(
@@ -54,8 +53,8 @@ export async function GET(
 
     // Check permission for authors
     if (
-      session?.user?.role === ROLES.AUTHOR &&
-      article.authorId !== session.user?.id
+      authResult.session?.user?.role === ROLES.AUTHOR &&
+      article.authorId !== authResult.session.user?.id
     ) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
@@ -113,8 +112,8 @@ export async function PUT(
     }
 
     if (
-      session?.user?.role === ROLES.AUTHOR &&
-      existingArticle.authorId !== session.user?.id
+      authResult.session?.user?.role === ROLES.AUTHOR &&
+      existingArticle.authorId !== authResult.session.user?.id
     ) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
@@ -225,8 +224,8 @@ export async function DELETE(
 
     // Authors can only delete their own articles
     if (
-      session?.user?.role === ROLES.AUTHOR &&
-      article.authorId !== session.user?.id
+      authResult.session?.user?.role === ROLES.AUTHOR &&
+      article.authorId !== authResult.session.user?.id
     ) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }

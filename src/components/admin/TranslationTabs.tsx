@@ -373,7 +373,7 @@ function AddTranslationModal({
   onAdd: (languageId: string) => void;
   onClose: () => void;
 }) {
-  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filter languages based on search query
@@ -382,6 +382,29 @@ function AddTranslationModal({
       language.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       language.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleLanguageToggle = (languageId: string) => {
+    setSelectedLanguages((prev) =>
+      prev.includes(languageId)
+        ? prev.filter((id) => id !== languageId)
+        : [...prev, languageId]
+    );
+  };
+
+  const handleAddSelected = () => {
+    selectedLanguages.forEach((languageId) => {
+      onAdd(languageId);
+    });
+    onClose();
+  };
+
+  const handleSelectAll = () => {
+    if (selectedLanguages.length === filteredLanguages.length) {
+      setSelectedLanguages([]);
+    } else {
+      setSelectedLanguages(filteredLanguages.map((lang) => lang.id));
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
@@ -392,7 +415,7 @@ function AddTranslationModal({
 
         <div className="p-6">
           <p className="text-sm text-gray-600 mb-4">
-            Choose a language to add a new translation:
+            Choose one or more languages to add translations:
           </p>
 
           {/* Search Input */}
@@ -423,6 +446,20 @@ function AddTranslationModal({
             </div>
           </div>
 
+          {/* Select All Button */}
+          {filteredLanguages.length > 0 && (
+            <div className="mb-3">
+              <button
+                onClick={handleSelectAll}
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              >
+                {selectedLanguages.length === filteredLanguages.length
+                  ? "Deselect All"
+                  : "Select All"}
+              </button>
+            </div>
+          )}
+
           {/* Language List */}
           <div className="space-y-2 mb-6 max-h-[300px] overflow-y-auto">
             {filteredLanguages.length > 0 ? (
@@ -432,11 +469,11 @@ function AddTranslationModal({
                   className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
                 >
                   <input
-                    type="radio"
+                    type="checkbox"
                     value={language.id}
-                    checked={selectedLanguage === language.id}
-                    onChange={(e) => setSelectedLanguage(e.target.value)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                    checked={selectedLanguages.includes(language.id)}
+                    onChange={() => handleLanguageToggle(language.id)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <div className="ml-3 flex items-center flex-1">
                     {language.flag && (
@@ -482,13 +519,21 @@ function AddTranslationModal({
             )}
           </div>
 
-          {/* Results count */}
-          {searchQuery && (
-            <div className="mb-4 text-xs text-gray-500">
-              Showing {filteredLanguages.length} of {availableLanguages.length}{" "}
-              languages
-            </div>
-          )}
+          {/* Results count and selection info */}
+          <div className="mb-4 space-y-2">
+            {searchQuery && (
+              <div className="text-xs text-gray-500">
+                Showing {filteredLanguages.length} of{" "}
+                {availableLanguages.length} languages
+              </div>
+            )}
+            {selectedLanguages.length > 0 && (
+              <div className="text-xs text-blue-600 font-medium">
+                {selectedLanguages.length} language
+                {selectedLanguages.length > 1 ? "s" : ""} selected
+              </div>
+            )}
+          </div>
 
           <div className="flex justify-end space-x-3">
             <button
@@ -498,11 +543,16 @@ function AddTranslationModal({
               Cancel
             </button>
             <button
-              onClick={() => selectedLanguage && onAdd(selectedLanguage)}
-              disabled={!selectedLanguage}
+              onClick={handleAddSelected}
+              disabled={selectedLanguages.length === 0}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Add Translation
+              Add{" "}
+              {selectedLanguages.length > 0
+                ? `${selectedLanguages.length} Translation${
+                    selectedLanguages.length > 1 ? "s" : ""
+                  }`
+                : "Translation"}
             </button>
           </div>
         </div>
