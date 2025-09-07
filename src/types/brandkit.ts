@@ -1,3 +1,5 @@
+import { SpacingValue } from "./page-builder";
+
 export interface BrandkitColors {
   primary: {
     50: string;
@@ -105,6 +107,7 @@ export interface BrandkitTypography {
       weights: number[];
       variable?: string; // CSS variable name
       url?: string; // Google Fonts URL or font file
+      lineHeight?: string;
     };
     body: {
       name: string;
@@ -112,6 +115,7 @@ export interface BrandkitTypography {
       weights: number[];
       variable?: string;
       url?: string;
+      lineHeight?: string;
     };
     mono: {
       name: string;
@@ -119,6 +123,7 @@ export interface BrandkitTypography {
       weights: number[];
       variable?: string;
       url?: string;
+      lineHeight?: string;
     };
   };
   scales: {
@@ -149,64 +154,125 @@ export interface BrandkitTypography {
   };
   textStyles: {
     h1: {
-      fontSize: string;
-      lineHeight: string;
+      fontSize: string | number;
+      lineHeight: string | number;
       fontWeight: number;
-      letterSpacing: string;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
     };
     h2: {
-      fontSize: string;
-      lineHeight: string;
+      fontSize: string | number;
+      lineHeight: string | number;
       fontWeight: number;
-      letterSpacing: string;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
     };
     h3: {
-      fontSize: string;
-      lineHeight: string;
+      fontSize: string | number;
+      lineHeight: string | number;
       fontWeight: number;
-      letterSpacing: string;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
     };
     h4: {
-      fontSize: string;
-      lineHeight: string;
+      fontSize: string | number;
+      lineHeight: string | number;
       fontWeight: number;
-      letterSpacing: string;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
     };
     h5: {
-      fontSize: string;
-      lineHeight: string;
+      fontSize: string | number;
+      lineHeight: string | number;
       fontWeight: number;
-      letterSpacing: string;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
     };
     h6: {
-      fontSize: string;
-      lineHeight: string;
+      fontSize: string | number;
+      lineHeight: string | number;
       fontWeight: number;
-      letterSpacing: string;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
     };
     body: {
-      fontSize: string;
-      lineHeight: string;
+      fontSize: string | number;
+      lineHeight: string | number;
       fontWeight: number;
-      letterSpacing: string;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
     };
     caption: {
-      fontSize: string;
-      lineHeight: string;
+      fontSize: string | number;
+      lineHeight: string | number;
       fontWeight: number;
-      letterSpacing: string;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
     };
     button: {
-      fontSize: string;
-      lineHeight: string;
+      fontSize: string | number;
+      lineHeight: string | number;
       fontWeight: number;
-      letterSpacing: string;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
     };
     link: {
-      fontSize: string;
-      lineHeight: string;
+      fontSize: string | number;
+      lineHeight: string | number;
       fontWeight: number;
-      letterSpacing: string;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
+    };
+    small: {
+      fontSize: string | number;
+      lineHeight: string | number;
+      fontWeight: number;
+      letterSpacing: string | number;
+      fontFamily?: string;
+      textAlign?: string;
+      textDecoration?: string;
+      textTransform?: string;
+      fontStyle?: string;
     };
   };
 }
@@ -214,41 +280,40 @@ export interface BrandkitTypography {
 export interface BrandkitSpacing {
   baseUnit: number; // 4 or 8 typically
   scale: {
-    0: string;
-    px: string;
-    0.5: string;
-    1: string;
-    1.5: string;
-    2: string;
-    2.5: string;
-    3: string;
-    3.5: string;
-    4: string;
-    5: string;
-    6: string;
-    7: string;
-    8: string;
-    9: string;
-    10: string;
-    11: string;
-    12: string;
-    14: string;
-    16: string;
-    20: string;
-    24: string;
-    28: string;
-    32: string;
-    36: string;
-    40: string;
-    44: string;
-    48: string;
-    52: string;
-    56: string;
-    60: string;
-    64: string;
-    72: string;
-    80: string;
-    96: string;
+    0: string | number;
+    0.5: string | number;
+    1: string | number;
+    1.5: string | number;
+    2: string | number;
+    2.5: string | number;
+    3: string | number;
+    3.5: string | number;
+    4: string | number;
+    5: string | number;
+    6: string | number;
+    7: string | number;
+    8: string | number;
+    9: string | number;
+    10: string | number;
+    11: string | number;
+    12: string | number;
+    14: string | number;
+    16: string | number;
+    20: string | number;
+    24: string | number;
+    28: string | number;
+    32: string | number;
+    36: string | number;
+    40: string | number;
+    44: string | number;
+    48: string | number;
+    52: string | number;
+    56: string | number;
+    60: string | number;
+    64: string | number;
+    72: string | number;
+    80: string | number;
+    96: string | number;
   };
   containerSizes: {
     sm: string; // 640px
@@ -427,13 +492,13 @@ export interface StylePreset {
   styleData: StylePresetData;
 }
 
-interface SpacingValue {
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-  unit: "px" | "rem" | "em" | "%";
-}
+// interface SpacingValue {
+//   top: number | string;
+//   right: number | string;
+//   bottom: number | string;
+//   left: number | string;
+//   unit: "px" | "rem" | "em" | "%";
+// }
 
 // Default brandkit for new installations
 export const DEFAULT_BRANDKIT: Omit<
@@ -632,13 +697,18 @@ export const DEFAULT_BRANDKIT: Omit<
         fontWeight: 500,
         letterSpacing: "0.02em",
       },
+      small: {
+        fontSize: "0.875rem",
+        lineHeight: "1.25rem",
+        fontWeight: 400,
+        letterSpacing: "0.01em",
+      },
     },
   },
   spacing: {
     baseUnit: 4,
     scale: {
       0: "0px",
-      px: "1px",
       0.5: "0.125rem",
       1: "0.25rem",
       1.5: "0.375rem",

@@ -55,6 +55,9 @@ export enum PageSectionType {
   BREADCRUMB_BLOCK = "BREADCRUMB_BLOCK",
   SIDEBAR_BLOCK = "SIDEBAR_BLOCK",
   CTA_BLOCK = "CTA_BLOCK",
+  PAGINATION_BLOCK = "PAGINATION_BLOCK",
+
+  FOOTER_BLOCK = "FOOTER_BLOCK",
 }
 
 // ===== LAYOUT SETTINGS =====
@@ -99,11 +102,11 @@ export interface LayoutSettings {
 }
 
 export interface SpacingValue {
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-  unit: "px" | "rem" | "em" | "%" | "vh" | "vw";
+  top?: number | string;
+  right?: number | string;
+  bottom?: number | string;
+  left?: number | string;
+  unit?: "px" | "rem" | "em" | "%" | "vh" | "vw";
 }
 
 // ===== STYLE SETTINGS =====
@@ -643,9 +646,11 @@ export interface PageSection {
     caption?: string;
   }>;
 
+  pageId?: string;
+
   // Metadata
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 // ===== TEMPLATE INTERFACES =====
