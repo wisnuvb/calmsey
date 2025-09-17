@@ -17,6 +17,7 @@ import {
   XMarkIcon,
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
+import { PaletteIcon } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: HomeIcon },
@@ -26,6 +27,7 @@ const navigation = [
   { name: "Categories", href: "/admin/categories", icon: FolderIcon },
   { name: "Tags", href: "/admin/tags", icon: TagIcon },
   { name: "Media", href: "/admin/media", icon: PhotoIcon },
+  { name: "Brandkits", href: "/admin/brandkits", icon: PaletteIcon },
   { name: "Contact", href: "/admin/contact", icon: ChatBubbleLeftRightIcon },
   { name: "Users", href: "/admin/users", icon: UserGroupIcon },
   { name: "Settings", href: "/admin/settings", icon: CogIcon },
@@ -65,7 +67,8 @@ export default function AdminLayout({
                 key={item.name}
                 href={item.href}
                 className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                  pathname === item.href
+                  pathname === item.href ||
+                  (item.href !== "/admin" && pathname.startsWith(item.href))
                     ? "bg-blue-100 text-blue-900"
                     : "text-gray-600 hover:bg-gray-50"
                 }`}
@@ -91,7 +94,8 @@ export default function AdminLayout({
                   key={item.name}
                   href={item.href}
                   className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                    pathname === item.href
+                    pathname === item.href ||
+                    (item.href !== "/admin" && pathname.startsWith(item.href))
                       ? "bg-blue-100 text-blue-900"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}

@@ -1,39 +1,39 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/api/brandkits/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, ROLE_VIEWER, ROLE_EDITOR } from "@/lib/auth-helpers";
-import {
-  BrandkitCreateInput,
-  BrandkitDatabase,
-  BrandkitFilterOptions,
-} from "@/lib/brandkit/database-operations";
+import { requireAuth, ROLE_EDITOR } from "@/lib/auth-helpers";
+import { BrandkitDatabase } from "@/lib/brandkit/database-operations";
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await requireAuth(ROLE_VIEWER);
+    const authResult = await requireAuth(ROLE_EDITOR);
     if (!authResult.success) return authResult.response;
     const { session } = authResult;
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
-    const category = searchParams.get("category") || undefined;
-    const authorId = searchParams.get("authorId") || undefined;
-    const search = searchParams.get("search") || undefined;
-    const isPublic = searchParams.get("public") === "true";
+    const search = searchParams.get("search") || "";
+    const isPublic = searchParams.get("isPublic");
+    const sortBy = searchParams.get("sortBy") || "name";
+    const sortOrder = searchParams.get("sortOrder") || "asc";
 
-    const options: BrandkitFilterOptions = {
+    const options = {
       page,
       limit,
-      category,
-      authorId: authorId || session?.user.id,
       search,
-      isPublic,
+      isPublic: isPublic ? isPublic === "true" : undefined,
+      sortBy: sortBy as "createdAt" | "updatedAt" | "name" | "usageCount",
+      sortOrder: sortOrder as "asc" | "desc",
+      authorId: session?.user.id,
     };
 
     const result = await BrandkitDatabase.getBrandkits(options);
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      success: true,
+      brandkits: result.brandkits,
+      pagination: result.pagination,
+    });
   } catch (error) {
     console.error("Error fetching brandkits:", error);
     return NextResponse.json(
@@ -59,11 +59,12 @@ export async function POST(request: NextRequest) {
       colors,
       typography,
       spacing,
+      assets,
+      isActive = true,
       isPublic = false,
       isDefault = false,
     } = body;
 
-    // Validation
     if (!name?.trim()) {
       return NextResponse.json(
         { error: "Brandkit name is required" },
@@ -71,67 +72,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!colors) {
-      return NextResponse.json(
-        { error: "Brandkit colors are required" },
-        { status: 400 }
-      );
-    }
-
-    const brandkitData: BrandkitCreateInput = {
+    const brandkitData = {
       name: name.trim(),
-      description: description?.trim(),
-      colors: colors,
-      typography: typography
-        ? typeof typography === "string"
-          ? typography
-          : JSON.stringify(typography)
-        : ({} as any),
-      spacing: spacing
-        ? typeof spacing === "string"
-          ? spacing
-          : JSON.stringify(spacing)
-        : ({} as any),
+      description: description?.trim() || "",
+      colors,
+      typography,
+      spacing,
+      assets,
       authorId: session?.user.id || "",
-      assets: {
-        logos: {
-          primary: {
-            light: "",
-            dark: "",
-            symbol: "",
-          },
-        },
-        iconLibrary: {
-          style: "outline",
-          customIcons: [],
-        },
-        imageLibrary: [],
-        patterns: [],
-      },
+      isActive,
+      isPublic,
+      isDefault,
     };
 
     const brandkit = await BrandkitDatabase.createBrandkit(brandkitData);
 
-    return NextResponse.json(
-      {
-        success: true,
-        brandkit,
-      },
-      { status: 201 }
-    );
+    return NextResponse.json({
+      success: true,
+      message: "Brandkit created successfully",
+      brandkit,
+    });
   } catch (error) {
     console.error("Error creating brandkit:", error);
-
-    // Handle specific database errors
-    if (error instanceof Error) {
-      if (error.message.includes("Unique constraint")) {
-        return NextResponse.json(
-          { error: "A brandkit with this name already exists" },
-          { status: 409 }
-        );
-      }
-    }
-
     return NextResponse.json(
       {
         error: "Failed to create brandkit",
