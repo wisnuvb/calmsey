@@ -679,7 +679,7 @@ export function EnhancedStyleEditor({
                             <Input
                               type="number"
                               value={
-                                currentLayout.padding[
+                                currentLayout.padding?.[
                                   side as keyof typeof currentLayout.padding
                                 ]
                               }
@@ -715,7 +715,7 @@ export function EnhancedStyleEditor({
                             <Input
                               type="number"
                               value={
-                                currentLayout.margin[
+                                currentLayout.margin?.[
                                   side as keyof typeof currentLayout.margin
                                 ]
                               }

@@ -62,42 +62,42 @@ export default function AdminDashboard() {
   const statCards = [
     {
       name: "Total Articles",
-      value: stats.totalArticles,
+      value: stats?.totalArticles,
       icon: DocumentTextIcon,
       color: "bg-blue-500",
       href: "/admin/articles",
     },
     {
       name: "Published",
-      value: stats.publishedArticles,
+      value: stats?.publishedArticles,
       icon: EyeIcon,
       color: "bg-green-500",
       href: "/admin/articles?status=published",
     },
     {
       name: "Drafts",
-      value: stats.draftArticles,
+      value: stats?.draftArticles,
       icon: PencilIcon,
       color: "bg-yellow-500",
       href: "/admin/articles?status=draft",
     },
     {
       name: "Media Files",
-      value: stats.totalMedia,
+      value: stats?.totalMedia,
       icon: PhotoIcon,
       color: "bg-purple-500",
       href: "/admin/media",
     },
     {
       name: "Users",
-      value: stats.totalUsers,
+      value: stats?.totalUsers,
       icon: UserGroupIcon,
       color: "bg-indigo-500",
       href: "/admin/users",
     },
     {
       name: "Unread Messages",
-      value: stats.unreadContacts,
+      value: stats?.unreadContacts,
       icon: ChatBubbleLeftRightIcon,
       color: "bg-red-500",
       href: "/admin/contact",
@@ -178,7 +178,7 @@ export default function AdminDashboard() {
             <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
               Recent Activity
             </h3>
-            {recentActivities.length > 0 ? (
+            {recentActivities?.length > 0 ? (
               <div className="flow-root">
                 <ul className="-mb-8">
                   {recentActivities.map((activity, index) => (

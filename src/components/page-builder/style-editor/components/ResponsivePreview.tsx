@@ -41,17 +41,17 @@ export function ResponsivePreview({
             <span className="text-xs font-medium">Visibility</span>
             <Badge
               variant={
-                deviceSettings.visibility === "visible"
+                deviceSettings?.visibility === "visible"
                   ? "default"
                   : "secondary"
               }
             >
-              {deviceSettings.visibility || "visible"}
+              {deviceSettings?.visibility || "visible"}
             </Badge>
           </div>
 
           {/* Display */}
-          {deviceSettings.display && (
+          {deviceSettings?.display && (
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium">Display</span>
               <Badge variant="outline">{deviceSettings.display}</Badge>
@@ -59,7 +59,7 @@ export function ResponsivePreview({
           )}
 
           {/* Font Size */}
-          {deviceSettings.fontSize && (
+          {deviceSettings?.fontSize && (
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium">Font Size</span>
               <Badge variant="outline">{deviceSettings.fontSize}px</Badge>
@@ -67,7 +67,7 @@ export function ResponsivePreview({
           )}
 
           {/* Padding */}
-          {deviceSettings.padding && (
+          {deviceSettings?.padding && (
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium">Padding</span>
               <Badge variant="outline">
@@ -79,7 +79,7 @@ export function ResponsivePreview({
           )}
 
           {/* Margin */}
-          {deviceSettings.margin && (
+          {deviceSettings?.margin && (
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium">Margin</span>
               <Badge variant="outline">
@@ -91,21 +91,21 @@ export function ResponsivePreview({
           )}
 
           {/* Content overrides */}
-          {deviceSettings.content && (
+          {deviceSettings?.content && (
             <div className="space-y-2">
               <span className="text-xs font-medium">Content Overrides</span>
               <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded">
-                {deviceSettings.content.title && (
+                {deviceSettings?.content.title && (
                   <div>
                     <strong>Title:</strong> {deviceSettings.content.title}
                   </div>
                 )}
-                {deviceSettings.content.subtitle && (
+                {deviceSettings?.content.subtitle && (
                   <div>
                     <strong>Subtitle:</strong> {deviceSettings.content.subtitle}
                   </div>
                 )}
-                {deviceSettings.content.content && (
+                {deviceSettings?.content.content && (
                   <div>
                     <strong>Content:</strong>{" "}
                     {deviceSettings.content.content.substring(0, 50)}...

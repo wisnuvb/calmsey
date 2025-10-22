@@ -15,11 +15,22 @@ export const ROLES = {
 
 export const ROLE_ADMIN = [ROLES.SUPER_ADMIN, ROLES.ADMIN];
 
-export const ROLE_EDITOR = [...ROLE_ADMIN, ROLES.EDITOR];
+export const ROLE_EDITOR = [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR];
 
-export const ROLE_AUTHOR = [...ROLE_EDITOR, ROLES.AUTHOR];
+export const ROLE_AUTHOR = [
+  ROLES.SUPER_ADMIN,
+  ROLES.ADMIN,
+  ROLES.EDITOR,
+  ROLES.AUTHOR,
+];
 
-export const ROLE_VIEWER = [...ROLE_AUTHOR, ROLES.VIEWER];
+export const ROLE_VIEWER = [
+  ROLES.SUPER_ADMIN,
+  ROLES.ADMIN,
+  ROLES.EDITOR,
+  ROLES.AUTHOR,
+  ROLES.VIEWER,
+];
 
 export type UserRole = (typeof ROLES)[keyof typeof ROLES];
 

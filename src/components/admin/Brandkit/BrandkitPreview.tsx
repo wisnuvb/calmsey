@@ -9,14 +9,50 @@ interface BrandkitPreviewProps {
 }
 
 export default function BrandkitPreview({ brandkit }: BrandkitPreviewProps) {
-  const getContrastColor = (hexColor: string): string => {
+  const getContrastColor = (hexColor: string | object): string => {
+    // Handle case where hexColor is an object (like semantic colors)
+    if (typeof hexColor === "object" && hexColor !== null) {
+      // If it's a semantic color object, use the 'main' property
+      if ("main" in hexColor && typeof hexColor.main === "string") {
+        hexColor = hexColor.main;
+      } else {
+        // Fallback to white if we can't determine the color
+        return "#ffffff";
+      }
+    }
+
+    // Ensure hexColor is a string
+    if (typeof hexColor !== "string" || !hexColor) {
+      return "#ffffff";
+    }
+
     const hex = hexColor.replace("#", "");
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
 
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     return luminance > 0.5 ? "#000000" : "#ffffff";
+  };
+
+  const getColorValue = (color: string | object): string => {
+    // Handle case where color is an object (like semantic colors)
+    if (typeof color === "object" && color !== null) {
+      // If it's a semantic color object, use the 'main' property
+      if ("main" in color && typeof color.main === "string") {
+        return color.main;
+      } else {
+        // Fallback to a default color if we can't determine the color
+        return "#000000";
+      }
+    }
+
+    // Ensure color is a string
+    if (typeof color !== "string" || !color) {
+      return "#000000";
+    }
+
+    return color;
   };
 
   return (
@@ -46,14 +82,16 @@ export default function BrandkitPreview({ brandkit }: BrandkitPreviewProps) {
                     <div
                       className="w-16 h-16 rounded-lg shadow-sm border border-gray-200 flex items-center justify-center text-xs font-medium"
                       style={{
-                        backgroundColor: color as string,
-                        color: getContrastColor(color as string),
+                        backgroundColor: getColorValue(
+                          color as string | object
+                        ),
+                        color: getContrastColor(color as string | object),
                       }}
                     >
                       {shade}
                     </div>
                     <span className="text-xs text-gray-500 mt-1">
-                      {color as string}
+                      {getColorValue(color as string | object)}
                     </span>
                   </div>
                 ))}
@@ -158,18 +196,18 @@ export default function BrandkitPreview({ brandkit }: BrandkitPreviewProps) {
               Section Spacing
             </h4>
             <div className="space-y-2">
-              {Object.entries(brandkit.spacing).map(([size, value]) => (
+              {Object.entries(brandkit.spacing.scale).map(([size, value]) => (
                 <div key={size} className="flex items-center space-x-3">
                   <div className="w-8 text-xs text-gray-500">{size}</div>
                   <div
                     className="bg-blue-200 rounded flex items-center justify-center text-xs text-blue-800 min-w-0"
                     style={{
-                      height: value as string,
+                      height: String(value),
                       minHeight: "20px",
                       width: "120px",
                     }}
                   >
-                    {value as string}
+                    {String(value)}
                   </div>
                 </div>
               ))}
@@ -182,21 +220,32 @@ export default function BrandkitPreview({ brandkit }: BrandkitPreviewProps) {
               Component Spacing
             </h4>
             <div className="space-y-2">
-              {Object.entries(brandkit.spacing.scale).map(([size, value]) => (
-                <div key={size} className="flex items-center space-x-3">
-                  <div className="w-8 text-xs text-gray-500">{size}</div>
-                  <div
-                    className="bg-green-200 rounded flex items-center justify-center text-xs text-green-800 min-w-0"
-                    style={{
-                      height: value as string,
-                      minHeight: "20px",
-                      width: "120px",
-                    }}
-                  >
-                    {value as string}
+              {Object.entries(brandkit.spacing.components).map(
+                ([component, spacing]) => (
+                  <div key={component} className="flex items-center space-x-3">
+                    <div className="w-8 text-xs text-gray-500 capitalize">
+                      {component}
+                    </div>
+                    <div
+                      className="bg-green-200 rounded flex items-center justify-center text-xs text-green-800 min-w-0"
+                      style={{
+                        height: "30px",
+                        minHeight: "20px",
+                        width: "120px",
+                      }}
+                    >
+                      <div className="text-center">
+                        <div className="text-xs">
+                          P: {String(spacing.padding)}
+                        </div>
+                        <div className="text-xs">
+                          M: {String(spacing.margin)}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </div>
         </div>

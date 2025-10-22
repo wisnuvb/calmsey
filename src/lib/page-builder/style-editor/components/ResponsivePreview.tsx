@@ -41,17 +41,17 @@ export function ResponsivePreview({
             <span className="text-xs font-medium">Visibility</span>
             <Badge
               variant={
-                deviceSettings.visibility === "visible"
+                deviceSettings?.visibility === "visible"
                   ? "default"
                   : "secondary"
               }
             >
-              {deviceSettings.visibility || "visible"}
+              {deviceSettings?.visibility || "visible"}
             </Badge>
           </div>
 
           {/* Display */}
-          {deviceSettings.display && (
+          {deviceSettings?.display && (
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium">Display</span>
               <Badge variant="outline">{deviceSettings.display}</Badge>
@@ -59,7 +59,7 @@ export function ResponsivePreview({
           )}
 
           {/* Font Size */}
-          {deviceSettings.fontSize && (
+          {deviceSettings?.fontSize && (
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium">Font Size</span>
               <Badge variant="outline">{deviceSettings.fontSize}px</Badge>

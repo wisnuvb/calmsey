@@ -61,21 +61,43 @@ export interface SiteSettings {
   };
 }
 
-// Supported languages
-export const SUPPORTED_LANGUAGES = ["en", "id"] as const;
-export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
-export const DEFAULT_LANGUAGE: SupportedLanguage = "en";
+// Dynamic language support - using database
+import {
+  getActiveLanguages,
+  getDefaultLanguage,
+  isValidLanguage as isValidLanguageDB,
+  getSupportedLanguages as getSupportedLanguagesDB,
+  type DynamicLanguage,
+} from "./dynamic-languages";
 
-// Language detection and validation
-export function isValidLanguage(lang: string): lang is SupportedLanguage {
-  return SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage);
+// Legacy constants for backward compatibility (will be deprecated)
+export const SUPPORTED_LANGUAGES = ["en", "id"] as const;
+export type SupportedLanguage = string; // Changed to string to support dynamic languages
+export const DEFAULT_LANGUAGE = "en"; // Fallback default
+
+// Dynamic language functions
+export async function getSupportedLanguages(): Promise<string[]> {
+  return await getSupportedLanguagesDB();
 }
 
-export function getValidLanguage(lang?: string): SupportedLanguage {
-  if (lang && isValidLanguage(lang)) {
+export async function getDefaultLanguageDynamic(): Promise<string> {
+  return await getDefaultLanguage();
+}
+
+export async function isValidLanguage(lang: string): Promise<boolean> {
+  return await isValidLanguageDB(lang);
+}
+
+export async function getValidLanguage(lang?: string): Promise<string> {
+  if (lang && (await isValidLanguage(lang))) {
     return lang;
   }
-  return DEFAULT_LANGUAGE;
+  return await getDefaultLanguageDynamic();
+}
+
+// Get active languages with full info
+export async function getActiveLanguagesWithInfo(): Promise<DynamicLanguage[]> {
+  return await getActiveLanguages();
 }
 
 // Public API functions

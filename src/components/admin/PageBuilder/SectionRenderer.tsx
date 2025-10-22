@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/admin/PageBuilder/SectionRenderer.tsx
 "use client";
 
@@ -155,14 +156,18 @@ export default function SectionRenderer({
 
 // Placeholder component for sections not yet implemented
 function PlaceholderSection({
-  section,
-  translation,
   layoutSettings,
   styleSettings,
   sectionType,
   isEditing,
   onClick,
-}: any) {
+}: {
+  layoutSettings: Record<string, any>;
+  styleSettings: Record<string, any>;
+  sectionType: string;
+  isEditing: boolean;
+  onClick?: () => void;
+}) {
   const sectionName = sectionType
     .replace(/_/g, " ")
     .toLowerCase()
@@ -191,7 +196,7 @@ function PlaceholderSection({
           {sectionName} Section
         </h3>
         <p className="text-sm text-gray-500 mb-2">
-          {translation?.title || "This section type is not yet implemented"}
+          {/* {translation?.title || "This section type is not yet implemented"} */}
         </p>
         {isEditing && (
           <p className="text-xs text-gray-400">
@@ -222,10 +227,10 @@ export function SectionWrapper({
   onClick,
 }: {
   children: React.ReactNode;
-  layoutSettings: any;
-  styleSettings: any;
-  animationSettings: any;
-  customSettings: any;
+  layoutSettings: Record<string, any>;
+  styleSettings: Record<string, any>;
+  animationSettings: Record<string, any>;
+  customSettings: Record<string, any>;
   className?: string;
   isEditing?: boolean;
   onClick?: () => void;
@@ -281,7 +286,10 @@ export function SectionWrapper({
         case "gradient":
           if (bg.gradient) {
             const colors = bg.gradient.colors
-              .map((c: any) => `${c.color} ${c.position}%`)
+              .map(
+                (c: { color: string; position: number }) =>
+                  `${c.color} ${c.position}%`
+              )
               .join(", ");
             styles.backgroundImage = `linear-gradient(${
               bg.gradient.direction || 0
@@ -313,7 +321,14 @@ export function SectionWrapper({
     if (styleSettings.boxShadow && styleSettings.boxShadow.length > 0) {
       styles.boxShadow = styleSettings.boxShadow
         .map(
-          (shadow: any) =>
+          (shadow: {
+            inset: boolean;
+            x: number;
+            y: number;
+            blur: number;
+            spread: number;
+            color: string;
+          }) =>
             `${shadow.inset ? "inset " : ""}${shadow.x}px ${shadow.y}px ${
               shadow.blur
             }px ${shadow.spread}px ${shadow.color}`

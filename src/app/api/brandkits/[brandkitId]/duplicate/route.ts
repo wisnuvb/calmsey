@@ -4,14 +4,14 @@ import { BrandkitDatabase } from "@/lib/brandkit/database-operations";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { brandkitId: string } }
+  { params }: { params: Promise<{ brandkitId: string }> }
 ) {
   try {
     const authResult = await requireAuth(ROLE_EDITOR);
     if (!authResult.success) return authResult.response;
     const { session } = authResult;
 
-    const { brandkitId } = params;
+    const { brandkitId } = await params;
     const body = await request.json();
     const { name } = body;
 

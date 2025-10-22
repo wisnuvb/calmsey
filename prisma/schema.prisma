@@ -546,6 +546,13 @@ model Page {
   layoutSettings String? @db.LongText // Page-level layout settings as JSON
   designSettings String? @db.LongText // Page-level design preferences as JSON
 
+  headerSettings String? @db.LongText // JSON untuk header config
+  footerSettings String? @db.LongText // JSON untuk footer config
+  showHeader     Boolean @default(true)
+  showFooter     Boolean @default(true)
+  customHeader   String? // Custom header content
+  customFooter   String? // Custom footer content
+
   // Relations
   authorId      String
   author        User              @relation(fields: [authorId], references: [id])

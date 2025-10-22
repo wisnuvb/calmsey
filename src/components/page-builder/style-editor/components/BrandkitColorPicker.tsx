@@ -1,13 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Palette, Plus, Eye, Copy } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Palette, Plus, Eye } from "lucide-react";
 import { Brandkit, ColorPalette } from "@/types/brandkit";
 import { StyleSettings } from "@/types/page-builder";
 
@@ -45,12 +44,14 @@ export function BrandkitColorPicker({
         });
         break;
       case "border":
-        onColorChange({
-          border: {
-            ...currentStyles.border,
-            color,
-          },
-        });
+        // onColorChange({
+        //   border: {
+        //     ...currentStyles.border,
+        //     color,
+        //     style: "solid",
+        //     width: "1px",
+        //   },
+        // });
         break;
     }
   };
@@ -126,7 +127,7 @@ export function BrandkitColorPicker({
     <div className="space-y-4">
       <Tabs
         value={activeColorType}
-        onValueChange={(value: any) => setActiveColorType(value)}
+        onValueChange={(value: string) => setActiveColorType(value as any)}
       >
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="primary">Primary</TabsTrigger>
@@ -156,7 +157,7 @@ export function BrandkitColorPicker({
           />
         </TabsContent>
 
-        <TabsContent value="semantic" className="mt-4 space-y-4">
+        {/* <TabsContent value="semantic" className="mt-4 space-y-4">
           <ColorPaletteDisplay
             palette={brandkit.colors.success}
             name="success"
@@ -167,7 +168,7 @@ export function BrandkitColorPicker({
           />
           <ColorPaletteDisplay palette={brandkit.colors.error} name="error" />
           <ColorPaletteDisplay palette={brandkit.colors.info} name="info" />
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
 
       {/* Quick access to common colors */}
@@ -178,14 +179,14 @@ export function BrandkitColorPicker({
             <span className="text-sm font-medium">Quick Colors</span>
           </div>
           <div className="grid grid-cols-6 gap-2">
-            {Object.entries(brandkit.colors.text).map(([name, color]) => (
+            {/* {Object.entries(brandkit.colors.text).map(([name, color]) => (
               <ColorSwatch
                 key={name}
                 color={color}
                 label={name}
                 onClick={() => applyColor(color, "text")}
               />
-            ))}
+            ))} */}
           </div>
         </div>
       </Card>

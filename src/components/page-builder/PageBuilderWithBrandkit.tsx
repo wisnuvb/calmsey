@@ -47,6 +47,8 @@ import { PageBrandkitManager } from "./PageBrandkitManager";
 import { BrandkitQuickActions } from "./BrandkitQuickActions";
 import { EnhancedStyleEditor } from "./style-editor/EnhancedStyleEditor";
 import { cn } from "@/lib/utils";
+import { AdvancedLayoutSettingsEditor } from "./AdvancedLayoutSettingsEditor";
+import { PageLayoutConfig } from "@/types/layout-settings";
 
 interface PageBuilderWithBrandkitProps {
   pageId: string;
@@ -79,22 +81,57 @@ export function PageBuilderWithBrandkit({
   const [isBrandkitManagerOpen, setIsBrandkitManagerOpen] = useState(false);
   const [isStyleEditorOpen, setIsStyleEditorOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
-  const [isDragMode, setIsDragMode] = useState(false);
+  // const [isDragMode, setIsDragMode] = useState(false);
   const [history, setHistory] = useState<PageSection[][]>([sections]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const [isLayoutEditorOpen, setIsLayoutEditorOpen] = useState(false);
+  const [layoutConfig, setLayoutConfig] = useState<PageLayoutConfig>({
+    header: {
+      enabled: true,
+      type: "default",
+      style: {
+        backgroundColor: "#ffffff",
+        textColor: "#000000",
+        sticky: false,
+        transparent: false,
+      },
+      navigation: {
+        showMainNav: true,
+        showLanguageSwitcher: true,
+        showSearch: false,
+      },
+    },
+    footer: {
+      enabled: true,
+      type: "default",
+      style: {
+        backgroundColor: "#1f2937",
+        textColor: "#ffffff",
+        showSocialLinks: true,
+        showContactInfo: true,
+      },
+      content: {
+        showQuickLinks: true,
+        showLegalLinks: true,
+        showSocialLinks: true,
+        showContactInfo: true,
+      },
+    },
+    layout: {
+      containerWidth: "container",
+      padding: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      },
+    },
+  });
 
   const [showRightSidebar, setShowRightSidebar] = useState(true);
 
-  const {
-    currentBrandkit,
-    isLoading,
-    error,
-    lastResult,
-    applyBrandkit,
-    removeBrandkit,
-    validateCompatibility,
-    previewChanges,
-  } = useBrandkitIntegration({ pageId });
+  const { currentBrandkit, error, lastResult, applyBrandkit, previewChanges } =
+    useBrandkitIntegration({ pageId });
 
   const selectedSection = sections.find((s) => s.id === selectedSectionId);
 
@@ -358,6 +395,14 @@ export function PageBuilderWithBrandkit({
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold">Page Builder</h2>
             <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsLayoutEditorOpen(true)}
+              >
+                <Layout className="h-3 w-3 mr-1" />
+                {/* Layout Settings */}
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -733,6 +778,38 @@ export function PageBuilderWithBrandkit({
                 onSaveAsPreset={(preset) => {
                   console.log("Save preset:", preset);
                 }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Layout Editor Modal */}
+      {isLayoutEditorOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="p-4 border-b flex items-center justify-between">
+              <h3 className="text-lg font-semibold">
+                Advanced Layout Settings
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsLayoutEditorOpen(false)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              <AdvancedLayoutSettingsEditor
+                currentConfig={layoutConfig}
+                onConfigChange={setLayoutConfig}
+                onSave={() => {
+                  // Save layout configuration to database
+                  console.log("Saving advanced layout config:", layoutConfig);
+                  setIsLayoutEditorOpen(false);
+                }}
+                brandkit={currentBrandkit}
               />
             </div>
           </div>

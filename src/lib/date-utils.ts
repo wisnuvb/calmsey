@@ -34,3 +34,19 @@ export const formatDateTime = (date: Date | string): string => {
 export const formatTime = (date: Date | string): string => {
   return formatDate(date, "HH:mm");
 };
+
+export const formatDateWithLanguage = (
+  date: Date | string,
+  language: string = "en"
+): string => {
+  const dateObj = typeof date === "string" ? parseISO(date) : date;
+
+  if (!isValid(dateObj)) {
+    return "Invalid date";
+  }
+
+  const formatString = language === "id" ? "dd MMMM yyyy" : "MMMM dd, yyyy";
+  const locale = language === "id" ? id : undefined;
+
+  return format(dateObj, formatString, { locale });
+};

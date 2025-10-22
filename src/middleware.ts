@@ -1,11 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import {
-  SUPPORTED_LANGUAGES,
-  DEFAULT_LANGUAGE,
-  isValidLanguage,
-} from "./lib/public-api";
-import { getSiteSetupStatus } from "./lib/site-setup";
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -22,54 +17,162 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  try {
-    const setupStatus = await getSiteSetupStatus();
+  // Temporary: Use hardcoded languages that match database
+  const supportedLanguages = [
+    "af",
+    "am",
+    "ar",
+    "ay",
+    "az",
+    "be",
+    "bg",
+    "bi",
+    "bn",
+    "bo",
+    "bs",
+    "cs",
+    "cy",
+    "da",
+    "de",
+    "dz",
+    "el",
+    "en",
+    "es",
+    "et",
+    "fa",
+    "fi",
+    "fj",
+    "fo",
+    "fr",
+    "ga",
+    "gn",
+    "ha",
+    "haw",
+    "he",
+    "hi",
+    "ho",
+    "hr",
+    "ht",
+    "hu",
+    "hy",
+    "id",
+    "ig",
+    "ii",
+    "is",
+    "it",
+    "ja",
+    "ka",
+    "kk",
+    "kl",
+    "km",
+    "ko",
+    "ku",
+    "ky",
+    "lb",
+    "lo",
+    "lt",
+    "lv",
+    "md",
+    "mg",
+    "mh",
+    "mk",
+    "mn",
+    "ms",
+    "mt",
+    "my",
+    "na",
+    "nd",
+    "ne",
+    "nl",
+    "no",
+    "ny",
+    "om",
+    "pau",
+    "pl",
+    "ps",
+    "pt",
+    "qu",
+    "rm",
+    "ro",
+    "ru",
+    "rw",
+    "se",
+    "si",
+    "sk",
+    "sl",
+    "sm",
+    "sn",
+    "so",
+    "sq",
+    "sr",
+    "ss",
+    "st",
+    "sv",
+    "sw",
+    "ta",
+    "tg",
+    "th",
+    "ti",
+    "tk",
+    "tl",
+    "tn",
+    "to",
+    "tpi",
+    "tr",
+    "ts",
+    "tvl",
+    "ug",
+    "uk",
+    "ur",
+    "uz",
+    "ve",
+    "vi",
+    "xh",
+    "yo",
+    "zh",
+    "zu",
+  ];
+  const defaultLanguage = "en";
 
-    // If database is not connected, let the page handle it
-    if (!setupStatus.dbConnected) {
-      return NextResponse.next();
+  return handleLanguageRouting(request, supportedLanguages, defaultLanguage);
+}
+
+function handleLanguageRouting(
+  request: NextRequest,
+  supportedLanguages: string[],
+  defaultLanguage: string
+) {
+  const pathname = request.nextUrl.pathname;
+
+  // Check if pathname starts with a language code
+  const pathnameHasValidLocale = supportedLanguages.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  );
+
+  // If no valid language in pathname
+  if (!pathnameHasValidLocale) {
+    // Extract potential language from pathname
+    const segments = pathname.split("/");
+    const possibleLang = segments[1];
+
+    // If it's an invalid language, redirect to default language
+    if (
+      possibleLang &&
+      possibleLang.length === 2 &&
+      !supportedLanguages.includes(possibleLang)
+    ) {
+      const newUrl = new URL(`/${defaultLanguage}${pathname}`, request.url);
+      return NextResponse.redirect(newUrl);
     }
 
-    // If setup is not complete and user is trying to access public routes
-    if (!setupStatus.isSetupComplete) {
-      // Let the page component handle the setup flow
-      return NextResponse.next();
+    // If no language specified and not root, add default language
+    if (pathname !== "/") {
+      const newUrl = new URL(`/${defaultLanguage}${pathname}`, request.url);
+      return NextResponse.redirect(newUrl);
     }
-
-    // Check if pathname starts with a language code
-    const pathnameHasValidLocale = SUPPORTED_LANGUAGES.some(
-      (locale) =>
-        pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-    );
-
-    // If no valid language in pathname
-    if (!pathnameHasValidLocale) {
-      // Extract potential language from pathname
-      const segments = pathname.split("/");
-      const possibleLang = segments[1];
-
-      // If it's an invalid language, redirect to default language
-      if (
-        possibleLang &&
-        possibleLang.length === 2 &&
-        !isValidLanguage(possibleLang)
-      ) {
-        const newUrl = new URL(`/${DEFAULT_LANGUAGE}${pathname}`, request.url);
-        return NextResponse.redirect(newUrl);
-      }
-
-      // If no language specified and not root, add default language
-      if (pathname !== "/") {
-        const newUrl = new URL(`/${DEFAULT_LANGUAGE}${pathname}`, request.url);
-        return NextResponse.redirect(newUrl);
-      }
-    }
-
-    return NextResponse.next();
-  } catch (error) {
-    console.error("Middleware error:", error);
-    return NextResponse.next();
   }
+
+  return NextResponse.next();
 }
 
 export const config = {

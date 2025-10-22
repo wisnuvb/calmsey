@@ -11,6 +11,8 @@ import {
   CloudArrowUpIcon,
   CheckIcon,
   ExclamationTriangleIcon,
+  // LayoutIcon,
+  ArchiveBoxIcon,
 } from "@heroicons/react/24/outline";
 import { GeneralSettings } from "@/components/admin/Settings/GeneralSettings";
 import { Language, SettingsData } from "@/components/admin/Settings/type";
@@ -20,6 +22,9 @@ import { MediaSettings } from "@/components/admin/Settings/MediaSettings";
 import { NotificationSettings } from "@/components/admin/Settings/NotificationSettings";
 import { SecuritySettings } from "@/components/admin/Settings/SecuritySettings";
 import { BackupSettings } from "@/components/admin/Settings/BackupSettings";
+import { AdvancedLayoutSettingsEditor } from "@/components/page-builder/AdvancedLayoutSettingsEditor";
+import { PageLayoutConfig } from "@/types/layout-settings";
+import { LayoutIcon } from "lucide-react";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
@@ -30,6 +35,48 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [layoutConfig, setLayoutConfig] = useState<PageLayoutConfig>({
+    header: {
+      enabled: true,
+      type: "default",
+      style: {
+        backgroundColor: "#ffffff",
+        textColor: "#000000",
+        sticky: false,
+        transparent: false,
+      },
+      navigation: {
+        showMainNav: true,
+        showLanguageSwitcher: true,
+        showSearch: false,
+      },
+    },
+    footer: {
+      enabled: true,
+      type: "default",
+      style: {
+        backgroundColor: "#1f2937",
+        textColor: "#ffffff",
+        showSocialLinks: true,
+        showContactInfo: true,
+      },
+      content: {
+        showQuickLinks: true,
+        showLegalLinks: true,
+        showSocialLinks: true,
+        showContactInfo: true,
+      },
+    },
+    layout: {
+      containerWidth: "container",
+      padding: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      },
+    },
+  });
 
   const tabs = [
     { id: "general", label: "General", icon: CogIcon },
@@ -38,11 +85,13 @@ export default function SettingsPage() {
     { id: "email", label: "Email", icon: EnvelopeIcon },
     { id: "media", label: "Media", icon: PhotoIcon },
     { id: "notifications", label: "Notifications", icon: BellIcon },
+    { id: "layout", label: "Layout", icon: LayoutIcon },
     { id: "backup", label: "Backup", icon: CloudArrowUpIcon },
   ];
 
   useEffect(() => {
     fetchSettings();
+    fetchLayoutConfig();
   }, []);
 
   const fetchSettings = async () => {
@@ -118,6 +167,44 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error("Error updating languages:", error);
+    }
+  };
+
+  // Add this function
+  const fetchLayoutConfig = async () => {
+    try {
+      const response = await fetch("/api/admin/settings/layout");
+      const data = await response.json();
+
+      if (data.success) {
+        setLayoutConfig(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch layout config:", error);
+    }
+  };
+
+  // Add this function
+  const saveLayoutConfig = async () => {
+    setSaving(true);
+    try {
+      const response = await fetch("/api/admin/settings/layout", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ layoutConfig }),
+      });
+
+      if (response.ok) {
+        setUnsavedChanges(false);
+        alert("Layout settings saved successfully!");
+      } else {
+        throw new Error("Failed to save layout settings");
+      }
+    } catch (error) {
+      console.error("Save layout settings error:", error);
+      alert("Failed to save layout settings");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -215,6 +302,16 @@ export default function SettingsPage() {
           <NotificationSettings
             getSetting={getSetting}
             onUpdate={updateSetting}
+          />
+        )}
+        {activeTab === "layout" && (
+          <AdvancedLayoutSettingsEditor
+            currentConfig={layoutConfig}
+            onConfigChange={(newConfig) => {
+              setLayoutConfig(newConfig);
+              setUnsavedChanges(true);
+            }}
+            onSave={saveLayoutConfig}
           />
         )}
         {activeTab === "backup" && <BackupSettings />}

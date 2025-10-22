@@ -2,7 +2,7 @@
 import { PublicArticle, SupportedLanguage } from "@/lib/public-api";
 import { ArticleCard } from "./ArticleCard";
 import { Breadcrumbs } from "./Breadcrumbs";
-import { formatDate } from "@/lib/utils";
+import { formatDateWithLanguage } from "@/lib/date-utils";
 import Image from "next/image";
 import { ShareButtons } from "./ShareButtons";
 
@@ -138,7 +138,7 @@ export function ArticlePage({
               dateTime={article.publishedAt.toISOString()}
               className="text-sm text-gray-500"
             >
-              {formatDate(article.publishedAt, language)}
+              {formatDateWithLanguage(article.publishedAt, language)}
             </time>
             <p className="text-xs text-gray-400 mt-1">
               {language === "en" ? "Published" : "Dipublikasikan"}

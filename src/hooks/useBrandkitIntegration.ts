@@ -23,7 +23,7 @@ export function useBrandkitIntegration({
     if (!pageId) return;
 
     try {
-      const response = await fetch(`/api/pages/${pageId}/brandkit`);
+      const response = await fetch(`/api/pages/${pageId}-brandkit/brandkit`);
       if (response.ok) {
         const data = await response.json();
         setCurrentBrandkit(data.brandkit);
@@ -65,7 +65,7 @@ export function useBrandkitIntegration({
       setError(null);
 
       try {
-        const response = await fetch(`/api/pages/${pageId}/brandkit`, {
+        const response = await fetch(`/api/pages/${pageId}-brandkit/brandkit`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -115,7 +115,7 @@ export function useBrandkitIntegration({
     setError(null);
 
     try {
-      const response = await fetch(`/api/pages/${pageId}/brandkit`, {
+      const response = await fetch(`/api/pages/${pageId}-brandkit/brandkit`, {
         method: "DELETE",
       });
 
@@ -141,11 +141,14 @@ export function useBrandkitIntegration({
   const validateCompatibility = useCallback(
     async (brandkitId: string) => {
       try {
-        const response = await fetch(`/api/pages/${pageId}/brandkit/validate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ brandkitId }),
-        });
+        const response = await fetch(
+          `/api/pages/${pageId}-brandkit/brandkit/validate`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ brandkitId }),
+          }
+        );
 
         if (response.ok) {
           return await response.json();

@@ -1,11 +1,15 @@
 // Language constants for middleware and public API
-export const SUPPORTED_LANGUAGES = ["en", "id"] as const;
-export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
-export const DEFAULT_LANGUAGE: SupportedLanguage = "en";
+// Note: These are legacy constants. Use dynamic-languages.ts for database-driven languages
 
-// Language detection and validation
-export function isValidLanguage(lang: string): lang is SupportedLanguage {
-  return SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage);
+// Legacy constants for backward compatibility
+export const SUPPORTED_LANGUAGES = ["en", "id"] as const;
+export type SupportedLanguage = string; // Changed to string to support dynamic languages
+export const DEFAULT_LANGUAGE = "en"; // Fallback default
+
+// Legacy function for backward compatibility
+export function isValidLanguage(lang: string): boolean {
+  // This is now a synchronous fallback - use dynamic-languages.ts for full functionality
+  return ["en", "id"].includes(lang);
 }
 
 export function getValidLanguage(lang?: string): SupportedLanguage {

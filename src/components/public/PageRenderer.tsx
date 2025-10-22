@@ -2,14 +2,13 @@
 // src/components/public/PageRenderer.tsx
 import React from "react";
 import { PageSection, PageSectionType } from "@/types/page-builder";
-// import { HeroSection } from "./sections/HeroSection";
-// import { TextSection } from "./sections/TextSection";
-// import { ImageSection } from "./sections/ImageSection";
-// import { ContactFormSection } from "./sections/ContactFormSection";
-// import { GallerySection } from "./sections/GallerySection";
-// import { TestimonialSection } from "./sections/TestimonialSection";
-// import { FeatureSection } from "./sections/FeatureSection";
-// import { CTASection } from "./sections/CTASection";
+import { HeroSection } from "./HeroSection";
+import { RichTextSection } from "./RichTextSection";
+import { ImageSection } from "./ImageSection";
+import { ContactFormSection } from "./ContactFormSection";
+import { ImageGallerySection } from "./ImageGallerySection";
+import { TestimonialsSection } from "./TestimonialsSection";
+import { StatsCounterSection } from "./StatsCounterSection";
 import Image from "next/image";
 
 interface PageRendererProps {
@@ -126,25 +125,22 @@ function SectionRenderer({ section, language }: SectionRendererProps) {
       return <HeroSection {...commonProps} />;
 
     case PageSectionType.RICH_TEXT:
-      return <TextSection {...commonProps} />;
+      return <RichTextSection {...commonProps} />;
 
     case PageSectionType.IMAGE:
       return <ImageSection {...commonProps} />;
 
-    case PageSectionType.IMAGE:
-      return <ImageTextSection {...commonProps} />;
-
     case PageSectionType.IMAGE_GALLERY:
-      return <GallerySection {...commonProps} />;
+      return <ImageGallerySection {...commonProps} />;
 
     case PageSectionType.CONTACT_FORM:
       return <ContactFormSection {...commonProps} />;
 
     case PageSectionType.TESTIMONIALS:
-      return <TestimonialSection {...commonProps} />;
+      return <TestimonialsSection {...commonProps} />;
 
-    case PageSectionType.FEATURED_CONTENT:
-      return <FeatureSection {...commonProps} />;
+    case PageSectionType.STATS_COUNTER:
+      return <StatsCounterSection {...commonProps} />;
 
     // case PageSectionType.CTA:
     //   return <CTASection {...commonProps} />;
