@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { SupportedLanguage } from "@/lib/public-api";
-import { Breadcrumbs } from "./Breadcrumbs";
 
 interface ContactPageProps {
   language: SupportedLanguage;
@@ -19,14 +18,6 @@ export function ContactPage({ language }: ContactPageProps) {
   const [error, setError] = useState("");
 
   const prefix = language === "en" ? "" : `/${language}`;
-
-  const breadcrumbItems = [
-    { label: language === "en" ? "Home" : "Beranda", href: prefix || "/" },
-    {
-      label: language === "en" ? "Contact" : "Kontak",
-      href: `${prefix}/contact`,
-    },
-  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,8 +60,6 @@ export function ContactPage({ language }: ContactPageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <Breadcrumbs items={breadcrumbItems} />
-
         {/* Header */}
         <div className="text-center mb-12">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">

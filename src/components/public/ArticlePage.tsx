@@ -1,7 +1,6 @@
 // src/components/public/ArticlePage.tsx
 import { PublicArticle, SupportedLanguage } from "@/lib/public-api";
 import { ArticleCard } from "./ArticleCard";
-import { Breadcrumbs } from "./Breadcrumbs";
 import { formatDateWithLanguage } from "@/lib/date-utils";
 import Image from "next/image";
 import { ShareButtons } from "./ShareButtons";
@@ -18,15 +17,6 @@ export function ArticlePage({
   language,
 }: ArticlePageProps) {
   const prefix = language === "en" ? "" : `/${language}`;
-
-  const breadcrumbItems = [
-    { label: language === "en" ? "Home" : "Beranda", href: prefix || "/" },
-    {
-      label: language === "en" ? "Articles" : "Artikel",
-      href: `${prefix}/articles`,
-    },
-    { label: article.title, href: `${prefix}/articles/${article.slug}` },
-  ];
 
   return (
     <div className="min-h-screen bg-white">
@@ -72,8 +62,6 @@ export function ArticlePage({
       )}
 
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
-        <Breadcrumbs items={breadcrumbItems} />
-
         {/* Article Header (if no featured image) */}
         {!article.featuredImage && (
           <header className="mb-8">
