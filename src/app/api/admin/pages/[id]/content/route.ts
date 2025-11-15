@@ -1,6 +1,6 @@
 // src/app/api/admin/pages/[id]/content/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { SimpleCMS } from "@/lib/services/simple-cms";
+import { SimpleCMS } from "@/lib/services/simple-cms-fixed";
 
 export async function GET(
   request: NextRequest,

@@ -74,7 +74,7 @@ export async function GET(
       translationStatus: {
         total: article.translations.length,
         languages: article.translations.map((t) => t.languageId),
-        complete: article.translations.filter((t) => t.title && t.content)
+        complete: article.translations.filter((t) => t.title && t.title.trim())
           .length,
       },
     };
@@ -118,8 +118,11 @@ export async function PUT(
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    // Update article using transaction
+    // HYBRID APPROACH: Update English content in Article, SEO fields in translations
     const updatedArticle = await prisma.$transaction(async (tx) => {
+      // Get English translation for main content
+      const englishTranslation = translations?.find((t: any) => t.languageId === "en");
+
       // Update main article
       const article = await tx.article.update({
         where: { id },
@@ -131,17 +134,24 @@ export async function PUT(
             status === "PUBLISHED" && !existingArticle.publishedAt
               ? new Date()
               : existingArticle.publishedAt,
+
+          // Update English content in Article model (for browser translation)
+          ...(englishTranslation && {
+            title: englishTranslation.title,
+            content: englishTranslation.content || "",
+            excerpt: englishTranslation.excerpt || null,
+          }),
         },
       });
 
-      // Update translations
+      // Update translations (SEO fields only)
       if (translations) {
         // Delete existing translations
         await tx.articleTranslation.deleteMany({
           where: { articleId: id },
         });
 
-        // Create new translations
+        // Create new translations (SEO fields only)
         if (translations.length > 0) {
           await tx.articleTranslation.createMany({
             data: translations
@@ -149,11 +159,12 @@ export async function PUT(
               .map((translation: any) => ({
                 articleId: id,
                 title: translation.title,
-                content: translation.content || "",
+                slug: translation.languageId === 'en' ? null : translation.slug || null,
                 excerpt: translation.excerpt || null,
                 seoTitle: translation.seoTitle || null,
                 seoDescription: translation.seoDescription || null,
                 languageId: translation.languageId,
+                // NOTE: content field removed - uses Article.content + browser translation
               })),
           });
         }

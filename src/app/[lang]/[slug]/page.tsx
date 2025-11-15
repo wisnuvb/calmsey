@@ -1,4 +1,4 @@
-import { SimpleCMS } from "@/lib/services/simple-cms";
+import { SimpleCMS } from "@/lib/services/simple-cms-fixed";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
