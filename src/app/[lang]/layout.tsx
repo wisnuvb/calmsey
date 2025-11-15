@@ -14,6 +14,9 @@ const FrontendLayout = async ({ children, params }: LanguageLayoutProps) => {
   return (
     <SessionProvider>
       <LanguageProvider language={lang || "en"}>
+        {/* Hidden Google Translate widget container for auto-translation */}
+        <div id="google_translate_element" style={{ display: 'none' }} />
+
         <Navbar />
         {children}
         <Footer />
