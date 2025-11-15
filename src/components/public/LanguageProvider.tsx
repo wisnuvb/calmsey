@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useEffect } from "react";
 import { SupportedLanguage } from "@/lib/public-api";
+import { translatePage, toGoogleTranslateCode } from "@/lib/browser-translate";
 
 interface LanguageContextType {
   language: SupportedLanguage;
@@ -23,6 +24,17 @@ export function LanguageProvider({
     language,
     isDefaultLanguage: language === "en",
   };
+
+  // Trigger browser translation when language changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const googleTranslateCode = toGoogleTranslateCode(language);
+      translatePage({
+        targetLanguage: googleTranslateCode,
+        sourceLanguage: 'en',
+      });
+    }
+  }, [language]);
 
   return (
     <LanguageContext.Provider value={value}>
