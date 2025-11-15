@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create article with translations
+    // HYBRID APPROACH: Store English content in Article model, SEO fields in translations
     const article = await prisma.article.create({
       data: {
         slug: slug || `article-${Date.now()}`,
@@ -175,17 +175,23 @@ export async function POST(request: NextRequest) {
         publishedAt: status === "PUBLISHED" ? new Date() : null,
         authorId: session!.user.id,
 
-        // Create translations
+        // Store English content directly in Article (for browser translation)
+        title: englishTranslation.title,
+        content: englishTranslation.content || "",
+        excerpt: englishTranslation.excerpt || null,
+
+        // Create translations (SEO fields only)
         translations: {
           create: translations
             .filter((t: any) => t.title && t.title.trim()) // Only create translations with titles
             .map((translation: any) => ({
               title: translation.title,
-              content: translation.content || "",
+              slug: translation.languageId === 'en' ? null : translation.slug || null, // Localized slug for non-English
               excerpt: translation.excerpt || null,
               seoTitle: translation.seoTitle || null,
               seoDescription: translation.seoDescription || null,
               languageId: translation.languageId,
+              // NOTE: content field removed - uses Article.content + browser translation
             })),
         },
 
