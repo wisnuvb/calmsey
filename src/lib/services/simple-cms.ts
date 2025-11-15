@@ -84,9 +84,6 @@ export class SimpleCMS {
       pageContent: this.parseDynamicContent(
         page.translations[0]?.pageContent || []
       ),
-      metadata: page.translations[0]?.metadata
-        ? JSON.parse(page.translations[0].metadata)
-        : undefined,
     }));
   }
 
@@ -104,7 +101,7 @@ export class SimpleCMS {
         case "JSON":
           try {
             parsedValue = JSON.parse(content.value);
-          } catch (e) {
+          } catch {
             parsedValue = content.value;
           }
           break;
@@ -139,12 +136,20 @@ export class SimpleCMS {
     slug: string,
     languageId: string
   ): Promise<SimplePage | null> {
+    // Normalize languageId
+    const normalizedLanguageId = languageId === "1" ? "en" : languageId;
+
     const page = await prisma.page.findUnique({
       where: { slug },
       include: {
         translations: {
           where: {
-            languageId: languageId,
+            languageId: normalizedLanguageId,
+          },
+          include: {
+            pageContent: {
+              orderBy: { order: "asc" },
+            },
           },
         },
       },
@@ -158,16 +163,9 @@ export class SimpleCMS {
       id: page.id,
       slug: page.slug,
       title: page.translations[0].title,
-      pageContent: page.translations[0].content
-        ? (() => {
-            try {
-              return JSON.parse(page.translations[0].content);
-            } catch (e) {
-              console.log(e);
-              return {};
-            }
-          })()
-        : {},
+      pageContent: this.parseDynamicContent(
+        page.translations[0]?.pageContent || []
+      ),
       excerpt: page.translations[0].excerpt || undefined,
       featuredImage: page.featuredImage || undefined,
       publishedAt: page.publishedAt || undefined,
@@ -180,6 +178,21 @@ export class SimpleCMS {
    * Create new page
    */
   static async createPage(data: CreatePageData): Promise<SimplePage> {
+    // Normalize languageId (convert "1" to "en" if needed)
+    const normalizedLanguageId =
+      data.languageId === "1" ? "en" : data.languageId;
+
+    // Verify language exists
+    const language = await prisma.language.findUnique({
+      where: { id: normalizedLanguageId },
+    });
+
+    if (!language) {
+      throw new Error(
+        `Language with id "${normalizedLanguageId}" does not exist. Please ensure the language is created first.`
+      );
+    }
+
     const page = await prisma.page.create({
       data: {
         slug: data.slug,
@@ -191,14 +204,18 @@ export class SimpleCMS {
         translations: {
           create: {
             title: data.title,
-            content: data.content,
+            // content field tidak ada di schema, gunakan PageContent untuk dynamic content
             excerpt: data.excerpt,
-            languageId: data.languageId,
+            languageId: normalizedLanguageId,
           },
         },
       },
       include: {
-        translations: true,
+        translations: {
+          include: {
+            pageContent: true,
+          },
+        },
       },
     });
 
@@ -206,16 +223,9 @@ export class SimpleCMS {
       id: page.id,
       slug: page.slug,
       title: page.translations[0].title,
-      pageContent: page.translations[0].content
-        ? (() => {
-            try {
-              return JSON.parse(page.translations[0].content);
-            } catch (e) {
-              console.log(e);
-              return {};
-            }
-          })()
-        : {},
+      pageContent: this.parseDynamicContent(
+        page.translations[0]?.pageContent || []
+      ),
       excerpt: page.translations[0].excerpt || undefined,
       featuredImage: page.featuredImage || undefined,
       publishedAt: page.publishedAt || undefined,
@@ -293,6 +303,9 @@ export class SimpleCMS {
     data: UpdatePageData,
     languageId: string
   ): Promise<SimplePage | null> {
+    // Normalize languageId
+    const normalizedLanguageId = languageId === "1" ? "en" : languageId;
+
     const page = await prisma.page.update({
       where: { id: pageId },
       data: {
@@ -300,11 +313,11 @@ export class SimpleCMS {
         translations: {
           updateMany: {
             where: {
-              languageId: languageId,
+              languageId: normalizedLanguageId,
             },
             data: {
               title: data.title,
-              content: data.content,
+              // content field tidak ada di schema, gunakan PageContent untuk dynamic content
               excerpt: data.excerpt,
             },
           },
@@ -313,7 +326,10 @@ export class SimpleCMS {
       include: {
         translations: {
           where: {
-            languageId: languageId,
+            languageId: normalizedLanguageId,
+          },
+          include: {
+            pageContent: true,
           },
         },
       },
@@ -327,16 +343,9 @@ export class SimpleCMS {
       id: page.id,
       slug: page.slug,
       title: page.translations[0].title,
-      pageContent: page.translations[0].content
-        ? (() => {
-            try {
-              return JSON.parse(page.translations[0].content);
-            } catch (e) {
-              console.log(e);
-              return {};
-            }
-          })()
-        : {},
+      pageContent: this.parseDynamicContent(
+        page.translations[0]?.pageContent || []
+      ),
       excerpt: page.translations[0].excerpt || undefined,
       featuredImage: page.featuredImage || undefined,
       publishedAt: page.publishedAt || undefined,
@@ -367,12 +376,20 @@ export class SimpleCMS {
     pageId: string,
     languageId: string
   ): Promise<SimplePage | null> {
+    // Normalize languageId
+    const normalizedLanguageId = languageId === "1" ? "en" : languageId;
+
     const page = await prisma.page.findUnique({
       where: { id: pageId },
       include: {
         translations: {
           where: {
-            languageId: languageId,
+            languageId: normalizedLanguageId,
+          },
+          include: {
+            pageContent: {
+              orderBy: { order: "asc" },
+            },
           },
         },
       },
@@ -386,16 +403,9 @@ export class SimpleCMS {
       id: page.id,
       slug: page.slug,
       title: page.translations[0].title,
-      pageContent: page.translations[0].content
-        ? (() => {
-            try {
-              return JSON.parse(page.translations[0].content);
-            } catch (e) {
-              console.log(e);
-              return {};
-            }
-          })()
-        : {},
+      pageContent: this.parseDynamicContent(
+        page.translations[0]?.pageContent || []
+      ),
       excerpt: page.translations[0].excerpt || undefined,
       featuredImage: page.featuredImage || undefined,
       publishedAt: page.publishedAt || undefined,

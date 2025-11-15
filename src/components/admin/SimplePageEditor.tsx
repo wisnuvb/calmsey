@@ -50,7 +50,7 @@ export function SimplePageEditor({
         },
         body: JSON.stringify({
           ...formData,
-          languageId: "1", // Default to English
+          languageId: "en", // Default to English
         }),
       });
 

@@ -374,8 +374,27 @@ async function main() {
 
   // Create categories with hierarchy
   console.log("📂 Creating categories...");
-  const aboutCategory = await prisma.category.create({
-    data: {
+  const aboutCategory = await prisma.category.upsert({
+    where: { slug: "about" },
+    update: {
+      order: 1,
+      translations: {
+        deleteMany: {},
+        create: [
+          {
+            name: "About Us",
+            description: "Information about Turning Tides Facility",
+            languageId: "en",
+          },
+          {
+            name: "Tentang Kami",
+            description: "Informasi tentang Fasilitas Turning Tides",
+            languageId: "id",
+          },
+        ],
+      },
+    },
+    create: {
       slug: "about",
       order: 1,
       translations: {
@@ -395,8 +414,27 @@ async function main() {
     },
   });
 
-  const servicesCategory = await prisma.category.create({
-    data: {
+  const servicesCategory = await prisma.category.upsert({
+    where: { slug: "services" },
+    update: {
+      order: 2,
+      translations: {
+        deleteMany: {},
+        create: [
+          {
+            name: "Services",
+            description: "Our rehabilitation and treatment services",
+            languageId: "en",
+          },
+          {
+            name: "Layanan",
+            description: "Layanan rehabilitasi dan perawatan kami",
+            languageId: "id",
+          },
+        ],
+      },
+    },
+    create: {
       slug: "services",
       order: 2,
       translations: {
@@ -417,8 +455,28 @@ async function main() {
   });
 
   // Create subcategories
-  const programsCategory = await prisma.category.create({
-    data: {
+  const programsCategory = await prisma.category.upsert({
+    where: { slug: "programs" },
+    update: {
+      parentId: servicesCategory.id,
+      order: 1,
+      translations: {
+        deleteMany: {},
+        create: [
+          {
+            name: "Treatment Programs",
+            description: "Various treatment and therapy programs",
+            languageId: "en",
+          },
+          {
+            name: "Program Perawatan",
+            description: "Berbagai program perawatan dan terapi",
+            languageId: "id",
+          },
+        ],
+      },
+    },
+    create: {
       slug: "programs",
       parentId: servicesCategory.id,
       order: 1,
@@ -439,8 +497,28 @@ async function main() {
     },
   });
 
-  const facilitiesCategory = await prisma.category.create({
-    data: {
+  const facilitiesCategory = await prisma.category.upsert({
+    where: { slug: "facilities" },
+    update: {
+      parentId: servicesCategory.id,
+      order: 2,
+      translations: {
+        deleteMany: {},
+        create: [
+          {
+            name: "Facilities",
+            description: "Our modern facilities and amenities",
+            languageId: "en",
+          },
+          {
+            name: "Fasilitas",
+            description: "Fasilitas dan amenitas modern kami",
+            languageId: "id",
+          },
+        ],
+      },
+    },
+    create: {
       slug: "facilities",
       parentId: servicesCategory.id,
       order: 2,
@@ -463,9 +541,30 @@ async function main() {
 
   // Create sample articles
   console.log("📄 Creating sample articles...");
-  await prisma.article.create({
-    data: {
+  await prisma.article.upsert({
+    where: { slug: "welcome-to-turning-tides" },
+    update: {},
+    create: {
       slug: "welcome-to-turning-tides",
+      title: "Welcome to Turning Tides Facility",
+      content: `
+        <h2>A New Beginning</h2>
+        <p>Welcome to Turning Tides Facility, where healing begins and hope is restored. Our state-of-the-art rehabilitation center provides comprehensive care in a supportive environment.</p>
+        
+        <h3>Our Mission</h3>
+        <p>We are dedicated to helping individuals overcome addiction and mental health challenges through evidence-based treatment programs and compassionate care.</p>
+        
+        <h3>What We Offer</h3>
+        <ul>
+          <li>Inpatient and outpatient programs</li>
+          <li>Individual and group therapy</li>
+          <li>Medical detoxification</li>
+          <li>Family support services</li>
+          <li>Aftercare planning</li>
+        </ul>
+      `,
+      excerpt:
+        "Discover Turning Tides Facility, where healing begins and hope is restored through comprehensive rehabilitation services.",
       status: "PUBLISHED",
       featuredImage: "/images/facility-exterior.jpg",
       publishedAt: new Date(),
@@ -474,22 +573,6 @@ async function main() {
         create: [
           {
             title: "Welcome to Turning Tides Facility",
-            content: `
-              <h2>A New Beginning</h2>
-              <p>Welcome to Turning Tides Facility, where healing begins and hope is restored. Our state-of-the-art rehabilitation center provides comprehensive care in a supportive environment.</p>
-              
-              <h3>Our Mission</h3>
-              <p>We are dedicated to helping individuals overcome addiction and mental health challenges through evidence-based treatment programs and compassionate care.</p>
-              
-              <h3>What We Offer</h3>
-              <ul>
-                <li>Inpatient and outpatient programs</li>
-                <li>Individual and group therapy</li>
-                <li>Medical detoxification</li>
-                <li>Family support services</li>
-                <li>Aftercare planning</li>
-              </ul>
-            `,
             excerpt:
               "Discover Turning Tides Facility, where healing begins and hope is restored through comprehensive rehabilitation services.",
             seoTitle:
@@ -500,22 +583,6 @@ async function main() {
           },
           {
             title: "Selamat Datang di Fasilitas Turning Tides",
-            content: `
-              <h2>Awal yang Baru</h2>
-              <p>Selamat datang di Fasilitas Turning Tides, tempat penyembuhan dimulai dan harapan dipulihkan. Pusat rehabilitasi canggih kami menyediakan perawatan komprehensif dalam lingkungan yang mendukung.</p>
-              
-              <h3>Misi Kami</h3>
-              <p>Kami berdedikasi membantu individu mengatasi kecanduan dan tantangan kesehatan mental melalui program perawatan berbasis bukti dan perawatan yang penuh kasih.</p>
-              
-              <h3>Yang Kami Tawarkan</h3>
-              <ul>
-                <li>Program rawat inap dan rawat jalan</li>
-                <li>Terapi individu dan kelompok</li>
-                <li>Detoksifikasi medis</li>
-                <li>Layanan dukungan keluarga</li>
-                <li>Perencanaan perawatan lanjutan</li>
-              </ul>
-            `,
             excerpt:
               "Temukan Fasilitas Turning Tides, tempat penyembuhan dimulai dan harapan dipulihkan melalui layanan rehabilitasi komprehensif.",
             seoTitle:
@@ -534,18 +601,31 @@ async function main() {
 
   // Create navigation menus
   console.log("🧭 Creating navigation menus...");
-  const mainMenu = await prisma.menu.create({
-    data: {
+  const mainMenu = await prisma.menu.upsert({
+    where: { key: "main-navigation" },
+    update: {
+      name: "Main Navigation",
+    },
+    create: {
       key: "main-navigation",
       name: "Main Navigation",
     },
   });
 
-  const footerMenu = await prisma.menu.create({
-    data: {
+  const footerMenu = await prisma.menu.upsert({
+    where: { key: "footer-links" },
+    update: {
+      name: "Footer Links",
+    },
+    create: {
       key: "footer-links",
       name: "Footer Links",
     },
+  });
+
+  // Delete existing menu items to avoid duplicates
+  await prisma.menuItem.deleteMany({
+    where: { menuId: { in: [mainMenu.id, footerMenu.id] } },
   });
 
   // Create main navigation items
@@ -717,8 +797,13 @@ async function main() {
   ];
 
   for (const setting of siteSettings) {
-    await prisma.siteSetting.create({
-      data: setting,
+    await prisma.siteSetting.upsert({
+      where: { key: setting.key },
+      update: {
+        value: setting.value,
+        type: setting.type,
+      },
+      create: setting,
     });
   }
 
@@ -731,8 +816,6 @@ async function main() {
       translations: [
         {
           title: "Welcome to Turning Tides",
-          content:
-            "<h1>Welcome to Turning Tides Facility</h1><p>Your journey to recovery starts here...</p>",
           excerpt: "Premier rehabilitation facility",
           languageId: "en",
         },
@@ -744,8 +827,6 @@ async function main() {
       translations: [
         {
           title: "About Us",
-          content:
-            "<h1>About Turning Tides</h1><p>Learn about our mission and values...</p>",
           excerpt: "Learn about our mission",
           languageId: "en",
         },
@@ -757,8 +838,6 @@ async function main() {
       translations: [
         {
           title: "Our Work",
-          content:
-            "<h1>Our Work</h1><p>Discover our programs and impact...</p>",
           excerpt: "Our programs and impact",
           languageId: "en",
         },
@@ -770,8 +849,6 @@ async function main() {
       translations: [
         {
           title: "Governance",
-          content:
-            "<h1>Governance</h1><p>Our governance structure and policies...</p>",
           excerpt: "Governance and policies",
           languageId: "en",
         },
@@ -783,8 +860,6 @@ async function main() {
       translations: [
         {
           title: "Stories",
-          content:
-            "<h1>Success Stories</h1><p>Read inspiring recovery stories...</p>",
           excerpt: "Inspiring recovery stories",
           languageId: "en",
         },
@@ -796,8 +871,6 @@ async function main() {
       translations: [
         {
           title: "Get Involved",
-          content:
-            "<h1>Get Involved</h1><p>Join our mission and make a difference...</p>",
           excerpt: "Join our mission",
           languageId: "en",
         },
@@ -806,8 +879,29 @@ async function main() {
   ];
 
   for (const pageData of defaultPages) {
-    await prisma.page.create({
-      data: {
+    // Delete existing translations first to avoid conflicts
+    const existingPage = await prisma.page.findUnique({
+      where: { slug: pageData.slug },
+      include: { translations: true },
+    });
+
+    if (existingPage) {
+      await prisma.pageTranslation.deleteMany({
+        where: { pageId: existingPage.id },
+      });
+    }
+
+    await prisma.page.upsert({
+      where: { slug: pageData.slug },
+      update: {
+        pageType: pageData.pageType as PageType,
+        status: "PUBLISHED",
+        publishedAt: new Date(),
+        translations: {
+          create: pageData.translations,
+        },
+      },
+      create: {
         slug: pageData.slug,
         pageType: pageData.pageType as PageType,
         status: "PUBLISHED",

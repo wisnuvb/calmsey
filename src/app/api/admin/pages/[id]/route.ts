@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { SimpleCMS } from "@/lib/services/simple-cms-fixed";
+import { SimpleCMS } from "@/lib/services/simple-cms";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // GET /api/admin/pages/[id] - Get page by ID
@@ -36,7 +36,7 @@ export async function GET(
 // PUT /api/admin/pages/[id] - Update page
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -47,15 +47,16 @@ export async function PUT(
     const body = await request.json();
     const { title, content, excerpt, featuredImage, languageId } = body;
 
+    const { id } = await params;
     const page = await SimpleCMS.updatePage(
-      params.id,
+      id,
       {
         title,
         content,
         excerpt,
         featuredImage,
       },
-      languageId || "1"
+      languageId || "en"
     );
 
     if (!page) {
@@ -75,7 +76,7 @@ export async function PUT(
 // DELETE /api/admin/pages/[id] - Delete page
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -83,7 +84,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const success = await SimpleCMS.deletePage(params.id);
+    const { id } = await params;
+    const success = await SimpleCMS.deletePage(id);
     if (!success) {
       return NextResponse.json(
         { error: "Failed to delete page" },
