@@ -84,10 +84,6 @@ export async function GET(request: NextRequest) {
               articleTranslations: true,
               categoryTranslations: true,
               menuItemTranslations: true,
-              siteContentTranslations: true,
-              // ✅ FIX: Correct field names based on schema
-              // pageTranslations: true, // NOT pageTranslation
-              // pageSectionTranslations: true, // NOT pageSectionTranslation
             },
           },
         },

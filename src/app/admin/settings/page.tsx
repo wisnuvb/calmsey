@@ -11,8 +11,6 @@ import {
   CloudArrowUpIcon,
   CheckIcon,
   ExclamationTriangleIcon,
-  // LayoutIcon,
-  ArchiveBoxIcon,
 } from "@heroicons/react/24/outline";
 import { GeneralSettings } from "@/components/admin/Settings/GeneralSettings";
 import { Language, SettingsData } from "@/components/admin/Settings/type";
@@ -85,7 +83,6 @@ export default function SettingsPage() {
     { id: "email", label: "Email", icon: EnvelopeIcon },
     { id: "media", label: "Media", icon: PhotoIcon },
     { id: "notifications", label: "Notifications", icon: BellIcon },
-    { id: "layout", label: "Layout", icon: LayoutIcon },
     { id: "backup", label: "Backup", icon: CloudArrowUpIcon },
   ];
 
@@ -302,16 +299,6 @@ export default function SettingsPage() {
           <NotificationSettings
             getSetting={getSetting}
             onUpdate={updateSetting}
-          />
-        )}
-        {activeTab === "layout" && (
-          <AdvancedLayoutSettingsEditor
-            currentConfig={layoutConfig}
-            onConfigChange={(newConfig) => {
-              setLayoutConfig(newConfig);
-              setUnsavedChanges(true);
-            }}
-            onSave={saveLayoutConfig}
           />
         )}
         {activeTab === "backup" && <BackupSettings />}

@@ -1,222 +1,101 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { requireAuth, ROLE_AUTHOR, ROLE_ADMIN } from "@/lib/auth-helpers";
+import { getServerSession } from "next-auth";
+import { SimpleCMS } from "@/lib/services/simple-cms";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// Mapping dari frontend types ke database enum values
-const SECTION_TYPE_MAPPING: Record<string, string> = {
-  TEXT: "RICH_TEXT",
-  HERO: "HERO",
-  IMAGE: "IMAGE",
-  IMAGE_TEXT: "IMAGE_GALLERY", // atau buat enum baru
-  VIDEO: "VIDEO_EMBED",
-  CONTACT_FORM: "CONTACT_FORM",
-  CTA: "BUTTON_GROUP",
-  GALLERY: "IMAGE_GALLERY",
-};
-
-// Reverse mapping untuk saat mengambil data dari database
-const REVERSE_SECTION_TYPE_MAPPING: Record<string, string> = {
-  RICH_TEXT: "TEXT",
-  HERO: "HERO",
-  IMAGE: "IMAGE",
-  IMAGE_GALLERY: "GALLERY",
-  VIDEO_EMBED: "VIDEO",
-  CONTACT_FORM: "CONTACT_FORM",
-  BUTTON_GROUP: "CTA",
-};
-
+// GET /api/admin/pages/[id] - Get page by ID
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const languageId = searchParams.get("languageId") || "en";
+
     const { id } = await params;
+    const page = await SimpleCMS.getPageById(id, languageId);
+    if (!page) {
+      return NextResponse.json({ error: "Page not found" }, { status: 404 });
+    }
 
-    const authResult = await requireAuth(ROLE_AUTHOR);
-    if (!authResult.success) return authResult.response;
+    return NextResponse.json(page);
+  } catch (error) {
+    console.error("Error fetching page:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
 
-    const page = await prisma.page.findUnique({
-      where: { id },
-      include: {
-        author: { select: { id: true, name: true, email: true } },
-        translations: {
-          orderBy: { languageId: "asc" },
-        },
-        sections: {
-          include: {
-            translations: {
-              orderBy: { languageId: "asc" },
-            },
-          },
-          orderBy: { order: "asc" },
-        },
+// PUT /api/admin/pages/[id] - Update page
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { title, content, excerpt, featuredImage, languageId } = body;
+
+    const page = await SimpleCMS.updatePage(
+      params.id,
+      {
+        title,
+        content,
+        excerpt,
+        featuredImage,
       },
-    });
+      languageId || "1"
+    );
 
     if (!page) {
       return NextResponse.json({ error: "Page not found" }, { status: 404 });
     }
 
-    // Map section types back to frontend format
-    const mappedPage = {
-      ...page,
-      sections: page.sections.map((section) => ({
-        ...section,
-        type: REVERSE_SECTION_TYPE_MAPPING[section.type] || section.type,
-      })),
-    };
-
-    return NextResponse.json({
-      success: true,
-      data: mappedPage,
-    });
+    return NextResponse.json(page);
   } catch (error) {
-    console.error("Get page error:", error);
+    console.error("Error updating page:", error);
     return NextResponse.json(
-      { error: "Failed to fetch page" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-
-    const authResult = await requireAuth(ROLE_AUTHOR);
-    if (!authResult.success) return authResult.response;
-
-    const body = await request.json();
-    const { slug, template, featuredImage, status, translations, sections } =
-      body;
-
-    // Update page
-    const page = await prisma.page.update({
-      where: { id },
-      data: {
-        slug,
-        template,
-        featuredImage,
-        status,
-        publishedAt: status === "PUBLISHED" ? new Date() : null,
-      },
-    });
-
-    // Update translations
-    if (translations && translations.length > 0) {
-      for (const translation of translations) {
-        await prisma.pageTranslation.upsert({
-          where: {
-            pageId_languageId: {
-              pageId: id,
-              languageId: translation.languageId,
-            },
-          },
-          update: {
-            title: translation.title,
-            content: translation.content,
-            excerpt: translation.excerpt,
-            seoTitle: translation.seoTitle,
-            seoDescription: translation.seoDescription,
-          },
-          create: {
-            pageId: id,
-            languageId: translation.languageId,
-            title: translation.title,
-            content: translation.content,
-            excerpt: translation.excerpt,
-            seoTitle: translation.seoTitle,
-            seoDescription: translation.seoDescription,
-          },
-        });
-      }
-    }
-
-    // Update sections if provided
-    if (sections !== undefined) {
-      // Delete existing sections
-      await prisma.pageSection.deleteMany({
-        where: { pageId: id },
-      });
-
-      // Create new sections
-      if (sections.length > 0) {
-        await prisma.pageSection.createMany({
-          data: sections.map((section: any, index: number) => ({
-            pageId: id,
-            type: SECTION_TYPE_MAPPING[section.type] || section.type, // Map to database enum
-            order: index,
-            isActive: true,
-            // Store section settings in appropriate fields
-            contentSettings: JSON.stringify(section.settings || {}),
-            layoutSettings: JSON.stringify({}),
-            styleSettings: JSON.stringify({}),
-            responsiveSettings: JSON.stringify({}),
-            animationSettings: JSON.stringify({}),
-            customSettings: JSON.stringify({}),
-          })),
-        });
-
-        const createdSections = await prisma.pageSection.findMany({
-          where: { pageId: id },
-          orderBy: { order: "asc" },
-        });
-
-        // Create section translations
-        for (let i = 0; i < sections.length; i++) {
-          const section = sections[i];
-          const dbSection = createdSections[i];
-
-          if (section.translations && section.translations.length > 0) {
-            await prisma.pageSectionTranslation.createMany({
-              data: section.translations.map((translation: any) => ({
-                sectionId: dbSection.id,
-                title: translation.title,
-                content: translation.content,
-                languageId: translation.languageId,
-              })),
-            });
-          }
-        }
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: page,
-    });
-  } catch (error) {
-    console.error("Update page error:", error);
-    return NextResponse.json(
-      { error: "Failed to update page" },
-      { status: 500 }
-    );
-  }
-}
-
+// DELETE /api/admin/pages/[id] - Delete page
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const authResult = await requireAuth(ROLE_ADMIN);
-    if (!authResult.success) return authResult.response;
-
-    await prisma.page.delete({
-      where: { id },
-    });
+    const success = await SimpleCMS.deletePage(params.id);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Failed to delete page" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Delete page error:", error);
+    console.error("Error deleting page:", error);
     return NextResponse.json(
-      { error: "Failed to delete page" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

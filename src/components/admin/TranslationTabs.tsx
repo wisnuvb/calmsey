@@ -481,11 +481,11 @@ function AddTranslationModal({
                     )}
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-900 block">
-                        {language.name}
+                        {language.name} ({language.id})
                       </span>
-                      <span className="text-xs text-gray-500">
+                      {/* <span className="text-xs text-gray-500">
                         {language.id}
-                      </span>
+                      </span> */}
                     </div>
                     {language.isDefault && (
                       <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">

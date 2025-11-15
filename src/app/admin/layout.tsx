@@ -3,6 +3,7 @@
 import { SessionProvider } from "next-auth/react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import ProtectedRoute from "@/components/admin/ProtectedRoute";
+import { SimpleFontLoader } from "@/components/SimpleFontLoader";
 import { usePathname } from "next/navigation";
 
 export default function AdminLayoutWrapper({
@@ -19,6 +20,7 @@ export default function AdminLayoutWrapper({
 
   return (
     <SessionProvider>
+      <SimpleFontLoader />
       <ProtectedRoute>
         <AdminLayout>{children}</AdminLayout>
       </ProtectedRoute>

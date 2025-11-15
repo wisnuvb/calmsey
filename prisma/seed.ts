@@ -1,5 +1,5 @@
 // prisma/seed.ts
-import { PrismaClient } from "@prisma/client";
+import { PageType, PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -463,7 +463,7 @@ async function main() {
 
   // Create sample articles
   console.log("📄 Creating sample articles...");
-  const welcomeArticle = await prisma.article.create({
+  await prisma.article.create({
     data: {
       slug: "welcome-to-turning-tides",
       status: "PUBLISHED",
@@ -532,49 +532,6 @@ async function main() {
     },
   });
 
-  // Create site content for navigation and common text
-  console.log("🌐 Creating site content...");
-  const siteContents = [
-    {
-      key: "common.read_more",
-      translations: [
-        { value: "Read More", languageId: "en" },
-        { value: "Baca Selengkapnya", languageId: "id" },
-      ],
-    },
-    {
-      key: "common.contact_us",
-      translations: [
-        { value: "Contact Us", languageId: "en" },
-        { value: "Hubungi Kami", languageId: "id" },
-      ],
-    },
-    {
-      key: "footer.copyright",
-      translations: [
-        {
-          value: "© 2025 Turning Tides Facility. All rights reserved.",
-          languageId: "en",
-        },
-        {
-          value: "© 2025 Fasilitas Turning Tides. Semua hak dilindungi.",
-          languageId: "id",
-        },
-      ],
-    },
-  ];
-
-  for (const content of siteContents) {
-    await prisma.siteContent.create({
-      data: {
-        key: content.key,
-        translations: {
-          create: content.translations,
-        },
-      },
-    });
-  }
-
   // Create navigation menus
   console.log("🧭 Creating navigation menus...");
   const mainMenu = await prisma.menu.create({
@@ -592,7 +549,7 @@ async function main() {
   });
 
   // Create main navigation items
-  const homeMenuItem = await prisma.menuItem.create({
+  await prisma.menuItem.create({
     data: {
       menuId: mainMenu.id,
       order: 1,
@@ -607,7 +564,7 @@ async function main() {
     },
   });
 
-  const aboutMenuItem = await prisma.menuItem.create({
+  await prisma.menuItem.create({
     data: {
       menuId: mainMenu.id,
       order: 2,
@@ -670,7 +627,7 @@ async function main() {
     },
   });
 
-  const contactMenuItem = await prisma.menuItem.create({
+  await prisma.menuItem.create({
     data: {
       menuId: mainMenu.id,
       order: 4,
@@ -764,6 +721,106 @@ async function main() {
       data: setting,
     });
   }
+
+  console.log("📄 Creating default pages...");
+
+  const defaultPages = [
+    {
+      slug: "home",
+      pageType: "HOME",
+      translations: [
+        {
+          title: "Welcome to Turning Tides",
+          content:
+            "<h1>Welcome to Turning Tides Facility</h1><p>Your journey to recovery starts here...</p>",
+          excerpt: "Premier rehabilitation facility",
+          languageId: "en",
+        },
+      ],
+    },
+    {
+      slug: "about-us",
+      pageType: "ABOUT_US",
+      translations: [
+        {
+          title: "About Us",
+          content:
+            "<h1>About Turning Tides</h1><p>Learn about our mission and values...</p>",
+          excerpt: "Learn about our mission",
+          languageId: "en",
+        },
+      ],
+    },
+    {
+      slug: "our-work",
+      pageType: "OUR_WORK",
+      translations: [
+        {
+          title: "Our Work",
+          content:
+            "<h1>Our Work</h1><p>Discover our programs and impact...</p>",
+          excerpt: "Our programs and impact",
+          languageId: "en",
+        },
+      ],
+    },
+    {
+      slug: "governance",
+      pageType: "GOVERNANCE",
+      translations: [
+        {
+          title: "Governance",
+          content:
+            "<h1>Governance</h1><p>Our governance structure and policies...</p>",
+          excerpt: "Governance and policies",
+          languageId: "en",
+        },
+      ],
+    },
+    {
+      slug: "stories",
+      pageType: "STORIES",
+      translations: [
+        {
+          title: "Stories",
+          content:
+            "<h1>Success Stories</h1><p>Read inspiring recovery stories...</p>",
+          excerpt: "Inspiring recovery stories",
+          languageId: "en",
+        },
+      ],
+    },
+    {
+      slug: "get-involved",
+      pageType: "GET_INVOLVED",
+      translations: [
+        {
+          title: "Get Involved",
+          content:
+            "<h1>Get Involved</h1><p>Join our mission and make a difference...</p>",
+          excerpt: "Join our mission",
+          languageId: "en",
+        },
+      ],
+    },
+  ];
+
+  for (const pageData of defaultPages) {
+    await prisma.page.create({
+      data: {
+        slug: pageData.slug,
+        pageType: pageData.pageType as PageType,
+        status: "PUBLISHED",
+        publishedAt: new Date(),
+        authorId: adminUser.id,
+        translations: {
+          create: pageData.translations,
+        },
+      },
+    });
+  }
+
+  console.log(`✅ Created ${defaultPages.length} default pages`);
 
   console.log("✅ Database seeded successfully!");
   console.log(`

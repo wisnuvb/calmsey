@@ -1,5 +1,5 @@
+import { SimpleFontLoader } from "@/components/SimpleFontLoader";
 import "./globals.css";
-import { FontLoader } from "@/components/FontLoader";
 
 export const metadata = {
   title: "Turning Tides Facility",
@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <FontLoader />
+        <SimpleFontLoader />
         {children}
       </body>
     </html>

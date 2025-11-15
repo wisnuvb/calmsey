@@ -14,7 +14,6 @@ interface PageData {
   id: string;
   title: string;
   slug: string;
-  template: string;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   excerpt: string;
   seoTitle: string;
@@ -31,7 +30,6 @@ export default function EditPagePage() {
     id: "",
     title: "",
     slug: "",
-    template: "BASIC",
     status: "DRAFT",
     excerpt: "",
     seoTitle: "",
@@ -64,7 +62,6 @@ export default function EditPagePage() {
           id: page.id,
           title: page.translations?.[0]?.title || "",
           slug: page.slug,
-          template: page.template,
           status: page.status,
           excerpt: page.translations?.[0]?.excerpt || "",
           seoTitle: page.translations?.[0]?.seoTitle || "",
