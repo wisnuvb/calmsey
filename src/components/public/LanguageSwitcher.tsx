@@ -2,9 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { SupportedLanguage } from "@/lib/public-api";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { cn } from "@/lib/utils";
+import {
+  translatePage,
+  setPageLanguage,
+  toGoogleTranslateCode,
+} from "@/lib/browser-translate";
 
 interface LanguageSwitcherProps {
   currentLanguage: SupportedLanguage;
@@ -17,6 +23,17 @@ export function LanguageSwitcher({
 }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const { languages, loading, error } = useActiveLanguages();
+
+  // Trigger browser translation when language changes
+  useEffect(() => {
+    const googleTranslateCode = toGoogleTranslateCode(currentLanguage);
+
+    // Set HTML lang attribute and trigger browser translation
+    translatePage({
+      targetLanguage: googleTranslateCode,
+      sourceLanguage: 'en', // Content is always in English
+    });
+  }, [currentLanguage]);
 
   const getLanguageUrl = (languageId: string) => {
     // Get all active language IDs
