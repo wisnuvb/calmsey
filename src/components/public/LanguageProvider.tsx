@@ -29,10 +29,25 @@ export function LanguageProvider({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const googleTranslateCode = toGoogleTranslateCode(language);
-      translatePage({
-        targetLanguage: googleTranslateCode,
-        sourceLanguage: 'en',
-      });
+
+      // Set HTML lang attribute
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = googleTranslateCode;
+      }
+
+      // For non-English languages, force Google Translate for auto-translation
+      if (language !== 'en') {
+        // Dynamic import to avoid SSR issues
+        import('@/lib/browser-translate').then(({ initGoogleTranslateWidget }) => {
+          // Force Google Translate widget for automatic translation
+          initGoogleTranslateWidget(googleTranslateCode);
+        });
+      } else {
+        // Clear translation when switching back to English
+        import('@/lib/browser-translate').then(({ clearTranslation }) => {
+          clearTranslation();
+        });
+      }
     }
   }, [language]);
 
