@@ -107,16 +107,9 @@ model Language {
 }
 
 // Main article table (language-agnostic)
-// HYBRID APPROACH: Content stored in English here, translations only for SEO
 model Article {
   id            String        @id @default(cuid())
-  slug          String        @unique // Base slug (English)
-
-  // Default content (English) - used for all languages via browser translation
-  title         String
-  content       String        @db.LongText
-  excerpt       String?       @db.Text
-
+  slug          String        @unique // Base slug, will be combined with language
   status        ArticleStatus @default(DRAFT)
   featuredImage String?
   publishedAt   DateTime?
@@ -126,25 +119,21 @@ model Article {
   // Relations
   authorId     String
   author       User                 @relation(fields: [authorId], references: [id])
-  translations ArticleTranslation[] // Optional translations for SEO only
+  translations ArticleTranslation[]
   categories   ArticleCategory[]
   articleTag   ArticleTag[]
 
   @@map("articles")
 }
 
-// Article translations for SEO fields only (content uses browser translation)
-// HYBRID APPROACH: Only SEO-critical fields, content from Article model
+// Article translations for each language
 model ArticleTranslation {
   id             String   @id @default(cuid())
-
-  // Localized SEO fields
-  slug           String? // Localized slug for URL (e.g., "perlindungan-pesisir")
-  title          String // Localized title for SEO
-  excerpt        String?  @db.Text // Localized excerpt
-  seoTitle       String? // Meta title
-  seoDescription String?  @db.Text // Meta description
-
+  title          String
+  content        String   @db.LongText
+  excerpt        String?  @db.Text
+  seoTitle       String?
+  seoDescription String?  @db.Text
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -156,7 +145,6 @@ model ArticleTranslation {
 
   // Ensure one translation per language per article
   @@unique([articleId, languageId])
-  @@unique([articleId, slug]) // Ensure unique slug per article
   @@map("article_translations")
 }
 
@@ -414,17 +402,19 @@ model Page {
   @@map("pages")
 }
 
-// Page translations for SEO fields only (content in PageSection)
-// HYBRID APPROACH: Only SEO-critical fields
+// Page translations untuk multi-language
 model PageTranslation {
   id String @id @default(cuid())
 
-  // Localized SEO fields only
-  slug           String? // Localized slug for URL
-  title          String // Localized title for SEO
-  excerpt        String? @db.Text // Localized excerpt
-  seoTitle       String? // Meta title
-  seoDescription String? @db.Text // Meta description
+  // Core fields (tetap ada untuk SEO dan struktur)
+  title          String
+  excerpt        String? @db.Text
+  seoTitle       String?
+  seoDescription String? @db.Text
+
+  // Dynamic content sebagai JSON
+  content  String  @db.LongText // JSON string untuk konten dinamis
+  metadata String? @db.LongText // JSON untuk metadata tambahan
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -434,10 +424,9 @@ model PageTranslation {
   page        Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
   languageId  String
   language    Language      @relation(fields: [languageId], references: [id])
-  pageContent PageContent[] // Keep for backward compatibility
+  pageContent PageContent[]
 
   @@unique([pageId, languageId])
-  @@unique([pageId, slug]) // Ensure unique slug per page
   @@map("page_translations")
 }
 
@@ -518,17 +507,11 @@ model PageAnalytics {
 }
 
 // Page Sections untuk flexible content
-// HYBRID APPROACH: Content stored here in English, translations for navigation only
 model PageSection {
   id       String          @id @default(cuid())
   type     PageSectionType
   order    Int             @default(0)
   isActive Boolean         @default(true)
-
-  // Default content (English) - used for all languages via browser translation
-  title    String? // Section title
-  subtitle String? // Section subtitle
-  content  String  @db.LongText // Main content (HTML/Markdown/JSON)
 
   // Enhanced Settings - Store as JSON
   layoutSettings     String? @db.LongText // Layout & positioning
@@ -545,19 +528,23 @@ model PageSection {
   // Relations
   pageId       String
   page         Page                     @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  translations PageSectionTranslation[] // Optional for navigation/TOC
+  translations PageSectionTranslation[]
 
   @@map("page_sections")
 }
 
-// PageSection translations for navigation/TOC only
-// HYBRID APPROACH: Only title/subtitle for navigation, content uses browser translation
 model PageSectionTranslation {
   id String @id @default(cuid())
 
-  // Localized navigation fields only (for TOC, anchors, etc)
-  title    String? // Localized section title for navigation
-  subtitle String? // Localized section subtitle
+  // Content fields
+  title    String? // Section title
+  subtitle String? // Section subtitle  
+  content  String  @db.LongText // Main content (HTML/Markdown)
+  metadata String? @db.LongText // Additional content data (JSON)
+
+  // SEO & Accessibility
+  altText String? // Alt text for images
+  caption String? // Captions
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
