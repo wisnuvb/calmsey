@@ -144,7 +144,7 @@ export class MediaUploadService {
       return `${this.cdnUrl}/${filePath}`;
     }
     return `https://${
-      this.bucketName
+      process.env.DO_SPACES_BUCKET
     }.${process.env.DO_SPACES_ENDPOINT?.replace("https://", "")}/${filePath}`;
   }
 

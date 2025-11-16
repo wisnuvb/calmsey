@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { PageType } from '@prisma/client';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { PageType } from "@prisma/client";
 import {
   getPageSchema,
   getFieldsBySection,
   validateFieldValue,
   type FieldDefinition,
-} from '@/lib/page-content-schema';
+} from "@/lib/page-content-schema";
+import Image from "next/image";
 
 interface PageContentEditorProps {
   pageType: PageType;
@@ -19,12 +20,13 @@ interface PageContentEditorProps {
 
 export function PageContentEditor({
   pageType,
-  language = 'en',
+  language = "en",
   initialContent = {},
   onSave,
 }: PageContentEditorProps) {
   const router = useRouter();
-  const [content, setContent] = useState<Record<string, string>>(initialContent);
+  const [content, setContent] =
+    useState<Record<string, string>>(initialContent);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -35,6 +37,7 @@ export function PageContentEditor({
   useEffect(() => {
     // Fetch existing content when component mounts
     fetchContent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageType, language]);
 
   const fetchContent = async () => {
@@ -47,7 +50,7 @@ export function PageContentEditor({
         setContent(data.content || {});
       }
     } catch (error) {
-      console.error('Error fetching content:', error);
+      console.error("Error fetching content:", error);
     }
   };
 
@@ -70,7 +73,7 @@ export function PageContentEditor({
     const newErrors: Record<string, string> = {};
 
     schema.fields.forEach((field) => {
-      const value = content[field.key] || '';
+      const value = content[field.key] || "";
       const validation = validateFieldValue(field, value);
 
       if (!validation.valid && validation.error) {
@@ -92,8 +95,8 @@ export function PageContentEditor({
 
     try {
       const response = await fetch(`/api/admin/page-content/${pageType}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           language,
           content,
@@ -101,7 +104,7 @@ export function PageContentEditor({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save content');
+        throw new Error("Failed to save content");
       }
 
       setSaveSuccess(true);
@@ -113,29 +116,35 @@ export function PageContentEditor({
       // Clear success message after 3 seconds
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
-      console.error('Error saving content:', error);
-      alert('Failed to save content. Please try again.');
+      console.error("Error saving content:", error);
+      alert("Failed to save content. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
   const renderField = (field: FieldDefinition) => {
-    const value = content[field.key] || field.defaultValue || '';
+    const value = content[field.key] || field.defaultValue || "";
     const error = errors[field.key];
 
     const commonClasses = `w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-      error ? 'border-red-500' : 'border-gray-300'
+      error ? "border-red-500" : "border-gray-300"
     }`;
 
     switch (field.type) {
-      case 'text':
-      case 'url':
-      case 'email':
-      case 'phone':
+      case "text":
+      case "url":
+      case "email":
+      case "phone":
         return (
           <input
-            type={field.type === 'url' ? 'url' : field.type === 'email' ? 'email' : 'text'}
+            type={
+              field.type === "url"
+                ? "url"
+                : field.type === "email"
+                ? "email"
+                : "text"
+            }
             value={value}
             onChange={(e) => handleChange(field.key, e.target.value)}
             placeholder={field.placeholder}
@@ -144,7 +153,7 @@ export function PageContentEditor({
           />
         );
 
-      case 'number':
+      case "number":
         return (
           <input
             type="number"
@@ -158,7 +167,7 @@ export function PageContentEditor({
           />
         );
 
-      case 'textarea':
+      case "textarea":
         return (
           <textarea
             value={value}
@@ -170,7 +179,7 @@ export function PageContentEditor({
           />
         );
 
-      case 'html':
+      case "html":
         return (
           <div>
             <textarea
@@ -187,7 +196,7 @@ export function PageContentEditor({
           </div>
         );
 
-      case 'image':
+      case "image":
         return (
           <div>
             <input
@@ -203,12 +212,14 @@ export function PageContentEditor({
             </p>
             {value && (
               <div className="mt-2">
-                <img
+                <Image
+                  width={100}
+                  height={100}
                   src={value}
                   alt="Preview"
                   className="max-w-xs h-auto rounded border"
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.style.display = "none";
                   }}
                 />
               </div>
@@ -216,7 +227,7 @@ export function PageContentEditor({
           </div>
         );
 
-      case 'json':
+      case "json":
         return (
           <div>
             <textarea
@@ -233,27 +244,27 @@ export function PageContentEditor({
           </div>
         );
 
-      case 'boolean':
+      case "boolean":
         return (
           <div className="flex items-center">
             <input
               type="checkbox"
-              checked={value === 'true' || value === '1'}
-              onChange={(e) => handleChange(field.key, e.target.checked ? 'true' : 'false')}
+              checked={value === "true" || value === "1"}
+              onChange={(e) =>
+                handleChange(field.key, e.target.checked ? "true" : "false")
+              }
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
-            <label className="ml-2 text-sm text-gray-700">
-              {field.label}
-            </label>
+            <label className="ml-2 text-sm text-gray-700">{field.label}</label>
           </div>
         );
 
-      case 'color':
+      case "color":
         return (
           <div className="flex items-center space-x-2">
             <input
               type="color"
-              value={value || '#000000'}
+              value={value || "#000000"}
               onChange={(e) => handleChange(field.key, e.target.value)}
               className="w-12 h-10 border rounded cursor-pointer"
             />
@@ -295,10 +306,11 @@ export function PageContentEditor({
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Edit {pageType.replace(/_/g, ' ')} Page
+          Edit {pageType.replace(/_/g, " ")} Page
         </h1>
         <p className="text-gray-600">
-          Update content for this page. Changes will be reflected on the frontend immediately.
+          Update content for this page. Changes will be reflected on the
+          frontend immediately.
         </p>
       </div>
 
@@ -350,7 +362,7 @@ export function PageContentEditor({
               <div className="space-y-6">
                 {fields.map((field) => (
                   <div key={field.key}>
-                    {field.type !== 'boolean' && (
+                    {field.type !== "boolean" && (
                       <label className="block mb-2">
                         <span className="text-sm font-medium text-gray-700">
                           {field.label}
@@ -399,7 +411,7 @@ export function PageContentEditor({
               disabled={saving}
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {saving ? 'Saving...' : 'Save Changes'}
+              {saving ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </div>

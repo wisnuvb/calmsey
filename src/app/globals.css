@@ -194,3 +194,69 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide Google Translate bar but keep translation functionality */
+/* This hides the banner that appears at the top of the page */
+.goog-te-banner-frame,
+.skiptranslate {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  top: -9999px !important;
+}
+
+/* Fix body positioning when translate bar is hidden */
+body {
+  top: 0 !important;
+  position: relative !important;
+}
+
+/* Ensure page content is not pushed down by hidden translate bar */
+html {
+  margin-top: 0 !important;
+}
+
+/* Hide the Google Translate select dropdown (we control it programmatically) */
+/* Keep it functional but invisible */
+.goog-te-combo {
+  position: absolute !important;
+  left: -9999px !important;
+  opacity: 0 !important;
+  pointer-events: auto !important; /* Keep it functional for programmatic control */
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}
+
+/* Hide any Google Translate UI elements */
+.goog-te-menu-frame,
+.goog-te-menu-value,
+.goog-te-menu2,
+.goog-te-menu-frame-skiptranslate {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  top: -9999px !important;
+}
+
+/* Hide the iframe that contains the translate bar */
+iframe[src*="translate.google.com"] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Ensure the hidden container doesn't affect layout */
+#google_translate_element {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}

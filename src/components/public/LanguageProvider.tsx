@@ -27,27 +27,16 @@ export function LanguageProvider({
 
   // Trigger browser translation when language changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const googleTranslateCode = toGoogleTranslateCode(language);
 
-      // Set HTML lang attribute
-      if (typeof document !== 'undefined') {
-        document.documentElement.lang = googleTranslateCode;
-      }
-
-      // For non-English languages, force Google Translate for auto-translation
-      if (language !== 'en') {
-        // Dynamic import to avoid SSR issues
-        import('@/lib/browser-translate').then(({ initGoogleTranslateWidget }) => {
-          // Force Google Translate widget for automatic translation
-          initGoogleTranslateWidget(googleTranslateCode);
-        });
-      } else {
-        // Clear translation when switching back to English
-        import('@/lib/browser-translate').then(({ clearTranslation }) => {
-          clearTranslation();
-        });
-      }
+      // Use translatePage which handles both browser translation and Google Translate fallback
+      translatePage({
+        targetLanguage: googleTranslateCode,
+        sourceLanguage: "en", // Content is always in English
+      }).catch((error) => {
+        console.error("[LanguageProvider] Translation error:", error);
+      });
     }
   }, [language]);
 

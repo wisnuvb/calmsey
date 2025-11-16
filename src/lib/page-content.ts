@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Page Content Helper Functions
  * Utilities for fetching and saving page content from/to database
  */
 
-import { prisma } from '@/lib/prisma';
-import { ContentType, PageType } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import { ContentType, PageType } from "@prisma/client";
 
 /**
  * Content Map for easy access to page content
@@ -13,7 +14,7 @@ export class PageContentMap extends Map<string, string> {
   /**
    * Get content with fallback to default value
    */
-  getString(key: string, defaultValue: string = ''): string {
+  getString(key: string, defaultValue: string = ""): string {
     return this.get(key) || defaultValue;
   }
 
@@ -33,7 +34,7 @@ export class PageContentMap extends Map<string, string> {
   getBoolean(key: string, defaultValue: boolean = false): boolean {
     const value = this.get(key);
     if (!value) return defaultValue;
-    return value === 'true' || value === '1';
+    return value === "true" || value === "1";
   }
 
   /**
@@ -55,7 +56,7 @@ export class PageContentMap extends Map<string, string> {
  */
 export async function getPageContent(
   pageIdentifier: string,
-  language: string = 'en'
+  language: string = "en"
 ): Promise<PageContentMap> {
   const contentMap = new PageContentMap();
 
@@ -94,7 +95,7 @@ export async function getPageContent(
 
     return contentMap;
   } catch (error) {
-    console.error('Error fetching page content:', error);
+    console.error("Error fetching page content:", error);
     return contentMap;
   }
 }
@@ -114,13 +115,13 @@ export async function savePageContent(
       where: {
         pageType_slug: {
           pageType,
-          slug: pageType.toLowerCase().replace(/_/g, '-'),
+          slug: pageType.toLowerCase().replace(/_/g, "-"),
         },
       },
       create: {
         pageType,
-        slug: pageType.toLowerCase().replace(/_/g, '-'),
-        status: 'PUBLISHED',
+        slug: pageType.toLowerCase().replace(/_/g, "-"),
+        status: "PUBLISHED",
         authorId: userId,
       },
       update: {
@@ -139,12 +140,12 @@ export async function savePageContent(
       create: {
         pageId: page.id,
         languageId,
-        title: content['hero.title'] || pageType,
-        seoTitle: content['hero.title'] || pageType,
+        title: content["hero.title"] || pageType,
+        seoTitle: content["hero.title"] || pageType,
       },
       update: {
-        title: content['hero.title'] || pageType,
-        seoTitle: content['hero.title'] || pageType,
+        title: content["hero.title"] || pageType,
+        seoTitle: content["hero.title"] || pageType,
         updatedAt: new Date(),
       },
     });
@@ -172,10 +173,10 @@ export async function savePageContent(
 
     return { success: true };
   } catch (error) {
-    console.error('Error saving page content:', error);
+    console.error("Error saving page content:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -186,83 +187,81 @@ export async function savePageContent(
 function inferContentType(key: string, value: string): ContentType {
   // Check by key patterns
   if (
-    key.includes('Image') ||
-    key.includes('image') ||
-    key.includes('logo') ||
-    key.includes('photo')
+    key.includes("Image") ||
+    key.includes("image") ||
+    key.includes("logo") ||
+    key.includes("photo")
   ) {
-    return 'IMAGE';
+    return "IMAGE";
   }
 
   if (
-    key.includes('Link') ||
-    key.includes('Url') ||
-    key.includes('url') ||
-    key.includes('href')
+    key.includes("Link") ||
+    key.includes("Url") ||
+    key.includes("url") ||
+    key.includes("href")
   ) {
-    return 'LINK';
+    return "LINK";
   }
 
-  if (key.includes('email')) {
-    return 'TEXT'; // Could add EMAIL type if needed
+  if (key.includes("email")) {
+    return "TEXT"; // Could add EMAIL type if needed
   }
 
-  if (key.includes('phone')) {
-    return 'TEXT'; // Could add PHONE type if needed
+  if (key.includes("phone")) {
+    return "TEXT"; // Could add PHONE type if needed
   }
 
-  if (key.includes('color') || key.includes('Color')) {
-    return 'TEXT'; // Could add COLOR type if needed
+  if (key.includes("color") || key.includes("Color")) {
+    return "TEXT"; // Could add COLOR type if needed
   }
 
   // Check value patterns
   if (!value) {
-    return 'TEXT';
+    return "TEXT";
   }
 
   // Check if it's a number
-  if (!isNaN(Number(value)) && value.trim() !== '') {
-    return 'NUMBER';
+  if (!isNaN(Number(value)) && value.trim() !== "") {
+    return "NUMBER";
   }
 
   // Check if it's boolean
-  if (value === 'true' || value === 'false') {
-    return 'BOOLEAN';
+  if (value === "true" || value === "false") {
+    return "BOOLEAN";
   }
 
   // Check if it's JSON
   if (
-    (value.startsWith('{') && value.endsWith('}')) ||
-    (value.startsWith('[') && value.endsWith(']'))
+    (value.startsWith("{") && value.endsWith("}")) ||
+    (value.startsWith("[") && value.endsWith("]"))
   ) {
     try {
       JSON.parse(value);
-      return 'JSON';
+      return "JSON";
     } catch {
       // Not valid JSON
     }
   }
 
   // Check if it's HTML
-  if (value.includes('<') && value.includes('>')) {
-    return 'HTML';
+  if (value.includes("<") && value.includes(">")) {
+    return "HTML";
   }
 
   // Check if it's a long text
   if (value.length > 500) {
-    return 'RICH_TEXT';
+    return "RICH_TEXT";
   }
 
   // Default
-  return 'TEXT';
+  return "TEXT";
 }
 
 /**
  * Get all pages with their content
  */
-export async function getAllPagesContent(
-  language: string = 'en'
-): Promise<
+export async function getAllPagesContent(language: string = "en"): Promise<
   Array<{
     pageType: PageType;
     slug: string;
@@ -297,7 +296,7 @@ export async function getAllPagesContent(
       };
     });
   } catch (error) {
-    console.error('Error fetching all pages content:', error);
+    console.error("Error fetching all pages content:", error);
     return [];
   }
 }
@@ -307,7 +306,7 @@ export async function getAllPagesContent(
  */
 export async function pageContentExists(
   pageType: PageType,
-  language: string = 'en'
+  language: string = "en"
 ): Promise<boolean> {
   try {
     const count = await prisma.page.count({
@@ -326,7 +325,7 @@ export async function pageContentExists(
 
     return count > 0;
   } catch (error) {
-    console.error('Error checking page content exists:', error);
+    console.error("Error checking page content exists:", error);
     return false;
   }
 }
@@ -336,7 +335,7 @@ export async function pageContentExists(
  */
 export async function deletePageContent(
   pageType: PageType,
-  language: string = 'en'
+  language: string = "en"
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const page = await prisma.page.findFirst({
@@ -349,7 +348,7 @@ export async function deletePageContent(
     });
 
     if (!page || !page.translations[0]) {
-      return { success: false, error: 'Page content not found' };
+      return { success: false, error: "Page content not found" };
     }
 
     await prisma.pageContent.deleteMany({
@@ -358,10 +357,10 @@ export async function deletePageContent(
 
     return { success: true };
   } catch (error) {
-    console.error('Error deleting page content:', error);
+    console.error("Error deleting page content:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -371,7 +370,7 @@ export async function deletePageContent(
  */
 export async function getPageContentObject(
   pageIdentifier: string,
-  language: string = 'en'
+  language: string = "en"
 ): Promise<Record<string, string>> {
   const contentMap = await getPageContent(pageIdentifier, language);
   const obj: Record<string, string> = {};

@@ -3,13 +3,16 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 
 interface PageProps {
-  params: {
-    slug: string;
-  };
+  params: Promise<{
+    lang: string;
+    slug: string[];
+  }>;
 }
 
 export default async function DynamicPage({ params }: PageProps) {
-  const page = await SimpleCMS.getPageBySlug(params.slug, "en"); // Default to English
+  const { lang, slug } = await params;
+  const slugString = slug.join("/");
+  const page = await SimpleCMS.getPageBySlug(slugString, lang);
 
   if (!page) {
     notFound();
@@ -36,10 +39,30 @@ export default async function DynamicPage({ params }: PageProps) {
           <p className="text-xl text-gray-600 mb-8">{page.excerpt}</p>
         )}
 
-        <div
-          className="prose prose-lg max-w-none"
-          dangerouslySetInnerHTML={{ __html: page.pageContent.content.value }}
-        />
+        {/* Render dynamic content */}
+        {Object.keys(page.pageContent).length > 0 ? (
+          <div className="prose prose-lg max-w-none">
+            {Object.entries(page.pageContent).map(([key, content]) => {
+              if (content.type === "HTML" || content.type === "RICH_TEXT") {
+                return (
+                  <div
+                    key={key}
+                    dangerouslySetInnerHTML={{ __html: String(content.value) }}
+                  />
+                );
+              }
+              return (
+                <div key={key}>
+                  <strong>{key}:</strong> {String(content.value)}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="prose prose-lg max-w-none">
+            <p>No content available for this page.</p>
+          </div>
+        )}
       </div>
     </div>
   );

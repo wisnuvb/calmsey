@@ -141,6 +141,26 @@ export async function POST(request: NextRequest) {
 
     const { session } = authResult;
 
+    // Verify user exists in database
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Invalid user session" },
+        { status: 401 }
+      );
+    }
+
+    // Check if user exists in database
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found in database" },
+        { status: 404 }
+      );
+    }
+
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
 
@@ -204,7 +224,7 @@ export async function POST(request: NextRequest) {
 
         // Upload file
         const uploadResult = await MediaUploadService.uploadFile(file, {
-          userId: session!.user.id,
+          userId: user.id,
           folder: "media",
         });
 
@@ -218,7 +238,7 @@ export async function POST(request: NextRequest) {
             url: uploadResult.url,
             alt: uploadResult.alt || null,
             caption: uploadResult.caption || null,
-            uploadedById: session!.user.id,
+            uploadedById: user.id, // Use verified user ID
           },
           include: {
             uploadedBy: {
@@ -228,9 +248,19 @@ export async function POST(request: NextRequest) {
         });
 
         uploadResults.push(mediaRecord);
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Upload error for ${file.name}:`, error);
-        errors.push(`${file.name}: Upload failed`);
+
+        // Provide more specific error messages
+        if (error?.code === "P2003") {
+          errors.push(
+            `${file.name}: Database constraint error - user not found`
+          );
+        } else if (error?.message) {
+          errors.push(`${file.name}: ${error.message}`);
+        } else {
+          errors.push(`${file.name}: Upload failed`);
+        }
       }
     }
 

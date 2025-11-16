@@ -335,43 +335,45 @@ export default function MediaPage() {
 
       {/* Filters and Controls */}
       <div className="mt-6 bg-white shadow rounded-lg p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          {/* Search */}
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search files..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            {/* Search */}
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search files..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-          {/* Filter */}
-          <div className="flex space-x-2">
-            {(
-              [
-                { key: "all", label: "All Files", icon: FolderIcon },
-                { key: "images", label: "Images", icon: PhotoIcon },
-                { key: "documents", label: "Documents", icon: DocumentIcon },
-                { key: "videos", label: "Videos", icon: FilmIcon },
-                { key: "audio", label: "Audio", icon: MusicalNoteIcon },
-              ] as const
-            ).map((filterOption) => (
-              <button
-                key={filterOption.key}
-                onClick={() => setFilter(filterOption.key)}
-                className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap ${
-                  filter === filterOption.key
-                    ? "bg-blue-100 text-blue-700 border border-blue-300"
-                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                <filterOption.icon className="h-4 w-4 mr-1" />
-                {filterOption.label}
-              </button>
-            ))}
+            {/* Filter */}
+            <div className="flex space-x-2">
+              {(
+                [
+                  { key: "all", label: "All Files", icon: FolderIcon },
+                  { key: "images", label: "Images", icon: PhotoIcon },
+                  { key: "documents", label: "Documents", icon: DocumentIcon },
+                  { key: "videos", label: "Videos", icon: FilmIcon },
+                  { key: "audio", label: "Audio", icon: MusicalNoteIcon },
+                ] as const
+              ).map((filterOption) => (
+                <button
+                  key={filterOption.key}
+                  onClick={() => setFilter(filterOption.key)}
+                  className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap ${
+                    filter === filterOption.key
+                      ? "bg-blue-100 text-blue-700 border border-blue-300"
+                      : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <filterOption.icon className="h-4 w-4 mr-1" />
+                  {filterOption.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* View Mode */}
@@ -558,6 +560,7 @@ function MediaCard({
   onSelect: () => void;
   onDelete: () => void;
 }) {
+  console.log(file.mimeType);
   const FileIcon = getFileIcon(file.mimeType);
   const isImage = file.mimeType.startsWith("image/");
 
@@ -581,7 +584,7 @@ function MediaCard({
       <div className="aspect-w-1 aspect-h-1 mb-3 bg-gray-100 rounded-lg overflow-hidden">
         {isImage ? (
           <Image
-            src={file.url}
+            src={`https://${file.url}`}
             alt={file.alt || file.originalName}
             width={100}
             height={100}

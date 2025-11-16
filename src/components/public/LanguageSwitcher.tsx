@@ -1,16 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
 import { SupportedLanguage } from "@/lib/public-api";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { cn } from "@/lib/utils";
-import {
-  translatePage,
-  setPageLanguage,
-  toGoogleTranslateCode,
-} from "@/lib/browser-translate";
 
 interface LanguageSwitcherProps {
   currentLanguage: SupportedLanguage;
@@ -24,16 +17,12 @@ export function LanguageSwitcher({
   const pathname = usePathname();
   const { languages, loading, error } = useActiveLanguages();
 
-  // Trigger browser translation when language changes
-  useEffect(() => {
-    const googleTranslateCode = toGoogleTranslateCode(currentLanguage);
-
-    // Set HTML lang attribute and trigger browser translation
-    translatePage({
-      targetLanguage: googleTranslateCode,
-      sourceLanguage: 'en', // Content is always in English
-    });
-  }, [currentLanguage]);
+  // Handle language change with page reload for stability
+  const handleLanguageChange = (languageId: string, url: string) => {
+    // Use full page reload to ensure LanguageProvider triggers correctly
+    // This ensures Google Translate is properly initialized with the new language
+    window.location.href = url;
+  };
 
   const getLanguageUrl = (languageId: string) => {
     // Get all active language IDs
@@ -122,27 +111,30 @@ export function LanguageSwitcher({
         )}
       >
         <div className="py-1">
-          {languages.map((language) => (
-            <Link
-              key={language.id}
-              href={getLanguageUrl(language.id)}
-              className={`block px-4 py-2 text-sm hover:bg-gray-100 ${
-                language.id === currentLanguage
-                  ? "text-blue-600 bg-blue-50"
-                  : "text-gray-700"
-              }`}
-            >
-              <div className="flex items-center space-x-2">
-                {language.flag && (
-                  <span className="text-lg">{language.flag}</span>
-                )}
-                <span>{language.name}</span>
-                {language.isDefault && (
-                  <span className="text-xs text-gray-500">(Default)</span>
-                )}
-              </div>
-            </Link>
-          ))}
+          {languages.map((language) => {
+            const languageUrl = getLanguageUrl(language.id);
+            return (
+              <button
+                key={language.id}
+                onClick={() => handleLanguageChange(language.id, languageUrl)}
+                className={`w-full text-left block px-4 py-2 text-sm hover:bg-gray-100 ${
+                  language.id === currentLanguage
+                    ? "text-blue-600 bg-blue-50"
+                    : "text-gray-700"
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  {language.flag && (
+                    <span className="text-lg">{language.flag}</span>
+                  )}
+                  <span>{language.name}</span>
+                  {language.isDefault && (
+                    <span className="text-xs text-gray-500">(Default)</span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

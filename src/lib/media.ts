@@ -4,6 +4,7 @@ import {
   MusicalNoteIcon,
   PhotoIcon,
 } from "@heroicons/react/24/outline";
+import { FaFilePdf, FaFileWord } from "react-icons/fa";
 
 export interface MediaFile {
   id: string;
@@ -26,6 +27,13 @@ export function getFileIcon(mimeType: string) {
   if (mimeType.startsWith("image/")) return PhotoIcon;
   if (mimeType.startsWith("video/")) return FilmIcon;
   if (mimeType.startsWith("audio/")) return MusicalNoteIcon;
+  if (mimeType.includes("pdf")) return FaFilePdf;
+  if (mimeType.includes("word") || mimeType.includes("document"))
+    return FaFileWord;
+  if (mimeType.includes("sheet") || mimeType.includes("excel"))
+    return DocumentIcon;
+  if (mimeType.includes("presentation") || mimeType.includes("powerpoint"))
+    return DocumentIcon;
   return DocumentIcon;
 }
 

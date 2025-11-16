@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Play, Search } from "lucide-react";
 import Image from "next/image";
 import { H1, P } from "../ui/typography";
@@ -17,22 +17,148 @@ interface HeroSectionProps {
   searchPlaceholder?: string;
   className?: string;
   dataSection?: string;
+  language?: string; // Language code for fetching content
+  pageType?: string; // PageType to fetch content from (e.g., "HOME")
 }
 
 export function HeroSection({
   variant = "video",
-  title = "Protecting Oceans, Biodiversity & Tackling Climate Change",
-  subtitle = "We want to make a world where local communities, fishers and indigenous peoples can lead in manage, conserve, develop, and adaptation of their environments and resources.",
-  videoUrl = "/hero-video.mp4",
-  posterImage = "/hero-poster.jpg",
-  backgroundImage = "/hero-bg.jpg",
-  showSearch = false,
-  searchPlaceholder = "Discover articles",
+  title: propTitle,
+  subtitle: propSubtitle,
+  videoUrl: propVideoUrl,
+  posterImage: propPosterImage,
+  backgroundImage: propBackgroundImage,
+  showSearch: propShowSearch,
+  searchPlaceholder: propSearchPlaceholder,
   className,
   dataSection = "hero",
+  language = "en",
+  pageType,
 }: HeroSectionProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // State for content from database
+  const [content, setContent] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+
+  // Fetch content from page_contents table
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await fetch(`/api/public/page-content/${pageType}`);
+        if (response.ok) {
+          const data = await response.json();
+          setContent(data.content || {});
+        }
+      } catch (error) {
+        console.error("Error fetching hero content:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (pageType) {
+      fetchContent();
+    } else {
+      setLoading(false);
+    }
+  }, [pageType, language]);
+
+  // Helper function to validate and get image URL
+  const getImageUrl = (
+    contentKey: string,
+    propValue?: string,
+    defaultValue: string = ""
+  ): string | null => {
+    const contentValue = content[contentKey];
+    // Check if content value is valid (not empty, not null, not undefined)
+    if (
+      contentValue &&
+      typeof contentValue === "string" &&
+      contentValue.trim() !== ""
+    ) {
+      return contentValue;
+    }
+    // Fallback to prop value
+    if (propValue && typeof propValue === "string" && propValue.trim() !== "") {
+      return propValue;
+    }
+    // Fallback to default only if it's not empty
+    if (defaultValue && defaultValue.trim() !== "") {
+      return defaultValue;
+    }
+    // Return null if no valid URL found
+    return null;
+  };
+
+  // Helper to check if URL is valid
+  const isValidUrl = (url: string | null | undefined): boolean => {
+    if (!url || typeof url !== "string" || url.trim() === "") {
+      return false;
+    }
+    // Check if it's a valid relative path (starts with /) or absolute URL
+    try {
+      if (
+        url.startsWith("/") ||
+        url.startsWith("http://") ||
+        url.startsWith("https://")
+      ) {
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  // Use content from database or fallback to props/defaults
+  const title =
+    content["hero.title"] ||
+    propTitle ||
+    "Protecting Oceans, Biodiversity & Tackling Climate Change";
+  const subtitle =
+    content["hero.subtitle"] ||
+    propSubtitle ||
+    "We want to make a world where local communities, fishers and indigenous peoples can lead in manage, conserve, develop, and adaptation of their environments and resources.";
+  const videoUrlRaw = getImageUrl(
+    "hero.videoUrl",
+    propVideoUrl,
+    "/hero-video.mp4"
+  );
+  const posterImageRaw = getImageUrl(
+    "hero.posterImage",
+    propPosterImage,
+    "/hero-poster.jpg"
+  );
+  const backgroundImageRaw = getImageUrl(
+    "hero.backgroundImage",
+    propBackgroundImage,
+    "/hero-bg.jpg"
+  );
+
+  // Ensure all URLs are strings (not null) and valid
+  const videoUrl: string =
+    videoUrlRaw && isValidUrl(videoUrlRaw) ? videoUrlRaw : "/hero-video.mp4";
+  const posterImage: string =
+    posterImageRaw && isValidUrl(posterImageRaw)
+      ? posterImageRaw
+      : "/hero-poster.jpg";
+  const backgroundImage: string =
+    backgroundImageRaw && isValidUrl(backgroundImageRaw)
+      ? backgroundImageRaw
+      : "/hero-bg.jpg";
+
+  const showSearch =
+    content["hero.showSearch"] === "true" || propShowSearch || false;
+  const searchPlaceholder =
+    content["hero.searchPlaceholder"] ||
+    propSearchPlaceholder ||
+    "Discover articles";
+  const variantFromContent = (content["hero.variant"] || variant) as
+    | "video"
+    | "simple"
+    | "search";
 
   const handlePlayVideo = () => {
     setIsPlaying(true);
@@ -44,8 +170,24 @@ export function HeroSection({
     console.log("Searching for:", searchQuery);
   };
 
+  // Show loading state if content is being fetched
+  if (loading && pageType) {
+    return (
+      <section className="relative bg-white pt-36" data-section={dataSection}>
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center max-w-[748px] w-full mx-auto mb-12 lg:mb-16">
+            <div className="animate-pulse">
+              <div className="h-12 bg-gray-200 rounded mb-6"></div>
+              <div className="h-6 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   // Video Hero Variant (Original)
-  if (variant === "video") {
+  if (variantFromContent === "video") {
     return (
       <section className="relative bg-white pt-36" data-section={dataSection}>
         <div className="max-w-7xl mx-auto px-4">
@@ -94,7 +236,7 @@ export function HeroSection({
   }
 
   // Simple Hero with Background Image
-  if (variant === "simple") {
+  if (variantFromContent === "simple") {
     return (
       <section
         className={cn(
@@ -105,13 +247,17 @@ export function HeroSection({
       >
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
-          <Image
-            src={backgroundImage}
-            alt="Hero background"
-            fill
-            className="object-cover"
-            priority
-          />
+          {isValidUrl(backgroundImage) ? (
+            <Image
+              src={backgroundImage}
+              alt="Hero background"
+              fill
+              className="object-cover"
+              priority
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-900" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/50"></div>
         </div>
 
@@ -129,7 +275,7 @@ export function HeroSection({
   }
 
   // Search Hero Variant
-  if (variant === "search") {
+  if (variantFromContent === "search") {
     return (
       <section
         className="relative min-h-[500px] lg:min-h-[600px] flex items-center pt-20"
@@ -137,13 +283,17 @@ export function HeroSection({
       >
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
-          <Image
-            src={backgroundImage}
-            alt="Hero background"
-            fill
-            className="object-cover"
-            priority
-          />
+          {isValidUrl(backgroundImage) ? (
+            <Image
+              src={backgroundImage}
+              alt="Hero background"
+              fill
+              className="object-cover"
+              priority
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-900" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/60"></div>
         </div>
 
