@@ -17,6 +17,7 @@ import {
   SpacingValue,
 } from "@/types/page-builder";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface ResponsivePreviewProps {
   sections: PageSection[];
@@ -392,7 +393,7 @@ function SectionRenderer({
         <div className="py-8">
           {translation?.metadata?.imageUrl ? (
             <Image
-              src={translation.metadata.imageUrl}
+              src={getImageUrl(translation.metadata.imageUrl)}
               alt={translation?.metadata?.alt || translation?.title || "Image"}
               className="w-full h-auto"
               width={1000}

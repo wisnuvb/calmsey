@@ -40,6 +40,7 @@ interface ArticleFormProps {
     featuredImage: string;
     categories: string[];
     tags: string[];
+    content?: string;
     translations: Translation[];
   };
   onSave: (data: {
@@ -48,6 +49,7 @@ interface ArticleFormProps {
     featuredImage: string;
     categories: string[];
     tags: string[];
+    content: string;
     translations: Translation[];
   }) => Promise<void>;
   onDelete?: () => Promise<void>;
@@ -207,6 +209,7 @@ export default function ArticleForm({
       categories: articleData.categories,
       tags: articleData.tags,
       translations: translations.filter((t) => t.title.trim()),
+      content: englishTranslation.content, // Ambil content dari English translation
     });
   };
 
@@ -409,7 +412,7 @@ export default function ArticleForm({
                         onClick={() => handleCategoryChange(categoryId, false)}
                         className="ml-1 text-blue-600 hover:text-blue-800"
                       >
-                        ×
+                        x
                       </button>
                     </span>
                   );
@@ -428,7 +431,7 @@ export default function ArticleForm({
                         onClick={() => handleTagChange(tagId, false)}
                         className="ml-1 text-green-600 hover:text-green-800"
                       >
-                        ×
+                        x
                       </button>
                     </span>
                   );

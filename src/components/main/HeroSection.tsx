@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Play, Search } from "lucide-react";
 import Image from "next/image";
 import { H1, P } from "../ui/typography";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
+import { usePageContent } from "@/contexts/PageContentContext";
 
 interface HeroSectionProps {
-  variant?: "video" | "simple" | "search";
+  variant?: "video" | "simple" | "search" | "overlay-bottom";
   title?: string;
   subtitle?: string;
   videoUrl?: string;
@@ -17,12 +18,10 @@ interface HeroSectionProps {
   searchPlaceholder?: string;
   className?: string;
   dataSection?: string;
-  language?: string; // Language code for fetching content
-  pageType?: string; // PageType to fetch content from (e.g., "HOME")
 }
 
 export function HeroSection({
-  variant = "video",
+  variant: propVariant = "video",
   title: propTitle,
   subtitle: propSubtitle,
   videoUrl: propVideoUrl,
@@ -32,64 +31,22 @@ export function HeroSection({
   searchPlaceholder: propSearchPlaceholder,
   className,
   dataSection = "hero",
-  language = "en",
-  pageType,
 }: HeroSectionProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // State for content from database
-  const [content, setContent] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
+  // Try to get content from context, fallback to empty object if not available
+  let pageContent: Record<string, string> = {};
+  try {
+    const context = usePageContent();
+    pageContent = context.content;
+  } catch {
+    // Not in PageContentProvider, use props only
+  }
 
-  // Fetch content from page_contents table
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const response = await fetch(`/api/public/page-content/${pageType}`);
-        if (response.ok) {
-          const data = await response.json();
-          setContent(data.content || {});
-        }
-      } catch (error) {
-        console.error("Error fetching hero content:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (pageType) {
-      fetchContent();
-    } else {
-      setLoading(false);
-    }
-  }, [pageType, language]);
-
-  // Helper function to validate and get image URL
-  const getImageUrl = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string | null => {
-    const contentValue = content[contentKey];
-    // Check if content value is valid (not empty, not null, not undefined)
-    if (
-      contentValue &&
-      typeof contentValue === "string" &&
-      contentValue.trim() !== ""
-    ) {
-      return contentValue;
-    }
-    // Fallback to prop value
-    if (propValue && typeof propValue === "string" && propValue.trim() !== "") {
-      return propValue;
-    }
-    // Fallback to default only if it's not empty
-    if (defaultValue && defaultValue.trim() !== "") {
-      return defaultValue;
-    }
-    // Return null if no valid URL found
-    return null;
+  // Helper to get value from content
+  const getContentValue = (key: string, defaultValue: string = ""): string => {
+    return pageContent[key] || defaultValue;
   };
 
   // Helper to check if URL is valid
@@ -97,7 +54,6 @@ export function HeroSection({
     if (!url || typeof url !== "string" || url.trim() === "") {
       return false;
     }
-    // Check if it's a valid relative path (starts with /) or absolute URL
     try {
       if (
         url.startsWith("/") ||
@@ -112,53 +68,60 @@ export function HeroSection({
     }
   };
 
-  // Use content from database or fallback to props/defaults
-  const title =
-    content["hero.title"] ||
-    propTitle ||
-    "Protecting Oceans, Biodiversity & Tackling Climate Change";
-  const subtitle =
-    content["hero.subtitle"] ||
-    propSubtitle ||
-    "We want to make a world where local communities, fishers and indigenous peoples can lead in manage, conserve, develop, and adaptation of their environments and resources.";
-  const videoUrlRaw = getImageUrl(
-    "hero.videoUrl",
-    propVideoUrl,
-    "/hero-video.mp4"
-  );
-  const posterImageRaw = getImageUrl(
-    "hero.posterImage",
-    propPosterImage,
-    "/hero-poster.jpg"
-  );
-  const backgroundImageRaw = getImageUrl(
+  // Helper function to get value with priority: context > props > default
+  const getValue = (
+    contentKey: string,
+    propValue?: string,
+    defaultValue: string = ""
+  ): string => {
+    const contentValue = getContentValue(contentKey, "");
+    if (contentValue && contentValue.trim() !== "") {
+      return contentValue;
+    }
+    if (propValue && propValue.trim() !== "") {
+      return propValue;
+    }
+    return defaultValue;
+  };
+
+  // Get all values with priority: context > props > default
+  const variant =
+    (getValue("hero.variant", propVariant) as
+      | "video"
+      | "simple"
+      | "search"
+      | "overlay-bottom") || propVariant;
+
+  const title = getValue("hero.title", propTitle, "");
+  const subtitle = getValue("hero.subtitle", propSubtitle, "");
+
+  const videoUrlRaw = getValue("hero.videoUrl", propVideoUrl, "");
+  const posterImageRaw = getValue("hero.posterImage", propPosterImage, "");
+  const backgroundImageRaw = getValue(
     "hero.backgroundImage",
     propBackgroundImage,
-    "/hero-bg.jpg"
+    ""
   );
 
-  // Ensure all URLs are strings (not null) and valid
-  const videoUrl: string =
-    videoUrlRaw && isValidUrl(videoUrlRaw) ? videoUrlRaw : "/hero-video.mp4";
-  const posterImage: string =
-    posterImageRaw && isValidUrl(posterImageRaw)
-      ? posterImageRaw
-      : "/hero-poster.jpg";
-  const backgroundImage: string =
-    backgroundImageRaw && isValidUrl(backgroundImageRaw)
-      ? backgroundImageRaw
-      : "/hero-bg.jpg";
+  // Ensure URLs are valid or use defaults
+  const videoUrl = isValidUrl(videoUrlRaw) ? videoUrlRaw : "/hero-video.mp4";
+  const posterImage = isValidUrl(posterImageRaw)
+    ? posterImageRaw
+    : "/hero-poster.jpg";
+  // const backgroundImage = isValidUrl(backgroundImageRaw)
+  //   ? backgroundImageRaw
+  //   : "/hero-bg.jpg";
 
   const showSearch =
-    content["hero.showSearch"] === "true" || propShowSearch || false;
-  const searchPlaceholder =
-    content["hero.searchPlaceholder"] ||
-    propSearchPlaceholder ||
-    "Discover articles";
-  const variantFromContent = (content["hero.variant"] || variant) as
-    | "video"
-    | "simple"
-    | "search";
+    getContentValue("hero.showSearch", "") === "true" ||
+    propShowSearch ||
+    false;
+
+  const searchPlaceholder = getValue(
+    "hero.searchPlaceholder",
+    propSearchPlaceholder,
+    "Discover articles"
+  );
 
   const handlePlayVideo = () => {
     setIsPlaying(true);
@@ -166,20 +129,53 @@ export function HeroSection({
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle search logic here
     console.log("Searching for:", searchQuery);
   };
 
-  // Show loading state if content is being fetched
-  if (loading && pageType) {
+  // Overlay Bottom Hero Variant (New)
+  if (variant === "overlay-bottom") {
     return (
-      <section className="relative bg-white pt-36" data-section={dataSection}>
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center max-w-[748px] w-full mx-auto mb-12 lg:mb-16">
-            <div className="animate-pulse">
-              <div className="h-12 bg-gray-200 rounded mb-6"></div>
-              <div className="h-6 bg-gray-200 rounded"></div>
-            </div>
+      <section
+        className={cn(
+          "relative min-h-[600px] lg:min-h-[800px] flex flex-col",
+          className
+        )}
+        data-section={dataSection}
+      >
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          {backgroundImageRaw ? (
+            <Image
+              src={getImageUrl(backgroundImageRaw)}
+              alt="Hero background"
+              fill
+              className="object-cover"
+              priority
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-900" />
+          )}
+          {/* Thin Overlay for Menu Visibility */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
+        </div>
+
+        {/* Blue Overlay Section at Bottom */}
+        <div className="relative z-10 mt-auto bg-[#3C62ED] py-[44px]">
+          <div className="container mx-auto px-4 sm:px-4 space-y-5">
+            <H1
+              style="h1bold"
+              className="text-white text-3xl sm:text-4xl lg:text-5xl leading-tight"
+            >
+              {title}
+            </H1>
+            {subtitle && (
+              <P
+                style="p1reg"
+                className="text-white text-base leading-relaxed font-normal font-work-sans"
+              >
+                {subtitle}
+              </P>
+            )}
           </div>
         </div>
       </section>
@@ -187,10 +183,10 @@ export function HeroSection({
   }
 
   // Video Hero Variant (Original)
-  if (variantFromContent === "video") {
+  if (variant === "video") {
     return (
       <section className="relative bg-white pt-36" data-section={dataSection}>
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="container mx-auto px-4">
           <div className="text-center max-w-[748px] w-full mx-auto mb-12 lg:mb-16">
             <H1
               style="h1bold"
@@ -236,7 +232,7 @@ export function HeroSection({
   }
 
   // Simple Hero with Background Image
-  if (variantFromContent === "simple") {
+  if (variant === "simple") {
     return (
       <section
         className={cn(
@@ -247,9 +243,9 @@ export function HeroSection({
       >
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
-          {isValidUrl(backgroundImage) ? (
+          {backgroundImageRaw ? (
             <Image
-              src={backgroundImage}
+              src={getImageUrl(backgroundImageRaw)}
               alt="Hero background"
               fill
               className="object-cover"
@@ -262,7 +258,7 @@ export function HeroSection({
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 text-center">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 text-center">
           <H1 style="h1bold" className="text-white mb-6 max-w-[674px] mx-auto">
             {title}
           </H1>
@@ -275,7 +271,7 @@ export function HeroSection({
   }
 
   // Search Hero Variant
-  if (variantFromContent === "search") {
+  if (variant === "search") {
     return (
       <section
         className="relative min-h-[500px] lg:min-h-[600px] flex items-center pt-20"
@@ -283,9 +279,9 @@ export function HeroSection({
       >
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
-          {isValidUrl(backgroundImage) ? (
+          {backgroundImageRaw ? (
             <Image
-              src={backgroundImage}
+              src={getImageUrl(backgroundImageRaw)}
               alt="Hero background"
               fill
               className="object-cover"

@@ -5,6 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import ProtectedRoute from "@/components/admin/ProtectedRoute";
 import { SimpleFontLoader } from "@/components/SimpleFontLoader";
 import { usePathname } from "next/navigation";
+import { ToastProvider } from "@/components/ui/toast";
 
 export default function AdminLayoutWrapper({
   children,
@@ -22,7 +23,9 @@ export default function AdminLayoutWrapper({
     <SessionProvider>
       <SimpleFontLoader />
       <ProtectedRoute>
-        <AdminLayout>{children}</AdminLayout>
+        <ToastProvider>
+          <AdminLayout>{children}</AdminLayout>
+        </ToastProvider>
       </ProtectedRoute>
     </SessionProvider>
   );

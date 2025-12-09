@@ -1,42 +1,191 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
+import { usePageContent } from "@/contexts/PageContentContext";
+import { getImageUrl } from "@/lib/utils";
+import { useState } from "react";
 
-export function WhereWeWorkSection() {
+interface WhereWeWorkSectionProps {
+  title?: string;
+  actionPlansText?: string;
+  explorationText?: string;
+  explorationLinkText?: string;
+  explorationLinkUrl?: string;
+  mapImage?: string;
+  partnersText?: string;
+}
+
+export function WhereWeWorkSection({
+  title: propTitle,
+  actionPlansText: propActionPlansText,
+  explorationText: propExplorationText,
+  explorationLinkText: propExplorationLinkText,
+  explorationLinkUrl: propExplorationLinkUrl,
+  mapImage: propMapImage,
+  partnersText: propPartnersText,
+}: WhereWeWorkSectionProps = {}) {
+  const [imageError, setImageError] = useState(false);
+
+  // Try to get content from context, fallback to empty object if not available
+  let pageContent: Record<string, string> = {};
+  try {
+    const context = usePageContent();
+    pageContent = context.content;
+  } catch {
+    // Not in PageContentProvider, use props only
+  }
+
+  // Helper to get value from content
+  const getContentValue = (key: string, defaultValue: string = ""): string => {
+    return pageContent[key] || defaultValue;
+  };
+
+  // Helper function to get value with priority: context > props > default
+  const getValue = (
+    contentKey: string,
+    propValue?: string,
+    defaultValue: string = ""
+  ): string => {
+    const contentValue = getContentValue(contentKey, "");
+    if (contentValue && contentValue.trim() !== "") {
+      return contentValue;
+    }
+    if (propValue && propValue.trim() !== "") {
+      return propValue;
+    }
+    return defaultValue;
+  };
+
+  // Get all values with priority: context > props > default
+  const title = getValue(
+    "whereWeWork.title",
+    propTitle,
+    "Where Does Turning Tides Work?"
+  );
+
+  const actionPlansText = getValue(
+    "whereWeWork.actionPlansText",
+    propActionPlansText,
+    "We have **developed action plans** for Latin America and Africa, and **mobilizing grants** for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda."
+  );
+
+  const explorationText = getValue(
+    "whereWeWork.explorationText",
+    propExplorationText,
+    "We are also in the **exploration and engagement phase** – Brazil, India, Indonesia, Sri Lanka, Thailand."
+  );
+
+  const explorationLinkText = getValue(
+    "whereWeWork.explorationLinkText",
+    propExplorationLinkText,
+    "View Report"
+  );
+
+  const explorationLinkUrl = getValue(
+    "whereWeWork.explorationLinkUrl",
+    propExplorationLinkUrl,
+    "#"
+  );
+
+  const mapImage = getValue(
+    "whereWeWork.mapImage",
+    propMapImage,
+    "/assets/world-map.png"
+  );
+
+  // Use getImageUrl with validation built-in
+  const imageUrl = getImageUrl(mapImage, "/assets/world-map.png");
+
+  const partnersText = getValue(
+    "whereWeWork.partnersText",
+    propPartnersText,
+    'Our **"Partners Piloting"** partners are Bangladesh, Thailand, Indonesia, Honduras, Senegal.'
+  );
+
   return (
-    <section
-      className="pt-16 lg:pt-24"
-      style={{
-        background:
-          "radial-gradient(circle at 50% 50%, #C8D3FF 0%, #FFFFFF 40%)",
-      }}
-    >
-      <div className="container mx-auto px-4">
+    <section className="bg-white py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Title */}
         <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-gray-900 mb-6">
-            Where Does Turning Tides Work?
+          <h2 className="text-3xl sm:text-[38px] font-nunito-sans font-bold text-[#010107]">
+            {title}
           </h2>
-          <p className="text-base font-normal text-gray-600 max-w-[542px] mx-auto">
-            We have active partnerships and and co-developed programs of work in{" "}
-            <span className="text-[#7db5bb] font-medium">Latin America</span>,{" "}
-            <span className="text-[#7db5bb] font-medium">SouthEast Asia</span>,
-            and{" "}
-            <span className="text-[#7db5bb] font-medium">
-              Sub-Saharan Africa
-            </span>
-            .
+        </div>
+
+        {/* Legend Blocks */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-12 lg:mb-16 max-w-5xl mx-auto">
+          {/* Left Block - Action Plans */}
+          <div className="flex items-start gap-4">
+            <div className="w-4 h-4 bg-[#3C62ED] flex-shrink-0 mt-1" />
+            <p className="text-base text-gray-900 font-work-sans leading-relaxed">
+              {actionPlansText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
+                // Every odd index is the text inside **
+                if (index % 2 === 1) {
+                  return <strong key={index}>{part}</strong>;
+                }
+                return <span key={index}>{part}</span>;
+              })}
+            </p>
+          </div>
+
+          {/* Right Block - Exploration Phase */}
+          <div className="flex items-start gap-4">
+            <div className="w-4 h-4 bg-[#7db5bb] flex-shrink-0 mt-1" />
+            <p className="text-base text-gray-900 font-work-sans leading-relaxed">
+              {explorationText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
+                // Every odd index is the text inside **
+                if (index % 2 === 1) {
+                  return <strong key={index}>{part}</strong>;
+                }
+                return <span key={index}>{part}</span>;
+              })}{" "}
+              <Link
+                href={explorationLinkUrl}
+                className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
+              >
+                <span>{explorationLinkText}</span>
+                <ExternalLink className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* World Map */}
+        <div className="relative w-full mb-12 lg:mb-16">
+          <div className="relative w-full aspect-[16/9] lg:aspect-[2/1]">
+            {!imageError ? (
+              <Image
+                src={imageUrl}
+                alt="World Map showing Turning Tides work locations"
+                fill
+                className="object-contain"
+                priority
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300">
+                <div className="text-center text-gray-500">
+                  <p className="text-sm">Image not available</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Text */}
+        <div className="text-center max-w-[417px] mx-auto">
+          <p className="text-base text-[#060726CC]">
+            {partnersText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
+              // Every odd index is the text inside **
+              if (index % 2 === 1) {
+                return <strong key={index}>{part}</strong>;
+              }
+              return <span key={index}>{part}</span>;
+            })}
           </p>
         </div>
-      </div>
-      <div className="relative w-full mx-auto">
-        <Image
-          src="/assets/demo/World map.png"
-          alt="World Map"
-          height={1000}
-          width={1000}
-          className="object-fill w-full h-full"
-          priority
-        />
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+import { getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -25,7 +26,7 @@ export const ArticleCard = ({ article }: ArticleCardProps) => {
       {/* Article Image */}
       <div className="relative aspect-video overflow-hidden">
         <Image
-          src={article.image}
+          src={getImageUrl(article.image)}
           alt={article.title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"

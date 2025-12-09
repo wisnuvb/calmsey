@@ -8,6 +8,7 @@ import {
   ExclamationTriangleIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
+import { TinyMCEEditor } from "./TinyMCEEditor";
 
 interface Language {
   id: string;
@@ -121,8 +122,6 @@ export default function TranslationTabs({
   const availableLanguages = languages.filter(
     (lang) => !translations.some((t) => t.languageId === lang.id)
   );
-
-  console.log(languages);
 
   const activeTranslation = getTranslation(activeLanguage);
 
@@ -257,6 +256,34 @@ function DefaultTranslationForm({
 }) {
   const canRemove = !language?.isDefault; // Can't remove default language translation
 
+  const handleImageUpload = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("files", file);
+
+    try {
+      const response = await fetch("/api/admin/media", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+
+      if (!data.success || !data.data || data.data.length === 0) {
+        throw new Error("Upload failed: No file returned");
+      }
+
+      return data.data[0].url;
+    } catch (err) {
+      console.error("Image upload error:", err);
+      throw err;
+    }
+  };
+
+  // console.log(translation);
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -306,12 +333,12 @@ function DefaultTranslationForm({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Content *
           </label>
-          <textarea
-            value={translation.content}
-            onChange={(e) => onUpdate({ content: e.target.value })}
-            rows={8}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <TinyMCEEditor
+            value={translation.content || ""}
+            onChange={(content) => onUpdate({ content })}
             placeholder={`${contentType} content in ${language?.name}`}
+            height={400}
+            onImageUpload={handleImageUpload}
           />
         </div>
 

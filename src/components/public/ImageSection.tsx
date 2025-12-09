@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
 
@@ -52,7 +53,7 @@ export default function ImageSection({
         {metadata.imageUrl ? (
           <div className={`${getImageSize()} ${getAlignment()}`}>
             <Image
-              src={metadata.imageUrl}
+              src={getImageUrl(metadata.imageUrl)}
               alt={metadata.alt || translation?.title || "Image"}
               className="w-full h-auto rounded-lg shadow-lg"
               loading="lazy"

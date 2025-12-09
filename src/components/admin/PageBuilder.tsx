@@ -31,6 +31,7 @@ import {
   PhoneIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 export interface PageSection {
   id: string;
@@ -460,7 +461,7 @@ function PageSectionPreview({ section }: { section: PageSection }) {
             </h3>
             {section.content.image && (
               <Image
-                src={section.content.image}
+                src={getImageUrl(section.content.image)}
                 alt={section.content.title ?? ""}
                 className="w-full h-64 object-cover rounded-lg"
                 width={1000}

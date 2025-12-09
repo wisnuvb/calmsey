@@ -109,13 +109,13 @@ model Language {
 // Main article table (language-agnostic)
 // HYBRID APPROACH: Content stored in English here, translations only for SEO
 model Article {
-  id            String        @id @default(cuid())
-  slug          String        @unique // Base slug (English)
+  id   String @id @default(cuid())
+  slug String @unique // Base slug (English)
 
   // Default content (English) - used for all languages via browser translation
-  title         String
-  content       String        @db.LongText
-  excerpt       String?       @db.Text
+  title   String
+  content String  @db.LongText
+  excerpt String? @db.Text
 
   status        ArticleStatus @default(DRAFT)
   featuredImage String?
@@ -136,17 +136,17 @@ model Article {
 // Article translations for SEO fields only (content uses browser translation)
 // HYBRID APPROACH: Only SEO-critical fields, content from Article model
 model ArticleTranslation {
-  id             String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // Localized SEO fields
   slug           String? // Localized slug for URL (e.g., "perlindungan-pesisir")
   title          String // Localized title for SEO
-  excerpt        String?  @db.Text // Localized excerpt
+  excerpt        String? @db.Text // Localized excerpt
   seoTitle       String? // Meta title
-  seoDescription String?  @db.Text // Meta description
+  seoDescription String? @db.Text // Meta description
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   articleId  String
@@ -637,6 +637,7 @@ enum PageType {
   HOME
   ABOUT_US
   OUR_WORK
+  OUR_FUND
   GOVERNANCE
   STORIES
   GET_INVOLVED

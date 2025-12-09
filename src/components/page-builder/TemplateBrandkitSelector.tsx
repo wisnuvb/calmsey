@@ -24,6 +24,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Copy, Palette, Plus, CheckCircle, AlertTriangle } from "lucide-react";
 import { Brandkit } from "@/types/brandkit";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface TemplateBrandkitSelectorProps {
   onCreatePage: (data: {
@@ -152,7 +153,7 @@ export function TemplateBrandkitSelector({
                 <div className="flex items-start gap-3">
                   {selectedTemplate.previewImage && (
                     <Image
-                      src={selectedTemplate.previewImage}
+                      src={getImageUrl(selectedTemplate.previewImage)}
                       alt={selectedTemplate.name}
                       className="w-16 h-16 rounded object-cover"
                       width={64}

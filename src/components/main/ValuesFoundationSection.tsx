@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
 interface ValuesFoundationSectionProps {
   title?: string;
@@ -29,7 +30,7 @@ export const ValuesFoundationSection: React.FC<
     <section className="w-full relative mt-28">
       <div className="bg-[#548F93] h-[282px] relative">
         <Image
-          src={image}
+          src={getImageUrl(image)}
           alt={imageAlt}
           width={1000}
           height={500}

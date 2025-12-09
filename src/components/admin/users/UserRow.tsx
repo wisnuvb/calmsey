@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { User, ROLE_LABELS } from "@/types/user";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface UserRowProps {
   user: User;
@@ -138,7 +139,7 @@ export default function UserRow({
           <div className="flex-shrink-0 h-10 w-10">
             {user.image ? (
               <Image
-                src={user.image}
+                src={getImageUrl(user.image)}
                 alt={user.name || "User"}
                 className="h-10 w-10 rounded-full object-cover"
                 width={100}

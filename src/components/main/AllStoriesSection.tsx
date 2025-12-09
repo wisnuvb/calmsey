@@ -5,6 +5,7 @@ import Image from "next/image";
 import { H2, H3, H5, P } from "../ui/typography";
 import { Play, MapPin, Calendar, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getImageUrl } from "@/lib/utils";
 
 interface Story {
   id: string;
@@ -141,7 +142,7 @@ export const AllStoriesSection: React.FC<AllStoriesSectionProps> = ({
               <div className="col-span-11 sm:col-span-5">
                 <div className="relative aspect-[6/4] bg-gray-200 overflow-hidden group">
                   <Image
-                    src={story.thumbnail}
+                    src={getImageUrl(story.thumbnail)}
                     alt={story.thumbnailAlt}
                     fill
                     className="object-cover"

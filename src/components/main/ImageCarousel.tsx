@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface CarouselImage {
   id: string;
@@ -69,7 +70,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
                 className={`relative overflow-hidden rounded-lg bg-gray-200 ${getAspectRatioClass()}`}
               >
                 <Image
-                  src={image.src}
+                  src={getImageUrl(image.src)}
                   alt={image.alt}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"

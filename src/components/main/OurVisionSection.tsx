@@ -1,59 +1,105 @@
 "use client";
 
-import { CheckCircle, ArrowRight } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import Image from "next/image";
-import { H2, P } from "@/components/ui/typography";
+import { H2 } from "@/components/ui/typography";
+import { usePageContent } from "@/contexts/PageContentContext";
+import { getImageUrl } from "@/lib/utils";
 
-export function OurVisionSection() {
+interface OurVisionSectionProps {
+  title?: string;
+  content?: string;
+  image?: string;
+  imageAlt?: string;
+}
+
+export function OurVisionSection({
+  title: propTitle,
+  content: propContent,
+  image: propImage,
+  imageAlt: propImageAlt,
+}: OurVisionSectionProps = {}) {
+  // Try to get content from context, fallback to empty object if not available
+  let pageContent: Record<string, string> = {};
+  try {
+    const context = usePageContent();
+    pageContent = context.content;
+  } catch {
+    // Not in PageContentProvider, use props only
+  }
+
+  // Helper to get value from content
+  const getContentValue = (key: string, defaultValue: string = ""): string => {
+    return pageContent[key] || defaultValue;
+  };
+
+  // Helper function to get value with priority: context > props > default
+  const getValue = (
+    contentKey: string,
+    propValue?: string,
+    defaultValue: string = ""
+  ): string => {
+    const contentValue = getContentValue(contentKey, "");
+    if (contentValue && contentValue.trim() !== "") {
+      return contentValue;
+    }
+    if (propValue && propValue.trim() !== "") {
+      return propValue;
+    }
+    return defaultValue;
+  };
+
+  // Get all values with priority: context > props > default
+  const title = getValue("vision.title", propTitle, "Our Vision");
+  const content = getValue(
+    "vision.content",
+    propContent,
+    "Local communities, small-scale fishers and fish workers, and Indigenous Peoples fully experience their tenure, and associated rights and agency in the allocation, use, conservation, management and development of coastal lands, shorelines, oceans, lakes, rivers, and associated resources – toward better environmental and societal outcomes."
+  );
+  const image = getValue(
+    "vision.image",
+    propImage,
+    "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png"
+  );
+  const imageAlt = getValue(
+    "vision.imageAlt",
+    propImageAlt,
+    "Woman holding dried fish in outdoor setting"
+  );
+
   return (
     <section className="py-16 lg:py-24 bg-white">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-          <div className="space-y-8">
-            <div className="flex items-start space-x-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left Column - Content */}
+          <div className="space-y-6">
+            {/* Heading with Icon */}
+            <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-[#3C62ED] rounded-lg flex items-center justify-center ">
-                  <CheckCircle className="w-4 h-4 text-white" />
+                <div className="w-12 h-12 bg-[#3C62ED] rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-white" />
                 </div>
               </div>
               <div>
                 <H2 style="h2bold" className="text-[#010107]">
-                  Our Vision
+                  {title}
                 </H2>
               </div>
             </div>
 
             {/* Vision Description */}
-            <div className="space-y-6">
-              <P style="p1reg" className="text-[#060726CC]">
-                Local communities, small-scale fishers and fish workers, and
-                Indigenous Peoples fully experience their tenure, and associated
-                rights and agency in the allocation, use, conservation,
-                management and development of coastal lands, shorelines, oceans,
-                lakes, rivers, and associated resources – toward better
-                environmental and societal outcomes.
-              </P>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="inline-flex items-center justify-center px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium">
-                Core Values
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </button>
-
-              <button className="inline-flex items-center justify-center px-6 py-3 bg-white text-black border-2 border-black rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                Our Principles
-              </button>
-            </div>
+            <div
+              className="text-[#060726CC] leading-relaxed text-base font-normal font-nunito-sans"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
           </div>
 
           {/* Right Column - Image */}
           <div className="relative">
-            <div className="relative w-full h-96 lg:h-[400px] rounded-2xl overflow-hidden">
+            <div className="relative w-full aspect-[5/4] lg:aspect-[6/4] overflow-hidden">
               <Image
-                src="/assets/demo/our-vision.png"
-                alt="Group of women in collaborative meeting discussing community rights and environmental protection"
+                src={getImageUrl(image)}
+                alt={imageAlt}
                 fill
                 className="object-cover"
                 priority

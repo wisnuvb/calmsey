@@ -5,6 +5,7 @@ export * from "./OngoingProjectsSection";
 export * from "./PartnerStoriesSection";
 export * from "./LatestArticlesSection";
 export * from "./StrategyDownloadSection";
+export * from "./OurWorkSection";
 
 // About Us
 export * from "./AboutUsHeroSection";
@@ -16,6 +17,11 @@ export * from "./DownloadFramework";
 export * from "./TeamSection";
 export * from "./ImageCarousel";
 export * from "./TenureFacilitySection";
+export * from "./QuoteSection";
+export * from "./TheoryOfChangeSection";
+export * from "./GenesisSection";
+export * from "./FundersSection";
+export * from "./TriptychGallerySection";
 
 // Our Work
 export * from "./CaseStudyCarousel";
@@ -35,6 +41,8 @@ export * from "./SteeringCommitteeSection";
 export * from "./AdvisoryCommitteesSection";
 export * from "./VoiceMattersHeroSection";
 export * from "./GetInvolvedSection";
+export * from "./RelationshipsSection";
+export * from "./LatestActivitySection";
 
 // Partners
 export * from "./PotentialPartnersSection";
@@ -54,3 +62,15 @@ export * from "./DetailStoryHeroSection";
 export * from "./DetailStoryVideoSection";
 export * from "./DetailStoryContentSection";
 export * from "./LatestStoriesSection";
+export * from "./AllStoriesListSection";
+
+// our fund
+export * from "./GrantmakingSection";
+export * from "./OurFourFundsSection";
+export * from "./FundDetailHeader";
+export * from "./FundDetailContent";
+
+// Governance
+export * from "./OurValuesPrinciplesSection";
+export * from "./GrantmakingProcessSection";
+export * from "./ConsultativeProcessSection";

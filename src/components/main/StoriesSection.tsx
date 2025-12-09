@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { H3, P } from "../ui/typography";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 interface VideoStory {
@@ -35,7 +35,7 @@ const VideoCard: React.FC<VideoStory> = ({
       }`}
     >
       <Image
-        src={imageSrc}
+        src={getImageUrl(imageSrc)}
         alt={imageAlt}
         width={isLarge ? 700 : 350}
         height={isLarge ? 400 : 200}

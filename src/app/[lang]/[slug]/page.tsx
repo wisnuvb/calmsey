@@ -1,17 +1,22 @@
 import { SimpleCMS } from "@/lib/services/simple-cms";
+import { getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 interface PageProps {
   params: Promise<{
     lang: string;
-    slug: string[];
+    slug: string | string[];
   }>;
 }
 
 export default async function DynamicPage({ params }: PageProps) {
   const { lang, slug } = await params;
-  const slugString = slug.join("/");
+
+  // Ensure slug is an array
+  const slugArray = Array.isArray(slug) ? slug : [slug];
+  const slugString = slugArray.join("/");
+
   const page = await SimpleCMS.getPageBySlug(slugString, lang);
 
   if (!page) {
@@ -26,7 +31,7 @@ export default async function DynamicPage({ params }: PageProps) {
             <Image
               width={1000}
               height={1000}
-              src={page.featuredImage}
+              src={getImageUrl(page.featuredImage)}
               alt={page.title}
               className="w-full h-64 object-cover rounded-lg"
             />

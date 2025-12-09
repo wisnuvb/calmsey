@@ -24,6 +24,7 @@ interface ArticleData {
   categories: string[];
   tags: string[];
   translations: Translation[];
+  content: string;
 }
 
 export default function EditArticlePage() {
@@ -52,16 +53,49 @@ export default function EditArticlePage() {
       if (response.ok) {
         const result = await response.json();
 
+        // Transform translations: sisipkan content dari article ke English translation
+        const transformedTranslations = (result.article.translations || []).map(
+          (t: any) => {
+            // Untuk English translation, tambahkan content dari article
+            if (t.languageId === "en") {
+              return {
+                ...t,
+                content: result.article.content || "",
+              };
+            }
+            // Untuk translation lain, content kosong (karena menggunakan browser translation)
+            return {
+              ...t,
+              content: "",
+            };
+          }
+        );
+
+        // Jika tidak ada English translation, buat satu dengan content dari article
+        const englishTranslation = transformedTranslations.find(
+          (t: any) => t.languageId === "en"
+        );
+        if (!englishTranslation) {
+          transformedTranslations.push({
+            languageId: "en",
+            title: result.article.title || "",
+            content: result.article.content || "",
+            excerpt: result.article.excerpt || "",
+            seoTitle: "",
+            seoDescription: "",
+          });
+        }
+
         // Transform the data to match our form structure
         const transformedData: ArticleData = {
           id: result.article.id,
           slug: result.article.slug,
           status: result.article.status,
           featuredImage: result.article.featuredImage || "",
-          categories:
-            result.article.categories?.map((c: any) => c.categoryId) || [],
+          categories: result.article.categories?.map((c: any) => c.id) || [],
           tags: result.article.articleTag?.map((t: any) => t.tagId) || [],
-          translations: result.article.translations || [],
+          translations: transformedTranslations,
+          content: result.article.content || "",
         };
 
         setArticleData(transformedData);
@@ -84,6 +118,7 @@ export default function EditArticlePage() {
     categories: string[];
     tags: string[];
     translations: Translation[];
+    content: string;
   }) => {
     setSaving(true);
     try {

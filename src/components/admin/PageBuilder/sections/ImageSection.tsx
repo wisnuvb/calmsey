@@ -5,6 +5,7 @@
 import React, { useState } from "react";
 import { SectionWrapper } from "../SectionRenderer";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface ImageSectionProps {
   section: any;
@@ -334,7 +335,7 @@ export default function ImageSection({
 
             {/* Lightbox Image */}
             <Image
-              src={imageUrl}
+              src={getImageUrl(imageUrl)}
               alt={imageAlt}
               className="max-w-full max-h-full object-contain"
               onClick={() => setIsLightboxOpen(false)}

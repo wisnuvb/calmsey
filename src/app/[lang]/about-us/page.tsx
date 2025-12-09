@@ -7,29 +7,56 @@ import {
   SupportSection,
   TeamSection,
   TenureFacilitySection,
+  QuoteSection,
+  TheoryOfChangeSection,
+  GenesisSection,
+  FundersSection,
+  TriptychGallerySection,
+  OurWorkSection,
 } from "@/components/main";
+import { PageContentProvider } from "@/contexts/PageContentContext";
+import { getPageContentServer } from "@/lib/page-content-server";
 import React from "react";
 
-const AboutUsPage = () => {
+interface AboutUsPageProps {
+  params: Promise<{ lang: string }>;
+}
+
+const AboutUsPage = async ({ params }: AboutUsPageProps) => {
+  const { lang } = await params;
+  const language = lang || "en";
+
+  const content = await getPageContentServer("ABOUT_US", language);
+
   return (
-    <>
+    <PageContentProvider
+      content={content}
+      pageType="ABOUT_US"
+      language={language}
+    >
       <HeroSection
-        variant="simple"
-        title="Ocean Protection & Climate Action with Communities"
-        subtitle="We are a young organisation that emerges from deep consultation. We are designed to respond to the growing and urgent need to empower with Indigenous and fisher peoples with funding, agency and rights."
-        backgroundImage="/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png"
-        dataSection="about-us"
+        variant="overlay-bottom"
+        title="Securing tenure and recognizing rights"
+        subtitle="We are a young organization built through wide-ranging consultation and by listening to the demands and priorities that Indigenous Peoples, small-scale fishers, and coastal communities have been articulating for years. We exist to support rights holders working to secure tenure over their territories—because territorial control is foundational to community agency and self-determination"
+        backgroundImage="/assets/hero-about-us.webp"
+        data-section="about-us"
       />
-      <AboutUsHeroSection />
+      <QuoteSection />
       <OurVisionSection />
       <WhatWeWannaAchieveSection />
       <OurGoalSection />
-      <SupportSection />
-      {/* <DownloadFramework /> */}
+      <TheoryOfChangeSection />
       <TeamSection />
+      <GenesisSection />
+      <FundersSection />
+      <TriptychGallerySection />
+      <OurWorkSection title="Discover Our Latest Activites and Publications" />
+      {/* <AboutUsHeroSection /> */}
+      {/* <SupportSection /> */}
+      {/* <DownloadFramework /> */}
       {/* <ImageCarousel /> */}
-      <TenureFacilitySection />
-    </>
+      {/* <TenureFacilitySection /> */}
+    </PageContentProvider>
   );
 };
 

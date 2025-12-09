@@ -28,6 +28,7 @@ import {
   MediaFile,
 } from "@/lib/media";
 import { useMedia } from "@/hooks/useMedia";
+import { getImageUrl } from "@/lib/utils";
 
 export default function MediaPage() {
   const {
@@ -560,7 +561,6 @@ function MediaCard({
   onSelect: () => void;
   onDelete: () => void;
 }) {
-  console.log(file.mimeType);
   const FileIcon = getFileIcon(file.mimeType);
   const isImage = file.mimeType.startsWith("image/");
 
@@ -584,7 +584,7 @@ function MediaCard({
       <div className="aspect-w-1 aspect-h-1 mb-3 bg-gray-100 rounded-lg overflow-hidden">
         {isImage ? (
           <Image
-            src={`https://${file.url}`}
+            src={getImageUrl(file.url)}
             alt={file.alt || file.originalName}
             width={100}
             height={100}
@@ -678,7 +678,7 @@ function MediaRow({
           <div className="flex-shrink-0 h-10 w-10">
             {isImage ? (
               <Image
-                src={file.url}
+                src={getImageUrl(file.url)}
                 alt={file.alt || file.originalName}
                 className="h-10 w-10 rounded object-cover"
                 width={40}

@@ -1,6 +1,7 @@
 // src/components/admin/BrandkitPreview.tsx
 "use client";
 
+import { getImageUrl } from "@/lib/utils";
 import { Brandkit } from "@/types/brandkit";
 import Image from "next/image";
 
@@ -264,7 +265,7 @@ export default function BrandkitPreview({ brandkit }: BrandkitPreviewProps) {
                 <p className="text-xs text-gray-500 mb-2">Primary Logo</p>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <Image
-                    src={brandkit.assets.logos.primary.light}
+                    src={getImageUrl(brandkit.assets.logos.primary.light)}
                     width={64}
                     height={64}
                     alt="Primary Logo"
@@ -280,7 +281,7 @@ export default function BrandkitPreview({ brandkit }: BrandkitPreviewProps) {
                   <Image
                     width={64}
                     height={64}
-                    src={brandkit.assets.logos.secondary.light}
+                    src={getImageUrl(brandkit.assets.logos.secondary.light)}
                     alt="Secondary Logo"
                     className="max-h-16 mx-auto"
                   />
@@ -294,7 +295,7 @@ export default function BrandkitPreview({ brandkit }: BrandkitPreviewProps) {
                   <Image
                     width={64}
                     height={64}
-                    src={brandkit.assets.logos.primary.symbol}
+                    src={getImageUrl(brandkit.assets.logos.primary.symbol)}
                     alt="Favicon"
                     className="w-8 h-8 mx-auto"
                   />
@@ -319,7 +320,7 @@ export default function BrandkitPreview({ brandkit }: BrandkitPreviewProps) {
                   <Image
                     width={64}
                     height={64}
-                    src={image.url}
+                    src={getImageUrl(image.url)}
                     alt={image.alt}
                     className="w-full h-full object-cover"
                   />

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface Funder {
   id: string;
@@ -25,37 +26,37 @@ export const OurFundersSection: React.FC<OurFundersSectionProps> = ({
     {
       id: "oceankind",
       name: "Oceankind",
-      logo: "/assets/partners/oceankind-logo.png",
+      logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
       logoAlt: "Oceankind Logo",
     },
     {
       id: "ocean-resilience",
       name: "Ocean Resilience & Climate Alliance",
-      logo: "/assets/partners/ocean-resilience-logo.png",
+      logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
       logoAlt: "Ocean Resilience & Climate Alliance Logo",
     },
     {
       id: "packard",
       name: "The David & Lucile Packard Foundation",
-      logo: "/assets/partners/packard-logo.png",
+      logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
       logoAlt: "The David & Lucile Packard Foundation Logo",
     },
     {
       id: "builders",
       name: "Builders Initiative",
-      logo: "/assets/partners/builders-logo.png",
+      logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
       logoAlt: "Builders Initiative Logo",
     },
     {
       id: "oak",
       name: "Oak Foundation",
-      logo: "/assets/partners/oak-logo.png",
+      logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
       logoAlt: "Oak Foundation Logo",
     },
     {
       id: "cargill",
       name: "Margaret A. Cargill Philanthropies",
-      logo: "/assets/partners/cargill-logo.png",
+      logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
       logoAlt: "Margaret A. Cargill Philanthropies Logo",
     },
   ],
@@ -82,7 +83,7 @@ export const OurFundersSection: React.FC<OurFundersSectionProps> = ({
               className="flex items-center justify-center p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors duration-200"
             >
               <Image
-                src={funder.logo}
+                src={getImageUrl(funder.logo)}
                 alt={funder.logoAlt}
                 width={120}
                 height={80}

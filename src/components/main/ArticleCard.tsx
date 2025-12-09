@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface ArticleCardProps {
   image: string;
@@ -26,7 +27,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
     >
       <div className="relative w-full h-48 overflow-hidden">
         <Image
-          src={image}
+          src={getImageUrl(image)}
           alt={imageAlt}
           fill
           className="object-cover"

@@ -9,7 +9,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { H2, H3, H5, P } from "../ui/typography";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 
 interface PartnerOrganization {
@@ -64,7 +64,7 @@ export function DetailStoryContentSection({
                     Partner Organization
                   </H3>
                   <Image
-                    src={partnerOrganization.logo}
+                    src={getImageUrl(partnerOrganization.logo)}
                     alt={partnerOrganization.name}
                     width={128}
                     height={128}
@@ -141,7 +141,7 @@ export function DetailStoryContentSection({
                     className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
                   >
                     <Image
-                      src={photo.src}
+                      src={getImageUrl(photo.src)}
                       alt={photo.alt}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"

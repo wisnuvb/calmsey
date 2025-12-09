@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
 
@@ -97,7 +98,7 @@ export const Lightbox: React.FC<LightboxProps> = ({
         {/* Main image */}
         <div onClick={(e) => e.stopPropagation()}>
           <Image
-            src={selectedImage.src}
+            src={getImageUrl(selectedImage.src)}
             alt={selectedImage.alt}
             width={1200}
             height={800}

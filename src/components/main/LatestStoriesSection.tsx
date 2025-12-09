@@ -5,6 +5,7 @@ import Image from "next/image";
 import { H3, H5, P } from "@/components/ui/typography";
 import { Play, MapPin, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getImageUrl } from "@/lib/utils";
 
 interface Story {
   id: string;
@@ -98,7 +99,7 @@ export const LatestStoriesSection: React.FC<LatestStoriesSectionProps> = ({
               {/* Video Thumbnail */}
               <div className="relative aspect-[16/10] bg-gray-200 overflow-hidden mb-8">
                 <Image
-                  src={story.thumbnail}
+                  src={getImageUrl(story.thumbnail)}
                   alt={story.thumbnailAlt}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"

@@ -1,4 +1,6 @@
 import { SimpleFontLoader } from "@/components/SimpleFontLoader";
+import { ToastProvider } from "@/components/ui/toast";
+
 import "./globals.css";
 
 export const metadata = {
@@ -15,7 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <SimpleFontLoader />
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

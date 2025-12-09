@@ -20,8 +20,8 @@ const navLinks: NavLink[] = [
   { label: "Our Work", href: "/our-work" },
   { label: "Our Fund", href: "/our-fund" },
   { label: "Governance", href: "/governance" },
-  { label: "Stories", href: "/stories" },
-  { label: "Articles", href: "/articles" },
+  { label: "Partner Stories", href: "/stories" },
+  // { label: "Articles", href: "/articles" },
 ];
 
 interface BackgroundContextType {
@@ -88,7 +88,6 @@ const analyzeElementBackground = (element: Element) => {
       cssVars[prop as keyof typeof cssVars] = rootStyles.getPropertyValue(prop);
     }
   }
-
   return analyzeBackgroundColor(element);
 };
 
@@ -121,10 +120,10 @@ export function Navbar() {
 
   useEffect(() => {
     const detectBackground = () => {
-      // Cari semua elemen dengan data-section
+      // Find all elements with data-section
       const sections = document.querySelectorAll("[data-section]");
 
-      // Cari section yang sedang terlihat di viewport
+      // Find section that is currently visible in the viewport
       let visibleSection = null;
       let maxVisibleArea = 0;
 
@@ -155,27 +154,27 @@ export function Navbar() {
       detectBackground();
     };
 
-    // Reset state saat navigasi
+    // Reset state when navigating
     setCurrentBackgroundAnalysis(null);
     setBackgroundType("light");
 
-    // Deteksi awal dengan delay untuk memastikan DOM sudah ter-render
+    // Detect initial with delay to ensure DOM has been rendered
     const timeoutId = setTimeout(() => {
       detectBackground();
     }, 100);
 
-    // Deteksi saat scroll
+    // Detect when scrolling
     window.addEventListener("scroll", handleScroll);
 
     return () => {
       clearTimeout(timeoutId);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []); // Hapus dependency array atau tambahkan pathname jika perlu
+  }, []); // Remove dependency array or add pathname if needed
 
-  // Ganti useEffect untuk route change dengan pathname
+  // Replace useEffect for route change with pathname
   useEffect(() => {
-    // Reset dan deteksi ulang saat route berubah
+    // Reset and detect again when route changes
     setCurrentBackgroundAnalysis(null);
     setBackgroundType("light");
 
@@ -213,7 +212,7 @@ export function Navbar() {
     }, 200);
 
     return () => clearTimeout(timeoutId);
-  }, [pathname]); // Gunakan pathname dari Next.js router
+  }, [pathname]); // Use pathname from Next.js router
 
   const getLogoSrc = () => {
     if (isScrolled) {
@@ -221,11 +220,11 @@ export function Navbar() {
     } else {
       if (currentBackgroundAnalysis) {
         return currentBackgroundAnalysis.isLight
-          ? "/assets/Logo-blue.png"
+          ? "/assets/Logo.png"
           : "/assets/Logo-white.png";
       } else {
         return backgroundType === "light"
-          ? "/assets/Logo-blue.png"
+          ? "/assets/Logo.png"
           : "/assets/Logo-white.png";
       }
     }

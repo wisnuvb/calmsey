@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { ChevronDown, Send } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
 interface GetInvolvedSectionProps {
   backgroundImage?: string;
@@ -65,7 +66,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
           <div className="relative">
             <div className="absolute inset-0">
               <Image
-                src={backgroundImage}
+                src={getImageUrl(backgroundImage)}
                 alt={backgroundImageAlt}
                 fill
                 className="object-cover"

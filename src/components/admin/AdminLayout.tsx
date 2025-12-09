@@ -21,15 +21,15 @@ import {
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: HomeIcon },
-  { name: "Menus", href: "/admin/menus", icon: Bars3Icon },
+  // { name: "Menus", href: "/admin/menus", icon: Bars3Icon },
   { name: "Page Content", href: "/admin/page-content", icon: PencilSquareIcon },
-  { name: "Pages", href: "/admin/pages", icon: DocumentTextIcon },
+  // { name: "Pages", href: "/admin/pages", icon: DocumentTextIcon },
   { name: "Articles", href: "/admin/articles", icon: DocumentTextIcon },
   { name: "Categories", href: "/admin/categories", icon: FolderIcon },
   { name: "Tags", href: "/admin/tags", icon: TagIcon },
   { name: "Media", href: "/admin/media", icon: PhotoIcon },
   // { name: "Brandkits", href: "/admin/brandkits", icon: PaletteIcon },
-  { name: "Contact", href: "/admin/contact", icon: ChatBubbleLeftRightIcon },
+  // { name: "Contact", href: "/admin/contact", icon: ChatBubbleLeftRightIcon },
   { name: "Users", href: "/admin/users", icon: UserGroupIcon },
   { name: "Settings", href: "/admin/settings", icon: CogIcon },
 ];

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PublicArticle, SupportedLanguage } from "@/lib/public-api";
 import Image from "next/image";
 import { formatDate } from "date-fns";
+import { getImageUrl } from "@/lib/utils";
 
 interface ArticleCardProps {
   article: PublicArticle;
@@ -23,7 +24,7 @@ export function ArticleCard({
       {article.featuredImage && (
         <div className="aspect-w-16 aspect-h-9">
           <Image
-            src={article.featuredImage}
+            src={getImageUrl(article.featuredImage)}
             alt={article.title}
             className="w-full h-48 object-cover"
             width={1000}

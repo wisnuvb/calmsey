@@ -3,6 +3,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
 interface CaseStudy {
   id: string;
@@ -190,7 +191,7 @@ export const CaseStudyCarousel: React.FC<CaseStudyCarouselProps> = ({
               {/* Image */}
               <div className="relative h-48 rounded-t-lg overflow-hidden">
                 <Image
-                  src={caseStudy.image}
+                  src={getImageUrl(caseStudy.image)}
                   alt={caseStudy.title}
                   fill
                   className="object-cover"

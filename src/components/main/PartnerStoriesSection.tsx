@@ -1,186 +1,435 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { Play } from "lucide-react";
+import { cn, getImageUrl } from "@/lib/utils";
+import { usePageContent } from "@/contexts/PageContentContext";
 
 interface Story {
-  quote: string;
-  organization: string;
-  logo: string;
-  bgImage: string;
+  id: string;
+  imageSrc: string;
+  imageAlt: string;
+  title: string;
+  description?: string;
+  url: string;
+  type: "video" | "article";
 }
 
-const stories: Story[] = [
+interface ArticleResponse {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt?: string;
+  featuredImage?: string;
+  publishedAt: string | Date;
+  categories?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+  }>;
+}
+
+const defaultStories: Story[] = [
   {
-    quote:
-      "Turning Tides' support makes it possible to safeguard the community's rights to manage their own territory",
-    organization: "Indonesian Marine Conservation Foundation",
-    logo: "/logos/imcf.svg",
-    bgImage: "/stories/indonesia-fisher.jpg",
+    id: "1",
+    imageSrc:
+      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=500&fit=crop",
+    imageAlt: "Pasibuntuliki - Lines of the Sea",
+    title: "Pasibuntuliki - Lines of the Sea",
+    description:
+      "What's remarkable is that this forum was born from the people's own initiative",
+    url: "#",
+    type: "video",
   },
   {
-    quote:
-      "Their partnership approach empowers local communities to take control of their coastal resources",
-    organization: "Honduras Coastal Alliance",
-    logo: "/logos/hca.svg",
-    bgImage: "/stories/honduras-community.jpg",
+    id: "2",
+    imageSrc:
+      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=500&fit=crop",
+    imageAlt: "After Anchoring the Boat",
+    title: "After Anchoring the Boat",
+    description: "They just deliver the fish and that's it.",
+    url: "#",
+    type: "video",
   },
   {
-    quote:
-      "Working with Turning Tides has transformed how we engage with fishing communities",
-    organization: "Senegal Ocean Guardians",
-    logo: "/logos/sog.svg",
-    bgImage: "/stories/senegal-fishers.jpg",
-  },
-  {
-    quote:
-      "The collaborative model ensures sustainable management while respecting indigenous rights",
-    organization: "Bangladesh Fisheries Network",
-    logo: "/logos/bfn.svg",
-    bgImage: "/stories/bangladesh-mangrove.jpg",
-  },
-  {
-    quote:
-      "Together we're creating lasting change in marine conservation and community empowerment",
-    organization: "Gambia Coastal Protection",
-    logo: "/logos/gcp.svg",
-    bgImage: "/stories/gambia-beach.jpg",
+    id: "3",
+    imageSrc:
+      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=500&fit=crop",
+    imageAlt: "Towards Tenure Reform for Indigenous Te...",
+    title: "Towards Tenure Reform for Indigenous Te...",
+    description: "",
+    url: "#",
+    type: "article",
   },
 ];
 
-export function PartnerStoriesSection() {
-  const [currentIndex, setCurrentIndex] = useState(0);
+interface PartnerStoriesSectionProps {
+  tag?: string;
+  title?: string;
+  description?: string;
+  buttonText?: string;
+  buttonUrl?: string;
+  backgroundColor?: "blue" | "white";
+  categorySlug?: string;
+  limit?: number;
+  className?: string;
+}
 
-  const nextStory = () => {
-    setCurrentIndex((prev) => (prev + 1) % stories.length);
+export function PartnerStoriesSection({
+  tag: propTag,
+  title: propTitle,
+  description: propDescription,
+  buttonText: propButtonText,
+  buttonUrl: propButtonUrl,
+  backgroundColor: propBackgroundColor = "blue",
+  categorySlug: propCategorySlug,
+  limit: propLimit = 3,
+  className,
+}: PartnerStoriesSectionProps = {}) {
+  // Try to get content from context
+  let pageContent: Record<string, string> = {};
+  try {
+    const context = usePageContent();
+    pageContent = context.content;
+  } catch {
+    // Not in PageContentProvider, use props only
+  }
+
+  // Helper to get value from content
+  const getContentValue = (key: string, defaultValue: string = ""): string => {
+    return pageContent[key] || defaultValue;
   };
 
-  const prevStory = () => {
-    setCurrentIndex((prev) => (prev - 1 + stories.length) % stories.length);
+  // Helper function to get value with priority: context > props > default
+  const getValue = (
+    contentKey: string,
+    propValue?: string,
+    defaultValue: string = ""
+  ): string => {
+    const contentValue = getContentValue(contentKey, "");
+    if (contentValue && contentValue.trim() !== "") {
+      return contentValue;
+    }
+    if (propValue && propValue.trim() !== "") {
+      return propValue;
+    }
+    return defaultValue;
   };
 
-  const currentStory = stories[currentIndex];
+  // Get all values with priority: context > props > default
+  const tag = getValue("partnerStories.tag", propTag, "");
+  const title = getValue("partnerStories.title", propTitle, "");
+  const description = getValue(
+    "partnerStories.description",
+    propDescription,
+    ""
+  );
+  const buttonText = getValue("partnerStories.buttonText", propButtonText, "");
+  const buttonUrl = getValue("partnerStories.buttonUrl", propButtonUrl, "");
+  const backgroundColor =
+    (getValue("partnerStories.backgroundColor", propBackgroundColor, "blue") as
+      | "blue"
+      | "white") || propBackgroundColor;
+  const categorySlug = getValue(
+    "partnerStories.categorySlug",
+    propCategorySlug,
+    ""
+  );
+  const limitString = getValue(
+    "partnerStories.limit",
+    propLimit?.toString(),
+    "3"
+  );
+  const limit = parseInt(limitString, 10) || 3;
+
+  const [stories, setStories] = useState<Story[]>(defaultStories);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch articles from API
+  useEffect(() => {
+    const fetchStories = async () => {
+      setLoading(true);
+      try {
+        const language = "en"; // You can get this from context if needed
+        const params = new URLSearchParams({
+          lang: language,
+          limit: limit.toString(),
+        });
+
+        if (categorySlug) {
+          params.append("category", categorySlug);
+        }
+
+        const response = await fetch(`/api/public/articles?${params}`);
+        const data = await response.json();
+
+        if (data.articles && Array.isArray(data.articles)) {
+          // Transform articles to stories
+          const transformedStories: Story[] = data.articles.map(
+            (article: ArticleResponse) => {
+              // Determine type based on categories or default to article
+              const isVideo =
+                article.categories?.some((cat) =>
+                  cat.slug.toLowerCase().includes("video")
+                ) || false;
+
+              // Build URL from slug
+              const articleUrl = `/${language}/articles/${article.slug}`;
+
+              return {
+                id: article.id,
+                imageSrc: article.featuredImage || "",
+                imageAlt: article.title || "Story image",
+                title: article.title || "",
+                description: article.excerpt || "",
+                url: articleUrl,
+                type: isVideo ? "video" : "article",
+              };
+            }
+          );
+
+          setStories(transformedStories);
+        }
+      } catch (error) {
+        console.error("Failed to fetch stories:", error);
+        setStories(defaultStories);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStories();
+  }, [categorySlug, limit]);
+
+  const mainStory = stories[0];
+  const sideStories = stories.slice(1);
+
+  const isBlueBackground = backgroundColor === "blue";
+  const textColor = isBlueBackground ? "text-white" : "text-[#010107]";
+  const textColorSecondary = isBlueBackground
+    ? "text-white/90"
+    : "text-[#060726CC]";
+  const borderColor = isBlueBackground ? "border-white/40" : "border-gray-300";
+  const buttonBg = isBlueBackground
+    ? "bg-white"
+    : "bg-white border border-gray-900";
+  const buttonTextColor = isBlueBackground ? "text-gray-900" : "text-gray-900";
 
   return (
-    <section className="relative min-h-[600px] lg:min-h-[700px] overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0">
-        <Image
-          src="/assets/partner1.webp"
-          alt="Community partner"
-          fill
-          className="object-cover transition-opacity duration-700"
-          priority
-        />
-        {/* Dark overlay - tambahkan z-index */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black0/70 to-black/10 z-10" />
-      </div>
+    <section
+      className={cn(
+        "relative overflow-hidden py-16 lg:py-24",
+        backgroundColor === "blue" ? "bg-[#3C62ED]" : "bg-white",
+        className
+      )}
+    >
+      {/* Content Container */}
+      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section - Only show if any header content exists */}
+        {(tag || title || description || buttonText) && (
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-12">
+            {/* Left Side - Tag, Title and Description */}
+            {(tag || title || description) && (
+              <div className={cn("space-y-[15px]", textColor)}>
+                {/* Tag */}
+                {tag && (
+                  <div className="inline-block">
+                    <span
+                      className={cn(
+                        "px-4 py-2 border rounded-full text-sm font-medium uppercase tracking-wider",
+                        borderColor,
+                        textColor
+                      )}
+                    >
+                      {tag}
+                    </span>
+                  </div>
+                )}
 
-      {/* Content Container - ubah z-index menjadi lebih tinggi */}
-      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 min-h-[600px] lg:min-h-[700px] flex items-center">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 w-full items-center">
-          {/* Left Side - Title and Description */}
-          <div className="text-white space-y-8">
-            {/* Tag */}
-            <div className="inline-block">
-              <span className="px-4 py-2 border border-white/40 rounded-full text-sm font-medium uppercase tracking-wider">
-                COMMUNITY ECHOES
-              </span>
-            </div>
+                {/* Title */}
+                {title && (
+                  <h2
+                    className={cn(
+                      "text-3xl sm:text-[38px] font-nunito-sans font-bold leading-tight",
+                      textColor
+                    )}
+                  >
+                    {title}
+                  </h2>
+                )}
 
-            {/* Title */}
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-              Stories From Our Partners
-            </h2>
-
-            {/* Description */}
-            <p className="text-lg lg:text-xl text-white/90 max-w-lg">
-              Turning Tides engages with a diversity of partners – across
-              multiple levels
-            </p>
-
-            {/* All Partners Button */}
-            <div className="pt-4">
-              <Link
-                href="/partners"
-                className="inline-block px-8 py-3 border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition-colors font-medium"
-              >
-                All Partners
-              </Link>
-            </div>
-          </div>
-
-          {/* Right Side - Testimonial Card */}
-          <div className="relative">
-            <div className="bg-white rounded-2xl p-8 lg:p-10 shadow-2xl">
-              {/* Quote */}
-              <blockquote className="mb-8">
-                <p className="text-xl lg:text-2xl text-gray-900 leading-relaxed">
-                  &quot;{currentStory.quote}&quot;
-                </p>
-              </blockquote>
-
-              {/* Organization Info */}
-              <div className="flex items-center gap-4">
-                {/* Logo */}
-                <div className="relative w-16 h-16 flex-shrink-0">
-                  <Image
-                    src={currentStory.logo}
-                    alt={currentStory.organization}
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-
-                {/* Organization Name */}
-                <div>
-                  <p className="text-sm lg:text-base font-medium text-gray-900">
-                    {currentStory.organization}
+                {/* Description */}
+                {description && (
+                  <p
+                    className={cn(
+                      "text-lg lg:text-xl max-w-lg",
+                      textColorSecondary
+                    )}
+                  >
+                    {description}
                   </p>
-                </div>
+                )}
               </div>
-            </div>
+            )}
 
-            {/* Carousel Controls */}
-            <div className="flex items-center justify-between mt-6">
-              {/* Counter */}
-              <div className="text-white font-medium">
-                {currentIndex + 1} of {stories.length}
+            {/* Right Side - All Stories Button */}
+            {buttonText && (
+              <div className="flex items-start lg:pt-[60px]">
+                <Link
+                  href={buttonUrl || "#"}
+                  className={cn(
+                    "inline-block px-6 py-3 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors font-medium",
+                    buttonBg,
+                    buttonTextColor,
+                    isBlueBackground
+                      ? "hover:bg-gray-100 focus:ring-white"
+                      : "border border-gray-900 hover:bg-gray-50 focus:ring-gray-900"
+                  )}
+                >
+                  {buttonText}
+                </Link>
               </div>
+            )}
+          </div>
+        )}
 
-              {/* Navigation Buttons */}
-              <div className="flex gap-3">
-                <button
-                  onClick={prevStory}
-                  className={cn(
-                    "w-12 h-12 rounded-full border flex items-center justify-center transition-all",
-                    currentIndex !== 0
-                      ? "bg-white border-white hover:bg-gray-100 text-gray-900"
-                      : "opacity-50 bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white hover:text-gray-900"
-                  )}
-                  aria-label="Previous story"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={nextStory}
-                  className={cn(
-                    "w-12 h-12 rounded-full border flex items-center justify-center transition-all",
-                    currentIndex !== stories.length - 1
-                      ? "bg-white border-white hover:bg-gray-100 text-gray-900"
-                      : "opacity-50 bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white hover:text-gray-900"
-                  )}
-                  aria-label="Next story"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-              </div>
+        {/* Stories Gallery Section */}
+        {loading ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Loading skeleton for main story */}
+            <div className="lg:col-span-2 relative overflow-hidden rounded-lg h-[400px] lg:h-[500px] bg-gray-200 animate-pulse" />
+            {/* Loading skeleton for side stories */}
+            <div className="lg:col-span-1 flex flex-col gap-6 h-[400px] lg:h-[500px]">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="relative overflow-hidden rounded-lg flex-1 min-h-0 bg-gray-200 animate-pulse"
+                />
+              ))}
             </div>
           </div>
-        </div>
+        ) : stories.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            No stories found
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Large Story Thumbnail - Left */}
+            {mainStory && (
+              <div className="lg:col-span-2 relative group overflow-hidden rounded-lg h-[400px] lg:h-[500px]">
+                <Image
+                  src={getImageUrl(mainStory.imageSrc)}
+                  alt={mainStory.imageAlt}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src =
+                      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=500&fit=crop";
+                  }}
+                />
+
+                {/* Play Button Overlay - Only for Video */}
+                {mainStory.type === "video" && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all duration-300 pointer-events-none z-10">
+                    <button
+                      className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110 cursor-pointer pointer-events-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+                      aria-label={`Play video: ${mainStory.title}`}
+                    >
+                      <Play
+                        className="w-8 h-8 text-gray-900 fill-current ml-1"
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </div>
+                )}
+
+                {/* Dark Overlay at Bottom */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/80 to-transparent p-6 lg:p-8 z-20">
+                  {mainStory.title && (
+                    <h3 className="text-xl lg:text-2xl font-bold text-white mb-2 font-nunito-sans">
+                      {mainStory.title}
+                    </h3>
+                  )}
+                  {mainStory.description && (
+                    <p className="text-base lg:text-lg text-white/90 mb-4 font-work-sans">
+                      {mainStory.description}
+                    </p>
+                  )}
+                  <Link
+                    href={mainStory.url}
+                    className="inline-block px-6 py-2 border border-white text-white text-sm font-semibold rounded-md hover:bg-white hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black transition-colors duration-300"
+                    aria-label={`${
+                      mainStory.type === "video" ? "Watch" : "Read"
+                    }: ${mainStory.title}`}
+                  >
+                    {mainStory.type === "video" ? "Watch Now" : "Read More"}
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Small Story Thumbnails - Right */}
+            {sideStories.length > 0 && (
+              <div
+                className="lg:col-span-1 flex flex-col gap-6 h-[400px] lg:h-[500px]"
+                role="list"
+                aria-label="Additional partner stories"
+              >
+                {sideStories.map((story) => (
+                  <div
+                    key={story.id}
+                    className="relative group overflow-hidden rounded-lg flex-1 min-h-0"
+                    role="listitem"
+                  >
+                    <Image
+                      src={getImageUrl(story.imageSrc)}
+                      alt={story.imageAlt}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src =
+                          "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=500&fit=crop";
+                      }}
+                    />
+
+                    {/* Play Button Overlay - Only for Video */}
+                    {story.type === "video" && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all duration-300 pointer-events-none z-10">
+                        <button
+                          className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110 cursor-pointer pointer-events-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+                          aria-label={`Play video: ${story.title}`}
+                        >
+                          <Play
+                            className="w-5 h-5 text-gray-900 fill-current ml-0.5"
+                            aria-hidden="true"
+                          />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Dark Overlay at Bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/80 to-transparent p-4 lg:p-5 z-20">
+                      {story.title && (
+                        <h3 className="text-base lg:text-lg font-bold text-white mb-1 font-nunito-sans">
+                          {story.title}
+                        </h3>
+                      )}
+                      {story.description && (
+                        <p className="text-sm lg:text-base text-white/90 font-work-sans">
+                          {story.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

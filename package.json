@@ -18,6 +18,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "postinstall": "node scripts/copy-tinymce.mjs",
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -42,6 +43,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.1",
+    "@monaco-editor/react": "^4.7.0",
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-label": "^2.1.7",
@@ -53,6 +55,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-switch": "^1.2.5",
     "@radix-ui/react-tabs": "^1.1.12",
+    "@tinymce/tinymce-react": "^5.1.1",
     "autoprefixer": "^10.4.21",
     "aws-sdk": "^2.1692.0",
     "bcryptjs": "^3.0.2",
@@ -81,6 +84,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
+    "tinymce": "^7.5.1",
     "uuid": "^11.1.0",
     "zod": "^4.0.17"
   },
@@ -91,8 +95,10 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-simple-maps": "^3.0.6",
+    "@types/tinymce": "^4.6.9",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
+    "fs-extra": "^11.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5"
   }

@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { Globe, Handshake } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
 interface AdvisoryCommitteesSectionProps {
   image?: string;
@@ -36,7 +37,7 @@ export const AdvisoryCommitteesSection: React.FC<
           <div className="order-2 lg:order-1">
             <div className="relative w-full h-96 lg:h-[500px] rounded-lg overflow-hidden shadow-lg">
               <Image
-                src={image}
+                src={getImageUrl(image)}
                 alt={imageAlt}
                 fill
                 className="object-cover"

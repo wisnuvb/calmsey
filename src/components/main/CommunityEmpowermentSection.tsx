@@ -6,6 +6,7 @@ import Masonry from "react-masonry-css";
 import { H2 } from "@/components/ui/typography";
 import { SearchIcon } from "lucide-react";
 import { Lightbox } from "../common";
+import { getImageUrl } from "@/lib/utils";
 
 interface CommunityImage {
   id: string;
@@ -145,7 +146,7 @@ export const CommunityEmpowermentSection: React.FC<
               onClick={() => openLightbox(image, index)}
             >
               <Image
-                src={image.src}
+                src={getImageUrl(image.src)}
                 alt={image.alt}
                 width={400}
                 height={0}

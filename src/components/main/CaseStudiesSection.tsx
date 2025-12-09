@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { CaseStudyCard } from "./CaseStudyCard";
+import { getImageUrl } from "@/lib/utils";
 
 interface MainCaseStudy {
   image: string;
@@ -74,7 +75,7 @@ export const CaseStudiesSection: React.FC<CaseStudiesSectionProps> = ({
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="relative w-full h-64 md:h-96 overflow-hidden">
               <Image
-                src={mainCaseStudy.image}
+                src={getImageUrl(mainCaseStudy.image)}
                 alt={mainCaseStudy.imageAlt}
                 fill
                 className="object-cover"

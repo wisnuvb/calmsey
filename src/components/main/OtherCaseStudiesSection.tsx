@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
 interface CaseStudy {
   id: string;
@@ -32,7 +33,7 @@ const CaseStudyCard: React.FC<CaseStudy> = ({
       {/* Image Container */}
       <div className="relative">
         <Image
-          src={image}
+          src={getImageUrl(image)}
           alt={imageAlt}
           width={400}
           height={250}

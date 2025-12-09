@@ -1,0 +1,196 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { usePageContent } from "@/contexts/PageContentContext";
+
+interface Funder {
+  id: string;
+  name: string;
+  logo: string;
+  logoAlt: string;
+}
+
+interface FundersSectionProps {
+  title?: string;
+  funders?: Funder[];
+  ctaText?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  className?: string;
+}
+
+const defaultFunders: Funder[] = [
+  {
+    id: "ocean-resilience",
+    name: "Ocean Resilience & Climate Alliance",
+    logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
+    logoAlt: "Ocean Resilience & Climate Alliance Logo",
+  },
+  {
+    id: "packard",
+    name: "The David & Lucile Packard Foundation",
+    logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
+    logoAlt: "The David & Lucile Packard Foundation Logo",
+  },
+  {
+    id: "builders",
+    name: "Builders Initiative",
+    logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
+    logoAlt: "Builders Initiative Logo",
+  },
+  {
+    id: "oak",
+    name: "AK Foundation",
+    logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
+    logoAlt: "AK Foundation Logo",
+  },
+  {
+    id: "cargill",
+    name: "Margaret A. Cargill Philanthropies",
+    logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
+    logoAlt: "Margaret A. Cargill Philanthropies Logo",
+  },
+];
+
+export function FundersSection({
+  title: propTitle,
+  funders: propFunders,
+  ctaText: propCtaText,
+  buttonText: propButtonText,
+  buttonLink: propButtonLink,
+  className,
+}: FundersSectionProps = {}) {
+  // Try to get content from context, fallback to empty object if not available
+  let pageContent: Record<string, string> = {};
+  try {
+    const context = usePageContent();
+    pageContent = context.content;
+  } catch {
+    // Not in PageContentProvider, use props only
+  }
+
+  // Helper to get value from content
+  const getContentValue = (key: string, defaultValue: string = ""): string => {
+    return pageContent[key] || defaultValue;
+  };
+
+  // Helper to get JSON value from content
+  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
+    const value = pageContent[key];
+    if (!value) return defaultValue;
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return defaultValue;
+    }
+  };
+
+  // Helper function to get value with priority: context > props > default
+  const getValue = (
+    contentKey: string,
+    propValue?: string,
+    defaultValue: string = ""
+  ): string => {
+    const contentValue = getContentValue(contentKey, "");
+    if (contentValue && contentValue.trim() !== "") {
+      return contentValue;
+    }
+    if (propValue && propValue.trim() !== "") {
+      return propValue;
+    }
+    return defaultValue;
+  };
+
+  // Get all values with priority: context > props > default
+  const title = getValue("funders.title", propTitle, "Our Funders");
+  const funders = getContentJSON<Funder[]>(
+    "funders.funders",
+    propFunders || defaultFunders
+  );
+  const ctaText = getValue(
+    "funders.ctaText",
+    propCtaText,
+    "Interested Working Together With Us to Transforming Coastal Right?"
+  );
+  const buttonText = getValue(
+    "funders.buttonText",
+    propButtonText,
+    "Become Funder"
+  );
+  const buttonLink = getValue(
+    "funders.buttonLink",
+    propButtonLink,
+    "/get-involved"
+  );
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const handleImageError = (funderId: string) => {
+    setImageErrors((prev) => ({ ...prev, [funderId]: true }));
+  };
+
+  const getImageSrc = (funder: Funder) => {
+    if (imageErrors[funder.id]) {
+      return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        funder.name
+      )}&size=120&background=random`;
+    }
+    return funder.logo;
+  };
+
+  return (
+    <section
+      className={cn("bg-white py-16 lg:py-24 text-[#010107]", className)}
+      data-section="funders"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-[64px]">
+        {/* Title */}
+        <div className="text-center">
+          <h2 className="text-xl sm:text-[38px] tracking-wider font-nunito-sans font-bold">
+            {title}
+          </h2>
+        </div>
+
+        {/* Funders Logos */}
+        <div className="flex flex-wrap justify-center items-center gap-6 lg:gap-8">
+          {funders.map((funder) => (
+            <div
+              key={funder.id}
+              className="flex items-center justify-center aspect-square w-[140px] lg:w-[180px]"
+            >
+              <Image
+                src={getImageSrc(funder)}
+                alt={funder.logoAlt}
+                width={120}
+                height={120}
+                className="object-contain max-w-full max-h-full"
+                unoptimized={imageErrors[funder.id]}
+                onError={() => handleImageError(funder.id)}
+                onLoadingComplete={(result) => {
+                  if (result.naturalWidth === 0) {
+                    handleImageError(funder.id);
+                  }
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Call to Action */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 lg:gap-8">
+          <p className="text-[#060726CC] text-base leading-[150%] tracking-normal font-work-sans text-center sm:text-left">
+            {ctaText}
+          </p>
+          <Link
+            href={buttonLink}
+            className="inline-flex items-center justify-center px-8 py-5 bg-white border border-[#CADBEA] text-[#010107] text-base rounded-[4px] hover:bg-gray-50 transition-colors font-normal font-work-sans whitespace-nowrap"
+          >
+            {buttonText}
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}

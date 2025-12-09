@@ -176,6 +176,8 @@ export default function NewArticlePage() {
           translations: translations.filter((t) => t.title.trim()), // Only save translations with titles
           categories: articleData.categories,
           tags: articleData.tags,
+          content:
+            translations.find((t) => t.languageId === "en")?.content || "",
         }),
       });
 
@@ -392,7 +394,7 @@ export default function NewArticlePage() {
                           }
                           className="ml-1 text-blue-600 hover:text-blue-800"
                         >
-                          ×
+                          x
                         </button>
                       </span>
                     );
@@ -411,7 +413,7 @@ export default function NewArticlePage() {
                           onClick={() => handleTagChange(tagId, false)}
                           className="ml-1 text-green-600 hover:text-green-800"
                         >
-                          ×
+                          x
                         </button>
                       </span>
                     );

@@ -1,48 +1,54 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { PageType } from '@prisma/client';
+import { Metadata } from "next";
+import Link from "next/link";
+import { PageType } from "@prisma/client";
 
 export const metadata: Metadata = {
-  title: 'Page Content Manager - Admin',
-  description: 'Manage content for all pages',
+  title: "Page Content Manager - Admin",
+  description: "Manage content for all pages",
 };
 
 const PAGE_TYPES = [
   {
-    type: 'HOME' as PageType,
-    name: 'Home Page',
-    description: 'Main landing page with hero, sections, and latest articles',
-    icon: '🏠',
+    type: "HOME" as PageType,
+    name: "Home Page",
+    description: "Main landing page with hero, sections, and latest articles",
+    icon: "🏠",
   },
   {
-    type: 'ABOUT_US' as PageType,
-    name: 'About Us',
-    description: 'Company information, vision, mission, and team',
-    icon: 'ℹ️',
+    type: "ABOUT_US" as PageType,
+    name: "About Us",
+    description: "Company information, vision, mission, and team",
+    icon: "ℹ️",
   },
   {
-    type: 'OUR_WORK' as PageType,
-    name: 'Our Work',
-    description: 'Case studies, approach, and success stories',
-    icon: '💼',
+    type: "OUR_WORK" as PageType,
+    name: "Our Work",
+    description: "Case studies, approach, and success stories",
+    icon: "💼",
   },
   {
-    type: 'GOVERNANCE' as PageType,
-    name: 'Governance',
-    description: 'Values, principles, funders, and committees',
-    icon: '⚖️',
+    type: "OUR_FUND" as PageType,
+    name: "Our Fund",
+    description: "Funding approach, tenure understanding, and framework",
+    icon: "💰",
   },
   {
-    type: 'GET_INVOLVED' as PageType,
-    name: 'Get Involved',
-    description: 'How to help and opportunities',
-    icon: '🤝',
+    type: "GOVERNANCE" as PageType,
+    name: "Governance",
+    description: "Values, principles, funders, and committees",
+    icon: "⚖️",
   },
   {
-    type: 'CONTACT' as PageType,
-    name: 'Contact',
-    description: 'Contact information and office hours',
-    icon: '📞',
+    type: "GET_INVOLVED" as PageType,
+    name: "Get Involved",
+    description: "How to help and opportunities",
+    icon: "🤝",
+  },
+  {
+    type: "CONTACT" as PageType,
+    name: "Contact",
+    description: "Contact information and office hours",
+    icon: "📞",
   },
 ];
 
@@ -55,7 +61,8 @@ export default function PageContentManagerPage() {
           Page Content Manager
         </h1>
         <p className="text-gray-600">
-          Edit content for your website pages. Changes will be reflected on the frontend immediately.
+          Edit content for your website pages. Changes will be reflected on the
+          frontend immediately.
         </p>
       </div>
 
@@ -80,8 +87,9 @@ export default function PageContentManagerPage() {
               Headless CMS Approach
             </h3>
             <p className="text-sm text-blue-800">
-              This system uses a headless CMS approach where the frontend design is controlled by developers,
-              but content is fully editable by you through simple forms. No complex page builders needed!
+              This system uses a headless CMS approach where the frontend design
+              is controlled by developers, but content is fully editable by you
+              through simple forms. No complex page builders needed!
             </p>
           </div>
         </div>
@@ -106,9 +114,7 @@ export default function PageContentManagerPage() {
               {page.name}
             </h3>
 
-            <p className="text-sm text-gray-600 mb-4">
-              {page.description}
-            </p>
+            <p className="text-sm text-gray-600 mb-4">{page.description}</p>
 
             <div className="flex items-center text-blue-600 text-sm font-medium">
               Edit Content
@@ -156,7 +162,9 @@ export default function PageContentManagerPage() {
             </svg>
             <div>
               <div className="font-medium text-gray-900">Articles</div>
-              <div className="text-xs text-gray-500">Manage blog posts and case studies</div>
+              <div className="text-xs text-gray-500">
+                Manage blog posts and case studies
+              </div>
             </div>
           </Link>
 
@@ -179,7 +187,9 @@ export default function PageContentManagerPage() {
             </svg>
             <div>
               <div className="font-medium text-gray-900">Media Library</div>
-              <div className="text-xs text-gray-500">Upload and manage images</div>
+              <div className="text-xs text-gray-500">
+                Upload and manage images
+              </div>
             </div>
           </Link>
 
@@ -202,7 +212,9 @@ export default function PageContentManagerPage() {
             </svg>
             <div>
               <div className="font-medium text-gray-900">Menus</div>
-              <div className="text-xs text-gray-500">Manage navigation menus</div>
+              <div className="text-xs text-gray-500">
+                Manage navigation menus
+              </div>
             </div>
           </Link>
 
@@ -231,7 +243,9 @@ export default function PageContentManagerPage() {
             </svg>
             <div>
               <div className="font-medium text-gray-900">Settings</div>
-              <div className="text-xs text-gray-500">Configure site settings</div>
+              <div className="text-xs text-gray-500">
+                Configure site settings
+              </div>
             </div>
           </Link>
         </div>

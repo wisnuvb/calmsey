@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface GovernanceValuesSectionProps {
   title?: string;
@@ -52,7 +53,7 @@ export const GovernanceValuesSection: React.FC<
             <div className="relative">
               <div className="relative overflow-hidden rounded-lg shadow-lg">
                 <Image
-                  src={image}
+                  src={getImageUrl(image)}
                   alt={imageAlt}
                   width={600}
                   height={400}

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { H1, P } from "../ui/typography";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 
 interface DetailStoryHeroSectionProps {
   title: string;
@@ -28,7 +28,7 @@ export function DetailStoryHeroSection({
       <div className="absolute inset-0">
         {backgroundImage && (
           <Image
-            src={backgroundImage}
+            src={getImageUrl(backgroundImage)}
             alt="Article background"
             fill
             className="object-cover"

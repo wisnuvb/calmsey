@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
 
@@ -53,7 +54,7 @@ export default function TestimonialsSection({
                 <div className="flex items-center">
                   {testimonial.avatar && (
                     <Image
-                      src={testimonial.avatar}
+                      src={getImageUrl(testimonial.avatar)}
                       alt={testimonial.name}
                       className="w-10 h-10 rounded-full mr-3"
                       width={100}

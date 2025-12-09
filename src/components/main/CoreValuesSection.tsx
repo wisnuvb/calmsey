@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
 interface CoreValue {
   id: string;
@@ -129,7 +130,7 @@ export const CoreValuesSection: React.FC<CoreValuesSectionProps> = ({
             <div className="order-2 lg:order-1">
               <div className="relative overflow-hidden rounded-lg shadow-lg">
                 <Image
-                  src={image}
+                  src={getImageUrl(image)}
                   alt={imageAlt}
                   width={600}
                   height={400}

@@ -3,6 +3,8 @@
 import React from "react";
 import Image from "next/image";
 import { Linkedin } from "lucide-react";
+import { H2, P } from "@/components/ui/typography";
+import { cn, getImageUrl } from "@/lib/utils";
 
 interface CommitteeMember {
   id: string;
@@ -26,8 +28,8 @@ export const SteeringCommitteeSection: React.FC<
   SteeringCommitteeSectionProps
 > = ({
   title = "The Steering Committee",
-  description = "Governance is spearheaded by the Steering Committee, who are responsible for setting the strategic direction.",
-  additionalDescription = "The Steering Committee has governed the initiative since the first months of its inception and is critical to the legitimacy and efficacy of the Facility, serving as one key governance attribute. The technical team remains responsive and accountable to the Steering Committee, which provides guidance to strategy and decision making.",
+  description = "Turning Tides is governed by a Steering Committee who are responsible for setting strategic direction and values alignment",
+  additionalDescription = "The implementation of our strategy and organizational priorities—composed of small-scale fisher leaders, Indigenous Peoples, and rights experts who bring both deep expertise and accountability to those we serve.The Steering Committee has governed the initiative since the first months of its inception and is critical to the accountability and efficacy",
   members = [
     {
       id: "myrna-cunningham",
@@ -66,74 +68,87 @@ export const SteeringCommitteeSection: React.FC<
   backgroundColor = "bg-white",
 }) => {
   return (
-    <section className={`w-full ${backgroundColor} py-16 md:py-24`}>
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section className={cn("w-full py-16 lg:py-24", backgroundColor)}>
+      <div className="container mx-auto px-4">
         {/* Title and Description */}
-        <div className="mb-12">
-          <div className="flex flex-col lg:flex-row gap-8 mb-8">
-            <div className="lg:w-1/3">
-              <h2 className="text-4xl md:text-5xl font-bold text-black mb-6">
+        <div className="mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Left Column - Title */}
+            <div>
+              <H2 style="h2bold" className="text-[#010107]">
                 {title}
-              </h2>
+              </H2>
             </div>
-            <div className="lg:w-2/3 space-y-4">
-              <p className="text-gray-700 text-lg leading-relaxed">
+
+            {/* Right Column - Descriptions */}
+            <div className="space-y-6">
+              <P style="p1reg" className="text-[#010107] leading-relaxed">
                 {description}
-              </p>
-              <p className="text-gray-700 text-lg leading-relaxed">
+              </P>
+              <P style="p1reg" className="text-[#06072680] leading-relaxed">
                 {additionalDescription}
-              </p>
+              </P>
             </div>
           </div>
         </div>
 
-        {/* Committee Members */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        {/* Committee Members Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {members.map((member) => (
-            <div key={member.id} className="text-center">
+            <div key={member.id} className="flex flex-col">
               <div className="relative mb-4">
-                <div className="relative w-48 h-48 mx-auto rounded-lg overflow-hidden">
+                <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg">
                   <Image
-                    src={member.image}
+                    src={getImageUrl(member.image)}
                     alt={member.imageAlt}
                     fill
                     className="object-cover"
                   />
+                  {/* LinkedIn Badge */}
                   {member.linkedinUrl && (
                     <a
                       href={member.linkedinUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="absolute bottom-2 left-2 w-8 h-8 bg-blue-600 rounded flex items-center justify-center hover:bg-blue-700 transition-colors duration-200"
+                      className="absolute bottom-3 left-3 w-8 h-8 bg-[#3C62ED] rounded flex items-center justify-center hover:bg-blue-700 transition-colors duration-200 shadow-md"
+                      aria-label={`${member.name}'s LinkedIn profile`}
                     >
                       <Linkedin className="w-4 h-4 text-white" />
                     </a>
                   )}
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-black mb-2">
-                {member.name}
-              </h3>
-              <p className="text-gray-600">{member.country}</p>
+
+              {/* Member Info */}
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-[#010107] font-nunito-sans">
+                  {member.name}
+                </h3>
+                <p className="text-base text-[#3C62ED] font-work-sans">
+                  {member.country}
+                </p>
+              </div>
             </div>
           ))}
         </div>
 
         {/* Pagination Indicator */}
-        <div className="flex justify-center mb-8">
-          <div className="flex space-x-2">
-            <div className="w-8 h-1 bg-blue-600 rounded"></div>
-            <div className="w-8 h-1 bg-gray-300 rounded"></div>
-            <div className="w-8 h-1 bg-gray-300 rounded"></div>
+        <div className="flex justify-center mb-12">
+          <div className="flex gap-2">
+            <div className="w-12 h-1 bg-[#3C62ED] rounded-full"></div>
+            <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
+            <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
           </div>
         </div>
 
         {/* Bottom Text */}
-        <div className="text-center">
-          <p className="text-gray-700 text-lg leading-relaxed max-w-4xl mx-auto">
-            {bottomText}
-          </p>
-        </div>
+        {bottomText && (
+          <div className="max-w-4xl mx-auto text-center">
+            <P style="p1reg" className="text-[#06072680] leading-relaxed">
+              {bottomText}
+            </P>
+          </div>
+        )}
       </div>
     </section>
   );

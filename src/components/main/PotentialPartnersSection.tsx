@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface PotentialPartnersSectionProps {
   title?: string;
@@ -66,7 +67,7 @@ export const PotentialPartnersSection: React.FC<
         {/* Background Image Section */}
         <div className="relative w-full h-96 md:h-[500px] mb-12 rounded-lg overflow-hidden">
           <Image
-            src={backgroundImage}
+            src={getImageUrl(backgroundImage)}
             alt={backgroundImageAlt}
             fill
             className="object-cover"

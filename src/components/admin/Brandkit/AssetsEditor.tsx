@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { BrandkitAssets } from "@/types/brandkit";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 interface AssetsEditorProps {
   assets: BrandkitAssets;
@@ -200,7 +201,7 @@ export default function AssetsEditor({ assets, onChange }: AssetsEditorProps) {
                       <Image
                         width={64}
                         height={64}
-                        src={assets.logos.primary.light}
+                        src={getImageUrl(assets.logos.primary.light)}
                         alt="Primary Logo"
                         className="max-h-16 mx-auto"
                       />
@@ -248,7 +249,7 @@ export default function AssetsEditor({ assets, onChange }: AssetsEditorProps) {
                       <Image
                         width={64}
                         height={64}
-                        src={assets.logos.secondary?.light}
+                        src={getImageUrl(assets.logos.secondary?.light)}
                         alt="Secondary Logo"
                         className="max-h-16 mx-auto"
                       />
@@ -296,7 +297,7 @@ export default function AssetsEditor({ assets, onChange }: AssetsEditorProps) {
                       <Image
                         width={32}
                         height={32}
-                        src={assets.logos.primary.symbol}
+                        src={getImageUrl(assets.logos.primary.symbol)}
                         alt="Favicon"
                         className="w-8 h-8 mx-auto"
                       />
@@ -345,7 +346,7 @@ export default function AssetsEditor({ assets, onChange }: AssetsEditorProps) {
                   <Image
                     width={32}
                     height={32}
-                    src={icon.url}
+                    src={getImageUrl(icon.url)}
                     alt={icon.name}
                     className="w-8 h-8"
                   />
@@ -426,8 +427,10 @@ export default function AssetsEditor({ assets, onChange }: AssetsEditorProps) {
             {assets.imageLibrary.map((image) => (
               <div key={image.id} className="relative group">
                 <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
-                  <img
-                    src={image.url}
+                  <Image
+                    width={64}
+                    height={64}
+                    src={getImageUrl(image.url)}
                     alt={image.alt}
                     className="w-full h-full object-cover"
                   />

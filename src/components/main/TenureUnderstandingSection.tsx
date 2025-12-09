@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { ExternalLink, FileText } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
 interface NavigationItem {
   id: string;
@@ -124,7 +125,7 @@ export const TenureUnderstandingSection: React.FC<
                 {activeContent.image && (
                   <div className="relative h-80 sm:h-96 rounded-lg overflow-hidden">
                     <Image
-                      src={activeContent.image}
+                      src={getImageUrl(activeContent.image)}
                       alt={activeContent.imageAlt}
                       fill
                       className="object-cover"
