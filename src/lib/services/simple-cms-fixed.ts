@@ -109,7 +109,7 @@ export class SimpleCMS {
         case "JSON":
           try {
             parsedValue = JSON.parse(content.value);
-          } catch (e) {
+          } catch {
             parsedValue = content.value;
           }
           break;
@@ -211,9 +211,9 @@ export class SimpleCMS {
       await prisma.pageContent.create({
         data: {
           pageTranslationId: page.translations[0].id,
-          key: 'page.content',
+          key: "page.content",
           value: data.content,
-          type: 'HTML',
+          type: "HTML",
           order: 0,
         },
       });
@@ -230,9 +230,9 @@ export class SimpleCMS {
       updatedAt: page.updatedAt,
       pageContent: data.content
         ? {
-            'page.content': {
+            "page.content": {
               value: data.content,
-              type: 'HTML' as ContentType,
+              type: "HTML" as ContentType,
             },
           }
         : {},
@@ -347,7 +347,7 @@ export class SimpleCMS {
         where: {
           pageTranslationId_key: {
             pageTranslationId: page.translations[0].id,
-            key: 'page.content',
+            key: "page.content",
           },
         },
         update: {
@@ -355,9 +355,9 @@ export class SimpleCMS {
         },
         create: {
           pageTranslationId: page.translations[0].id,
-          key: 'page.content',
+          key: "page.content",
           value: data.content,
-          type: 'HTML',
+          type: "HTML",
         },
       });
     }

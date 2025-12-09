@@ -14,8 +14,6 @@ interface TenureFacilitySectionProps {
 }
 
 export const TenureFacilitySection: React.FC<TenureFacilitySectionProps> = ({
-  title = "Tenure Facility",
-  subtitle = "Living Forests. Thriving Communities.",
   description = "Turning Tides is legally and fiscally hosted by the **Tenure Facility Fund**, which is a US 501(C)3 non-profit subsidiary of the International Land and Forest Tenure Facility. We recognize the potential value addition that can be achieved through this collaboration when we get it right and we respect each other's distinct approaches and partners.",
   fiscalAgreementUrl = "#",
   socialContractUrl = "#",

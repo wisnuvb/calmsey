@@ -8,7 +8,6 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { PageSection, PageSectionType } from "@/types/page-builder";
-import { PageBuilderWithBrandkit } from "@/components/page-builder/PageBuilderWithBrandkit";
 
 interface PageData {
   id: string;
@@ -36,7 +35,6 @@ export default function EditPagePage() {
     seoDescription: "",
   });
   const [sections, setSections] = useState<PageSection[]>([]);
-  const [selectedSectionId, setSelectedSectionId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +43,7 @@ export default function EditPagePage() {
     if (pageId) {
       fetchPage();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageId]);
 
   const fetchPage = async () => {
@@ -253,144 +252,6 @@ export default function EditPagePage() {
     }
   };
 
-  const handleSectionsChange = (updatedSections: PageSection[]) => {
-    setSections(updatedSections);
-  };
-
-  const handleSectionSelect = (sectionId: string) => {
-    setSelectedSectionId(sectionId);
-  };
-
-  const handleSectionAdd = (
-    sectionType: PageSectionType,
-    afterSectionId?: string
-  ) => {
-    const newSection: PageSection = {
-      id: `section-${Date.now()}`,
-      type: sectionType,
-      order: sections.length,
-      isActive: true,
-      layoutSettings: {
-        width: "container",
-        padding: { top: "2rem", bottom: "2rem" },
-        alignment: "center",
-        margin: { top: "0", right: "0", bottom: "0", left: "0", unit: "px" },
-        verticalAlignment: "top",
-        display: "block",
-      },
-      styleSettings: {
-        background: { type: "none" },
-        textColor: "#333333",
-      },
-      responsiveSettings: {
-        desktop: { visibility: "visible" },
-        tablet: { visibility: "visible" },
-        mobile: { visibility: "visible" },
-      },
-      animationSettings: {
-        entrance: {
-          enabled: false,
-          type: "none",
-          duration: 300,
-          delay: 0,
-          easing: "ease",
-        },
-        scroll: {
-          enabled: false,
-          type: "none",
-          trigger: "viewport",
-          triggerOffset: 0,
-          speed: 1,
-        },
-        hover: {
-          enabled: false,
-          type: "none",
-          duration: 200,
-          easing: "ease",
-        },
-        custom: [],
-        enabled: false,
-        customCode: "",
-      },
-      contentSettings: {},
-      customSettings: {
-        cssClasses: [],
-        customCSS: "",
-        customJS: "",
-        attributes: {},
-        seoSettings: {
-          enableStructuredData: false,
-          noIndex: false,
-          noFollow: false,
-        },
-        accessibilitySettings: {
-          enableKeyboardNavigation: true,
-          enableScreenReaderSupport: true,
-          highContrast: false,
-          reducedMotion: false,
-        },
-      },
-      translations: [
-        {
-          languageId: "en",
-          title: "New Section",
-          content: "Add your content here",
-          metadata: {},
-        },
-      ],
-    };
-
-    let updatedSections = [...sections];
-    if (afterSectionId) {
-      const insertIndex =
-        sections.findIndex((s) => s.id === afterSectionId) + 1;
-      updatedSections.splice(insertIndex, 0, newSection);
-    } else {
-      updatedSections.push(newSection);
-    }
-
-    // Reorder sections
-    updatedSections = updatedSections.map((section, index) => ({
-      ...section,
-      order: index,
-    }));
-
-    setSections(updatedSections);
-  };
-
-  const handleSectionDelete = (sectionId: string) => {
-    const updatedSections = sections
-      .filter((s) => s.id !== sectionId)
-      .map((section, index) => ({ ...section, order: index }));
-    setSections(updatedSections);
-  };
-
-  const handleSectionDuplicate = (sectionId: string) => {
-    const sectionToDuplicate = sections.find((s) => s.id === sectionId);
-    if (!sectionToDuplicate) return;
-
-    const duplicatedSection: PageSection = {
-      ...sectionToDuplicate,
-      id: `section-${Date.now()}`,
-      translations: sectionToDuplicate.translations.map((translation) => ({
-        ...translation,
-        title: translation.title ? `${translation.title} (Copy)` : undefined,
-      })),
-    };
-
-    const insertIndex = sections.findIndex((s) => s.id === sectionId) + 1;
-    const updatedSections = [...sections];
-    updatedSections.splice(insertIndex, 0, duplicatedSection);
-
-    // Reorder sections
-    const reorderedSections = updatedSections.map((section, index) => ({
-      ...section,
-      order: index,
-    }));
-
-    setSections(reorderedSections);
-  };
-
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -537,7 +398,7 @@ export default function EditPagePage() {
       </div>
 
       {/* Page Builder with Brandkit Integration */}
-      <PageBuilderWithBrandkit
+      {/* <PageBuilderWithBrandkit
         pageId={pageId}
         sections={sections}
         selectedSectionId={selectedSectionId}
@@ -548,7 +409,7 @@ export default function EditPagePage() {
         onSectionDuplicate={handleSectionDuplicate}
         onSave={handleSave}
         className="h-[calc(100vh-120px)]"
-      />
+      /> */}
     </div>
   );
 }

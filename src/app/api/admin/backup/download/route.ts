@@ -1,7 +1,7 @@
 import { requireAuth, ROLES } from "@/lib/auth-helpers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const authResult = await requireAuth([ROLES.SUPER_ADMIN]);
     if (!authResult.success) return authResult.response;

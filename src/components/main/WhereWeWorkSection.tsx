@@ -15,6 +15,7 @@ interface WhereWeWorkSectionProps {
   explorationLinkUrl?: string;
   mapImage?: string;
   partnersText?: string;
+  content?: string;
 }
 
 export function WhereWeWorkSection({
@@ -157,7 +158,7 @@ export function WhereWeWorkSection({
           <div className="relative w-full aspect-[16/9] lg:aspect-[2/1]">
             {!imageError ? (
               <Image
-                src={imageUrl}
+                src={getImageUrl(imageUrl)}
                 alt="World Map showing Turning Tides work locations"
                 fill
                 className="object-contain"

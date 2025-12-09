@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * HOME PAGE - Example Integration with Headless CMS
  *
@@ -22,14 +23,15 @@ import {
 import { getPageContent } from "@/lib/page-content";
 
 interface HomePageProps {
-  params: {
+  params: Promise<{
     lang: string;
-  };
+  }>;
 }
 
 export default async function HomePage({ params }: HomePageProps) {
+  const { lang } = await params;
   // Fetch page content from database
-  const content = await getPageContent('HOME', params.lang);
+  const content = await getPageContent("HOME", lang);
 
   return (
     <>
@@ -44,13 +46,19 @@ export default async function HomePage({ params }: HomePageProps) {
         - hero.subtitle
       */}
       <HeroSection
-        variant={content.getString('hero.variant', 'video') as any}
-        posterImage={content.getString('hero.posterImage', '/assets/demo/bg-video.png')}
-        videoUrl={content.getString('hero.videoUrl', '/assets/video/8248432-hd_1280_720_30fps.mp4')}
-        title={content.getString('hero.title')}
-        subtitle={content.getString('hero.subtitle')}
-        ctaText={content.getString('hero.ctaText', 'Learn More')}
-        ctaLink={content.getString('hero.ctaLink', '/about-us')}
+        variant={content.getString("hero.variant", "video") as any}
+        posterImage={content.getString(
+          "hero.posterImage",
+          "/assets/demo/bg-video.png"
+        )}
+        videoUrl={content.getString(
+          "hero.videoUrl",
+          "/assets/video/8248432-hd_1280_720_30fps.mp4"
+        )}
+        title={content.getString("hero.title")}
+        subtitle={content.getString("hero.subtitle")}
+        ctaText={content.getString("hero.ctaText", "Learn More")}
+        ctaLink={content.getString("hero.ctaLink", "/about-us")}
         dataSection="hero"
       />
 
@@ -62,8 +70,8 @@ export default async function HomePage({ params }: HomePageProps) {
         - whyUs.content (HTML)
       */}
       <WhyTurningTidesSection
-        title={content.getString('whyUs.title', 'Why TurningTides')}
-        content={content.getString('whyUs.content')}
+        title={content.getString("whyUs.title", "Why TurningTides")}
+        content={content.getString("whyUs.content")}
       />
 
       {/* Partner Stories - using default implementation */}
@@ -78,9 +86,9 @@ export default async function HomePage({ params }: HomePageProps) {
         - whereWeWork.mapImage
       */}
       <WhereWeWorkSection
-        title={content.getString('whereWeWork.title', 'Where We Work')}
-        description={content.getString('whereWeWork.description')}
-        mapImage={content.getString('whereWeWork.mapImage')}
+        title={content.getString("whereWeWork.title", "Where We Work")}
+        content={content.getString("whereWeWork.content")}
+        mapImage={content.getString("whereWeWork.mapImage")}
       />
 
       {/* Ongoing Projects - using default */}
@@ -94,24 +102,35 @@ export default async function HomePage({ params }: HomePageProps) {
         - articles.limit (number of articles to show)
       */}
       <LatestArticlesSection
-        title={content.getString('articles.title', 'Latest Articles')}
-        limit={content.getNumber('articles.limit', 6)}
+        title={content.getString("articles.title", "Latest Articles")}
+        limit={content.getNumber("articles.limit", 6)}
       />
 
       {/*
         Strategy Download Section
 
         Admin editable:
-        - strategy.title
         - strategy.description
         - strategy.downloadUrl
         - strategy.buttonText
+        - strategy.learnMoreButtonText
+        - strategy.learnMoreButtonUrl
       */}
       <StrategyDownloadSection
-        title={content.getString('strategy.title', 'Download Our Strategy')}
-        description={content.getString('strategy.description')}
-        downloadUrl={content.getString('strategy.downloadUrl')}
-        buttonText={content.getString('strategy.buttonText', 'Download PDF')}
+        description={content.getString("strategy.description")}
+        downloadUrl={content.getString("strategy.downloadUrl")}
+        downloadButtonText={content.getString(
+          "strategy.buttonText",
+          "Download PDF"
+        )}
+        learnMoreButtonText={content.getString(
+          "strategy.learnMoreButtonText",
+          "Learn More"
+        )}
+        learnMoreButtonUrl={content.getString(
+          "strategy.learnMoreButtonUrl",
+          "/our-fund"
+        )}
       />
     </>
   );

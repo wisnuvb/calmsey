@@ -10,12 +10,8 @@ import {
   EyeIcon,
   TrashIcon,
   MagnifyingGlassIcon,
-  FunnelIcon,
   ChatBubbleLeftRightIcon,
-  ExclamationTriangleIcon,
   CheckIcon,
-  ClockIcon,
-  ArchiveBoxIcon,
 } from "@heroicons/react/24/outline";
 
 interface ContactMessage {
@@ -60,6 +56,7 @@ export default function ContactPage() {
 
   useEffect(() => {
     fetchMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, statusFilter]);
 
   const fetchMessages = async () => {
@@ -213,26 +210,6 @@ export default function ContactPage() {
     if (message.status === "UNREAD") {
       await updateMessageStatus(message.id, "READ");
     }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const badges = {
-      UNREAD: "bg-red-100 text-red-800",
-      READ: "bg-blue-100 text-blue-800",
-      RESOLVED: "bg-green-100 text-green-800",
-      CLOSED: "bg-gray-100 text-gray-800",
-    };
-    return badges[status as keyof typeof badges] || badges.UNREAD;
-  };
-
-  const getStatusIcon = (status: string) => {
-    const icons = {
-      UNREAD: EnvelopeIcon,
-      READ: EnvelopeOpenIcon,
-      RESOLVED: CheckCircleIcon,
-      CLOSED: XCircleIcon,
-    };
-    return icons[status as keyof typeof icons] || EnvelopeIcon;
   };
 
   if (loading) {

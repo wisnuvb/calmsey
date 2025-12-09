@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { requireAuth, ROLES } from "@/lib/auth-helpers";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const authResult = await requireAuth([ROLES.SUPER_ADMIN]);
     if (!authResult.success) return authResult.response;

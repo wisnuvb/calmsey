@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { H4, P } from "../ui/typography";
+import { P } from "../ui/typography";
 
 interface FooterLink {
   label: string;
@@ -18,31 +18,28 @@ const footerSections: FooterSection[] = [
   {
     title: "About Us",
     links: [
-      { label: "Vision & Goals", href: "/about/vision" },
-      { label: "Our Principles", href: "/about/principles" },
-      { label: "Activities", href: "/about/activities" },
-      { label: "Fiscal and Legal Status", href: "/about/legal" },
-      { label: "Strategy to 2030", href: "/about/strategy" },
+      { label: "Vision", href: "/about-us" },
+      { label: "Goal & Strategy", href: "/about-us" },
+      { label: "Team", href: "/about-us" },
+      { label: "Our Funders", href: "/about-us" },
+      { label: "Our Guiding Policies", href: "/governance" },
+    ],
+  },
+  {
+    title: "Funds",
+    links: [
+      { label: "4 Supported Funds", href: "/our-fund" },
+      { label: "Steering Committees", href: "/governance" },
+      { label: "Partners", href: "/our-fund" },
     ],
   },
   {
     title: "Our Works",
     links: [
-      { label: "How We Work", href: "/work/how" },
-      { label: "Where We Work", href: "/work/where" },
-      { label: "Partner Stories", href: "/work/stories" },
-      { label: "Grantmaking Framework", href: "/work/grantmaking" },
-      { label: "Theory of Change", href: "/work/theory" },
-    ],
-  },
-  {
-    title: "Get Involved",
-    links: [
-      { label: "Supported Funds", href: "/get-involved/funds" },
-      { label: "Funders", href: "/get-involved/funders" },
-      { label: "Guiding Policies", href: "/get-involved/policies" },
-      { label: "Steering Committees", href: "/get-involved/committees" },
-      { label: "Partners", href: "/get-involved/partners" },
+      { label: "How We Work", href: "/our-work" },
+      { label: "Grantmaking Framework", href: "/our-fund" },
+      { label: "Activities", href: "/our-work" },
+      { label: "Stories", href: "/stories" },
     ],
   },
 ];
@@ -51,14 +48,14 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-br from-indigo-950 via-purple-900 to-indigo-950 text-white">
+    <footer className="bg-gradient-to-br from-[#1E0F39] via-[#2a1551] to-[#3a1d6f] text-white">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-32">
           {/* Logo and Brand Section - Left */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center mb-6">
-              <div className="w-16 h-16 relative mr-4">
+          <div className="lg:col-span-4">
+            <Link href="/">
+              <div className="w-auto h-32 relative mr-3">
                 <Image
                   src="/assets/Logo-white.png"
                   alt="Turning Tides Logo"
@@ -66,79 +63,82 @@ export function Footer() {
                   className="object-contain"
                 />
               </div>
-              <h1 className="text-2xl font-bold text-white tracking-wider">
-                TURNING TIDES
-              </h1>
             </Link>
-
-            <div className="mb-8">
-              <P className="text-white text-sm leading-relaxed">
-                Supporting rights, power, and let&apos;s turn the tide,
-                together!
-              </P>
-            </div>
-
-            {/* Hosting Information */}
-            <div className="border-t border-white/20 pt-6 mb-8">
-              <div className="flex items-center mb-4">
-                <div className="w-8 h-8 relative mr-3">
-                  <Image
-                    src="/assets/Logo-white.png"
-                    alt="Tenure Facility Logo"
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-                <P className="text-white text-sm">
-                  Turning Tides is legally and fiscally hosted by the{" "}
-                  <strong>Tenure Facility Fund</strong>
-                </P>
-              </div>
-            </div>
-
-            {/* Copyright */}
-            <div className="text-xs text-white/80">
-              © {currentYear} Turning Tides. All Rights Reserved
+            <div className="border-t border-white/50 my-8" />
+            <div className="flex items-start gap-6">
+              <Image
+                src="/assets/Logo-TenureFacility.png"
+                alt="Tenure Facility Logo"
+                width={100}
+                height={100}
+                className="w-auto h-11 object-contain"
+              />
+              <p className="font-work-sans font-normal text-base text-white/80 leading-[150%] tracking-[0%]">
+                Turning Tides is fiscally sponsored by the Tenure Facility Fund,
+                a US 501c3 subsidiary of the International Land & Forest Tenure
+                Facility
+              </p>
             </div>
           </div>
 
           {/* Navigation Links - 3 Columns */}
-          {footerSections.map((section) => (
-            <div key={section.title} className="lg:col-span-1">
-              <h3 className="text-lg font-semibold mb-6 text-teal-300">
-                {section.title}
-              </h3>
-              <ul className="space-y-3">
-                {section.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-white hover:text-teal-300 transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+          <div className="lg:col-span-7 space-y-11">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {footerSections.map((section) => (
+                <div key={section.title}>
+                  <h3 className="text-base font-semibold mb-4 text-yellow-300">
+                    {section.title}
+                  </h3>
+                  <ul className="space-y-2">
+                    {section.links.map((link) => (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          className="text-sm text-white hover:text-yellow-300 transition-colors"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
-          ))}
-
-          {/* Connect with us Section - Right */}
-          {/* <div className="lg:col-span-1">
-            <div className="bg-indigo-900/50 rounded-lg p-6 border border-indigo-800/50">
-              <P className="text-white text-sm leading-relaxed mb-6">
+            <div className="bg-[#150B28] p-6 flex items-center justify-between gap-20 rounded">
+              <p className="text-white text-sm font-work-sans font-semibold leading-[150%] tracking-[0%]">
                 Connect with us to co-create solutions that protect rights,
                 sustain livelihoods, and centre local voices.
-              </P>
+              </p>
               <Link
-                href="/get-involved"
-                className="inline-flex items-center justify-center w-full px-6 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm"
+                href="/contact"
+                className="py-4 px-6 border border-[#FFFFFF] rounded shrink-0 text-white text-sm"
               >
-                Get Involved
+                Contact Us
               </Link>
             </div>
+          </div>
+
+          {/* Connect with us Section - Right */}
+          {/* <div className="lg:col-span-3">
+            <P className="text-white text-sm leading-relaxed mb-6">
+              Connect with us to co-create solutions that protect rights,
+              sustain livelihoods, and centre local voices.
+            </P>
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center px-6 py-3 border border-white text-white text-sm font-medium rounded-md hover:bg-white hover:text-gray-900 transition-colors"
+            >
+              Contact Us
+            </Link>
           </div> */}
         </div>
+
+        {/* Horizontal Divider */}
+      </div>
+      <div className="py-8 bg-[#111416]">
+        <p className="text-center text-base font-work-sans font-normal text-white/50">
+          © Turning Tides. All Rights Reserved
+        </p>
       </div>
     </footer>
   );

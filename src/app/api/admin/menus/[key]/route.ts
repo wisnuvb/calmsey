@@ -84,7 +84,7 @@ export async function PUT(
       }
 
       // Second pass: Update parentId relationships
-      for (const [originalId, { menuItem, originalItem }] of createdItems) {
+      for (const [{ menuItem, originalItem }] of createdItems) {
         if (originalItem.parentId) {
           const parentItem = createdItems.get(originalItem.parentId);
           if (parentItem) {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { SimpleCMS } from "@/lib/services/simple-cms";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 
 // GET /api/admin/pages/[id] - Get page by ID
 export async function GET(

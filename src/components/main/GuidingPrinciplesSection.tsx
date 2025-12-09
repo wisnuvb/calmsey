@@ -10,7 +10,6 @@ import {
   Sprout,
   Calendar,
   Users,
-  FileCheck,
 } from "lucide-react";
 
 interface Principle {

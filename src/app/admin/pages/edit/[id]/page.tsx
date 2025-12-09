@@ -1,24 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { SimplePageEditor } from "@/components/admin/SimplePageEditor";
 
 interface EditPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EditPagePage({ params }: EditPageProps) {
+  const { id } = use(params);
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPage = async () => {
       try {
-        const response = await fetch(
-          `/api/admin/pages/${params.id}?languageId=en`
-        );
+        const response = await fetch(`/api/admin/pages/${id}?languageId=en`);
         if (response.ok) {
           const data = await response.json();
           setPageData(data);
@@ -31,7 +30,7 @@ export default function EditPagePage({ params }: EditPageProps) {
     };
 
     fetchPage();
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
     return (
@@ -50,5 +49,5 @@ export default function EditPagePage({ params }: EditPageProps) {
     );
   }
 
-  return <SimplePageEditor pageId={params.id} initialData={pageData} />;
+  return <SimplePageEditor pageId={id} initialData={pageData} />;
 }

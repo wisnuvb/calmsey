@@ -51,26 +51,6 @@ export default function UserRow({
     return false;
   };
 
-  const updateUserRole = async (userId: string, newRole: string) => {
-    try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: newRole }),
-      });
-
-      if (response.ok) {
-        onRefresh();
-      } else {
-        const error = await response.json();
-        alert(error.error || "Failed to update user role");
-      }
-    } catch (error) {
-      console.error("Update role error:", error);
-      alert("Failed to update user role");
-    }
-  };
-
   const deleteUser = async (userId: string, userName: string) => {
     if (
       !confirm(

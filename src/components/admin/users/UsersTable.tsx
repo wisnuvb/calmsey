@@ -1,4 +1,4 @@
-import { UserGroupIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { User } from "@/types/user";
 import { UserRow } from ".";
 

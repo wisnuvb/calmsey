@@ -18,6 +18,8 @@ interface HeroSectionProps {
   searchPlaceholder?: string;
   className?: string;
   dataSection?: string;
+  ctaText?: string;
+  ctaLink?: string;
 }
 
 export function HeroSection({

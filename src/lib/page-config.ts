@@ -54,6 +54,21 @@ export const PAGE_TYPE_CONFIGS: Record<PageType, PageTypeConfig> = {
     isStatic: false,
   },
 
+  [PageType.OUR_FUND]: {
+    type: PageType.OUR_FUND,
+    slug: "our-fund",
+    name: "Our Fund",
+    description: "Information about our funds and grantmaking",
+    requiredSections: [PageSectionType.RICH_TEXT],
+    optionalSections: [
+      PageSectionType.IMAGE_GALLERY,
+      PageSectionType.DOCUMENT_LIST,
+      PageSectionType.TABS,
+    ],
+    allowedSettings: ["layout", "showFilters"],
+    isStatic: true,
+  },
+
   [PageType.GOVERNANCE]: {
     type: PageType.GOVERNANCE,
     slug: "governance",

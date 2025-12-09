@@ -1,12 +1,9 @@
 import {
-  AboutUsHeroSection,
   HeroSection,
   OurVisionSection,
   WhatWeWannaAchieveSection,
   OurGoalSection,
-  SupportSection,
   TeamSection,
-  TenureFacilitySection,
   QuoteSection,
   TheoryOfChangeSection,
   GenesisSection,
@@ -39,7 +36,7 @@ const AboutUsPage = async ({ params }: AboutUsPageProps) => {
         title="Securing tenure and recognizing rights"
         subtitle="We are a young organization built through wide-ranging consultation and by listening to the demands and priorities that Indigenous Peoples, small-scale fishers, and coastal communities have been articulating for years. We exist to support rights holders working to secure tenure over their territories—because territorial control is foundational to community agency and self-determination"
         backgroundImage="/assets/hero-about-us.webp"
-        data-section="about-us"
+        dataSection="about-us"
       />
       <QuoteSection />
       <OurVisionSection />

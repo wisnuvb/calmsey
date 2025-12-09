@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { H2, P } from "@/components/ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 
@@ -16,13 +15,6 @@ interface GrantmakingProcessSectionProps {
 }
 
 export function GrantmakingProcessSection({
-  title = "Our Grantmaking Process",
-  subtitle,
-  description,
-  paragraphs = [
-    "Our grantmaking process is built on trust, transparency, and partnership. We work closely with local communities, small-scale fishers, fish workers, and Indigenous Peoples to ensure that funding decisions are made collaboratively and reflect the needs and priorities of those most affected.",
-    "Through regular consultations, active listening, and responsive support, we create opportunities for meaningful change that centers the voices and experiences of our partners.",
-  ],
   image = "/assets/gov-grantmaking.webp",
   imageAlt = "Grantmaking process meeting with partners",
   backgroundColor = "bg-white",

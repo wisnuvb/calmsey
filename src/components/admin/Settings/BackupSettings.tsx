@@ -17,7 +17,7 @@ export function BackupSettings() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        await response.json();
         setLastBackup(new Date().toISOString());
         alert("Backup created successfully!");
       } else {

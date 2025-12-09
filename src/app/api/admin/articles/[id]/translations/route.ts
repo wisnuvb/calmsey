@@ -13,8 +13,7 @@ export async function POST(
     if (!authResult.success) return authResult.response;
 
     const body = await request.json();
-    const { languageId, title, content, excerpt, seoTitle, seoDescription } =
-      body;
+    const { languageId, title, excerpt, seoTitle, seoDescription } = body;
 
     // Check if article exists
     const article = await prisma.article.findUnique({
@@ -35,7 +34,6 @@ export async function POST(
       },
       update: {
         title,
-        content,
         excerpt,
         seoTitle,
         seoDescription,
@@ -44,7 +42,6 @@ export async function POST(
         articleId: id,
         languageId,
         title,
-        content,
         excerpt,
         seoTitle,
         seoDescription,

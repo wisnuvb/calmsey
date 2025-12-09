@@ -8,7 +8,7 @@ interface JsonFieldProps {
   error?: string;
 }
 
-export function JsonField({ field, value, onChange, error }: JsonFieldProps) {
+export function JsonField({ value, onChange, error }: JsonFieldProps) {
   const isValidJSON = (str: string): boolean => {
     if (!str.trim()) return true;
     try {

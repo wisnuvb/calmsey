@@ -1,15 +1,8 @@
 import {
-  CaseStudyCarousel,
-  CollectiveActionSection,
-  CommunityEmpowermentSection,
-  DownloadFramework,
-  GrantmakingApproachSection,
   HeroSection,
   LatestActivitySection,
   PartnerStoriesSection,
   RelationshipsSection,
-  StoriesSection,
-  TenureUnderstandingSection,
 } from "@/components/main";
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";

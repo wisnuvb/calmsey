@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ROLE_AUTHOR, ROLE_EDITOR } from "@/lib/auth-helpers";
 
@@ -184,7 +182,7 @@ export async function POST(request: NextRequest) {
             name: tag.name,
             articleCount: tag._count.articles,
           });
-        } catch (error) {
+        } catch {
           errors.push(`Failed to create tag "${tagName}"`);
         }
       }

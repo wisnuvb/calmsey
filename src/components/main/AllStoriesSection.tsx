@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { H2, H3, H5, P } from "../ui/typography";
+import { H3, P } from "../ui/typography";
 import { Play, MapPin, Calendar, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getImageUrl } from "@/lib/utils";

@@ -34,6 +34,7 @@ export function TinyMCEEditor({
   const handleUploadImage = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     blobInfo: any,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progress: (percent: number) => void
   ): Promise<string> => {
     if (!onImageUpload) {

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Play } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContent } from "@/contexts/PageContentContext";
+import { useImageError } from "@/hooks/useImageError";
 
 interface Story {
   id: string;
@@ -88,6 +89,9 @@ export function PartnerStoriesSection({
   limit: propLimit = 3,
   className,
 }: PartnerStoriesSectionProps = {}) {
+  // Use global image error handler
+  const { hasError, handleError } = useImageError();
+
   // Try to get content from context
   let pageContent: Record<string, string> = {};
   try {
@@ -319,17 +323,20 @@ export function PartnerStoriesSection({
             {/* Large Story Thumbnail - Left */}
             {mainStory && (
               <div className="lg:col-span-2 relative group overflow-hidden rounded-lg h-[400px] lg:h-[500px]">
-                <Image
-                  src={getImageUrl(mainStory.imageSrc)}
-                  alt={mainStory.imageAlt}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src =
-                      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=500&fit=crop";
-                  }}
-                />
+                {!hasError(mainStory.id) ? (
+                  <Image
+                    src={getImageUrl(mainStory.imageSrc)}
+                    alt={mainStory.imageAlt}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={() => handleError(mainStory.id)}
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 text-sm">No image</span>
+                  </div>
+                )}
 
                 {/* Play Button Overlay - Only for Video */}
                 {mainStory.type === "video" && (
@@ -384,17 +391,20 @@ export function PartnerStoriesSection({
                     className="relative group overflow-hidden rounded-lg flex-1 min-h-0"
                     role="listitem"
                   >
-                    <Image
-                      src={getImageUrl(story.imageSrc)}
-                      alt={story.imageAlt}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src =
-                          "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=500&fit=crop";
-                      }}
-                    />
+                    {!hasError(story.id) ? (
+                      <Image
+                        src={getImageUrl(story.imageSrc)}
+                        alt={story.imageAlt}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={() => handleError(story.id)}
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-sm">No image</span>
+                      </div>
+                    )}
 
                     {/* Play Button Overlay - Only for Video */}
                     {story.type === "video" && (

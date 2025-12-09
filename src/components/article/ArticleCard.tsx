@@ -1,7 +1,7 @@
 import { getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 
 interface Article {
   id: string;
@@ -17,6 +17,8 @@ interface ArticleCardProps {
 }
 
 export const ArticleCard = ({ article }: ArticleCardProps) => {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <Link
       key={article.id}
@@ -24,13 +26,21 @@ export const ArticleCard = ({ article }: ArticleCardProps) => {
       className="group bg-white rounded-sm overflow-hidden transition-all duration-300"
     >
       {/* Article Image */}
-      <div className="relative aspect-video overflow-hidden">
-        <Image
-          src={getImageUrl(article.image)}
-          alt={article.title}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+      <div className="relative aspect-video overflow-hidden bg-gray-200">
+        {!imageError && article.image ? (
+          <Image
+            src={getImageUrl(article.image)}
+            alt={article.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={() => setImageError(true)}
+            unoptimized
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-200">
+            <span className="text-gray-400 text-sm">No image</span>
+          </div>
+        )}
       </div>
 
       {/* Article Content */}

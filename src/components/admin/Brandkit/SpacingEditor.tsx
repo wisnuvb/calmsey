@@ -19,16 +19,6 @@ export default function SpacingEditor({
     });
   };
 
-  const handleScaleChange = (key: string, value: string) => {
-    onChange({
-      ...spacing,
-      scale: {
-        ...spacing.scale,
-        [key]: value,
-      },
-    });
-  };
-
   const handleContainerSizeChange = (key: string, value: string) => {
     onChange({
       ...spacing,

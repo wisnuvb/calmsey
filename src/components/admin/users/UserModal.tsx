@@ -9,7 +9,7 @@ import {
   DocumentTextIcon,
   EyeIcon,
 } from "@heroicons/react/24/outline";
-import { User, ROLE_LABELS, ROLE_DESCRIPTIONS, RoleFilter } from "@/types/user";
+import { User, ROLE_LABELS, ROLE_DESCRIPTIONS } from "@/types/user";
 
 interface UserModalProps {
   user: User | null;

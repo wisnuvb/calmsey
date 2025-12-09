@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { ArticleCard } from "../article";
 import { H2 } from "../ui/typography";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface Article {
   id: string;
@@ -45,14 +44,22 @@ const articles: Article[] = [
   },
 ];
 
-export function LatestArticlesSection() {
+interface LatestArticlesSectionProps {
+  title?: string;
+  limit?: number;
+}
+
+export function LatestArticlesSection({
+  title = "Recent Updates",
+  limit = 6,
+}: LatestArticlesSectionProps = {}) {
   return (
     <section className="py-16 lg:py-24 bg-[#F7FAFC]">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-12 lg:mb-14 gap-4">
           <H2 style="h2reg" className="text-3xl sm:text-[38px] text-[#010107]">
-            Recent Updates
+            {title}
           </H2>
           <Link
             href="/articles"
@@ -65,7 +72,7 @@ export function LatestArticlesSection() {
 
         {/* Articles Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.map((article) => (
+          {articles.slice(0, limit).map((article) => (
             <ArticleCard key={article.id} article={article} />
           ))}
         </div>

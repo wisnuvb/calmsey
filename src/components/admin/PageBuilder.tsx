@@ -2,7 +2,7 @@
 // src/components/admin/PageBuilder.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -103,7 +103,6 @@ function SortableSection({
 }
 
 export default function PageBuilder({
-  pageId,
   initialSections = [],
   onSave,
 }: PageBuilderProps) {

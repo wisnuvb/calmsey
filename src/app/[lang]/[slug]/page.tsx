@@ -1,6 +1,5 @@
 import { SimpleCMS } from "@/lib/services/simple-cms";
-import { getImageUrl } from "@/lib/utils";
-import Image from "next/image";
+import { SafeImage } from "@/components/common/SafeImage";
 import { notFound } from "next/navigation";
 
 interface PageProps {
@@ -28,11 +27,11 @@ export default async function DynamicPage({ params }: PageProps) {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {page.featuredImage && (
           <div className="mb-8">
-            <Image
+            <SafeImage
+              src={page.featuredImage}
+              alt={page.title}
               width={1000}
               height={1000}
-              src={getImageUrl(page.featuredImage)}
-              alt={page.title}
               className="w-full h-64 object-cover rounded-lg"
             />
           </div>

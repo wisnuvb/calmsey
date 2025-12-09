@@ -21,23 +21,15 @@ const defaultFunders: Funder[] = [
 ];
 
 interface WhyTurningTidesSectionProps {
-  missionTitle?: string;
-  missionDescription?: string;
-  fundersLabel?: string;
-  funders?: Funder[];
-  whyTitle?: string;
-  whyContent?: string;
+  title?: string;
+  content?: string;
   ctaText?: string;
   ctaLink?: string;
 }
 
 export function WhyTurningTidesSection({
-  missionTitle: propMissionTitle,
-  missionDescription: propMissionDescription,
-  fundersLabel: propFundersLabel,
-  funders: propFunders,
-  whyTitle: propWhyTitle,
-  whyContent: propWhyContent,
+  title: propTitle,
+  content: propContent,
   ctaText: propCtaText,
   ctaLink: propCtaLink,
 }: WhyTurningTidesSectionProps = {}) {
@@ -85,34 +77,34 @@ export function WhyTurningTidesSection({
   // Get all values with priority: context > props > default
   const missionTitle = getValue(
     "whyUs.missionTitle",
-    propMissionTitle,
+    propTitle,
     "Turning Tides is an international, value-led, facility dedicated to supporting the tenure and rights of local communities, fisher peoples, and Indigenous Peoples."
   );
 
   const missionDescription = getValue(
     "whyUs.missionDescription",
-    propMissionDescription,
+    propContent,
     "When tenure is secure and surrounding human rights are recognized, communities thrive, environments are protected, and economies are inclusive and strong."
   );
 
   const fundersLabel = getValue(
     "whyUs.fundersLabel",
-    propFundersLabel,
+    propContent,
     "Together with the Funders Transforming Coastal Right"
   );
 
   const funders =
-    propFunders || getContentJSON<Funder[]>("whyUs.funders", defaultFunders);
+    propContent || getContentJSON<Funder[]>("whyUs.funders", defaultFunders);
 
   const whyTitle = getValue(
     "whyUs.whyTitle",
-    propWhyTitle,
+    propTitle,
     "So Why Are We Turning Tides?"
   );
 
   const whyContent = getValue(
     "whyUs.whyContent",
-    propWhyContent,
+    propContent,
     "Because collective rights are still being eroded by weak commitments, powerful interests, narrow views of tenure, and tokenistic efforts toward participation."
   );
 
@@ -145,22 +137,23 @@ export function WhyTurningTidesSection({
 
               {/* Funders Logo Row */}
               <div className="flex flex-wrap lg:flex-nowrap items-center gap-8 lg:gap-12">
-                {funders.map((funder, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-center transition-all duration-300 opacity-80 hover:opacity-100"
-                    title={funder.name}
-                  >
-                    <div className="relative w-12 h-12">
-                      <Image
-                        src={getImageUrl(funder.logo)}
-                        alt={funder.name}
-                        fill
-                        className="object-contain"
-                      />
+                {Array.isArray(funders) &&
+                  funders.map((funder: Funder, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-center transition-all duration-300 opacity-80 hover:opacity-100"
+                      title={funder.name}
+                    >
+                      <div className="relative w-12 h-12">
+                        <Image
+                          src={getImageUrl(funder.logo)}
+                          alt={funder.name}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           </div>

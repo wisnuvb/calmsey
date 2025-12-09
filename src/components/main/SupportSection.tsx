@@ -7,9 +7,7 @@ import {
   Settings,
   Scale,
   FileSearch,
-  CheckCircle,
   CheckCircle2,
-  CheckCircle2Icon,
 } from "lucide-react";
 import { H2, H5, H6, P } from "../ui/typography";
 

@@ -17,8 +17,6 @@ export function ContactPage({ language }: ContactPageProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
 
-  const prefix = language === "en" ? "" : `/${language}`;
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -43,7 +41,7 @@ export function ContactPage({ language }: ContactPageProps) {
               : "Gagal mengirim pesan")
         );
       }
-    } catch (error) {
+    } catch {
       setError(
         language === "en" ? "Failed to send message" : "Gagal mengirim pesan"
       );

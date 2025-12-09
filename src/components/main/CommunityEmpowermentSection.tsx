@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Masonry from "react-masonry-css";
 import { H2 } from "@/components/ui/typography";
-import { SearchIcon } from "lucide-react";
 import { Lightbox } from "../common";
 import { getImageUrl } from "@/lib/utils";
 

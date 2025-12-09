@@ -8,7 +8,7 @@ export async function GET(
   try {
     const { menuKey } = await params;
     const { searchParams } = new URL(request.url);
-    const language = getValidLanguage(searchParams.get("lang") || "en");
+    const language = await getValidLanguage(searchParams.get("lang") || "en");
 
     const navigation = await PublicAPI.getNavigationMenu(menuKey, language);
 

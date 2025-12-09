@@ -63,7 +63,6 @@ export const OurFundersSection: React.FC<OurFundersSectionProps> = ({
   description = "Interested Working Together With Us to Transforming Coastal Right?",
   buttonText = "Become Funder",
   buttonLink = "/contact",
-  backgroundColor = "bg-black",
 }) => {
   return (
     <section className={`w-full bg-white py-16 md:py-24`}>

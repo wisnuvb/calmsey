@@ -11,7 +11,6 @@ import {
   CogIcon,
   HomeIcon,
   FolderIcon,
-  ChatBubbleLeftRightIcon,
   TagIcon,
   Bars3Icon,
   XMarkIcon,

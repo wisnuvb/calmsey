@@ -34,7 +34,6 @@ export default function ProtectedRoute({
       router.push("/admin/unauthorized");
       return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, status, router, isExcludedPath, allowedRoles, pathname]);
 
   if (status === "loading") {

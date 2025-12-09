@@ -69,16 +69,6 @@ const analyzeBackgroundColor = (element: Element) => {
 
 // Fungsi untuk menganalisis semua CSS classes dan mencari background color
 const analyzeElementBackground = (element: Element) => {
-  const computedStyle = window.getComputedStyle(element);
-  const allStyles = {
-    backgroundColor: computedStyle.backgroundColor,
-    backgroundImage: computedStyle.backgroundImage,
-    background: computedStyle.background,
-    color: computedStyle.color,
-    // Ambil semua CSS custom properties
-    cssVariables: {},
-  };
-
   // Ambil CSS custom properties
   const rootStyles = getComputedStyle(document.documentElement);
   const cssVars: Record<string, string> = {};
@@ -220,16 +210,21 @@ export function Navbar() {
     } else {
       if (currentBackgroundAnalysis) {
         return currentBackgroundAnalysis.isLight
-          ? "/assets/Logo.png"
+          ? "/assets/Logo-blue.png"
           : "/assets/Logo-white.png";
       } else {
         return backgroundType === "light"
-          ? "/assets/Logo.png"
+          ? "/assets/Logo-white.png"
           : "/assets/Logo-white.png";
       }
     }
   };
-
+  console.log(
+    getLogoSrc(),
+    currentBackgroundAnalysis,
+    backgroundType,
+    isScrolled
+  );
   return (
     <nav
       className={cn(
@@ -243,7 +238,7 @@ export function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <div className="w-[79px] h-[60px] relative">
+            <div className="w-[79px] h-[50px] relative">
               <Image
                 src={getLogoSrc()}
                 alt="Turning Tides Logo"

@@ -4,7 +4,6 @@ import {
   MapPin,
   Play,
   Share2,
-  ExternalLink,
   Link as LinkIcon,
   ArrowUpRight,
 } from "lucide-react";

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ROLE_ADMIN } from "@/lib/auth-helpers";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const authResult = await requireAuth(ROLE_ADMIN);
     if (!authResult.success) return authResult.response;

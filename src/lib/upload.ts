@@ -139,7 +139,7 @@ export class ImageUploadService {
     }
   }
 
-  static generateThumbnail(originalUrl: string, width: number = 300): string {
+  static generateThumbnail(originalUrl: string): string {
     // Jika pakai CDN yang support image transformation (seperti ImageKit)
     // return `${originalUrl}?tr=w-${width},q-80`;
 

@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ROLE_ADMIN, ROLE_EDITOR } from "@/lib/auth-helpers";
 

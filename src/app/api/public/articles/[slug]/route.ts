@@ -6,9 +6,10 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = await params;
+    const resolvedParams = await params;
+    const slug = resolvedParams.slug;
     const { searchParams } = new URL(request.url);
-    const language = getValidLanguage(searchParams.get("lang") || "en");
+    const language = await getValidLanguage(searchParams.get("lang") || "en");
 
     const article = await PublicAPI.getArticleBySlug(slug, language);
 

@@ -1,9 +1,12 @@
 // src/components/public/ArticleCard.tsx
+"use client";
+
 import Link from "next/link";
 import { PublicArticle, SupportedLanguage } from "@/lib/public-api";
 import Image from "next/image";
 import { formatDate } from "date-fns";
 import { getImageUrl } from "@/lib/utils";
+import { useState } from "react";
 
 interface ArticleCardProps {
   article: PublicArticle;
@@ -16,12 +19,13 @@ export function ArticleCard({
   language,
   showExcerpt = true,
 }: ArticleCardProps) {
+  const [imageError, setImageError] = useState(false);
   const prefix = language === "en" ? "" : `/${language}`;
   const articleUrl = `${prefix}/articles/${article.slug}`;
 
   return (
     <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-      {article.featuredImage && (
+      {article.featuredImage && !imageError && (
         <div className="aspect-w-16 aspect-h-9">
           <Image
             src={getImageUrl(article.featuredImage)}
@@ -29,6 +33,8 @@ export function ArticleCard({
             className="w-full h-48 object-cover"
             width={1000}
             height={1000}
+            onError={() => setImageError(true)}
+            unoptimized
           />
         </div>
       )}

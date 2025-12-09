@@ -1,8 +1,8 @@
 import { requireAuth, ROLE_ADMIN } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const authResult = await requireAuth(ROLE_ADMIN);
     if (!authResult.success) return authResult.response;

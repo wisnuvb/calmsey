@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "@/lib/prisma";
-import { PageTemplate, PageStatus } from "@prisma/client";
+import { PageStatus, PageType } from "@prisma/client";
 
 export interface SiteSetupStatus {
   dbConnected: boolean;
@@ -27,7 +27,7 @@ export async function getSiteSetupStatus(): Promise<SiteSetupStatus> {
     // Check if homepage/landing page exists
     const landingPage = await prisma.page.findFirst({
       where: {
-        template: PageTemplate.LANDING,
+        pageType: PageType.HOME,
         status: PageStatus.PUBLISHED,
       },
     });
@@ -57,7 +57,7 @@ export async function getPageByTemplate(template: string, language: string) {
   try {
     const page = await prisma.page.findFirst({
       where: {
-        template: template as PageTemplate,
+        pageType: template as PageType,
         status: PageStatus.PUBLISHED,
       },
       include: {

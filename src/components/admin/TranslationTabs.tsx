@@ -82,7 +82,6 @@ export default function TranslationTabs({
 
   const getLanguageStatus = (languageId: string) => {
     const translation = getTranslation(languageId);
-    const language = languages.find((l) => l.id === languageId);
 
     if (!translation) return "missing";
     if (!translation.title || !translation.content) return "incomplete";

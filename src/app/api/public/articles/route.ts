@@ -4,7 +4,7 @@ import { PublicAPI, getValidLanguage } from "@/lib/public-api";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const language = getValidLanguage(searchParams.get("lang") || "en");
+    const language = await getValidLanguage(searchParams.get("lang") || "en");
     const limit = parseInt(searchParams.get("limit") || "10");
     const category = searchParams.get("category");
 

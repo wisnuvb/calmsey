@@ -2,11 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  PlusIcon,
-  TrashIcon,
-  ArrowPathIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { BrandkitColors } from "@/types/brandkit";
 
 interface ColorPaletteEditorProps {
@@ -33,17 +29,6 @@ export default function ColorPaletteEditor({
   const shadeNumbers = [
     0, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950,
   ];
-
-  const updateColorShade = (groupId: string, shade: number, color: string) => {
-    const updatedColors = {
-      ...colors,
-      [groupId]: {
-        ...colors[groupId as keyof BrandkitColors],
-        [shade]: color,
-      },
-    };
-    onChange(updatedColors);
-  };
 
   const generateColorPalette = (groupId: string, baseColor: string) => {
     // Simple color generation based on base color

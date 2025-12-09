@@ -4,6 +4,7 @@ import { ArticleCard } from "./ArticleCard";
 import { formatDateWithLanguage } from "@/lib/date-utils";
 import Image from "next/image";
 import { ShareButtons } from "./ShareButtons";
+import { getImageUrl } from "@/lib/utils";
 
 interface ArticlePageProps {
   article: PublicArticle;
@@ -24,7 +25,7 @@ export function ArticlePage({
       {article.featuredImage && (
         <div className="relative h-64 md:h-96 overflow-hidden">
           <Image
-            src={article.featuredImage}
+            src={getImageUrl(article.featuredImage)}
             alt={article.title}
             className="w-full h-full object-cover"
             width={1000}

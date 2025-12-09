@@ -18,13 +18,11 @@ interface ValuesFoundationSectionProps {
 export const ValuesFoundationSection: React.FC<
   ValuesFoundationSectionProps
 > = ({
-  title = "Our Values and Principles",
   image = "/assets/demo/our-vision.png", // Placeholder image path
   imageAlt = "Our team representing our values and principles",
   text = "Our values and principles were built from what we were hearing through consultation from our potential partners, in discussion with the Steering Committee, and from established practices of liberatory approaches to grantmaking.",
   buttonText = "Funds We Support",
   buttonLink = "/fund",
-  backgroundColor = "bg-teal-600",
 }) => {
   return (
     <section className="w-full relative mt-28">
