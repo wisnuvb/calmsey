@@ -57,7 +57,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
 
   return (
     <section
-      className={`w-full ${backgroundColor} py-16 md:py-24`}
+      className={`w-full ${backgroundColor} pt-16 md:pt-24`}
       data-section="get-involved"
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12">
@@ -231,6 +231,20 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
             </div>
           </div>
         </div>
+      </div>
+      <div className="bg-[#3C62ED] py-[100px] px-[120px] flex items-center justify-between gap-[70px]">
+        <p className="text-base text-white font-normal font-work-sans max-w-[433px]">
+          Supporting rights and tenure of local communities, small scale
+          fishers, fish workers, and Indigenous Peoples.
+        </p>
+        <p className="text-base text-white/50 font-normal font-work-sans max-w-[697px]">
+          If you are a group, organization, or collective that represents or
+          directly serves local communities, small-scale fishers or fish
+          workers, or Indigenous Peoples,{" "}
+          <span className="text-white">
+            reach out to us and share your work and aspirations here.
+          </span>
+        </p>
       </div>
     </section>
   );

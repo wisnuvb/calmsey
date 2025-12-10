@@ -86,15 +86,15 @@ export function Footer() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {footerSections.map((section) => (
                 <div key={section.title}>
-                  <h3 className="text-base font-semibold mb-4 text-yellow-300">
+                  <h3 className="text-base font-semibold mb-4 text-[#C4DF99]">
                     {section.title}
                   </h3>
                   <ul className="space-y-2">
-                    {section.links.map((link) => (
-                      <li key={link.href}>
+                    {section.links.map((link, i) => (
+                      <li key={`${link.href}-${i}`}>
                         <Link
                           href={link.href}
-                          className="text-sm text-white hover:text-yellow-300 transition-colors"
+                          className="text-sm text-white hover:text-[#C4DF99] transition-colors"
                         >
                           {link.label}
                         </Link>

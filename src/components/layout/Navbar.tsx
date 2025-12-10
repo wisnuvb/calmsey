@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -23,25 +23,6 @@ const navLinks: NavLink[] = [
   { label: "Partner Stories", href: "/stories" },
   // { label: "Articles", href: "/articles" },
 ];
-
-interface BackgroundContextType {
-  backgroundType: "light" | "dark";
-  setBackgroundType: (type: "light" | "dark") => void;
-}
-
-const BackgroundContext = React.createContext<
-  BackgroundContextType | undefined
->(undefined);
-
-export const useBackgroundContext = () => {
-  const context = useContext(BackgroundContext);
-  if (!context) {
-    throw new Error(
-      "useBackgroundContext must be used within BackgroundProvider"
-    );
-  }
-  return context;
-};
 
 const analyzeBackgroundColor = (element: Element) => {
   const computedStyle = window.getComputedStyle(element);
@@ -84,9 +65,6 @@ const analyzeElementBackground = (element: Element) => {
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [backgroundType, setBackgroundType] = useState<"light" | "dark">(
-    "light"
-  );
   const [currentBackgroundAnalysis, setCurrentBackgroundAnalysis] = useState<{
     isLight: boolean;
     luminance: number;
@@ -97,6 +75,22 @@ export function Navbar() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const { language } = useLanguage();
+
+  // Check if current page is home
+  const isHomePage =
+    pathname === `/${language}` ||
+    pathname === "/en" ||
+    pathname === "/id" ||
+    pathname === "/";
+
+  // Check if current page is get-involved (should also have dynamic background detection)
+  const isGetInvolvedPage =
+    pathname === `/${language}/get-involved` ||
+    pathname === "/en/get-involved" ||
+    pathname === "/id/get-involved";
+
+  // Pages that should have dynamic background detection
+  const hasDynamicBackground = isHomePage || isGetInvolvedPage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -109,6 +103,16 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    // Jalankan deteksi background di home page dan get-involved page
+    // Untuk halaman lain, gunakan white text/logo
+    if (!hasDynamicBackground) {
+      setCurrentBackgroundAnalysis({
+        isLight: false,
+        luminance: 0,
+      });
+      return;
+    }
+
     const detectBackground = () => {
       // Find all elements with data-section
       const sections = document.querySelectorAll("[data-section]");
@@ -128,83 +132,71 @@ export function Navbar() {
         }
       });
 
-      if (visibleSection) {
-        const analysis = analyzeElementBackground(visibleSection);
+      // Fallback: jika tidak ada section yang terlihat, gunakan section pertama
+      let elementToAnalyze: Element | null = visibleSection;
+      if (!elementToAnalyze && sections.length > 0) {
+        elementToAnalyze = sections[0] as Element;
+      }
+
+      if (elementToAnalyze) {
+        const analysis = analyzeElementBackground(elementToAnalyze);
         if (analysis) {
           setCurrentBackgroundAnalysis({
             isLight: analysis.isLight,
             luminance: analysis.luminance,
           });
-          setBackgroundType(analysis.isLight ? "light" : "dark");
+          return true;
         }
       }
+      return false;
     };
 
     const handleScroll = () => {
       detectBackground();
     };
 
-    // Reset state when navigating
-    setCurrentBackgroundAnalysis(null);
-    setBackgroundType("light");
+    // Fungsi untuk deteksi dengan multiple attempts
+    const attemptDetection = (maxAttempts = 8, delay = 150) => {
+      let attempts = 0;
 
-    // Detect initial with delay to ensure DOM has been rendered
-    const timeoutId = setTimeout(() => {
-      detectBackground();
-    }, 100);
+      const tryDetect = () => {
+        attempts++;
+        const success = detectBackground();
 
-    // Detect when scrolling
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []); // Remove dependency array or add pathname if needed
-
-  // Replace useEffect for route change with pathname
-  useEffect(() => {
-    // Reset and detect again when route changes
-    setCurrentBackgroundAnalysis(null);
-    setBackgroundType("light");
-
-    const timeoutId = setTimeout(() => {
-      const detectBackground = () => {
-        const sections = document.querySelectorAll("[data-section]");
-
-        let visibleSection = null;
-        let maxVisibleArea = 0;
-
-        sections.forEach((section) => {
-          const rect = section.getBoundingClientRect();
-          const visibleHeight =
-            Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
-
-          if (visibleHeight > 0 && visibleHeight > maxVisibleArea) {
-            maxVisibleArea = visibleHeight;
-            visibleSection = section;
-          }
-        });
-
-        if (visibleSection) {
-          const analysis = analyzeElementBackground(visibleSection);
-          if (analysis) {
-            setCurrentBackgroundAnalysis({
-              isLight: analysis.isLight,
-              luminance: analysis.luminance,
-            });
-            setBackgroundType(analysis.isLight ? "light" : "dark");
-          }
+        if (!success && attempts < maxAttempts) {
+          setTimeout(() => {
+            requestAnimationFrame(tryDetect);
+          }, delay);
         }
       };
 
-      detectBackground();
-    }, 200);
+      // Delay awal untuk memastikan DOM ready
+      setTimeout(() => {
+        requestAnimationFrame(tryDetect);
+      }, 100);
+    };
 
-    return () => clearTimeout(timeoutId);
-  }, [pathname]); // Use pathname from Next.js router
+    // Reset state
+    setCurrentBackgroundAnalysis(null);
+
+    // Deteksi awal dengan multiple attempts
+    attemptDetection(8, 150);
+
+    // Deteksi saat scrolling
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [pathname, hasDynamicBackground]);
 
   const getLogoSrc = () => {
+    // Untuk halaman tanpa dynamic background, selalu gunakan logo putih
+    if (!hasDynamicBackground) {
+      return "/assets/Logo-white.png";
+    }
+
+    // Untuk halaman dengan dynamic background (home & get-involved)
     if (isScrolled) {
       return "/assets/Logo-white.png";
     } else {
@@ -213,18 +205,10 @@ export function Navbar() {
           ? "/assets/Logo-blue.png"
           : "/assets/Logo-white.png";
       } else {
-        return backgroundType === "light"
-          ? "/assets/Logo-white.png"
-          : "/assets/Logo-white.png";
+        return "/assets/Logo-blue.png";
       }
     }
   };
-  console.log(
-    getLogoSrc(),
-    currentBackgroundAnalysis,
-    backgroundType,
-    isScrolled
-  );
   return (
     <nav
       className={cn(
@@ -255,9 +239,11 @@ export function Navbar() {
                 key={link.href}
                 href={`/${language}${link.href}`}
                 className={cn(
-                  "transition-colors duration-300 text-base font-normal hover:text-blue-300",
-                  isScrolled || !currentBackgroundAnalysis?.isLight
-                    ? "text-white"
+                  "transition-colors duration-300 text-base font-normal",
+                  !hasDynamicBackground ||
+                    isScrolled ||
+                    !currentBackgroundAnalysis?.isLight
+                    ? "text-white hover:text-blue-300"
                     : "text-gray-700 hover:text-[#3C62ED]"
                 )}
               >
@@ -281,7 +267,11 @@ export function Navbar() {
             </button> */}
             <LanguageSwitcher
               currentLanguage={language}
-              isDark={isScrolled || !currentBackgroundAnalysis?.isLight}
+              isDark={
+                !hasDynamicBackground ||
+                isScrolled ||
+                !currentBackgroundAnalysis?.isLight
+              }
             />
 
             {/* Get Involved Button */}
@@ -289,7 +279,9 @@ export function Navbar() {
               href="/get-involved"
               className={cn(
                 "px-6 py-2 border-2 rounded transition-all duration-300 text-sm font-medium",
-                isScrolled || !currentBackgroundAnalysis?.isLight
+                !hasDynamicBackground ||
+                  isScrolled ||
+                  !currentBackgroundAnalysis?.isLight
                   ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
                   : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white"
               )}
@@ -302,10 +294,12 @@ export function Navbar() {
           <button
             onClick={toggleMenu}
             className={cn(
-              "lg:hidden p-2 rounded-md transition-colors duration-300 hover:bg-gray-100",
-              isScrolled || !currentBackgroundAnalysis?.isLight
+              "lg:hidden p-2 rounded-md transition-colors duration-300",
+              !hasDynamicBackground ||
+                isScrolled ||
+                !currentBackgroundAnalysis?.isLight
                 ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
-                : "text-gray-700 hover:text-[#3C62ED]"
+                : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-100"
             )}
             aria-label="Toggle menu"
           >
@@ -319,7 +313,9 @@ export function Navbar() {
         <div
           className={cn(
             "lg:hidden border-t transition-all duration-300",
-            isScrolled || !currentBackgroundAnalysis?.isLight
+            !hasDynamicBackground ||
+              isScrolled ||
+              !currentBackgroundAnalysis?.isLight
               ? "bg-[#3C62ED]/95 backdrop-blur-md border-blue-500/30"
               : "bg-white border-gray-200"
           )}
@@ -331,7 +327,9 @@ export function Navbar() {
                 href={link.href}
                 className={cn(
                   "block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300",
-                  isScrolled || !currentBackgroundAnalysis?.isLight
+                  !hasDynamicBackground ||
+                    isScrolled ||
+                    !currentBackgroundAnalysis?.isLight
                     ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
                     : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-50"
                 )}
@@ -344,7 +342,9 @@ export function Navbar() {
               <button
                 className={cn(
                   "w-full flex items-center justify-center space-x-1 px-3 py-2 text-sm transition-colors duration-300",
-                  isScrolled || !currentBackgroundAnalysis?.isLight
+                  !hasDynamicBackground ||
+                    isScrolled ||
+                    !currentBackgroundAnalysis?.isLight
                     ? "text-white hover:text-blue-300"
                     : "text-gray-700 hover:text-[#3C62ED]"
                 )}
@@ -356,7 +356,9 @@ export function Navbar() {
                 href="/get-involved"
                 className={cn(
                   "block w-full text-center px-6 py-2 border-2 rounded transition-all duration-300 text-sm font-medium",
-                  isScrolled || !currentBackgroundAnalysis?.isLight
+                  !hasDynamicBackground ||
+                    isScrolled ||
+                    !currentBackgroundAnalysis?.isLight
                     ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
                     : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white"
                 )}
