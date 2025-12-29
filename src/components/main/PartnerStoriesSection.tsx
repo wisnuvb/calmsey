@@ -13,7 +13,8 @@ interface Story {
   imageSrc: string;
   imageAlt: string;
   title: string;
-  description?: string;
+  location: string;
+  date: string;
   url: string;
   type: "video" | "article";
 }
@@ -39,8 +40,8 @@ const defaultStories: Story[] = [
       "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=500&fit=crop",
     imageAlt: "Pasibuntuliki - Lines of the Sea",
     title: "Pasibuntuliki - Lines of the Sea",
-    description:
-      "What's remarkable is that this forum was born from the people's own initiative",
+    location: "Indonesia",
+    date: "September, 2025",
     url: "#",
     type: "video",
   },
@@ -48,9 +49,10 @@ const defaultStories: Story[] = [
     id: "2",
     imageSrc:
       "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=500&fit=crop",
-    imageAlt: "After Anchoring the Boat",
-    title: "After Anchoring the Boat",
-    description: "They just deliver the fish and that's it.",
+    imageAlt: "A new breath for the women of Néma Bah",
+    title: "A new breath for the women of Néma Bah",
+    location: "India",
+    date: "September, 2025",
     url: "#",
     type: "video",
   },
@@ -58,11 +60,12 @@ const defaultStories: Story[] = [
     id: "3",
     imageSrc:
       "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=500&fit=crop",
-    imageAlt: "Towards Tenure Reform for Indigenous Te...",
-    title: "Towards Tenure Reform for Indigenous Te...",
-    description: "",
+    imageAlt: "Rakhaine Women Fight for Survival, Tenure, and Identity",
+    title: "Rakhaine Women Fight for Survival, Tenure, and Identity",
+    location: "India",
+    date: "September, 2025",
     url: "#",
-    type: "article",
+    type: "video",
   },
 ];
 
@@ -179,6 +182,21 @@ export function PartnerStoriesSection({
                   cat.slug.toLowerCase().includes("video")
                 ) || false;
 
+              // Try to find location from categories (excluding video)
+              const locationCategory = article.categories?.find(
+                (cat) => !cat.slug.toLowerCase().includes("video")
+              );
+              const location = locationCategory
+                ? locationCategory.name
+                : "Indonesia"; // Fallback location if not found
+
+              // Format date
+              const dateObj = new Date(article.publishedAt);
+              const date = dateObj.toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric",
+              });
+
               // Build URL from slug
               const articleUrl = `/${language}/articles/${article.slug}`;
 
@@ -187,7 +205,8 @@ export function PartnerStoriesSection({
                 imageSrc: article.featuredImage || "",
                 imageAlt: article.title || "Story image",
                 title: article.title || "",
-                description: article.excerpt || "",
+                location,
+                date,
                 url: articleUrl,
                 type: isVideo ? "video" : "article",
               };
@@ -207,19 +226,14 @@ export function PartnerStoriesSection({
     fetchStories();
   }, [categorySlug, limit]);
 
-  const mainStory = stories[0];
-  const sideStories = stories.slice(1);
-
   const isBlueBackground = backgroundColor === "blue";
   const textColor = isBlueBackground ? "text-white" : "text-[#010107]";
   const textColorSecondary = isBlueBackground
-    ? "text-white/90"
+    ? "text-white/80"
     : "text-[#060726CC]";
   const borderColor = isBlueBackground ? "border-white/40" : "border-gray-300";
-  const buttonBg = isBlueBackground
-    ? "bg-white"
-    : "bg-white border border-gray-900";
-  const buttonTextColor = isBlueBackground ? "text-gray-900" : "text-gray-900";
+  const buttonBg = isBlueBackground ? "bg-white" : "bg-[#010107]";
+  const buttonTextColor = isBlueBackground ? "text-[#010107]" : "text-white";
 
   return (
     <section
@@ -230,66 +244,58 @@ export function PartnerStoriesSection({
       )}
     >
       {/* Content Container */}
-      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Section - Only show if any header content exists */}
+      <div className="relative z-20 container mx-auto px-4">
+        {/* Header Section */}
         {(tag || title || description || buttonText) && (
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-12">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
             {/* Left Side - Tag, Title and Description */}
-            {(tag || title || description) && (
-              <div className={cn("space-y-[15px]", textColor)}>
-                {/* Tag */}
-                {tag && (
-                  <div className="inline-block">
-                    <span
-                      className={cn(
-                        "px-4 py-2 border rounded-full text-sm font-medium uppercase tracking-wider",
-                        borderColor,
-                        textColor
-                      )}
-                    >
-                      {tag}
-                    </span>
-                  </div>
-                )}
-
-                {/* Title */}
-                {title && (
-                  <h2
+            <div className="max-w-2xl">
+              {tag && (
+                <div className="mb-[19px]">
+                  <span
                     className={cn(
-                      "text-3xl sm:text-[38px] font-nunito-sans font-bold leading-tight",
+                      "px-4 py-1.5 border rounded-full text-xs font-normal uppercase tracking-wider",
+                      borderColor,
                       textColor
                     )}
                   >
-                    {title}
-                  </h2>
-                )}
+                    {tag}
+                  </span>
+                </div>
+              )}
 
-                {/* Description */}
-                {description && (
-                  <p
-                    className={cn(
-                      "text-lg lg:text-xl max-w-lg",
-                      textColorSecondary
-                    )}
-                  >
-                    {description}
-                  </p>
-                )}
-              </div>
-            )}
+              {title && (
+                <h2
+                  className={cn(
+                    "text-3xl sm:text-4xl lg:text-[42px] font-bold leading-tight mb-3 font-nunito-sans",
+                    textColor
+                  )}
+                >
+                  {title}
+                </h2>
+              )}
 
-            {/* Right Side - All Stories Button */}
+              {description && (
+                <p
+                  className={cn(
+                    "text-base font-normal font-work-sans",
+                    textColorSecondary
+                  )}
+                >
+                  {description}
+                </p>
+              )}
+            </div>
+
+            {/* Right Side - Button */}
             {buttonText && (
-              <div className="flex items-start lg:pt-[60px]">
+              <div className="flex-shrink-0">
                 <Link
                   href={buttonUrl || "#"}
                   className={cn(
-                    "inline-block px-6 py-3 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors font-medium",
+                    "inline-flex items-center justify-center px-8 py-3 rounded-lg text-sm font-semibold transition-transform hover:scale-105 active:scale-95",
                     buttonBg,
-                    buttonTextColor,
-                    isBlueBackground
-                      ? "hover:bg-gray-100 focus:ring-white"
-                      : "border border-gray-900 hover:bg-gray-50 focus:ring-gray-900"
+                    buttonTextColor
                   )}
                 >
                   {buttonText}
@@ -299,147 +305,91 @@ export function PartnerStoriesSection({
           </div>
         )}
 
-        {/* Stories Gallery Section */}
-        {loading ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Loading skeleton for main story */}
-            <div className="lg:col-span-2 relative overflow-hidden rounded-lg h-[400px] lg:h-[500px] bg-gray-200 animate-pulse" />
-            {/* Loading skeleton for side stories */}
-            <div className="lg:col-span-1 flex flex-col gap-6 h-[400px] lg:h-[500px]">
-              {Array.from({ length: 2 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="relative overflow-hidden rounded-lg flex-1 min-h-0 bg-gray-200 animate-pulse"
-                />
-              ))}
-            </div>
-          </div>
-        ) : stories.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            No stories found
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Large Story Thumbnail - Left */}
-            {mainStory && (
-              <div className="lg:col-span-2 relative group overflow-hidden rounded-lg h-[400px] lg:h-[500px]">
-                {!hasError(mainStory.id) ? (
-                  <Image
-                    src={getImageUrl(mainStory.imageSrc)}
-                    alt={mainStory.imageAlt}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    onError={() => handleError(mainStory.id)}
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">No image</span>
-                  </div>
-                )}
-
-                {/* Play Button Overlay - Only for Video */}
-                {mainStory.type === "video" && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all duration-300 pointer-events-none z-10">
-                    <button
-                      className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110 cursor-pointer pointer-events-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
-                      aria-label={`Play video: ${mainStory.title}`}
-                    >
-                      <Play
-                        className="w-8 h-8 text-gray-900 fill-current ml-1"
-                        aria-hidden="true"
-                      />
-                    </button>
-                  </div>
-                )}
-
-                {/* Dark Overlay at Bottom */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/80 to-transparent p-6 lg:p-8 z-20">
-                  {mainStory.title && (
-                    <h3 className="text-xl lg:text-2xl font-bold text-white mb-2 font-nunito-sans">
-                      {mainStory.title}
-                    </h3>
-                  )}
-                  {mainStory.description && (
-                    <p className="text-base lg:text-lg text-white/90 mb-4 font-work-sans">
-                      {mainStory.description}
-                    </p>
-                  )}
-                  <Link
-                    href={mainStory.url}
-                    className="inline-block px-6 py-2 border border-white text-white text-sm font-semibold rounded-md hover:bg-white hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black transition-colors duration-300"
-                    aria-label={`${
-                      mainStory.type === "video" ? "Watch" : "Read"
-                    }: ${mainStory.title}`}
-                  >
-                    {mainStory.type === "video" ? "Watch Now" : "Read More"}
-                  </Link>
+        {/* Stories Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
+          {loading
+            ? // Loading Skeletons
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex flex-col gap-4 animate-pulse">
+                  <div className="w-full aspect-[16/10] bg-white/20 rounded-lg" />
+                  <div className="h-6 w-3/4 bg-white/20 rounded" />
+                  <div className="h-4 w-1/2 bg-white/20 rounded" />
                 </div>
-              </div>
-            )}
-
-            {/* Small Story Thumbnails - Right */}
-            {sideStories.length > 0 && (
-              <div
-                className="lg:col-span-1 flex flex-col gap-6 h-[400px] lg:h-[500px]"
-                role="list"
-                aria-label="Additional partner stories"
-              >
-                {sideStories.map((story) => (
-                  <div
-                    key={story.id}
-                    className="relative group overflow-hidden rounded-lg flex-1 min-h-0"
-                    role="listitem"
-                  >
-                    {!hasError(story.id) ? (
-                      <Image
-                        src={getImageUrl(story.imageSrc)}
-                        alt={story.imageAlt}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={() => handleError(story.id)}
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400 text-sm">No image</span>
-                      </div>
-                    )}
-
-                    {/* Play Button Overlay - Only for Video */}
-                    {story.type === "video" && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all duration-300 pointer-events-none z-10">
-                        <button
-                          className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110 cursor-pointer pointer-events-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
-                          aria-label={`Play video: ${story.title}`}
-                        >
-                          <Play
-                            className="w-5 h-5 text-gray-900 fill-current ml-0.5"
-                            aria-hidden="true"
-                          />
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Dark Overlay at Bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/80 to-transparent p-4 lg:p-5 z-20">
-                      {story.title && (
-                        <h3 className="text-base lg:text-lg font-bold text-white mb-1 font-nunito-sans">
-                          {story.title}
-                        </h3>
+              ))
+            : stories.map((story) => (
+                <div key={story.id} className="group flex flex-col gap-4">
+                  {/* Thumbnail Container */}
+                  <Link href={story.url} className="block relative w-full">
+                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-sm bg-gray-200">
+                      {!hasError(story.id) ? (
+                        <Image
+                          src={getImageUrl(story.imageSrc)}
+                          alt={story.imageAlt}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          onError={() => handleError(story.id)}
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                          <span className="text-gray-500 text-sm">
+                            No image
+                          </span>
+                        </div>
                       )}
-                      {story.description && (
-                        <p className="text-sm lg:text-base text-white/90 font-work-sans">
-                          {story.description}
-                        </p>
+
+                      {/* Video Overlay Elements */}
+                      {story.type === "video" && (
+                        <>
+                          {/* Center Play Button */}
+                          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110">
+                              <Play className="w-6 h-6 text-black fill-black ml-1" />
+                            </div>
+                          </div>
+
+                          {/* Bottom Left Video Badge */}
+                          <div className="absolute bottom-4 left-4 z-10">
+                            <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-md">
+                              <Play className="w-3 h-3 text-black fill-black" />
+                              <span className="text-[10px] font-bold text-black uppercase tracking-wider leading-none">
+                                Video
+                              </span>
+                            </div>
+                          </div>
+                        </>
                       )}
                     </div>
+                  </Link>
+
+                  {/* Content */}
+                  <div className="flex flex-col gap-2">
+                    <Link href={story.url}>
+                      <h3
+                        className={cn(
+                          "text-xl sm:text-2xl font-bold leading-tight transition-colors hover:text-white/80 font-nunito-sans",
+                          textColor
+                        )}
+                      >
+                        {story.title}
+                      </h3>
+                    </Link>
+
+                    {/* Meta Info */}
+                    <div
+                      className={cn(
+                        "flex items-center text-sm font-medium tracking-wide uppercase font-work-sans",
+                        isBlueBackground ? "text-blue-200" : "text-gray-500"
+                      )}
+                    >
+                      <span>{story.date}</span>
+                      <span className="mx-2 opacity-60">|</span>
+                      <span>{story.location}</span>
+                    </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                </div>
+              ))}
+        </div>
       </div>
     </section>
   );

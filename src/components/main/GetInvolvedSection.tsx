@@ -18,10 +18,10 @@ interface GetInvolvedSectionProps {
 export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   backgroundImage = "/assets/demo/get-involved.png",
   backgroundImageAlt = "Workshop meeting with community members",
-  title = "Let's Get Involved",
-  subtitle = "Together Transforming Coastal Right.",
-  overlayTitle = "Support Marine Conservation & Community Rights",
-  overlayDescription = "Join Turning Tides in protecting marine ecosystems and supporting community and Indigenous rights through volunteerism and collaboration.",
+  title = "Get connected",
+  subtitle = "",
+  overlayTitle = "Support tenure and surrounding human rights",
+  overlayDescription = "Join Turning Tides in supporting Indigenous Peoples, small-scale fishers, and coastal communities to secure and control their territories—work that is inseparable from environmental and social justice",
   backgroundColor = "bg-white",
 }) => {
   const [formData, setFormData] = useState({
@@ -60,7 +60,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
       className={`w-full ${backgroundColor} pt-16 md:pt-24`}
       data-section="get-involved"
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[600px]">
           {/* Left Column - Background Image with Overlay */}
           <div className="relative">
@@ -77,50 +77,54 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
 
             {/* Overlay Content */}
             <div className="relative z-10 p-8 md:p-12 flex flex-col justify-center h-full">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight font-nunito-sans">
                 {overlayTitle}
               </h2>
-              <p className="text-gray-200 text-lg leading-relaxed">
+              <p className="text-white/95 text-lg leading-[1.8] font-work-sans">
                 {overlayDescription}
               </p>
             </div>
           </div>
 
           {/* Right Column - Form */}
-          <div className="bg-white p-8 md:p-12 flex flex-col justify-center">
+          <div className="bg-white p-8 md:p-16 flex flex-col justify-center">
             <div className="max-w-md mx-auto w-full">
-              <div className="mb-8">
-                <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <div className="mb-10">
+                <h3 className="text-4xl font-bold text-gray-900 mb-2 font-nunito-sans">
                   {title}
                 </h3>
-                <p className="text-gray-600 text-lg">{subtitle}</p>
+                {subtitle && (
+                  <p className="text-gray-600 text-base font-work-sans">
+                    {subtitle}
+                  </p>
+                )}
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Full Name */}
-                <div>
-                  <input
-                    type="text"
-                    name="fullName"
-                    placeholder="Full name"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    required
-                  />
-                </div>
-
-                {/* Email */}
-                <div>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    required
-                  />
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Full Name and Email Row */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <input
+                      type="text"
+                      name="fullName"
+                      placeholder="Full name"
+                      value={formData.fullName}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                      required
+                    />
+                  </div>
                 </div>
 
                 {/* Organization */}
@@ -184,45 +188,23 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                 <div>
                   <textarea
                     name="message"
-                    placeholder="Tell us what you want.."
+                    placeholder="Tell us what you want..."
                     value={formData.message}
                     onChange={handleInputChange}
-                    rows={4}
+                    rows={5}
                     maxLength={maxChars}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-sm"
                     required
                   />
-                  <div className="text-right text-sm text-gray-500 mt-1">
+                  <div className="text-right text-xs text-gray-500 mt-2">
                     {charCount} / {maxChars.toLocaleString()}
-                  </div>
-                </div>
-
-                {/* reCAPTCHA */}
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="recaptcha"
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    required
-                  />
-                  <label htmlFor="recaptcha" className="text-sm text-gray-600">
-                    I&apos;m not a robot
-                  </label>
-                  <div className="text-xs text-gray-500">
-                    <a href="#" className="text-blue-600 hover:underline">
-                      Privacy
-                    </a>{" "}
-                    -{" "}
-                    <a href="#" className="text-blue-600 hover:underline">
-                      Terms
-                    </a>
                   </div>
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                  className="w-full bg-[#B4C7F2] hover:bg-[#A3B7E8] text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 mt-8"
                 >
                   <Send className="w-5 h-5" />
                   Send Message

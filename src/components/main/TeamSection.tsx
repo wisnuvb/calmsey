@@ -149,14 +149,14 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
   };
 
   return (
-    <section className="bg-white py-16 lg:py-24">
+    <section className="bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#010107] mb-6 font-nunito-sans">
+          <h2 className="text-3xl sm:text-4xl lg:text-[38px] font-bold text-[#010107] mb-6 font-nunito-sans">
             {title}
           </h2>
-          <p className="text-base text-[#060726CC] max-w-4xl mx-auto leading-relaxed font-work-sans">
+          <p className="text-base text-[#060726CC] max-w-4xl mx-auto leading-[150%] tracking-normal font-work-sans">
             {description}
           </p>
         </div>

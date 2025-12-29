@@ -62,7 +62,7 @@ const styleClasses: Record<TypographyStyle, string> = {
   p2reg: "font-work-sans font-normal text-sm leading-[150%] align-middle",
 
   // Variant tambahan untuk kelengkapan
-  h1bold: "font-bold text-5xl sm:text-[48px] font-nunito-sans leading-[120%]",
+  h1bold: "font-bold text-3xl sm:text-[48px] font-nunito-sans leading-[120%]",
   h3semibold: "font-semibold text-2xl font-nunito-sans",
   h3bold:
     "text-xl sm:text-[32px] leading-[120%] tracking-normal font-bold font-nunito-sans",

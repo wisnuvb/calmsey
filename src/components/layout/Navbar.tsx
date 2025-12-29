@@ -17,8 +17,9 @@ interface NavLink {
 
 const navLinks: NavLink[] = [
   { label: "About Us", href: "/about-us" },
-  { label: "Our Work", href: "/our-work" },
-  { label: "Our Fund", href: "/our-fund" },
+  // { label: "Our Work", href: "/our-work" },
+  { label: "Our Approach", href: "/our-approach" },
+  { label: "Our Funds", href: "/our-fund" },
   { label: "Governance", href: "/governance" },
   { label: "Partner Stories", href: "/stories" },
   // { label: "Articles", href: "/articles" },
@@ -90,17 +91,19 @@ export function Navbar() {
     pathname === "/id/get-involved";
 
   // Pages that should have dynamic background detection
-  const hasDynamicBackground = isHomePage || isGetInvolvedPage;
+  const hasDynamicBackground = isGetInvolvedPage;
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      setIsScrolled(scrollTop > 0);
+      if (!isHomePage) {
+        setIsScrolled(scrollTop > 0);
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHomePage]);
 
   useEffect(() => {
     // Jalankan deteksi background di home page dan get-involved page
@@ -191,6 +194,11 @@ export function Navbar() {
   }, [pathname, hasDynamicBackground]);
 
   const getLogoSrc = () => {
+    // Jika halaman home, selalu gunakan logo putih
+    if (isHomePage) {
+      return "/assets/Logo-blue.png";
+    }
+
     // Untuk halaman tanpa dynamic background, selalu gunakan logo putih
     if (!hasDynamicBackground) {
       return "/assets/Logo-white.png";
@@ -213,7 +221,9 @@ export function Navbar() {
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
-        isScrolled
+        isHomePage
+          ? "bg-white !text-[#010107]"
+          : isScrolled
           ? "bg-[#3C62ED]/95 backdrop-blur-md shadow-lg"
           : "bg-transparent"
       )}
@@ -240,9 +250,11 @@ export function Navbar() {
                 href={`/${language}${link.href}`}
                 className={cn(
                   "transition-colors duration-300 text-base font-normal",
-                  !hasDynamicBackground ||
-                    isScrolled ||
-                    !currentBackgroundAnalysis?.isLight
+                  isHomePage
+                    ? "text-[#010107]"
+                    : !hasDynamicBackground ||
+                      isScrolled ||
+                      !currentBackgroundAnalysis?.isLight
                     ? "text-white hover:text-blue-300"
                     : "text-gray-700 hover:text-[#3C62ED]"
                 )}
@@ -279,9 +291,11 @@ export function Navbar() {
               href="/get-involved"
               className={cn(
                 "px-6 py-2 border-2 rounded transition-all duration-300 text-sm font-medium",
-                !hasDynamicBackground ||
-                  isScrolled ||
-                  !currentBackgroundAnalysis?.isLight
+                isHomePage
+                  ? "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white"
+                  : !hasDynamicBackground ||
+                    (isScrolled && !isHomePage) ||
+                    !currentBackgroundAnalysis?.isLight
                   ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
                   : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white"
               )}
@@ -295,9 +309,11 @@ export function Navbar() {
             onClick={toggleMenu}
             className={cn(
               "lg:hidden p-2 rounded-md transition-colors duration-300",
-              !hasDynamicBackground ||
-                isScrolled ||
-                !currentBackgroundAnalysis?.isLight
+              isHomePage
+                ? "text-[#010107]"
+                : !hasDynamicBackground ||
+                  (isScrolled && !isHomePage) ||
+                  !currentBackgroundAnalysis?.isLight
                 ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
                 : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-100"
             )}
@@ -313,9 +329,11 @@ export function Navbar() {
         <div
           className={cn(
             "lg:hidden border-t transition-all duration-300",
-            !hasDynamicBackground ||
-              isScrolled ||
-              !currentBackgroundAnalysis?.isLight
+            isHomePage
+              ? "bg-white !text-[#010107]"
+              : !hasDynamicBackground ||
+                (isScrolled && !isHomePage) ||
+                !currentBackgroundAnalysis?.isLight
               ? "bg-[#3C62ED]/95 backdrop-blur-md border-blue-500/30"
               : "bg-white border-gray-200"
           )}
@@ -327,9 +345,11 @@ export function Navbar() {
                 href={link.href}
                 className={cn(
                   "block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300",
-                  !hasDynamicBackground ||
-                    isScrolled ||
-                    !currentBackgroundAnalysis?.isLight
+                  isHomePage
+                    ? "text-[#010107]"
+                    : !hasDynamicBackground ||
+                      (isScrolled && !isHomePage) ||
+                      !currentBackgroundAnalysis?.isLight
                     ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
                     : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-50"
                 )}
@@ -342,9 +362,11 @@ export function Navbar() {
               <button
                 className={cn(
                   "w-full flex items-center justify-center space-x-1 px-3 py-2 text-sm transition-colors duration-300",
-                  !hasDynamicBackground ||
-                    isScrolled ||
-                    !currentBackgroundAnalysis?.isLight
+                  isHomePage
+                    ? "text-[#010107]"
+                    : !hasDynamicBackground ||
+                      (isScrolled && !isHomePage) ||
+                      !currentBackgroundAnalysis?.isLight
                     ? "text-white hover:text-blue-300"
                     : "text-gray-700 hover:text-[#3C62ED]"
                 )}
@@ -356,9 +378,11 @@ export function Navbar() {
                 href="/get-involved"
                 className={cn(
                   "block w-full text-center px-6 py-2 border-2 rounded transition-all duration-300 text-sm font-medium",
-                  !hasDynamicBackground ||
-                    isScrolled ||
-                    !currentBackgroundAnalysis?.isLight
+                  isHomePage
+                    ? "border-[#3C62ED] text-[#3C62ED]"
+                    : !hasDynamicBackground ||
+                      (isScrolled && !isHomePage) ||
+                      !currentBackgroundAnalysis?.isLight
                     ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
                     : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white"
                 )}

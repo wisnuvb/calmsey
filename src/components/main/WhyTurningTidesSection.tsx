@@ -5,6 +5,7 @@ import Link from "next/link";
 import { H5, P } from "../ui/typography";
 import { usePageContent } from "@/contexts/PageContentContext";
 import { getImageUrl } from "@/lib/utils";
+import { ArrowUpRightIcon } from "lucide-react";
 
 interface Funder {
   name: string;
@@ -105,11 +106,11 @@ export function WhyTurningTidesSection({
   const whyContent = getValue(
     "whyUs.whyContent",
     propContent,
-    "Because collective rights are still being eroded by weak commitments, powerful interests, narrow views of tenure, and tokenistic efforts toward participation."
+    "Turning Tides provides fiscal and other supports that lead local communities, fisher peoples and Indigenous peoples to fully experience their tenure and associated rights."
   );
 
-  const ctaText = getValue("whyUs.ctaText", propCtaText, "More About Us");
-  const ctaLink = getValue("whyUs.ctaLink", propCtaLink, "/about");
+  const ctaText = getValue("whyUs.ctaText", propCtaText, "Our Funds");
+  const ctaLink = getValue("whyUs.ctaLink", propCtaLink, "/our-fund");
 
   return (
     <section className="py-16 lg:py-20 bg-white">
@@ -160,9 +161,9 @@ export function WhyTurningTidesSection({
 
           {/* Right Column - Why Box */}
           <div className="lg:pl-8">
-            <H5 style="h5bold" className="text-[#3C62ED] mb-6">
+            {/* <H5 style="h5bold" className="text-[#3C62ED] mb-6">
               {whyTitle}
-            </H5>
+            </H5> */}
 
             <P style="p1reg" className="text-[#060726CC] text-base">
               {whyContent}
@@ -171,9 +172,10 @@ export function WhyTurningTidesSection({
             <div className="mt-8 sm:mt-14">
               <Link
                 href={ctaLink}
-                className="inline-block px-6 py-3 border-2 border-gray-900 text-gray-900 rounded-lg hover:bg-gray-900 hover:text-white transition-colors font-medium"
+                className="inline-flex items-center justify-between gap-4 px-8 py-5 border border-[#3C62ED] text-[#3C62ED] rounded-lg hover:bg-[#3C62ED] hover:text-white transition-colors font-medium"
               >
                 {ctaText}
+                <ArrowUpRightIcon />
               </Link>
             </div>
           </div>

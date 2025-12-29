@@ -142,16 +142,14 @@ export function FundersSection({
 
   return (
     <section
-      className={cn("bg-white py-16 lg:py-24 text-[#010107]", className)}
+      className={cn("bg-white text-[#010107] py-16 lg:py-24", className)}
       data-section="funders"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-[64px]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-11">
         {/* Title */}
-        <div className="text-center">
-          <h2 className="text-xl sm:text-[38px] tracking-wider font-nunito-sans font-bold">
-            {title}
-          </h2>
-        </div>
+        <h2 className="text-xl sm:text-[38px] text-[#010107] text-center tracking-wider font-nunito-sans font-bold">
+          {title}
+        </h2>
 
         {/* Funders Logos */}
         <div className="flex flex-wrap justify-center items-center gap-6 lg:gap-8">
@@ -163,8 +161,8 @@ export function FundersSection({
               <Image
                 src={getImageSrc(funder)}
                 alt={funder.logoAlt}
-                width={120}
-                height={120}
+                width={140}
+                height={140}
                 className="object-contain max-w-full max-h-full"
                 unoptimized={imageErrors[funder.id]}
                 onError={() => handleImageError(funder.id)}

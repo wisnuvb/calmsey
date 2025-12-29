@@ -112,7 +112,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
     <section className={cn("py-20 bg-white", className)}>
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-[#C3D7E8] pb-8">
           <H3
             style="h3bold"
             className="text-[#010107] font-[var(--font-nunito)] leading-[1.2]"

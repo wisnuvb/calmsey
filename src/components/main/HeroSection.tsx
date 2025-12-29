@@ -261,7 +261,10 @@ export function HeroSection({
 
         {/* Content */}
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 text-center">
-          <H1 style="h1bold" className="text-white mb-6 max-w-[674px] mx-auto">
+          <H1
+            style="h1bold"
+            className="text-white mb-6 sm:mb-11 max-w-[674px] mx-auto"
+          >
             {title}
           </H1>
           <P style="p1reg" className="text-white/90 max-w-4xl mx-auto">

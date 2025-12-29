@@ -3,6 +3,7 @@
 import { Download } from "lucide-react";
 import { H5 } from "../ui/typography";
 import { usePageContent } from "@/contexts/PageContentContext";
+import { cn } from "@/lib/utils";
 
 interface StrategyDownloadSectionProps {
   description?: string;
@@ -10,6 +11,7 @@ interface StrategyDownloadSectionProps {
   downloadButtonText?: string;
   learnMoreButtonText?: string;
   learnMoreButtonUrl?: string;
+  withBorderTop?: boolean;
 }
 
 export function StrategyDownloadSection({
@@ -18,6 +20,7 @@ export function StrategyDownloadSection({
   downloadButtonText: propDownloadButtonText,
   learnMoreButtonText: propLearnMoreButtonText,
   learnMoreButtonUrl: propLearnMoreButtonUrl,
+  withBorderTop,
 }: StrategyDownloadSectionProps = {}) {
   // Try to get content from context, fallback to empty object if not available
   let pageContent: Record<string, string> = {};
@@ -81,13 +84,14 @@ export function StrategyDownloadSection({
   );
 
   return (
-    <section className="py-8 lg:py-11 bg-gradient-to-r from-[#3C62ED] to-[#2f55e1]">
+    <section className="bg-[#3C62ED]">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+        {withBorderTop && <div className="border border-[#FFFFFF80]" />}
+        <div className="py-16 sm:py-24 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
           {/* Left - Text Content */}
           <H5
             style="h5regular"
-            className="text-white leading-relaxed max-w-[466px]"
+            className="text-white text-lg sm:text-2xl leading-relaxed max-w-[466px]"
           >
             {description}
           </H5>

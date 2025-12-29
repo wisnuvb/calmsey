@@ -1,12 +1,28 @@
+import { metadata } from "@/app/layout";
 import {
   DetailStoryHeroSection,
   DetailStoryVideoSection,
   DetailStoryContentSection,
   LatestStoriesSection,
+  FeedbackCalloutSection,
 } from "@/components/main";
+import { PageContentProvider } from "@/contexts/PageContentContext";
+import { getPageContentServer } from "@/lib/page-content-server";
 import React from "react";
 
-const DetailStoryPage = () => {
+interface DetailStoryPageProps {
+  params: Promise<{ lang: string }>;
+}
+
+const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
+  const { lang } = await params;
+  const language = lang || "en";
+
+  const content = await getPageContentServer("DETAIL_STORY", language);
+
+  metadata.title = "Detail Story";
+  metadata.description = "";
+
   // Mock data - dalam implementasi nyata, ini akan datang dari API
   const storyData = {
     title: "Pasibuntuluki - Lines of the Sea",
@@ -52,7 +68,11 @@ const DetailStoryPage = () => {
   };
 
   return (
-    <>
+    <PageContentProvider
+      content={content}
+      pageType="DETAIL_STORY"
+      language={language}
+    >
       <DetailStoryHeroSection
         title={storyData.title}
         date={storyData.date}
@@ -70,7 +90,12 @@ const DetailStoryPage = () => {
         relatedArticles={storyData.relatedArticles}
       />
       <LatestStoriesSection />
-    </>
+      <FeedbackCalloutSection
+        title="We value your support"
+        description="Connect with us to co-create solutions that protect rights, sustain livelihoods, and centre local voices."
+        feedbackText="Get Involved"
+      />
+    </PageContentProvider>
   );
 };
 

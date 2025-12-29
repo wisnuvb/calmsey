@@ -39,7 +39,7 @@ const defaultFundsData: FundData[] = [
     imageSrc: "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
     imageAlt: "People drying fish on racks",
     icon: "Waves",
-    learnMoreLink: "/funds/grassroot",
+    learnMoreLink: "/our-fund/grassroot",
     imagePosition: "left",
   },
   {
@@ -173,7 +173,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
     <section className={cn("bg-white py-16 lg:py-24", className)}>
       <div className="container mx-auto px-4">
         {/* Header Section - Centered */}
-        <div className="max-w-4xl mx-auto text-center mb-14 space-y-8">
+        <div className="max-w-4xl mx-auto text-center mb-14 space-y-8 hidden">
           <H2
             style="h2bold"
             className="text-[#010107] text-2xl sm:text-[38px] leading-[120%] tracking-normal font-bold font-nunito-sans"
@@ -223,7 +223,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
                   </h3>
                   <P
                     style="p1reg"
-                    className="text-[#060726CC] text-base leading-relaxed"
+                    className="text-[#060726CC] text-base font-normal leading-relaxed"
                   >
                     {fund.description}
                   </P>

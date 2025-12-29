@@ -37,7 +37,7 @@ const footerSections: FooterSection[] = [
     title: "Our Works",
     links: [
       { label: "How We Work", href: "/our-work" },
-      { label: "Grantmaking Framework", href: "/our-fund" },
+      { label: "Our Approach", href: "/our-approach" },
       { label: "Activities", href: "/our-work" },
       { label: "Stories", href: "/stories" },
     ],
@@ -74,9 +74,11 @@ export function Footer() {
                 className="w-auto h-11 object-contain"
               />
               <p className="font-work-sans font-normal text-base text-white/80 leading-[150%] tracking-[0%]">
-                Turning Tides is fiscally sponsored by the Tenure Facility Fund,
+                {/* Turning Tides is fiscally sponsored by the Tenure Facility Fund,
                 a US 501c3 subsidiary of the International Land & Forest Tenure
-                Facility
+                Facility */}
+                Turning Tides is legally and fiscally hosted by{" "}
+                <strong>the Tenure Facility Fund</strong>
               </p>
             </div>
           </div>
@@ -104,7 +106,7 @@ export function Footer() {
                 </div>
               ))}
             </div>
-            <div className="bg-[#150B28] p-6 flex items-center justify-between gap-20 rounded">
+            <div className="bg-[#150B28] p-6 flex items-center justify-between gap-20 rounded hidden">
               <p className="text-white text-sm font-work-sans font-semibold leading-[150%] tracking-[0%]">
                 Connect with us to co-create solutions that protect rights,
                 sustain livelihoods, and centre local voices.

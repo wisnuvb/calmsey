@@ -65,9 +65,9 @@ export const SupportSection: React.FC = () => {
     },
     {
       id: "tenure-rights",
-      title: 'What We Mean by "Tenure Rights"',
+      title: "What we understand by tenure",
       content: {
-        title: 'What We Mean by "Tenure Rights"',
+        title: "What we understand by tenure",
         description: [
           "Tenure rights refer to the bundle of rights that people and communities have to access, use, and manage natural resources, particularly aquatic environments.",
           "These rights are fundamental to ensuring sustainable livelihoods and environmental stewardship.",
@@ -98,9 +98,9 @@ export const SupportSection: React.FC = () => {
     },
     {
       id: "tenure-security",
-      title: 'Why "Tenure Security" Matters?',
+      title: "Our Grantmaking",
       content: {
-        title: 'Why "Tenure Security" Matters?',
+        title: "Framework​",
         description: [
           "Tenure security provides the foundation for sustainable development and environmental conservation.",
           "When communities have secure tenure rights, they are more likely to invest in long-term resource management and conservation practices.",

@@ -10,6 +10,11 @@ import {
   FundersSection,
   TriptychGallerySection,
   OurWorkSection,
+  OurValuesSection,
+  DownloadFramework,
+  WhereWeWorkSection,
+  ValueSupportSection,
+  FeedbackCalloutSection,
 } from "@/components/main";
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
@@ -32,27 +37,37 @@ const AboutUsPage = async ({ params }: AboutUsPageProps) => {
       language={language}
     >
       <HeroSection
-        variant="overlay-bottom"
+        variant="simple"
         title="Securing tenure and recognizing rights"
         subtitle="We are a young organization built through wide-ranging consultation and by listening to the demands and priorities that Indigenous Peoples, small-scale fishers, and coastal communities have been articulating for years. We exist to support rights holders working to secure tenure over their territories—because territorial control is foundational to community agency and self-determination"
         backgroundImage="/assets/hero-about-us.webp"
         dataSection="about-us"
+        className="h-[590px] !min-h-[590px]"
       />
-      <QuoteSection />
+      {/* <QuoteSection /> */}
+
       <OurVisionSection />
-      <WhatWeWannaAchieveSection />
+      <OurValuesSection />
+      {/* <WhatWeWannaAchieveSection /> */}
       <OurGoalSection />
-      <TheoryOfChangeSection />
+      {/* <TheoryOfChangeSection /> */}
+      <WhereWeWorkSection />
       <TeamSection />
-      <GenesisSection />
       <FundersSection />
-      <TriptychGallerySection />
-      <OurWorkSection title="Discover Our Latest Activites and Publications" />
+      <GenesisSection />
+      {/* <TriptychGallerySection /> */}
+      {/* <OurWorkSection title="Discover Our Latest Activites and Publications" /> */}
       {/* <AboutUsHeroSection /> */}
       {/* <SupportSection /> */}
       {/* <DownloadFramework /> */}
       {/* <ImageCarousel /> */}
       {/* <TenureFacilitySection /> */}
+      <ValueSupportSection />
+      <FeedbackCalloutSection
+        title="We value your support"
+        description="Connect with us to co-create solutions that protect rights, sustain livelihoods, and centre local voices."
+        feedbackText="Get Involved"
+      />
     </PageContentProvider>
   );
 };

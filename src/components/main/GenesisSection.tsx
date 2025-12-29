@@ -76,22 +76,20 @@ export function GenesisSection({
   const logoSrc = getValue("genesis.logoSrc", propLogoSrc, "/assets/Logo.png");
   return (
     <section
-      className={cn("bg-white py-16 lg:py-24", className)}
+      className={cn("bg-[#ECEFFD] py-16 lg:py-[100px]", className)}
       data-section="genesis"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
-        <div className="text-center mb-8 lg:mb-12">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#3C62ED] font-nunito-sans">
-            {title}
-          </h1>
-        </div>
+        <h1 className="text-center text-3xl sm:text-4xl lg:text-[38px] font-bold text-[#3C62ED] font-nunito-sans mb-8">
+          {title}
+        </h1>
 
         {/* Intro Paragraph */}
         <div className="max-w-4xl mx-auto mb-12 lg:mb-16">
           <P
             style="p1reg"
-            className="text-[#060726CC] leading-relaxed font-work-sans"
+            className="text-[#060726CC] text-center leading-relaxed font-work-sans"
           >
             {introParagraph}
           </P>
@@ -120,7 +118,7 @@ export function GenesisSection({
 
           {/* Right Column - Blue Block with Logo */}
           <div className="flex items-center justify-center">
-            <div className="w-full bg-[#3C62ED] rounded-lg p-12 lg:p-16 flex flex-col items-center justify-center min-h-[300px]">
+            <div className="w-full bg-[#3C62ED] rounded-lg p-12 lg:p-16 flex flex-col items-center justify-center min-h-[368px]">
               {/* Logo */}
               <div className="relative w-32 h-32 mb-6">
                 <Image
