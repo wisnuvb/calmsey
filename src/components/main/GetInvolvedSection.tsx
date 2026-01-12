@@ -33,6 +33,9 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
     message: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
   const [charCount, setCharCount] = useState(0);
   const maxChars = 5000;
 
@@ -49,10 +52,43 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/get-involved", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send message");
+      }
+
+      setSuccess(true);
+      // Reset form
+      setFormData({
+        fullName: "",
+        email: "",
+        organization: "",
+        country: "",
+        partnershipType: "",
+        message: "",
+      });
+      setCharCount(0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -176,10 +212,10 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                     required
                   >
                     <option value="">I want to become partner</option>
-                    <option value="funding">Funding Partner</option>
-                    <option value="technical">Technical Partner</option>
-                    <option value="community">Community Partner</option>
-                    <option value="research">Research Partner</option>
+                    <option value="Funding Partner">Funding Partner</option>
+                    <option value="Technical Partner">Technical Partner</option>
+                    <option value="Community Partner">Community Partner</option>
+                    <option value="Research Partner">Research Partner</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
@@ -201,13 +237,35 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   </div>
                 </div>
 
+                {error && (
+                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                    {error}
+                  </div>
+                )}
+
+                {success && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                    Thank you! Your message has been sent.
+                  </div>
+                )}
+
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-[#B4C7F2] hover:bg-[#A3B7E8] text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 mt-8"
+                  disabled={loading}
+                  className="w-full bg-[#3C62ED] hover:bg-[#3C62ED] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 mt-8"
                 >
-                  <Send className="w-5 h-5" />
-                  Send Message
+                  {loading ? (
+                    <>
+                      <span className="animate-spin">⏳</span>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5" />
+                      Send Message
+                    </>
+                  )}
                 </button>
               </form>
             </div>

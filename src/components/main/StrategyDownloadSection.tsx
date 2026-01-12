@@ -51,6 +51,28 @@ export function StrategyDownloadSection({
     return defaultValue;
   };
 
+  // Helper function to ensure URL has https:// protocol
+  const ensureHttpsUrl = (url: string): string => {
+    if (!url || url.trim() === "") {
+      return url;
+    }
+
+    const trimmedUrl = url.trim();
+
+    // Jika sudah memiliki protokol (http:// atau https://), return as-is
+    if (/^https?:\/\//i.test(trimmedUrl)) {
+      return trimmedUrl;
+    }
+
+    // Jika dimulai dengan // (protocol-relative), tambahkan https:
+    if (trimmedUrl.startsWith("//")) {
+      return `https:${trimmedUrl}`;
+    }
+
+    // Jika tidak ada protokol, tambahkan https://
+    return `https://${trimmedUrl}`;
+  };
+
   // Get all values with priority: context > props > default
   const description = getValue(
     "strategy.description",
@@ -58,11 +80,16 @@ export function StrategyDownloadSection({
     "Our approach, values, risk mitigation, milestones and budget estimates are in our Strategy to 2030."
   );
 
-  const downloadUrl = getValue(
+  const rawDownloadUrl = getValue(
     "strategy.downloadUrl",
     propDownloadUrl,
     "/downloads/strategy-2030.pdf"
   );
+
+  // Ensure downloadUrl has https:// protocol
+  const downloadUrl = rawDownloadUrl.startsWith("/")
+    ? rawDownloadUrl // Relative URL, keep as-is
+    : ensureHttpsUrl(rawDownloadUrl);
 
   const downloadButtonText = getValue(
     "strategy.buttonText",
@@ -100,7 +127,8 @@ export function StrategyDownloadSection({
             <a
               href={downloadUrl}
               download
-              className="inline-flex items-center gap-3 px-8 py-5 bg-white text-gray-900 rounded hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl w-full sm:w-[310px]"
+              target="_blank"
+              className="inline-flex items-center justify-center gap-3 px-8 py-5 bg-white text-gray-900 rounded hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl w-full sm:w-[310px]"
             >
               <Download className="w-5 h-5" />
               {downloadButtonText}

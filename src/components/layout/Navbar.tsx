@@ -84,8 +84,6 @@ export function Navbar() {
     pathname === "/id" ||
     pathname === "/";
 
-  console.log({ isHomePage });
-
   // Check if current page is get-involved (should also have dynamic background detection)
   const isGetInvolvedPage =
     pathname === `/${language}/get-involved` ||
