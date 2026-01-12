@@ -87,11 +87,11 @@ export function StrategyDownloadSection({
     <section className="bg-[#3C62ED]">
       <div className="container mx-auto px-4">
         {withBorderTop && <div className="border border-[#FFFFFF80]" />}
-        <div className="py-16 sm:py-24 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+        <div className="py-8 sm:py-11 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
           {/* Left - Text Content */}
           <H5
             style="h5regular"
-            className="text-white text-lg sm:text-2xl leading-relaxed max-w-[466px]"
+            className="text-white text-lg sm:text-2xl leading-[140%] tracking-normal max-w-[466px]"
           >
             {description}
           </H5>

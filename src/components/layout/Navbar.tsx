@@ -84,6 +84,8 @@ export function Navbar() {
     pathname === "/id" ||
     pathname === "/";
 
+  console.log({ isHomePage });
+
   // Check if current page is get-involved (should also have dynamic background detection)
   const isGetInvolvedPage =
     pathname === `/${language}/get-involved` ||
@@ -280,9 +282,10 @@ export function Navbar() {
             <LanguageSwitcher
               currentLanguage={language}
               isDark={
-                !hasDynamicBackground ||
-                isScrolled ||
-                !currentBackgroundAnalysis?.isLight
+                !isHomePage &&
+                (!hasDynamicBackground ||
+                  isScrolled ||
+                  !currentBackgroundAnalysis?.isLight)
               }
             />
 

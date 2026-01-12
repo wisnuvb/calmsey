@@ -137,7 +137,17 @@ export function FundersSection({
         funder.name
       )}&size=120&background=random`;
     }
-    return funder.logo;
+    // Ensure URL has protocol
+    let logoUrl = funder.logo;
+    if (logoUrl && !logoUrl.startsWith("http://") && !logoUrl.startsWith("https://")) {
+      logoUrl = "https://" + logoUrl;
+    }
+    return logoUrl;
+  };
+
+  const shouldUseUnoptimized = (funder: Funder) => {
+    // Use unoptimized for fallback placeholder or external URLs
+    return imageErrors[funder.id] || funder.logo.includes("ui-avatars.com");
   };
 
   return (
@@ -156,15 +166,15 @@ export function FundersSection({
           {funders.map((funder) => (
             <div
               key={funder.id}
-              className="flex items-center justify-center aspect-square w-[140px] lg:w-[180px]"
+              className="flex items-center justify-center h-[110px] w-[140px] lg:w-[180px]"
             >
               <Image
                 src={getImageSrc(funder)}
                 alt={funder.logoAlt}
                 width={140}
-                height={140}
+                height={110}
                 className="object-contain max-w-full max-h-full"
-                unoptimized={imageErrors[funder.id]}
+                unoptimized={shouldUseUnoptimized(funder)}
                 onError={() => handleImageError(funder.id)}
                 onLoadingComplete={(result) => {
                   if (result.naturalWidth === 0) {

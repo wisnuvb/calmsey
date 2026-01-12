@@ -1,11 +1,9 @@
 import React from "react";
 import {
   VideoHeroSection,
-  WhereWeWorkSection,
   WhyTurningTidesSection,
   PartnerStoriesSection,
   StrategyDownloadSection,
-  OurWorkSection,
   GrantmakingSection,
 } from "@/components/main";
 import { getPageContentServer } from "@/lib/page-content-server";

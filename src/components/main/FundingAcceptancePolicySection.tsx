@@ -63,23 +63,31 @@ export function FundingAcceptancePolicySection({
     "/governance/funding-policy"
   );
 
+  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
+    const value = pageContent[key];
+    if (!value) return defaultValue;
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return defaultValue;
+    }
+  };
+
   const defaultParagraphs = [
     "We prioritize upholding high standards of ethics, integrity, and transparency in all aspects of our operations. To this end, we have established a policy to guide our decision-making regarding the acceptance of external funding.",
     "This document serves as a safeguard, helping Turning Tides make informed decisions regarding external funding acceptance – allowing us to increase funds accessible to local communities, small-scale fishers, fisher workers and Indigenous Peoples, while maintaining our commitment to ethical conduct, financial prudence, and mission alignment.",
   ];
 
-  const paragraphKeys = [
-    "fundingAcceptancePolicy.paragraph1",
-    "fundingAcceptancePolicy.paragraph2",
-  ];
+  // Get paragraphs from content (can be array of strings or array of objects with paragraph property)
+  const rawParagraphs = getContentJSON<string[] | { paragraph: string }[]>(
+    "fundingAcceptancePolicy.paragraphs",
+    propParagraphs || defaultParagraphs
+  );
 
-  const paragraphs = (
-    propParagraphs && propParagraphs.length > 0
-      ? propParagraphs
-      : defaultParagraphs.map((fallback, idx) =>
-          getValue(paragraphKeys[idx], undefined, fallback)
-        )
-  ).filter((paragraph) => paragraph && paragraph.trim() !== "");
+  // Normalize to array of strings
+  const paragraphs = rawParagraphs
+    .map((p) => (typeof p === "string" ? p : p.paragraph))
+    .filter((paragraph) => paragraph && paragraph.trim() !== "");
 
   return (
     <section className={cn("py-20 lg:py-24", backgroundColor)}>

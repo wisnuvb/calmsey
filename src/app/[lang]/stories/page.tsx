@@ -7,6 +7,7 @@ import {
 } from "@/components/main";
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
+import { getStories, getStoriesCategories } from "@/lib/stories";
 
 interface StoriesPageProps {
   params: Promise<{ lang: string }>;
@@ -17,6 +18,44 @@ const StoriesPage = async ({ params }: StoriesPageProps) => {
   const language = lang || "en";
 
   const content = await getPageContentServer("STORIES", language);
+
+  // Get configuration from content
+  const maxStories = parseInt(content["allStories.maxStories"] || "12");
+  const sortOrder = (content["allStories.sortOrder"] || "Latest") as
+    | "Latest"
+    | "Oldest"
+    | "A-Z"
+    | "Z-A";
+  const defaultCategory = content["allStories.defaultCategory"] || "";
+
+  // Parse filter categories
+  let filterCategories: string[] = [];
+  try {
+    const filterCategoriesRaw = content["allStories.filterCategories"];
+    if (filterCategoriesRaw) {
+      const parsed = JSON.parse(filterCategoriesRaw);
+      filterCategories = Array.isArray(parsed)
+        ? parsed.map((item) =>
+            typeof item === "string" ? item : item.categorySlug
+          )
+        : [];
+    }
+  } catch (error) {
+    console.error("Error parsing filterCategories:", error);
+  }
+
+  // Fetch stories from database
+  const stories = await getStories({
+    maxStories,
+    sortOrder,
+    filterCategories:
+      filterCategories.length > 0 ? filterCategories : undefined,
+    defaultCategory: defaultCategory || undefined,
+    language,
+  });
+
+  // Fetch available categories for filtering
+  const categories = await getStoriesCategories(language);
 
   return (
     <PageContentProvider
@@ -34,7 +73,11 @@ const StoriesPage = async ({ params }: StoriesPageProps) => {
       />
       <CommunityStoriesSection />
       {/* <AllStoriesSection /> */}
-      <AllStoriesListSection />
+      <AllStoriesListSection
+        stories={stories}
+        categories={categories}
+        defaultCategory={defaultCategory}
+      />
       <FeedbackCalloutSection
         title="We value your support"
         description="Connect with us to co-create solutions that protect rights, sustain livelihoods, and centre local voices."

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Handshake, ChevronDown, ChevronUp } from "lucide-react";
+import { usePageContent } from "@/contexts/PageContentContext";
 
 interface Policy {
   id: string;
@@ -20,84 +21,148 @@ interface GuidingPoliciesSectionProps {
   backgroundColor?: string;
 }
 
+const defaultPolicies: Policy[] = [
+  {
+    id: "our-strategy",
+    title: "Our Strategy",
+    content:
+      "Our strategy lays our vision, goal, values and principles. As we learn with partners, we may update our Strategy from time to time. When changes are made, we will update the date listed on the documents. Please review this page periodically for any updates.",
+    linkText: "Our strategy",
+    linkHref: "/strategy",
+  },
+  {
+    id: "fiscal-sponsorship",
+    title: "Fiscal Sponsorship Agreement",
+    content:
+      "This agreement outlines the terms and conditions for fiscal sponsorship partnerships with Turning Tides.",
+  },
+  {
+    id: "social-contract",
+    title: "Social Contract",
+    content:
+      "Our social contract defines the mutual commitments and expectations between Turning Tides and our partners.",
+  },
+  {
+    id: "conflict-of-interest",
+    title: "Conflict of Interest",
+    content:
+      "This policy addresses potential conflicts of interest and ensures transparency in all our partnerships.",
+  },
+  {
+    id: "funding-acceptance",
+    title: "Funding Acceptance",
+    content:
+      "Guidelines for accepting and managing funding from various sources while maintaining our values.",
+  },
+  {
+    id: "grievance-mechanism",
+    title: "Grievance Mechanism",
+    content:
+      "Procedures for addressing concerns and grievances in a fair and transparent manner.",
+  },
+  {
+    id: "non-discrimination",
+    title: "Non-Discrimination Policy",
+    content:
+      "Our commitment to non-discrimination and equal treatment for all partners and stakeholders.",
+  },
+  {
+    id: "steering-committee",
+    title: "Turning Tides' Steering Committee",
+    content:
+      "Information about our steering committee structure, roles, and responsibilities.",
+  },
+  {
+    id: "other-policies",
+    title: "Policies not listed here",
+    content:
+      "Additional policies and guidelines that may apply to specific partnerships or situations.",
+  },
+  {
+    id: "amendments",
+    title: "Amendments to Policies",
+    content:
+      "Process for updating and amending our policies to ensure they remain relevant and effective.",
+  },
+  {
+    id: "contact-info",
+    title: "Contact Information",
+    content:
+      "How to reach us for questions about our policies or to provide feedback.",
+  },
+];
+
 export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
-  title = "Our Guiding Policies",
-  lastUpdate = "15 January 2025",
-  description = "Our guiding policies support collaboration, transparency, and flexibility, ensuring that each of our funds are tailored to foster responsiveness and adaptability.",
-  policies = [
-    {
-      id: "our-strategy",
-      title: "Our Strategy",
-      content:
-        "Our strategy lays our vision, goal, values and principles. As we learn with partners, we may update our Strategy from time to time. When changes are made, we will update the date listed on the documents. Please review this page periodically for any updates.",
-      linkText: "Our strategy",
-      linkHref: "/strategy",
-    },
-    {
-      id: "fiscal-sponsorship",
-      title: "Fiscal Sponsorship Agreement",
-      content:
-        "This agreement outlines the terms and conditions for fiscal sponsorship partnerships with Turning Tides.",
-    },
-    {
-      id: "social-contract",
-      title: "Social Contract",
-      content:
-        "Our social contract defines the mutual commitments and expectations between Turning Tides and our partners.",
-    },
-    {
-      id: "conflict-of-interest",
-      title: "Conflict of Interest",
-      content:
-        "This policy addresses potential conflicts of interest and ensures transparency in all our partnerships.",
-    },
-    {
-      id: "funding-acceptance",
-      title: "Funding Acceptance",
-      content:
-        "Guidelines for accepting and managing funding from various sources while maintaining our values.",
-    },
-    {
-      id: "grievance-mechanism",
-      title: "Grievance Mechanism",
-      content:
-        "Procedures for addressing concerns and grievances in a fair and transparent manner.",
-    },
-    {
-      id: "non-discrimination",
-      title: "Non-Discrimination Policy",
-      content:
-        "Our commitment to non-discrimination and equal treatment for all partners and stakeholders.",
-    },
-    {
-      id: "steering-committee",
-      title: "Turning Tides' Steering Committee",
-      content:
-        "Information about our steering committee structure, roles, and responsibilities.",
-    },
-    {
-      id: "other-policies",
-      title: "Policies not listed here",
-      content:
-        "Additional policies and guidelines that may apply to specific partnerships or situations.",
-    },
-    {
-      id: "amendments",
-      title: "Amendments to Policies",
-      content:
-        "Process for updating and amending our policies to ensure they remain relevant and effective.",
-    },
-    {
-      id: "contact-info",
-      title: "Contact Information",
-      content:
-        "How to reach us for questions about our policies or to provide feedback.",
-    },
-  ],
+  title: propTitle,
+  lastUpdate: propLastUpdate,
+  description: propDescription,
+  policies: propPolicies,
   backgroundColor = "bg-white",
 }) => {
+  // Try to get content from context, fallback to empty object if not available
+  let pageContent: Record<string, string> = {};
+  try {
+    const context = usePageContent();
+    pageContent = context.content;
+  } catch {
+    // Not in PageContentProvider, use props only
+  }
+
+  const getContentValue = (key: string, defaultValue: string = ""): string => {
+    return pageContent[key] || defaultValue;
+  };
+
+  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
+    const value = pageContent[key];
+    if (!value) return defaultValue;
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return defaultValue;
+    }
+  };
+
+  const getValue = (
+    contentKey: string,
+    propValue?: string,
+    defaultValue: string = ""
+  ): string => {
+    const contentValue = getContentValue(contentKey, "");
+    if (contentValue && contentValue.trim() !== "") {
+      return contentValue;
+    }
+    if (propValue && propValue.trim() !== "") {
+      return propValue;
+    }
+    return defaultValue;
+  };
+
+  // Get values from context > props > defaults
+  const title = getValue(
+    "guidingPolicies.title",
+    propTitle,
+    "Our Guiding Policies"
+  );
+
+  const lastUpdate = getValue(
+    "guidingPolicies.lastUpdate",
+    propLastUpdate,
+    "15 January 2025"
+  );
+
+  const description = getValue(
+    "guidingPolicies.description",
+    propDescription,
+    "Our guiding policies support collaboration, transparency, and flexibility, ensuring that each of our funds are tailored to foster responsiveness and adaptability."
+  );
+
+  const policies = getContentJSON<Policy[]>(
+    "guidingPolicies.policies",
+    propPolicies || defaultPolicies
+  );
+
   const [expandedPolicy, setExpandedPolicy] = useState<string | null>(
-    "our-strategy"
+    policies.length > 0 ? policies[0].id : null
   );
 
   const togglePolicy = (policyId: string) => {

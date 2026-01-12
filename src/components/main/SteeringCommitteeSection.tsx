@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { Linkedin } from "lucide-react";
+import { Linkedin, ChevronLeft, ChevronRight } from "lucide-react";
 import { H2, P } from "@/components/ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 
@@ -71,6 +71,26 @@ export const SteeringCommitteeSection: React.FC<
   bottomText,
   backgroundColor = "bg-white",
 }) => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const membersPerPage = 4;
+  const totalPages = Math.ceil(members.length / membersPerPage);
+
+  const startIndex = currentPage * membersPerPage;
+  const endIndex = startIndex + membersPerPage;
+  const currentMembers = members.slice(startIndex, endIndex);
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => (prev > 0 ? prev - 1 : totalPages - 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => (prev < totalPages - 1 ? prev + 1 : 0));
+  };
+
+  const handlePageClick = (pageIndex: number) => {
+    setCurrentPage(pageIndex);
+  };
+
   return (
     <section className={cn("w-full pb-16 lg:pb-24", backgroundColor)}>
       <div className="container mx-auto px-4 max-w-6xl">
@@ -99,54 +119,88 @@ export const SteeringCommitteeSection: React.FC<
         </div>
 
         {/* Committee Members Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {members.map((member) => (
-            <div key={member.id} className="flex flex-col">
-              <div className="relative mb-4">
-                <div className="relative w-full aspect-[3/4] overflow-hidden rounded">
-                  <Image
-                    src={getImageUrl(member.image)}
-                    alt={member.imageAlt}
-                    fill
-                    className="object-cover"
-                  />
-                  {/* LinkedIn Badge */}
-                  {member.linkedinUrl && (
-                    <a
-                      href={member.linkedinUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute bottom-3 left-3 w-9 h-9 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center hover:shadow-lg transition-shadow duration-200"
-                      aria-label={`${member.name}'s LinkedIn profile`}
-                    >
-                      <Linkedin className="w-4 h-4 text-[#3C62ED]" />
-                    </a>
-                  )}
+        <div className="relative">
+          {/* Navigation Buttons */}
+          {totalPages > 1 && (
+            <>
+              <button
+                onClick={handlePrevPage}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="w-5 h-5 text-[#3C62ED]" />
+              </button>
+              <button
+                onClick={handleNextPage}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                aria-label="Next page"
+              >
+                <ChevronRight className="w-5 h-5 text-[#3C62ED]" />
+              </button>
+            </>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            {currentMembers.map((member) => (
+              <div key={member.id} className="flex flex-col">
+                <div className="relative mb-4">
+                  <div className="relative w-full aspect-[3/4] overflow-hidden rounded">
+                    <Image
+                      src={getImageUrl(member.image)}
+                      alt={member.imageAlt}
+                      fill
+                      className="object-cover"
+                    />
+                    {/* LinkedIn Badge */}
+                    {member.linkedinUrl && (
+                      <a
+                        href={member.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute bottom-3 left-3 w-9 h-9 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center hover:shadow-lg transition-shadow duration-200"
+                        aria-label={`${member.name}'s LinkedIn profile`}
+                      >
+                        <Linkedin className="w-4 h-4 text-[#3C62ED]" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* Member Info */}
+                <div className="space-y-1">
+                  <h3 className="text-xl font-bold text-[#010107] font-nunito-sans">
+                    {member.name}
+                  </h3>
+                  <p className="text-base text-[#3C62ED] font-work-sans">
+                    {member.country}
+                  </p>
                 </div>
               </div>
-
-              {/* Member Info */}
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold text-[#010107] font-nunito-sans">
-                  {member.name}
-                </h3>
-                <p className="text-base text-[#3C62ED] font-work-sans">
-                  {member.country}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Pagination Indicator */}
-        <div className="flex justify-center mb-12">
-          <div className="flex gap-3">
-            <div className="w-12 h-1.5 bg-[#3C62ED] rounded-full"></div>
-            <div className="w-12 h-1.5 bg-[#E5E7EB] rounded-full"></div>
-            <div className="w-12 h-1.5 bg-[#E5E7EB] rounded-full opacity-80"></div>
-            <div className="w-12 h-1.5 bg-[#E5E7EB] rounded-full opacity-60"></div>
+        {totalPages > 1 && (
+          <div className="flex justify-center mb-12">
+            <div className="flex gap-3">
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handlePageClick(index)}
+                  className={cn(
+                    "w-12 h-1.5 rounded-full transition-all duration-300",
+                    currentPage === index
+                      ? "bg-[#3C62ED]"
+                      : "bg-[#E5E7EB] hover:bg-[#D1D5DB]"
+                  )}
+                  aria-label={`Go to page ${index + 1}`}
+                  aria-current={currentPage === index ? "true" : "false"}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Bottom Text */}
         {bottomText && (

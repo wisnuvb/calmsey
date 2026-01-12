@@ -20,9 +20,15 @@ const PAGE_TYPES = [
     description: "Company information, vision, mission, and team",
     icon: "ℹ️",
   },
+  // {
+  //   type: "OUR_WORK" as PageType,
+  //   name: "Our Work",
+  //   description: "Case studies, approach, and success stories",
+  //   icon: "💼",
+  // },
   {
-    type: "OUR_WORK" as PageType,
-    name: "Our Work",
+    type: "OUR_APPROACH" as PageType,
+    name: "Our Approach",
     description: "Case studies, approach, and success stories",
     icon: "💼",
   },
@@ -37,6 +43,12 @@ const PAGE_TYPES = [
     name: "Governance",
     description: "Values, principles, funders, and committees",
     icon: "⚖️",
+  },
+  {
+    type: "STORIES" as PageType,
+    name: "Partner Stories",
+    description: "Stories from our partners and communities",
+    icon: "📖",
   },
   {
     type: "GET_INVOLVED" as PageType,

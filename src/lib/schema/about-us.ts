@@ -4,16 +4,14 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
   pageType: "ABOUT_US",
   sections: [
     "Hero",
-    "Quote",
     "Our Vision",
-    "What We Want to Achieve",
+    "Our Values",
     "Our Goal",
-    "Theory of Change",
-    "Genesis",
+    "Where We Work",
     "Team",
     "Funders",
-    "Triptych Gallery",
-    "Our Work",
+    "Genesis",
+    "Feedback Callout",
   ],
   fields: [
     // Hero Section
@@ -39,18 +37,6 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       label: "Hero Background Image",
       type: "image",
       section: "Hero",
-    },
-
-    // Quote Section
-    {
-      key: "quote.content",
-      label: "Quote",
-      type: "textarea",
-      section: "Quote",
-      defaultValue:
-        "Flowing funds with greater control and direction of rights holders and their allies",
-      placeholder: "Insert quote here",
-      helpText: "Main quote text displayed in the quote section",
     },
 
     // Our Vision Section
@@ -88,46 +74,107 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       helpText: "Alternative text for the image (accessibility)",
     },
 
-    // What We Want to Achieve Section
+    // Our Values Section
     {
-      key: "achieve.tag",
-      label: "Section Tag",
+      key: "values.title",
+      label: "Values Title",
       type: "text",
-      section: "What We Want to Achieve",
-      defaultValue: "WHAT WE WANNA ACHIEVE",
-      helpText: "Small uppercase heading displayed above the quote",
+      section: "Our Values",
+      defaultValue: "Our Values",
+      helpText: "Main heading for the values section",
     },
     {
-      key: "achieve.quote",
-      label: "Main Quote",
+      key: "values.description",
+      label: "Values Description",
       type: "textarea",
-      section: "What We Want to Achieve",
+      section: "Our Values",
       defaultValue:
-        "A world where local communities, fishers and Indigenous Peoples can lead in managing, conserving, developing and adapting their lands, waters and resoruces",
-      helpText: "Main quote text displayed in the section",
+        "Our values and principles were built through consultation with partners, discussion with the Steering Committee, and established practices of liberatory grantmaking. They guide our decisions, interactions, and approach to our work—they are foundational to who we are as an organization.",
+      helpText: "Description text displayed below the title",
     },
     {
-      key: "achieve.image",
-      label: "Achieve Image",
-      type: "image",
-      section: "What We Want to Achieve",
-      defaultValue: "/assets/achieve-1.webp",
-      helpText: "Full width image displayed below the quote",
-    },
-    {
-      key: "achieve.imageAlt",
-      label: "Image Alt Text",
-      type: "text",
-      section: "What We Want to Achieve",
-      defaultValue:
-        "Bustling floating market with boats carrying goods, showcasing local communities managing their resources",
-      helpText: "Alternative text for the image (accessibility)",
-    },
-    {
-      key: "achieve.content",
-      label: "Content",
-      type: "html",
-      section: "What We Want to Achieve",
+      key: "values.items",
+      label: "Values List",
+      type: "multiple",
+      section: "Our Values",
+      defaultValue: JSON.stringify(
+        [
+          {
+            id: "center-power",
+            title:
+              "Center power with partners (i.e., Local communities, small-scale fishers, fish workers, and Indigenous Peoples, and the groups that legitimately serve and support them)",
+            imageSrc: "/assets/partner1.webp",
+            className: "h-[400px] md:h-full",
+          },
+          {
+            id: "uphold-lived-experience",
+            title: "Uphold lived experience and diverse knowledge.",
+            imageSrc: "/assets/our-view.webp",
+            className: "h-[250px]",
+          },
+          {
+            id: "base-trust",
+            title: "Base our work on trust, responsiveness and service.",
+            imageSrc: "/assets/slider-1.webp",
+            className: "h-[250px]",
+          },
+          {
+            id: "transparency",
+            title: "Prioritize transparency & accountability.",
+            imageSrc: "/assets/slider-2.webp",
+            className: "h-[250px]",
+          },
+          {
+            id: "foster-solidarity",
+            title: "Foster solidarity and protect civic spaces.",
+            imageSrc: "/assets/slider-3.webp",
+            className: "h-[250px]",
+          },
+          {
+            id: "self-determination",
+            title:
+              "Prioritize and plan for self-determination and independence.",
+            imageSrc: "/assets/achieve-1.webp",
+            className: "h-[250px]",
+          },
+          {
+            id: "humility",
+            title: "Commit to humility and reflexivity.",
+            imageSrc: "/assets/gov-hero.webp",
+            className: "h-[400px] md:h-full",
+          },
+        ],
+        null,
+        2
+      ),
+      itemLabel: "Value",
+      itemSchema: [
+        {
+          key: "title",
+          label: "Value Title",
+          type: "text",
+          required: true,
+          placeholder: "Center power with partners",
+        },
+        {
+          key: "imageSrc",
+          label: "Image",
+          type: "image",
+          required: true,
+          placeholder: "/assets/image.jpg",
+        },
+        {
+          key: "className",
+          label: "CSS Class (height)",
+          type: "text",
+          required: false,
+          placeholder: "h-[250px]",
+          helpText:
+            "CSS height class for the card (e.g., h-[250px] or h-[400px])",
+        },
+      ],
+      helpText:
+        "List of organizational values with images. Each value has a title, image, and optional height class.",
     },
 
     // Our Goal Section
@@ -209,55 +256,68 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       helpText: "Text displayed on the download button",
     },
 
-    // Theory of Change Section
+    // Where We Work Section
     {
-      key: "theoryOfChange.title",
-      label: "Section Tag",
+      key: "whereWeWork.title",
+      label: "Section Title",
       type: "text",
-      section: "Theory of Change",
-      defaultValue: "THEORY OF CHANGE",
-      helpText: "Small uppercase heading displayed above the subtitle",
-    },
-    {
-      key: "theoryOfChange.subtitle",
-      label: "Section Subtitle",
-      type: "text",
-      section: "Theory of Change",
-      defaultValue: "How We View Change to Happen?",
+      section: "Where We Work",
+      defaultValue: "Where Does Turning Tides Work?",
       helpText: "Main heading for the section",
     },
     {
-      key: "theoryOfChange.description",
-      label: "Description",
+      key: "whereWeWork.actionPlansText",
+      label: "Action Plans Text",
       type: "textarea",
-      section: "Theory of Change",
+      section: "Where We Work",
       defaultValue:
-        "Self-determination, meaningful participation and locally led action become possible diverse rights of local communities, small-scale fishers, fish workers, and Indigenous Peoples are recognized. To move toward secure tenure and recognized rights it is these peoples that must be centered in resourcing and actions – with direct funding and greater control in fund distribution. We engage with a diversity of partners – across multiple levels – who are affecting governance of oceans, coasts, rivers, lakes, climate responses, conservation and food systems.\n\nWe collaborate most closely with local communities, small-scale fishers, fish workers, Indigenous Peoples, and their representative groups and allies. Throughout these partnerships we pay particular attention to strategies that promote social inclusion and gender equity. We employ and support targeted strategies with women, non-elite and economically disadvantaged peoples. We collaborate with partners who support different social groups and peoples to improve their experiences, agency and power within established legal, economic and social systems. The work we support will lead to greater quality and accessibility of services for facilitation, negotiation, documentation, registration, conflict resolution, and remedy.\n\nWe support ongoing efforts to build accountability, respect and awareness amongst governments, NGOs, funders and the private sector, ensuring rights recognition and tenure sensitivity in the policies and processes they employ. We support work that evaluates and diversifies the values and knowledge systems that are influencing these decision makers. We support work that changes and/or challenges (including via strategic litigation) inequitable or unjust legal, economic and social conditions, processes or policies that are undermining tenure security and rights in the governance of oceans, coasts, lakes, shorelines, and other aquatic systems.",
-      helpText: "Detailed description text (supports line breaks with \\n)",
+        "We have **developed action plans** for Latin America and Africa, and **mobilizing grants** for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda.",
+      helpText:
+        "Text describing action plans (use **text** for bold formatting)",
     },
     {
-      key: "theoryOfChange.image",
-      label: "Theory of Change Diagram",
+      key: "whereWeWork.explorationText",
+      label: "Exploration Phase Text",
+      type: "textarea",
+      section: "Where We Work",
+      defaultValue:
+        "We are also in the **exploration and engagement phase** – Brazil, India, Indonesia, Sri Lanka, Thailand.",
+      helpText:
+        "Text describing exploration phase (use **text** for bold formatting)",
+    },
+    {
+      key: "whereWeWork.explorationLinkText",
+      label: "Exploration Link Text",
+      type: "text",
+      section: "Where We Work",
+      defaultValue: "View Report",
+      helpText: "Text for the exploration report link",
+    },
+    {
+      key: "whereWeWork.explorationLinkUrl",
+      label: "Exploration Link URL",
+      type: "text",
+      section: "Where We Work",
+      defaultValue: "#",
+      helpText: "URL for the exploration report",
+    },
+    {
+      key: "whereWeWork.mapImage",
+      label: "Map Image",
       type: "image",
-      section: "Theory of Change",
-      defaultValue: "/assets/our-view.webp",
-      helpText: "Diagram image showing the theory of change",
+      section: "Where We Work",
+      defaultValue: "/assets/world-map.png",
+      helpText: "World map image showing work locations",
     },
     {
-      key: "theoryOfChange.imageAlt",
-      label: "Image Alt Text",
-      type: "text",
-      section: "Theory of Change",
-      defaultValue: "Theory of Change diagram showing how change happens",
-      helpText: "Alternative text for the image (accessibility)",
-    },
-    {
-      key: "theoryOfChange.showMoreText",
-      label: "Show More Button Text",
-      type: "text",
-      section: "Theory of Change",
-      defaultValue: "Show More",
-      helpText: "Text displayed on the expand/collapse button",
+      key: "whereWeWork.partnersText",
+      label: "Partners Text",
+      type: "textarea",
+      section: "Where We Work",
+      defaultValue:
+        'Our **"Partners Piloting"** partners are Bangladesh, Thailand, Indonesia, Honduras, Senegal.',
+      helpText:
+        "Text describing pilot partners (use **text** for bold formatting)",
     },
 
     // Team Section
@@ -524,192 +584,55 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       helpText: "URL for the CTA button",
     },
 
-    // Triptych Gallery Section
+    // Feedback Callout Section
     {
-      key: "triptych.images",
-      label: "Gallery Images",
-      type: "multiple",
-      section: "Triptych Gallery",
-      defaultValue: JSON.stringify(
-        [
-          {
-            id: "1",
-            src: "/assets/slider-2.webp",
-            alt: "Coastal fishing village with colorful boats and local people",
-            width: "narrow",
-          },
-          {
-            id: "2",
-            src: "/assets/slider-1.webp",
-            alt: "Underwater scene with school of fish swimming in deep blue water",
-            width: "wide",
-          },
-          {
-            id: "3",
-            src: "/assets/slider-3.webp",
-            alt: "View from inside a boat looking out towards open sea and sky",
-            width: "narrow",
-          },
-        ],
-        null,
-        2
-      ),
-      itemLabel: "Image",
-      itemSchema: [
-        {
-          key: "src",
-          label: "Image URL",
-          type: "image",
-          required: true,
-          placeholder: "/path/to/image.jpg",
-        },
-        {
-          key: "alt",
-          label: "Alt Text",
-          type: "text",
-          required: true,
-          placeholder: "Image description",
-        },
-        {
-          key: "width",
-          label: "Width",
-          type: "text",
-          required: false,
-          placeholder: "narrow, medium, or wide",
-          helpText:
-            "Image width: 'narrow' (14%), 'medium' (33.333%), or 'wide' (71%)",
-        },
-      ],
-      helpText:
-        "Gallery images displayed in triptych format. Images are shown in sets of 3. Each image can have a width setting: narrow (14%), medium (33.333%), or wide (71%).",
-    },
-    {
-      key: "triptych.autoPlay",
-      label: "Auto Play",
-      type: "boolean",
-      section: "Triptych Gallery",
-      defaultValue: "false",
-      helpText: "Enable automatic slideshow",
-    },
-    {
-      key: "triptych.autoPlayInterval",
-      label: "Auto Play Interval (ms)",
-      type: "number",
-      section: "Triptych Gallery",
-      defaultValue: "5000",
-      helpText: "Time in milliseconds between auto-play transitions",
-    },
-    {
-      key: "triptych.showNavigation",
-      label: "Show Navigation",
-      type: "boolean",
-      section: "Triptych Gallery",
-      defaultValue: "true",
-      helpText: "Show navigation arrows and progress indicators",
-    },
-
-    // Support Section
-    // {
-    //   key: "support.title",
-    //   label: "Support Title",
-    //   type: "text",
-    //   section: "Support",
-    // },
-    // {
-    //   key: "support.content",
-    //   label: "Support Content",
-    //   type: "html",
-    //   section: "Support",
-    // },
-    // Our Work Section
-    {
-      key: "ourWork.heading",
-      label: "Section Heading",
+      key: "feedbackCallout.title",
+      label: "Title",
       type: "text",
-      section: "Our Work",
-      defaultValue: "OUR WORK",
-      helpText: "Small uppercase heading above the title",
+      section: "Feedback Callout",
+      defaultValue: "We value your feedback",
+      helpText: "Main title of the feedback section",
     },
     {
-      key: "ourWork.title",
-      label: "Section Title",
-      type: "text",
-      section: "Our Work",
-      defaultValue: "Discover Our Latest Activities",
-      helpText: "Main title of the section",
-    },
-    {
-      key: "ourWork.description",
+      key: "feedbackCallout.description",
       label: "Description",
       type: "textarea",
-      section: "Our Work",
+      section: "Feedback Callout",
       defaultValue:
-        "Turning Tides works in close partnership with grassroots groups, NGO allies, and dedicated funders. We connect regularly in person and virtually to exchange knowledge, provide supports and create new opportunities for change.",
+        "Share your thoughts to help us continually improve our governance, practices and accountability.",
       helpText: "Description text below the title",
     },
     {
-      key: "ourWork.buttonText",
-      label: "Button Text",
+      key: "feedbackCallout.feedbackText",
+      label: "Feedback Button Text",
       type: "text",
-      section: "Our Work",
-      defaultValue: "See Our Work",
-      helpText: "Text for the call-to-action button",
+      section: "Feedback Callout",
+      defaultValue: "Give Feedback",
+      helpText: "Text for the feedback button",
     },
     {
-      key: "ourWork.buttonUrl",
-      label: "Button URL",
+      key: "feedbackCallout.feedbackLink",
+      label: "Feedback Button Link",
       type: "text",
-      section: "Our Work",
-      defaultValue: "/our-work",
-      helpText: "URL for the call-to-action button",
+      section: "Feedback Callout",
+      defaultValue: "/feedback",
+      helpText: "URL for the feedback button",
     },
     {
-      key: "ourWork.images",
-      label: "Images List",
-      type: "multiple",
-      section: "Our Work",
-      defaultValue: JSON.stringify(
-        [
-          {
-            src: "/assets/demo/16d51a5010efc92e05fa498a2dd962f76c4544ab.png",
-            alt: "Person holding fish on boat at sunset",
-          },
-          {
-            src: "/assets/demo/61d49ae554575244d2db7ab0551faf2183798c04.png",
-            alt: "Group of diverse people smiling outdoors",
-          },
-          {
-            src: "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
-            alt: "Person holding dried fish",
-          },
-          {
-            src: "/assets/demo/achive.png",
-            alt: "People gathered around table looking at map",
-          },
-        ],
-        null,
-        2
-      ),
-      helpText: "Add, edit, or remove images for the gallery",
-      itemLabel: "Image",
-      itemSchema: [
-        {
-          key: "src",
-          label: "Image URL",
-          type: "image",
-          required: true,
-          placeholder: "/images/example.jpg",
-          helpText: "Image source URL or path",
-        },
-        {
-          key: "alt",
-          label: "Alt Text",
-          type: "text",
-          required: true,
-          placeholder: "Image description",
-          helpText: "Alternative text for accessibility",
-        },
-      ],
+      key: "feedbackCallout.learnMoreText",
+      label: "Learn More Button Text",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "Learn More",
+      helpText: "Text for the learn more button",
+    },
+    {
+      key: "feedbackCallout.learnMoreLink",
+      label: "Learn More Button Link",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "/governance",
+      helpText: "URL for the learn more button",
     },
   ],
 };

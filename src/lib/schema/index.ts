@@ -5,3 +5,5 @@ export * from "./our-work";
 export * from "./our-fund";
 export * from "./governnace";
 export * from "./get-involve";
+export * from "./our-approach";
+export * from "./partner-stories";

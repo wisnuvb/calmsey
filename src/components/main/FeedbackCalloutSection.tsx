@@ -1,6 +1,5 @@
 "use client";
 
-import { Mail } from "lucide-react";
 import { H2, P } from "@/components/ui/typography";
 import { usePageContent } from "@/contexts/PageContentContext";
 
@@ -59,22 +58,22 @@ export function FeedbackCalloutSection({
     "Share your thoughts to help us continually improve our governance, practices and accountability."
   );
   const feedbackText = getValue(
-    "feedbackCallout.feedbackText",
+    "feedbackCallout.feedbackButtonText",
     propFeedbackText,
     "Give Feedback"
   );
   const feedbackLink = getValue(
-    "feedbackCallout.feedbackLink",
+    "feedbackCallout.feedbackButtonLink",
     propFeedbackLink,
     "/feedback"
   );
   const learnMoreText = getValue(
-    "feedbackCallout.learnMoreText",
+    "feedbackCallout.learnMoreButtonText",
     propLearnMoreText,
     "Learn More"
   );
   const learnMoreLink = getValue(
-    "feedbackCallout.learnMoreLink",
+    "feedbackCallout.learnMoreButtonLink",
     propLearnMoreLink,
     "/governance"
   );
@@ -105,7 +104,6 @@ export function FeedbackCalloutSection({
               href={feedbackLink}
               className="inline-flex items-center justify-center gap-3 bg-white text-[#3C62ED] px-6 py-5 rounded-lg shadow-sm hover:bg-gray-100 transition-colors duration-200 w-full sm:w-[231px]"
             >
-              {/* <Mail className="w-5 h-5" /> */}
               {feedbackText}
             </a>
             <a

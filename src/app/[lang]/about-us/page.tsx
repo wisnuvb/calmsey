@@ -62,7 +62,7 @@ const AboutUsPage = async ({ params }: AboutUsPageProps) => {
       {/* <DownloadFramework /> */}
       {/* <ImageCarousel /> */}
       {/* <TenureFacilitySection /> */}
-      <ValueSupportSection />
+      {/* <ValueSupportSection /> */}
       <FeedbackCalloutSection
         title="We value your support"
         description="Connect with us to co-create solutions that protect rights, sustain livelihoods, and centre local voices."

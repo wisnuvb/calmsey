@@ -33,6 +33,8 @@ interface AllStoriesListSectionProps {
   sortOptions?: string[];
   onStoryClick?: (storyId: string) => void;
   className?: string;
+  categories?: { slug: string; name: string }[];
+  defaultCategory: string;
 }
 
 export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({

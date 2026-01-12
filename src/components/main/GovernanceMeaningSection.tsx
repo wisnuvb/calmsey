@@ -69,25 +69,32 @@ export function GovernanceMeaningSection({
     "Boats near a riverside community"
   );
 
+  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
+    const value = pageContent[key];
+    if (!value) return defaultValue;
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return defaultValue;
+    }
+  };
+
   const defaultParagraphs = [
     "Lorem ipsum dolor sit amet consectetur. Purus sed massa pharetra maecenas eu eleifend turpis. Arcu tellus fermentum quis tempor faucibus et eros arcu. Eget non nullam senectus sit risus ut felis. Malesuada placerat suspendisse nulla proin faucibus. Eros sem quam magna et volutpat pellentesque. Arcu molestie ac tellus pellentesque placerat in suspendisse. Senectus nisl quis tincidunt mauris nibh ac ac eget.",
     "Justo tortor nam dictumst dui pretium nec. Sapien dignissim diam nulla arcu magnis mauris scelerisque id sollicitudin. Eu vestibulum in eu felis sit amet pellentesque sagittis suspendisse. Tristique fames neque semper nisl purus pretium sem ornare nisl. Non aliquam dolor amet odio. Est scelerisque semper euismod mauris. Egestas varius enim tortor commodo elementum curabitur faucibus cras.",
     "Turpis at pellentesque dui quis accumsan at pellentesque ultricies. Rutrum sed leo ut dolor morbi eget. Eget semper malesuada tempus sit malesuada imperdiet malesuada dignissim bibendum. Duis viverra tempus elementum sit velit at in. Gravida nunc diam risus pharetra nibh nullam. Blandit et eget viverra nisl vitae",
   ];
 
-  const paragraphKeys = [
-    "governanceMeaning.paragraph1",
-    "governanceMeaning.paragraph2",
-    "governanceMeaning.paragraph3",
-  ];
+  // Get paragraphs from content (can be array of strings or array of objects with paragraph property)
+  const rawParagraphs = getContentJSON<string[] | { paragraph: string }[]>(
+    "governanceMeaning.paragraphs",
+    propParagraphs || defaultParagraphs
+  );
 
-  const paragraphs = (
-    propParagraphs && propParagraphs.length > 0
-      ? propParagraphs
-      : defaultParagraphs.map((fallback, idx) =>
-          getValue(paragraphKeys[idx], undefined, fallback)
-        )
-  ).filter((paragraph) => paragraph && paragraph.trim() !== "");
+  // Normalize to array of strings
+  const paragraphs = rawParagraphs
+    .map((p) => (typeof p === "string" ? p : p.paragraph))
+    .filter((paragraph) => paragraph && paragraph.trim() !== "");
 
   return (
     <section className="bg-white py-16 lg:py-20">

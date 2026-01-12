@@ -238,7 +238,7 @@ export function PartnerStoriesSection({
   return (
     <section
       className={cn(
-        "relative overflow-hidden py-16 lg:py-24",
+        "relative overflow-hidden pt-16 pb-8 lg:pt-24 sm:pb-14",
         backgroundColor === "blue" ? "bg-[#3C62ED]" : "bg-white",
         className
       )}
@@ -293,7 +293,7 @@ export function PartnerStoriesSection({
                 <Link
                   href={buttonUrl || "#"}
                   className={cn(
-                    "inline-flex items-center justify-center px-8 py-3 rounded-lg text-sm font-semibold transition-transform hover:scale-105 active:scale-95",
+                    "inline-flex items-center justify-center px-8 py-5 rounded-sm text-sm font-medium transition-transform hover:scale-105 active:scale-95 border border-[#CADBEA]",
                     buttonBg,
                     buttonTextColor
                   )}

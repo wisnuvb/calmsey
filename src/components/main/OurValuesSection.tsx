@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { getImageUrl, cn } from "@/lib/utils";
 import { H2, P } from "@/components/ui/typography";
+import { usePageContent } from "@/contexts/PageContentContext";
 
 interface ValueItem {
   id: string;
@@ -61,21 +62,76 @@ const defaultValues: ValueItem[] = [
 interface OurValuesSectionProps {
   title?: string;
   description?: string;
+  values?: ValueItem[];
 }
 
 export const OurValuesSection: React.FC<OurValuesSectionProps> = ({
-  title = "Our Values",
-  description = "Our values and principles were built through consultation with partners, discussion with the Steering Committee, and established practices of liberatory grantmaking. They guide our decisions, interactions, and approach to our work—they are foundational to who we are as an organization.",
+  title: propTitle,
+  description: propDescription,
+  values: propValues,
 }) => {
+  // Try to get content from context, fallback to empty object if not available
+  let pageContent: Record<string, string> = {};
+  try {
+    const context = usePageContent();
+    pageContent = context.content;
+  } catch {
+    // Not in PageContentProvider, use props only
+  }
+
+  // Helper to get value from content
+  const getContentValue = (key: string, defaultValue: string = ""): string => {
+    return pageContent[key] || defaultValue;
+  };
+
+  // Helper to get JSON value from content
+  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
+    const value = pageContent[key];
+    if (!value) return defaultValue;
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return defaultValue;
+    }
+  };
+
+  // Helper function to get value with priority: context > props > default
+  const getValue = (
+    contentKey: string,
+    propValue?: string,
+    defaultValue: string = ""
+  ): string => {
+    const contentValue = getContentValue(contentKey, "");
+    if (contentValue && contentValue.trim() !== "") {
+      return contentValue;
+    }
+    if (propValue && propValue.trim() !== "") {
+      return propValue;
+    }
+    return defaultValue;
+  };
+
+  // Get all values with priority: context > props > default
+  const title = getValue("values.title", propTitle, "Our Values");
+  const description = getValue(
+    "values.description",
+    propDescription,
+    "Our values and principles were built through consultation with partners, discussion with the Steering Committee, and established practices of liberatory grantmaking. They guide our decisions, interactions, and approach to our work—they are foundational to who we are as an organization."
+  );
+  const values = getContentJSON<ValueItem[]>(
+    "values.items",
+    propValues || defaultValues
+  );
+
   // Split values into columns for the masonry layout
   // Column 1: Center power (Tall), Foster solidarity
-  const col1 = [defaultValues[0], defaultValues[4]];
+  const col1 = [values[0], values[4]];
 
   // Column 2: Uphold lived experience, Prioritize transparency, Prioritize self-determination
-  const col2 = [defaultValues[1], defaultValues[3], defaultValues[5]];
+  const col2 = [values[1], values[3], values[5]];
 
   // Column 3: Base our work on trust, Commit to humility (Tall)
-  const col3 = [defaultValues[2], defaultValues[6]];
+  const col3 = [values[2], values[6]];
 
   return (
     <section className="bg-white">
