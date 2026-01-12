@@ -1,6 +1,5 @@
 "use client";
 
-import { CheckCircle } from "lucide-react";
 import Image from "next/image";
 import { H2 } from "@/components/ui/typography";
 import { usePageContent } from "@/contexts/PageContentContext";

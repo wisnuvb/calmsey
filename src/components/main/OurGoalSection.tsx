@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Target } from "lucide-react";
+import { Download } from "lucide-react";
 import Image from "next/image";
 import { H2, H6, P } from "../ui/typography";
 import { usePageContent } from "@/contexts/PageContentContext";

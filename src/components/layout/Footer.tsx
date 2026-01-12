@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { P } from "../ui/typography";
 
 interface FooterLink {
   label: string;
@@ -45,8 +44,6 @@ const footerSections: FooterSection[] = [
 ];
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
-
   return (
     <footer className="bg-gradient-to-br from-[#1E0F39] via-[#2a1551] to-[#3a1d6f] text-white">
       {/* Main Footer Content */}

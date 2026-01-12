@@ -24,13 +24,11 @@ export function SafeImageWithError({
   height,
   fill,
   className,
-  imageId,
   placeholder,
   objectFit = "cover",
   priority,
 }: SafeImageWithErrorProps) {
   const [imageError, setImageError] = useState(false);
-  const uniqueId = imageId || src;
 
   if (imageError || !src) {
     return (

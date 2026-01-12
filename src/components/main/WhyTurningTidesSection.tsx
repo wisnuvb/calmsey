@@ -97,12 +97,6 @@ export function WhyTurningTidesSection({
   const funders =
     propContent || getContentJSON<Funder[]>("whyUs.funders", defaultFunders);
 
-  const whyTitle = getValue(
-    "whyUs.whyTitle",
-    propTitle,
-    "So Why Are We Turning Tides?"
-  );
-
   const whyContent = getValue(
     "whyUs.whyContent",
     propContent,

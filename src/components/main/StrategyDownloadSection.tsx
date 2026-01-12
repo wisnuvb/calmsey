@@ -3,7 +3,6 @@
 import { Download } from "lucide-react";
 import { H5 } from "../ui/typography";
 import { usePageContent } from "@/contexts/PageContentContext";
-import { cn } from "@/lib/utils";
 
 interface StrategyDownloadSectionProps {
   description?: string;

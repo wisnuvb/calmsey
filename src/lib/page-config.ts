@@ -54,6 +54,21 @@ export const PAGE_TYPE_CONFIGS: Record<PageType, PageTypeConfig> = {
     isStatic: false,
   },
 
+  [PageType.OUR_APPROACH]: {
+    type: PageType.OUR_APPROACH,
+    slug: "our-approach",
+    name: "Our Approach",
+    description: "Our guiding principles and methodology",
+    requiredSections: [PageSectionType.RICH_TEXT],
+    optionalSections: [
+      PageSectionType.FEATURED_CONTENT,
+      PageSectionType.IMAGE_GALLERY,
+      PageSectionType.DOCUMENT_LIST,
+    ],
+    allowedSettings: ["layout", "showFilters", "itemsPerPage"],
+    isStatic: true,
+  },
+
   [PageType.OUR_FUND]: {
     type: PageType.OUR_FUND,
     slug: "our-fund",

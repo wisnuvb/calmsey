@@ -1,19 +1,12 @@
 import {
   HeroSection,
   OurVisionSection,
-  WhatWeWannaAchieveSection,
   OurGoalSection,
   TeamSection,
-  QuoteSection,
-  TheoryOfChangeSection,
   GenesisSection,
   FundersSection,
-  TriptychGallerySection,
-  OurWorkSection,
   OurValuesSection,
-  DownloadFramework,
   WhereWeWorkSection,
-  ValueSupportSection,
   FeedbackCalloutSection,
 } from "@/components/main";
 import { PageContentProvider } from "@/contexts/PageContentContext";

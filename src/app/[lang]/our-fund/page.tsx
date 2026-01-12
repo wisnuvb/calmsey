@@ -1,6 +1,5 @@
 import {
   FeedbackCalloutSection,
-  GrantmakingSection,
   HeroSection,
   OurFourFundsSection,
   OurPartnersSection,

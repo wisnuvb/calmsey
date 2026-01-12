@@ -1,21 +1,11 @@
 import { metadata } from "@/app/layout";
 import {
-  AdvisoryCommitteesSection,
-  ConsultativeProcessSection,
-  CoreValuesSection,
   FundingAcceptancePolicySection,
   GovernanceMeaningSection,
   GuidingPoliciesSection,
   FeedbackCalloutSection,
-  GovernanceValuesSection,
-  GrantmakingProcessSection,
-  GuidingPrinciplesSection,
   HeroSection,
-  OurFundersSection,
-  OurValuesPrinciplesSection,
   SteeringCommitteeSection,
-  ValuesFoundationSection,
-  VoiceMattersHeroSection,
 } from "@/components/main";
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";

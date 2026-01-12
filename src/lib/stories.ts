@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 
 export interface StoryArticle {
@@ -37,7 +38,7 @@ export async function getStories(
 
   try {
     // Build where clause
-    const where: any = {
+    const where: Prisma.ArticleWhereInput = {
       status: "PUBLISHED",
       publishedAt: {
         lte: new Date(), // Only published articles
@@ -62,7 +63,9 @@ export async function getStories(
     }
 
     // Build orderBy clause
-    let orderBy: any = {};
+    let orderBy: Prisma.ArticleOrderByWithRelationInput = {
+      publishedAt: "desc",
+    };
     switch (sortOrder) {
       case "Latest":
         orderBy = { publishedAt: "desc" };
