@@ -13,6 +13,7 @@ import {
   Filter,
 } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
+import { usePageContent } from "@/contexts/PageContentContext";
 
 interface Story {
   id: string;
@@ -34,68 +35,124 @@ interface AllStoriesListSectionProps {
   onStoryClick?: (storyId: string) => void;
   className?: string;
   categories?: { slug: string; name: string }[];
-  defaultCategory: string;
+  defaultCategory?: string;
 }
 
 export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
-  title = "All Stories From Our Partners",
-  stories = [
-    {
-      id: "1",
-      title: "Pasibuntuluki - Lines of the Sea",
-      location: "Indonesia",
-      date: "Sep 4, 2025",
-      description:
-        "In the waters of southwestern Sulawesi, coastal communities across Langkai and Lanjukang Islands have pioneered thriving conservation systems that demonstrate the power of traditional ecological knowledge. I communities across Langkai and Lanjukang Islands have pioneered thriving",
-      thumbnail: "/assets/demo/61d49ae554575244d2db7ab0551faf2183798c04.png",
-      thumbnailAlt: "Two men in a small boat on calm water",
-      type: "video",
-      url: "/stories/1",
-    },
-    {
-      id: "2",
-      title: "After Anchoring the Boat",
-      location: "Thailand",
-      date: "Aug 26, 2025",
-      description:
-        "In Thailand's coastal communities, fisherwomen are the backbone of an entire food system. They process catches, repair nets, manage equipment, and sell at markets, yet Thai law refuses to recognize them as 'fishers.' That legal definition belongs only to those who physically catch aquatic animals—a narrow classification that ex...",
-      thumbnail: "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
-      thumbnailAlt: "Traditional boats on water",
-      type: "video",
-      url: "/stories/2",
-    },
-    {
-      id: "3",
-      title:
-        "Towards Tenure Reform for Indigenous Territories and Local Community Managed Areas in Eastern Indonesia",
-      location: "Indonesia",
-      date: "Jul 16, 2025",
-      description:
-        "Across Indonesia's archipelago, coastal communities have pioneered sophisticated marine governance rooted in traditional ecological knowledge, yet their proven stewardship faces significant legal gaps, lacks enforcement capacity, and confronts mounting external threats. In the Padaido Islands, the Padaidori people manage la...",
-      thumbnail: "/assets/demo/61d49ae554575244d2db7ab0551faf2183798c04.png",
-      thumbnailAlt: "Man in yellow shirt holding a stick",
-      type: "video",
-      url: "/stories/3",
-    },
-    {
-      id: "4",
-      title: "A new breath for the women of Néma Bah",
-      location: "Senegal",
-      date: "Aug 26, 2025",
-      description:
-        "Women in Senegal – as in many countries around the world – face significant barriers to land access and rights. Through a longstanding partnership with CAOPA, the women of Néma Bah have secured a title and deed to the land and waters on which they work. With this security, investing in better tools, skills and infrastructu...",
-      thumbnail: "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
-      thumbnailAlt: "Woman with pink headscarf in boat",
-      type: "video",
-      url: "/stories/4",
-    },
-  ],
-  showLoadMore = true,
-  sortOptions = ["Latest", "Oldest", "A-Z", "Z-A"],
+  title: propTitle,
+  stories: propStories = [],
+  showLoadMore: propShowLoadMore,
+  sortOptions: propSortOptions,
   onStoryClick,
   className,
+  categories: propCategories = [],
+  defaultCategory: propDefaultCategory,
 }) => {
-  const [sortBy, setSortBy] = useState("Latest");
+  // Try to get content from context, fallback to empty object if not available
+  let pageContent: Record<string, string> = {};
+  try {
+    const context = usePageContent();
+    pageContent = context.content;
+  } catch {
+    // Not in PageContentProvider, use props only
+  }
+
+  // Helper to get value from content
+  const getContentValue = (key: string, defaultValue: string = ""): string => {
+    return pageContent[key] || defaultValue;
+  };
+
+  // Helper to get JSON value from content
+  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
+    const value = pageContent[key];
+    if (!value) return defaultValue;
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return defaultValue;
+    }
+  };
+
+  // Helper function to get value with priority: context > props > default
+  const getValue = (
+    contentKey: string,
+    propValue?: string,
+    defaultValue: string = ""
+  ): string => {
+    const contentValue = getContentValue(contentKey, "");
+    if (contentValue && contentValue.trim() !== "") {
+      return contentValue;
+    }
+    if (propValue && propValue.trim() !== "") {
+      return propValue;
+    }
+    return defaultValue;
+  };
+
+  // Get all values with priority: context > props > default
+  const title = getValue(
+    "allStories.title",
+    propTitle,
+    "All Stories From Our Partners"
+  );
+
+  const showLoadMore = (() => {
+    const contentValue = getContentValue("allStories.showLoadMore", "");
+    if (contentValue !== "") {
+      return contentValue === "true";
+    }
+    if (propShowLoadMore !== undefined) {
+      return propShowLoadMore;
+    }
+    return true;
+  })();
+
+  const sortOptions = (() => {
+    // Sort options are typically static, but we can allow override via props
+    if (propSortOptions && propSortOptions.length > 0) {
+      return propSortOptions;
+    }
+    return ["Latest", "Oldest", "A-Z", "Z-A"];
+  })();
+
+  // Get default category and categories for filtering (prepared for future filter implementation)
+  // Note: These variables are prepared for filter dropdown implementation
+  // Currently filter dropdown UI is not fully implemented, but data is ready
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const defaultCategory = getValue(
+    "allStories.defaultCategory",
+    propDefaultCategory,
+    ""
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const categories = (() => {
+    if (propCategories && propCategories.length > 0) {
+      return propCategories;
+    }
+    // Try to get from content if available
+    const filterCategories = getContentJSON<Array<{ categorySlug: string }>>(
+      "allStories.filterCategories",
+      []
+    );
+    if (filterCategories.length > 0) {
+      return filterCategories.map((item) => ({
+        slug: item.categorySlug,
+        name: item.categorySlug,
+      }));
+    }
+    return [];
+  })();
+
+  // Use stories from props (fetched from database)
+  const stories = propStories || [];
+  // Get default sort order from content
+  const defaultSortOrder = getValue(
+    "allStories.sortOrder",
+    undefined,
+    "Latest"
+  );
+  const [sortBy, setSortBy] = useState(defaultSortOrder);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [displayedStories, setDisplayedStories] = useState(4);

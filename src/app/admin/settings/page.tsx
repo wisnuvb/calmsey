@@ -5,9 +5,7 @@ import {
   CogIcon,
   GlobeAltIcon,
   ShieldCheckIcon,
-  EnvelopeIcon,
   PhotoIcon,
-  BellIcon,
   CloudArrowUpIcon,
   CheckIcon,
   ExclamationTriangleIcon,
@@ -35,9 +33,9 @@ export default function SettingsPage() {
     { id: "general", label: "General", icon: CogIcon },
     { id: "languages", label: "Languages", icon: GlobeAltIcon },
     { id: "security", label: "Security", icon: ShieldCheckIcon },
-    { id: "email", label: "Email", icon: EnvelopeIcon },
+    // { id: "email", label: "Email", icon: EnvelopeIcon },
     { id: "media", label: "Media", icon: PhotoIcon },
-    { id: "notifications", label: "Notifications", icon: BellIcon },
+    // { id: "notifications", label: "Notifications", icon: BellIcon },
     { id: "backup", label: "Backup", icon: CloudArrowUpIcon },
   ];
 

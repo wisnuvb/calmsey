@@ -40,13 +40,29 @@ export function MultipleField({
   // Parse current value as JSON array
   let items: Record<string, any>[] = [];
   try {
-    if (value.trim()) {
-      items = JSON.parse(value);
-      if (!Array.isArray(items)) {
+    if (value && value.trim()) {
+      const parsed = JSON.parse(value);
+      // Ensure parsed value is an array
+      if (Array.isArray(parsed)) {
+        // Ensure all items in array are objects
+        items = parsed.map((item) => {
+          if (
+            typeof item === "object" &&
+            item !== null &&
+            !Array.isArray(item)
+          ) {
+            return item;
+          }
+          // If item is not an object, return empty object
+          return {};
+        });
+      } else {
+        // If parsed value is not an array, reset to empty array
         items = [];
       }
     }
   } catch {
+    // If parsing fails, reset to empty array
     items = [];
   }
 
@@ -69,10 +85,23 @@ export function MultipleField({
     itemFieldKey: string,
     itemValue: string
   ) => {
+    // Ensure items is an array
+    if (!Array.isArray(items)) {
+      items = [];
+    }
+
     const newItems = [...items];
-    if (!newItems[index]) {
+
+    // Ensure the item at index is an object
+    if (
+      !newItems[index] ||
+      typeof newItems[index] !== "object" ||
+      Array.isArray(newItems[index])
+    ) {
       newItems[index] = {};
     }
+
+    // Now safely set the property
     newItems[index][itemFieldKey] = itemValue;
     onChange(JSON.stringify(newItems, null, 2));
   };
@@ -82,8 +111,16 @@ export function MultipleField({
     itemValue: any,
     itemIndex: number
   ) => {
+    // Ensure itemValue is an object
+    const safeItemValue =
+      typeof itemValue === "object" &&
+      itemValue !== null &&
+      !Array.isArray(itemValue)
+        ? itemValue
+        : {};
+
     const itemFieldValue =
-      itemValue?.[itemField.key] || itemField.defaultValue || "";
+      safeItemValue[itemField.key] || itemField.defaultValue || "";
 
     const itemCommonClasses = `w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
       error ? "border-red-500" : "border-gray-300"
