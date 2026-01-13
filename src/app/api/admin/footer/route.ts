@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
  * GET /api/admin/footer
  * Fetch all footer sections with links
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 

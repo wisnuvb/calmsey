@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +33,7 @@ export default function FooterManagerPage() {
 
   useEffect(() => {
     fetchFooter();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchFooter = async () => {

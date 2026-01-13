@@ -31,7 +31,8 @@
     "db:validate": "prisma validate",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "release": "git pull && yarn && yarn build && pm2 restart ecosystem.config.js"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

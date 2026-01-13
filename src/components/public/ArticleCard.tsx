@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { PublicArticle, SupportedLanguage } from "@/lib/public-api";
 import Image from "next/image";
-import { formatDate } from "date-fns";
+import { formatDateWithLanguage } from "@/lib/date-utils";
 import { getImageUrl } from "@/lib/utils";
 import { useState } from "react";
 
@@ -73,7 +73,7 @@ export function ArticleCard({
         <div className="flex items-center justify-between text-sm text-gray-500">
           <span>{article.author.name}</span>
           <time dateTime={article.publishedAt.toISOString()}>
-            {formatDate(article.publishedAt, language)}
+            {formatDateWithLanguage(article.publishedAt, language)}
           </time>
         </div>
 
