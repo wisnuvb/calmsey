@@ -24,7 +24,7 @@ export async function POST() {
     const mysqldump = `mysqldump -u ${process.env.DB_USER} -p${process.env.DB_PASSWORD} ${process.env.DB_NAME} > ${backupFile}`;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    exec(mysqldump, (error: any, stdout: any, stderr: any) => {
+    exec(mysqldump, (error: any) => {
       if (error) {
         console.error("Backup error:", error);
         return;

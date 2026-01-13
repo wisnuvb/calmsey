@@ -19,13 +19,18 @@ export function ArticlePage({
 }: ArticlePageProps) {
   const prefix = language === "en" ? "" : `/${language}`;
 
+  const publishedDate =
+    article.publishedAt instanceof Date
+      ? article.publishedAt
+      : new Date(article.publishedAt);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Article Header with Featured Image */}
       {article.featuredImage && (
         <div className="relative h-64 md:h-96 overflow-hidden">
           <Image
-            src={getImageUrl(article.featuredImage)}
+            src={getImageUrl(article.featuredImage || "/assets/slider-3.webp")}
             alt={article.title}
             className="w-full h-full object-cover"
             width={1000}
@@ -120,14 +125,48 @@ export function ArticlePage({
                 </p>
               </div>
             </div>
+
+            {article.location && (
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                  <svg
+                    className="w-5 h-5 text-green-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    {article.location}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {language === "en" ? "Location" : "Lokasi"}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="text-right">
             <time
-              dateTime={article.publishedAt.toISOString()}
+              dateTime={publishedDate.toISOString()}
               className="text-sm text-gray-500"
             >
-              {formatDateWithLanguage(article.publishedAt, language)}
+              {formatDateWithLanguage(publishedDate, language)}
             </time>
             <p className="text-xs text-gray-400 mt-1">
               {language === "en" ? "Published" : "Dipublikasikan"}

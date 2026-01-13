@@ -8,7 +8,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
     "Our Values",
     "Our Goal",
     "Where We Work",
-    "Team",
+    "Our Team",
     "Funders",
     "Genesis",
     "Feedback Callout",
@@ -325,7 +325,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       key: "team.title",
       label: "Team Section Title",
       type: "text",
-      section: "Team",
+      section: "Our Team",
       defaultValue: "The Turning Tides' Team",
       helpText: "Main heading for the team section",
     },
@@ -333,7 +333,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       key: "team.description",
       label: "Team Description",
       type: "textarea",
-      section: "Team",
+      section: "Our Team",
       defaultValue:
         "Meet the Turning Tides' team - people from across the globe with combined experiences in progressive philanthropy, human rights, gender equity, community organizing, Indigenous affairs, equity law, and environmental justice.",
       helpText: "Description text displayed below the title",
@@ -342,7 +342,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       key: "team.members",
       label: "Team Members (JSON)",
       type: "multiple",
-      section: "Team",
+      section: "Our Team",
       defaultValue: JSON.stringify(
         [
           {

@@ -26,72 +26,116 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
     {
       key: "grantmaking.navigationItems",
       label: "Navigation Items",
-      type: "json",
+      type: "multiple",
       section: "Grantmaking",
+      helpText:
+        "Manage navigation items for the Grantmaking section. Each item represents a tab with its own content.",
+      itemLabel: "Navigation Item",
+      itemSchema: [
+        {
+          key: "id",
+          label: "Item ID",
+          type: "text",
+          required: true,
+          placeholder: "approach",
+          helpText:
+            "Unique identifier for this navigation item (e.g., approach, tenure, framework)",
+        },
+        {
+          key: "label",
+          label: "Navigation Label",
+          type: "text",
+          required: true,
+          placeholder: "Our approach to Grantmaking",
+          helpText: "Text displayed in the navigation button",
+        },
+        {
+          key: "contentTitle",
+          label: "Content Title",
+          type: "text",
+          required: true,
+          placeholder: "Our approach to Grantmaking",
+          helpText: "Main title displayed in the content area",
+        },
+        {
+          key: "imageSrc",
+          label: "Image URL",
+          type: "image",
+          required: false,
+          placeholder: "/images/example.jpg",
+          helpText: "Optional image displayed in the content area",
+        },
+        {
+          key: "imageAlt",
+          label: "Image Alt Text",
+          type: "text",
+          required: false,
+          placeholder: "Image description",
+          helpText: "Alternative text for the image (for accessibility)",
+        },
+        {
+          key: "paragraphs",
+          label: "Content Paragraphs",
+          type: "textarea",
+          required: false,
+          placeholder:
+            "First paragraph here.\n\nSecond paragraph here.\n\nThird paragraph here.",
+          helpText:
+            "Content paragraphs. Separate multiple paragraphs with a blank line (double newline). Each paragraph will be displayed separately.",
+        },
+        {
+          key: "practicesTitle",
+          label: "Practices Section Title",
+          type: "text",
+          required: false,
+          placeholder: "What we practice",
+          helpText:
+            "Optional title for the practices list (leave empty if no practices)",
+        },
+        {
+          key: "practices",
+          label: "Practices List",
+          type: "textarea",
+          required: false,
+          placeholder:
+            '{"id": "1", "text": "First practice"}\n{"id": "2", "text": "Second practice"}',
+          helpText:
+            'Optional practices list. Format: One practice per line as JSON object. Example: {"id": "1", "text": "Practice text"}. Leave empty if no practices.',
+        },
+      ],
       defaultValue: JSON.stringify(
         [
           {
             id: "approach",
             label: "Our approach to Grantmaking",
-            content: {
-              id: "approach",
-              title: "Our approach to Grantmaking",
-              imageSrc:
-                "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
-              imageAlt: "Grantmaking approach",
-              paragraphs: [
-                "Turning Tides implements and advocates for liberatory approaches to partnership and grantmaking – empowering and centering local communities, small-scale fishers and fish workers, and Indigenous Peoples and their supporting groups, rather than maintaining hierarchical relationships.",
-                "We are accountable to our partners and work to change systems that create barriers to tenure security. Our practices include multi-year flexible funding, streamlined processes, and partnership support that extends beyond financial contributions.",
-              ],
-              practicesTitle: "What we practice",
-              practices: [
-                {
-                  id: "1",
-                  text: "Shared decision-making in strategy and grantmaking",
-                },
-                {
-                  id: "2",
-                  text: "Partner-centered grantmaking processes (language justice, administrative burden shifting, feedback integration)",
-                },
-                {
-                  id: "3",
-                  text: "Rights-based safeguarding and ethical engagement (FPIC, data sovereignty, cultural protocols)",
-                },
-                {
-                  id: "4",
-                  text: "Multi-year flexible funding with partnership support beyond financial contributions",
-                },
-              ],
-            },
+            contentTitle: "Our approach to Grantmaking",
+            imageSrc:
+              "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
+            imageAlt: "Grantmaking approach",
+            paragraphs:
+              "Turning Tides implements and advocates for liberatory approaches to partnership and grantmaking – empowering and centering local communities, small-scale fishers and fish workers, and Indigenous Peoples and their supporting groups, rather than maintaining hierarchical relationships.\n\nWe are accountable to our partners and work to change systems that create barriers to tenure security. Our practices include multi-year flexible funding, streamlined processes, and partnership support that extends beyond financial contributions.",
+            practicesTitle: "What we practice",
+            practices:
+              '{"id": "1", "text": "Shared decision-making in strategy and grantmaking"}\n{"id": "2", "text": "Partner-centered grantmaking processes (language justice, administrative burden shifting, feedback integration)"}\n{"id": "3", "text": "Rights-based safeguarding and ethical engagement (FPIC, data sovereignty, cultural protocols)"}\n{"id": "4", "text": "Multi-year flexible funding with partnership support beyond financial contributions"}',
           },
           {
             id: "tenure",
             label: "What we understand by tenure",
-            content: {
-              id: "tenure",
-              title: "What we understand by tenure",
-              paragraphs: [
-                "Tenure refers to the relationship, whether legally or customarily defined, among people with respect to land, water, and resources. It determines who can use what resources, for how long, and under what conditions.",
-              ],
-            },
+            contentTitle: "What we understand by tenure",
+            paragraphs:
+              "Tenure refers to the relationship, whether legally or customarily defined, among people with respect to land, water, and resources. It determines who can use what resources, for how long, and under what conditions.",
           },
           {
             id: "framework",
             label: "Our Grantmaking Framework",
-            content: {
-              id: "framework",
-              title: "Our Grantmaking Framework",
-              paragraphs: [
-                "Our grantmaking framework is designed to support communities in securing and strengthening their tenure rights through flexible, partner-centered approaches.",
-              ],
-            },
+            contentTitle: "Our Grantmaking Framework",
+            paragraphs:
+              "Our grantmaking framework is designed to support communities in securing and strengthening their tenure rights through flexible, partner-centered approaches.",
           },
         ],
         null,
         2
       ),
-      helpText:
-        'JSON array of navigation items. Each item should have: id, label, and content object with title, imageSrc (optional), imageAlt (optional), paragraphs (array), practicesTitle (optional), and practices (array of objects with id and text). Example: [{"id": "approach", "label": "Our Approach", "content": {"id": "approach", "title": "Title", "paragraphs": ["Paragraph 1", "Paragraph 2"], "practicesTitle": "Practices", "practices": [{"id": "1", "text": "Practice 1"}]}}]',
     },
 
     // Our Four Funds Section
@@ -115,8 +159,79 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
     {
       key: "fourFunds.funds",
       label: "Funds List",
-      type: "json",
+      type: "multiple",
       section: "Our Four Funds",
+      helpText:
+        "Manage the four funds displayed in this section. Each fund represents a different funding pathway.",
+      itemLabel: "Fund",
+      itemSchema: [
+        {
+          key: "id",
+          label: "Fund ID",
+          type: "text",
+          required: true,
+          placeholder: "grassroot-fund",
+          helpText:
+            "Unique identifier for this fund (lowercase, use hyphens for spaces)",
+        },
+        {
+          key: "title",
+          label: "Fund Title",
+          type: "text",
+          required: true,
+          placeholder: "Grassroot Fund",
+          helpText: "Display title for the fund",
+        },
+        {
+          key: "description",
+          label: "Fund Description",
+          type: "textarea",
+          required: true,
+          placeholder: "Description of what this fund supports...",
+          helpText: "Detailed description of the fund's purpose and focus",
+        },
+        {
+          key: "imageSrc",
+          label: "Image URL",
+          type: "image",
+          required: true,
+          placeholder: "/assets/demo/image.png",
+          helpText: "URL to the fund's featured image",
+        },
+        {
+          key: "imageAlt",
+          label: "Image Alt Text",
+          type: "text",
+          required: true,
+          placeholder: "Description of the image",
+          helpText: "Alternative text for the image (for accessibility)",
+        },
+        {
+          key: "icon",
+          label: "Icon Name",
+          type: "text",
+          required: true,
+          placeholder: "Waves",
+          helpText:
+            'Icon to display. Options: "Waves", "Globe", "Zap", or "Lightbulb"',
+        },
+        {
+          key: "learnMoreLink",
+          label: "Learn More Link",
+          type: "url",
+          required: true,
+          placeholder: "/our-fund/grassroot",
+          helpText: "URL to the detailed fund page",
+        },
+        {
+          key: "imagePosition",
+          label: "Image Position",
+          type: "text",
+          required: true,
+          placeholder: "left",
+          helpText: 'Position of the image. Options: "left" or "right"',
+        },
+      ],
       defaultValue: JSON.stringify(
         [
           {
@@ -171,8 +286,6 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
         null,
         2
       ),
-      helpText:
-        'JSON array of fund objects. Each fund should have: id, title, description, imageSrc, imageAlt, icon (one of: "Waves", "Globe", "Zap", "Lightbulb"), learnMoreLink, and imagePosition ("left" or "right"). Example: [{"id": "fund-1", "title": "Fund Title", "description": "Fund description", "imageSrc": "/path/to/image.jpg", "imageAlt": "Alt text", "icon": "Waves", "learnMoreLink": "/funds/fund-1", "imagePosition": "left"}]',
     },
 
     // Our Partners Section
@@ -196,8 +309,54 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
     {
       key: "partners.partners",
       label: "Partners List",
-      type: "json",
+      type: "multiple",
       section: "Our Partners",
+      helpText:
+        "Manage the list of partners displayed in this section. Add, edit, or remove partners as needed.",
+      itemLabel: "Partner",
+      itemSchema: [
+        {
+          key: "id",
+          label: "Partner ID",
+          type: "text",
+          required: true,
+          placeholder: "ledars",
+          helpText:
+            "Unique identifier for this partner (lowercase, use hyphens for spaces)",
+        },
+        {
+          key: "name",
+          label: "Partner Name",
+          type: "text",
+          required: true,
+          placeholder: "LEDARS",
+          helpText: "Display name of the partner organization",
+        },
+        {
+          key: "logo",
+          label: "Logo URL",
+          type: "image",
+          required: true,
+          placeholder: "/assets/partners/ledars-logo.png",
+          helpText: "URL to the partner's logo image",
+        },
+        {
+          key: "logoAlt",
+          label: "Logo Alt Text",
+          type: "text",
+          required: true,
+          placeholder: "LEDARS Logo",
+          helpText: "Alternative text for the logo (for accessibility)",
+        },
+        {
+          key: "website",
+          label: "Website URL",
+          type: "url",
+          required: false,
+          placeholder: "https://ledars.org",
+          helpText: "Optional: Partner's website URL",
+        },
+      ],
       defaultValue: JSON.stringify(
         [
           {
@@ -295,8 +454,6 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
         null,
         2
       ),
-      helpText:
-        'JSON array of partner objects. Each partner should have: id, name, logo, logoAlt, and website (optional). Example: [{"id": "partner-1", "name": "Partner Name", "logo": "/path/to/logo.png", "logoAlt": "Partner Logo", "website": "https://partner.org"}]',
     },
     {
       key: "partners.callToActionText",

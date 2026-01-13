@@ -113,9 +113,10 @@ model Article {
   slug String @unique // Base slug (English)
 
   // Default content (English) - used for all languages via browser translation
-  title   String
-  content String  @db.LongText
-  excerpt String? @db.Text
+  title    String
+  content  String  @db.LongText
+  excerpt  String? @db.Text
+  location String?
 
   status        ArticleStatus @default(DRAFT)
   featuredImage String?
@@ -643,4 +644,33 @@ enum PageType {
   STORIES
   GET_INVOLVED
   CUSTOM
+}
+
+model FooterSection {
+  id        String   @id @default(cuid())
+  title     String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  links FooterLink[]
+
+  @@map("footer_sections")
+}
+
+model FooterLink {
+  id        String        @id @default(cuid())
+  sectionId String
+  section   FooterSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  label     String
+  href      String
+  order     Int           @default(0)
+  isActive  Boolean       @default(true)
+  target    MenuTarget    @default(SELF) // Reuse existing enum
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@map("footer_links")
 }

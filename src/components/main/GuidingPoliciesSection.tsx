@@ -171,7 +171,7 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
 
   return (
     <section className={`w-full ${backgroundColor} py-16 md:py-24`}>
-      <div className="max-w-6xl mx-auto px-6 md:px-8">
+      <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">

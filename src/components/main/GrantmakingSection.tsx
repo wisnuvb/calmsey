@@ -28,6 +28,17 @@ interface NavigationItem {
   content: TabContent;
 }
 
+interface MultipleFieldItem {
+  id: string;
+  label: string;
+  contentTitle: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  paragraphs?: string;
+  practicesTitle?: string;
+  practices?: string;
+}
+
 interface GrantmakingSectionProps {
   navigationItems?: NavigationItem[];
   activeSectionId?: string;
@@ -119,11 +130,76 @@ export function GrantmakingSection({
     }
   };
 
+  // Transform multiple field format to NavigationItem format
+  const transformMultipleToNavigationItems = (
+    items: MultipleFieldItem[]
+  ): NavigationItem[] => {
+    if (!Array.isArray(items)) return [];
+
+    return items
+      .filter((item) => item && item.id && item.label && item.contentTitle)
+      .map((item) => {
+        // Parse paragraphs (separated by double newline)
+        const paragraphs: string[] = [];
+        if (item.paragraphs && typeof item.paragraphs === "string") {
+          paragraphs.push(
+            ...item.paragraphs
+              .split(/\n\s*\n/)
+              .map((p: string) => p.trim())
+              .filter((p: string) => p.length > 0)
+          );
+        }
+
+        // Parse practices (one JSON object per line)
+        const practices: { id: string; text: string }[] = [];
+        if (item.practices && typeof item.practices === "string") {
+          const practiceLines = item.practices
+            .split("\n")
+            .map((line: string) => line.trim())
+            .filter((line: string) => line.length > 0);
+
+          practiceLines.forEach((line: string) => {
+            try {
+              const practice = JSON.parse(line);
+              if (practice.id && practice.text) {
+                practices.push({
+                  id: String(practice.id),
+                  text: String(practice.text),
+                });
+              }
+            } catch {
+              // Skip invalid JSON lines
+            }
+          });
+        }
+
+        return {
+          id: String(item.id),
+          label: String(item.label),
+          content: {
+            id: String(item.id),
+            title: String(item.contentTitle),
+            ...(item.imageSrc && { imageSrc: String(item.imageSrc) }),
+            ...(item.imageAlt && { imageAlt: String(item.imageAlt) }),
+            ...(paragraphs.length > 0 && { paragraphs }),
+            ...(item.practicesTitle && {
+              practicesTitle: String(item.practicesTitle),
+            }),
+            ...(practices.length > 0 && { practices }),
+          },
+        };
+      });
+  };
+
   // Get navigationItems with priority: context > props > default
-  const contextNavigationItems = getContentJSON<NavigationItem[]>(
+  const contextNavigationItemsRaw = getContentJSON<MultipleFieldItem[]>(
     "grantmaking.navigationItems",
     []
   );
+  const contextNavigationItems = transformMultipleToNavigationItems(
+    contextNavigationItemsRaw
+  );
+
   const navigationItems =
     contextNavigationItems.length > 0
       ? contextNavigationItems

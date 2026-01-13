@@ -132,8 +132,15 @@ export async function POST(request: NextRequest) {
     const { session } = authResult;
 
     const body = await request.json();
-    const { slug, status, featuredImage, translations, categories, tags } =
-      body;
+    const {
+      slug,
+      status,
+      featuredImage,
+      location,
+      translations,
+      categories,
+      tags,
+    } = body;
 
     // Validation
     if (!translations || translations.length === 0) {
@@ -172,6 +179,7 @@ export async function POST(request: NextRequest) {
         slug: slug || `article-${Date.now()}`,
         status: status || "DRAFT",
         featuredImage: featuredImage || null,
+        location: location || null,
         publishedAt: status === "PUBLISHED" ? new Date() : null,
         authorId: session!.user.id,
 
@@ -186,7 +194,10 @@ export async function POST(request: NextRequest) {
             .filter((t: any) => t.title && t.title.trim()) // Only create translations with titles
             .map((translation: any) => ({
               title: translation.title,
-              slug: translation.languageId === 'en' ? null : translation.slug || null, // Localized slug for non-English
+              slug:
+                translation.languageId === "en"
+                  ? null
+                  : translation.slug || null, // Localized slug for non-English
               excerpt: translation.excerpt || null,
               seoTitle: translation.seoTitle || null,
               seoDescription: translation.seoDescription || null,

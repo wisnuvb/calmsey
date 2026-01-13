@@ -21,6 +21,7 @@ interface ArticleData {
   slug: string;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   featuredImage: string;
+  location: string;
   categories: string[];
   tags: string[];
   translations: Translation[];
@@ -92,6 +93,7 @@ export default function EditArticlePage() {
           slug: result.article.slug,
           status: result.article.status,
           featuredImage: result.article.featuredImage || "",
+          location: result.article.location || "",
           categories: result.article.categories?.map((c: any) => c.id) || [],
           tags: result.article.articleTag?.map((t: any) => t.tagId) || [],
           translations: transformedTranslations,

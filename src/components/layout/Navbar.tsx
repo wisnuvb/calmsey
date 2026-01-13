@@ -77,12 +77,15 @@ export function Navbar() {
 
   const { language } = useLanguage();
 
+  const isDetailOurFundPage = pathname.includes("/our-fund/");
+
   // Check if current page is home
   const isHomePage =
     pathname === `/${language}` ||
     pathname === "/en" ||
     pathname === "/id" ||
-    pathname === "/";
+    pathname === "/" ||
+    isDetailOurFundPage;
 
   // Check if current page is get-involved (should also have dynamic background detection)
   const isGetInvolvedPage =

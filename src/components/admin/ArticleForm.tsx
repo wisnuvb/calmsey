@@ -28,6 +28,7 @@ interface ArticleFormData {
   slug: string;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   featuredImage: string;
+  location: string;
   categories: string[];
   tags: string[];
 }
@@ -38,6 +39,7 @@ interface ArticleFormProps {
     slug: string;
     status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
     featuredImage: string;
+    location: string;
     categories: string[];
     tags: string[];
     content?: string;
@@ -47,6 +49,7 @@ interface ArticleFormProps {
     slug: string;
     status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
     featuredImage: string;
+    location: string;
     categories: string[];
     tags: string[];
     content: string;
@@ -70,6 +73,7 @@ export default function ArticleForm({
     slug: initialData?.slug || "",
     status: initialData?.status || "DRAFT",
     featuredImage: initialData?.featuredImage || "",
+    location: initialData?.location || "",
     categories: initialData?.categories || [],
     tags: initialData?.tags || [],
   });
@@ -206,6 +210,7 @@ export default function ArticleForm({
       slug: articleData.slug,
       status: publishNow ? "PUBLISHED" : articleData.status,
       featuredImage: articleData.featuredImage || "",
+      location: articleData.location || "",
       categories: articleData.categories,
       tags: articleData.tags,
       translations: translations.filter((t) => t.title.trim()),
@@ -316,6 +321,28 @@ export default function ArticleForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="https://example.com/image.jpg"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Location
+            </label>
+            <input
+              type="text"
+              value={articleData.location}
+              onChange={(e) =>
+                setArticleData((prev) => ({
+                  ...prev,
+                  location: e.target.value,
+                }))
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="e.g., Jakarta, Indonesia"
+            />
+            <p className="text-sm text-gray-500 mt-1">
+              Optional: Add the location where this article is about or was
+              written
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

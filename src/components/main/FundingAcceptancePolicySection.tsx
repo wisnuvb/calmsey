@@ -91,7 +91,7 @@ export function FundingAcceptancePolicySection({
 
   return (
     <section className={cn("py-20 lg:py-24", backgroundColor)}>
-      <div className="container mx-auto max-w-6xl px-4">
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           {/* Left Column - Title */}
           <H2

@@ -10,6 +10,7 @@ export interface PublicArticle {
   content: string;
   excerpt?: string;
   featuredImage?: string;
+  location?: string;
   publishedAt: Date;
   author: {
     name: string;
@@ -426,6 +427,22 @@ export class PublicAPI {
   private static formatArticle(article: any): PublicArticle {
     const translation = article.translations[0];
 
+    // Ensure publishedAt is a Date object
+    let publishedAt: Date;
+    if (article.publishedAt instanceof Date) {
+      publishedAt = article.publishedAt;
+    } else if (typeof article.publishedAt === "string") {
+      publishedAt = new Date(article.publishedAt);
+    } else {
+      // Fallback for Prisma serialized dates
+      publishedAt = new Date(article.publishedAt);
+    }
+
+    // Validate the date
+    if (isNaN(publishedAt.getTime())) {
+      publishedAt = new Date(); // Fallback to current date if invalid
+    }
+
     return {
       id: article.id,
       slug: article.slug,
@@ -433,7 +450,8 @@ export class PublicAPI {
       content: translation?.content || "",
       excerpt: translation?.excerpt,
       featuredImage: article.featuredImage,
-      publishedAt: article.publishedAt,
+      location: article.location,
+      publishedAt,
       author: {
         name: article.author.name || "Anonymous",
       },

@@ -37,49 +37,7 @@ const HomePage = async ({ params }: HomePageProps) => {
       {/* <OngoingProjectsSection /> */}
       {/* <LatestArticlesSection /> */}
       {/* <OurWorkSection /> */}
-      <GrantmakingSection
-        navigationItems={[
-          {
-            id: "approach",
-            label: "Our approach to Grantmaking",
-            content: {
-              id: "approach",
-              title: "Our approach to Grantmaking",
-              imageSrc:
-                "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
-              imageAlt: "Floating village",
-              paragraphs: [
-                "Turning Tides implements and advocates for liberatory approaches...",
-                "Our practices include multi-year flexible funding...",
-              ],
-              practicesTitle: "What we practice",
-              practices: [
-                { id: "1", text: "Shared decision-making..." },
-                { id: "2", text: "Partner-centered grantmaking..." },
-                // ... more practices
-              ],
-            },
-          },
-          {
-            id: "tenure",
-            label: "What we understand by tenure",
-            content: {
-              id: "tenure",
-              title: "What we understand by tenure",
-              paragraphs: ["Tenure refers to the relationship..."],
-            },
-          },
-          {
-            id: "framework",
-            label: "Our Grantmaking Framework",
-            content: {
-              id: "framework",
-              title: "Our Grantmaking Framework",
-              paragraphs: ["Our grantmaking framework is designed..."],
-            },
-          },
-        ]}
-      />
+      <GrantmakingSection />
       <PartnerStoriesSection
         tag="COMMUNITY ECHOES"
         title="Stories From Our Partners"

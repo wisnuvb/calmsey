@@ -621,10 +621,34 @@ export function PageContentEditor({
           currentFileField
             ? ["all"]
             : currentMultipleField
-            ? ["images"]
+            ? (() => {
+                // Check if the current field in multiple is file type
+                const field = schema?.fields.find(
+                  (f) => f.key === currentMultipleField.fieldKey
+                );
+                const itemField = field?.itemSchema?.find(
+                  (f) => f.key === currentMultipleField.itemFieldKey
+                );
+                return itemField?.type === "file" ? ["all"] : ["images"];
+              })()
             : ["images"]
         }
-        initialFilter={currentFileField ? "all" : "images"}
+        initialFilter={
+          currentFileField
+            ? "all"
+            : currentMultipleField
+            ? (() => {
+                // Check if the current field in multiple is file type
+                const field = schema?.fields.find(
+                  (f) => f.key === currentMultipleField.fieldKey
+                );
+                const itemField = field?.itemSchema?.find(
+                  (f) => f.key === currentMultipleField.itemFieldKey
+                );
+                return itemField?.type === "file" ? "all" : "images";
+              })()
+            : "images"
+        }
       />
     </div>
   );

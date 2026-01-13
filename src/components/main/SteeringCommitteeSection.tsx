@@ -93,7 +93,7 @@ export const SteeringCommitteeSection: React.FC<
 
   return (
     <section className={cn("w-full pb-16 lg:pb-24", backgroundColor)}>
-      <div className="container mx-auto px-4 max-w-6xl">
+      <div className="container mx-auto px-4">
         {/* Title and Description */}
         <div className="mb-12 lg:mb-16 space-y-10">
           <H2

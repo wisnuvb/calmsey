@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Image from "next/image";
-import { Plus, Trash2, GripVertical, Image as ImageIcon } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  GripVertical,
+  Image as ImageIcon,
+  File,
+  Download,
+} from "lucide-react";
 import { FieldDefinition, MultipleItemField } from "@/lib/page-content-schema";
 import { TextField } from "./TextField";
 import { TextareaField } from "./TextareaField";
@@ -37,6 +44,56 @@ export function MultipleField({
     );
   }
 
+  // Helper function to transform nested structure to flat structure
+  const transformNestedToFlat = (item: any): any => {
+    // If item has nested content structure (old format), transform it
+    if (item.content && typeof item.content === "object") {
+      const transformed: any = {
+        id: item.id || "",
+        label: item.label || "",
+        contentTitle: item.content.title || item.contentTitle || "",
+        imageSrc: item.content.imageSrc || item.imageSrc || "",
+        imageAlt: item.content.imageAlt || item.imageAlt || "",
+        practicesTitle:
+          item.content.practicesTitle || item.practicesTitle || "",
+      };
+
+      // Transform paragraphs array to string (separated by double newline)
+      if (Array.isArray(item.content.paragraphs)) {
+        transformed.paragraphs = item.content.paragraphs.join("\n\n");
+      } else if (typeof item.content.paragraphs === "string") {
+        transformed.paragraphs = item.content.paragraphs;
+      } else if (item.paragraphs) {
+        transformed.paragraphs = item.paragraphs;
+      } else {
+        transformed.paragraphs = "";
+      }
+
+      // Transform practices array to string (one JSON object per line)
+      if (Array.isArray(item.content.practices)) {
+        transformed.practices = item.content.practices
+          .map((p: any) =>
+            JSON.stringify({
+              id: String(p.id || ""),
+              text: String(p.text || ""),
+            })
+          )
+          .join("\n");
+      } else if (typeof item.content.practices === "string") {
+        transformed.practices = item.content.practices;
+      } else if (item.practices) {
+        transformed.practices = item.practices;
+      } else {
+        transformed.practices = "";
+      }
+
+      return transformed;
+    }
+
+    // If already in flat format, return as is
+    return item;
+  };
+
   // Parse current value as JSON array
   let items: Record<string, any>[] = [];
   try {
@@ -44,14 +101,15 @@ export function MultipleField({
       const parsed = JSON.parse(value);
       // Ensure parsed value is an array
       if (Array.isArray(parsed)) {
-        // Ensure all items in array are objects
+        // Ensure all items in array are objects and transform if needed
         items = parsed.map((item) => {
           if (
             typeof item === "object" &&
             item !== null &&
             !Array.isArray(item)
           ) {
-            return item;
+            // Transform nested structure to flat if needed
+            return transformNestedToFlat(item);
           }
           // If item is not an object, return empty object
           return {};
@@ -214,6 +272,115 @@ export function MultipleField({
             }
             error={error}
           />
+        );
+
+      case "file":
+        // Helper to get file info
+        const getFileInfo = (url: string) => {
+          if (!url || !url.trim()) {
+            return { filename: "", extension: "" };
+          }
+
+          let pathname = url;
+          try {
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+              const urlObj = new URL(url);
+              pathname = urlObj.pathname;
+            } else {
+              pathname = url;
+            }
+          } catch {
+            pathname = url;
+          }
+
+          const pathParts = pathname.split("/");
+          const filename =
+            pathParts[pathParts.length - 1] || pathname || "file";
+          const lastDotIndex = filename.lastIndexOf(".");
+          const extension =
+            lastDotIndex > 0
+              ? filename.substring(lastDotIndex + 1).toLowerCase()
+              : "";
+
+          return { filename, extension };
+        };
+
+        const fileInfo =
+          itemFieldValue && itemFieldValue.trim()
+            ? getFileInfo(itemFieldValue)
+            : null;
+
+        const getFileTypeIcon = (extension: string) => {
+          const imageExts = ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp"];
+          const videoExts = ["mp4", "webm", "ogg", "mov", "avi"];
+          const audioExts = ["mp3", "wav", "ogg", "m4a", "aac"];
+          const docExts = ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx"];
+
+          if (imageExts.includes(extension)) return "🖼️";
+          if (videoExts.includes(extension)) return "🎥";
+          if (audioExts.includes(extension)) return "🎵";
+          if (docExts.includes(extension)) return "📄";
+          return "📎";
+        };
+
+        return (
+          <div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={itemFieldValue}
+                onChange={(e) =>
+                  handleMultipleItemChange(
+                    itemIndex,
+                    itemField.key,
+                    e.target.value
+                  )
+                }
+                placeholder="/files/example.pdf"
+                className={`${itemCommonClasses} flex-1`}
+                required={itemField.required}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenMediaPicker(field.key, itemIndex, itemField.key);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2 whitespace-nowrap"
+              >
+                <File className="w-4 h-4" />
+                Select from Media
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Enter file URL or select from Media (all file types)
+            </p>
+            {itemFieldValue && fileInfo && (
+              <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl">
+                    {getFileTypeIcon(fileInfo.extension)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {fileInfo.filename}
+                    </p>
+                    <p className="text-xs text-gray-500 uppercase">
+                      {fileInfo.extension || "unknown"} file
+                    </p>
+                  </div>
+                  <a
+                    href={itemFieldValue}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    title="Open file"
+                  >
+                    <Download className="w-4 h-4" />
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
         );
 
       case "boolean":

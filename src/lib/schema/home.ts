@@ -5,6 +5,7 @@ export const HOME_SCHEMA: PageContentSchema = {
   sections: [
     "Hero",
     "Why TurningTides",
+    "Grantmaking",
     "Partner Stories",
     "Where We Work",
     "Our Work",
@@ -158,6 +159,90 @@ export const HOME_SCHEMA: PageContentSchema = {
       defaultValue: "/about",
       helpText: "URL for the call-to-action button",
     },
+
+    // Grantmaking Section
+    {
+      key: "grantmaking.navigationItems",
+      label: "Navigation Items",
+      type: "multiple",
+      section: "Grantmaking",
+      helpText:
+        "Manage navigation items for the Grantmaking section. Each item represents a tab with its own content.",
+      itemLabel: "Navigation Item",
+      itemSchema: [
+        {
+          key: "id",
+          label: "Item ID",
+          type: "text",
+          required: true,
+          placeholder: "approach",
+          helpText:
+            "Unique identifier for this navigation item (e.g., approach, tenure, framework)",
+        },
+        {
+          key: "label",
+          label: "Navigation Label",
+          type: "text",
+          required: true,
+          placeholder: "Our approach to Grantmaking",
+          helpText: "Text displayed in the navigation button",
+        },
+        {
+          key: "contentTitle",
+          label: "Content Title",
+          type: "text",
+          required: true,
+          placeholder: "Our approach to Grantmaking",
+          helpText: "Main title displayed in the content area",
+        },
+        {
+          key: "imageSrc",
+          label: "Image URL",
+          type: "image",
+          required: false,
+          placeholder: "/images/example.jpg",
+          helpText: "Optional image displayed in the content area",
+        },
+        {
+          key: "imageAlt",
+          label: "Image Alt Text",
+          type: "text",
+          required: false,
+          placeholder: "Image description",
+          helpText: "Alternative text for the image (for accessibility)",
+        },
+        {
+          key: "paragraphs",
+          label: "Content Paragraphs",
+          type: "textarea",
+          required: false,
+          placeholder:
+            "First paragraph here.\n\nSecond paragraph here.\n\nThird paragraph here.",
+          helpText:
+            "Content paragraphs. Separate multiple paragraphs with a blank line (double newline). Each paragraph will be displayed separately.",
+        },
+        {
+          key: "practicesTitle",
+          label: "Practices Section Title",
+          type: "text",
+          required: false,
+          placeholder: "What we practice",
+          helpText:
+            "Optional title for the practices list (leave empty if no practices)",
+        },
+        {
+          key: "practices",
+          label: "Practices List",
+          type: "textarea",
+          required: false,
+          placeholder:
+            '{"id": "1", "text": "First practice"}\n{"id": "2", "text": "Second practice"}',
+          helpText:
+            'Optional practices list. Format: One practice per line as JSON object. Example: {"id": "1", "text": "Practice text"}. Leave empty if no practices.',
+        },
+      ],
+    },
+
     // Partner Stories Section
     {
       key: "partnerStories.tag",
@@ -407,12 +492,42 @@ export const HOME_SCHEMA: PageContentSchema = {
       helpText: "Main description text displayed on the left side",
     },
     {
-      key: "strategy.downloadUrl",
-      label: "PDF Download URL",
-      type: "file",
+      key: "strategy.downloadFiles",
+      label: "PDF Download Files",
+      type: "multiple",
       section: "Strategy",
-      defaultValue: "/downloads/strategy-2030.pdf",
-      helpText: "Link to the strategy PDF file",
+      helpText:
+        "Manage PDF files for different languages. Users will be able to choose their preferred language when downloading.",
+      itemLabel: "Download File",
+      itemSchema: [
+        {
+          key: "language",
+          label: "Language Code",
+          type: "text",
+          required: true,
+          placeholder: "en",
+          helpText:
+            "Language code (e.g., 'en' for English, 'id' for Indonesian)",
+        },
+        {
+          key: "url",
+          label: "PDF File URL",
+          type: "file",
+          required: true,
+          placeholder: "/downloads/strategy-2030-en.pdf",
+          helpText: "URL to the PDF file for this language",
+        },
+      ],
+      defaultValue: JSON.stringify(
+        [
+          {
+            language: "en",
+            url: "/downloads/strategy-2030.pdf",
+          },
+        ],
+        null,
+        2
+      ),
     },
     {
       key: "strategy.buttonText",

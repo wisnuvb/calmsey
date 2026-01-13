@@ -2,48 +2,126 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface FooterLink {
+  id: string;
   label: string;
   href: string;
+  target: "SELF" | "BLANK";
 }
 
 interface FooterSection {
+  id: string;
   title: string;
   links: FooterLink[];
 }
 
-const footerSections: FooterSection[] = [
-  {
-    title: "About Us",
-    links: [
-      { label: "Vision", href: "/about-us" },
-      { label: "Goal & Strategy", href: "/about-us" },
-      { label: "Team", href: "/about-us" },
-      { label: "Our Funders", href: "/about-us" },
-      { label: "Our Guiding Policies", href: "/governance" },
-    ],
-  },
-  {
-    title: "Funds",
-    links: [
-      { label: "4 Supported Funds", href: "/our-fund" },
-      { label: "Steering Committees", href: "/governance" },
-      { label: "Partners", href: "/our-fund" },
-    ],
-  },
-  {
-    title: "Our Works",
-    links: [
-      { label: "How We Work", href: "/our-work" },
-      { label: "Our Approach", href: "/our-approach" },
-      { label: "Activities", href: "/our-work" },
-      { label: "Stories", href: "/stories" },
-    ],
-  },
-];
-
 export function Footer() {
+  const [footerSections, setFooterSections] = useState<FooterSection[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFooter();
+  }, []);
+
+  const fetchFooter = async () => {
+    try {
+      const response = await fetch("/api/public/footer");
+      if (response.ok) {
+        const data = await response.json();
+        setFooterSections(data.sections || []);
+      }
+    } catch (error) {
+      console.error("Error fetching footer:", error);
+      // Fallback to default sections if API fails
+      setFooterSections([
+        {
+          id: "1",
+          title: "About Us",
+          links: [
+            { id: "1", label: "Vision", href: "/about-us", target: "SELF" },
+            {
+              id: "2",
+              label: "Goal & Strategy",
+              href: "/about-us",
+              target: "SELF",
+            },
+            { id: "3", label: "Team", href: "/about-us", target: "SELF" },
+            {
+              id: "4",
+              label: "Our Funders",
+              href: "/about-us",
+              target: "SELF",
+            },
+            {
+              id: "5",
+              label: "Our Guiding Policies",
+              href: "/governance",
+              target: "SELF",
+            },
+          ],
+        },
+        {
+          id: "2",
+          title: "Funds",
+          links: [
+            {
+              id: "6",
+              label: "4 Supported Funds",
+              href: "/our-fund",
+              target: "SELF",
+            },
+            {
+              id: "7",
+              label: "Steering Committees",
+              href: "/governance",
+              target: "SELF",
+            },
+            { id: "8", label: "Partners", href: "/our-fund", target: "SELF" },
+          ],
+        },
+        {
+          id: "3",
+          title: "Our Works",
+          links: [
+            {
+              id: "9",
+              label: "How We Work",
+              href: "/our-work",
+              target: "SELF",
+            },
+            {
+              id: "10",
+              label: "Our Approach",
+              href: "/our-approach",
+              target: "SELF",
+            },
+            {
+              id: "11",
+              label: "Activities",
+              href: "/our-work",
+              target: "SELF",
+            },
+            { id: "12", label: "Stories", href: "/stories", target: "SELF" },
+          ],
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <footer className="bg-gradient-to-br from-[#1E0F39] via-[#2a1551] to-[#3a1d6f] text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <div className="text-center">Loading...</div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="bg-gradient-to-br from-[#1E0F39] via-[#2a1551] to-[#3a1d6f] text-white">
       {/* Main Footer Content */}
@@ -71,9 +149,6 @@ export function Footer() {
                 className="w-auto h-11 object-contain"
               />
               <p className="font-work-sans font-normal text-base text-white/80 leading-[150%] tracking-[0%]">
-                {/* Turning Tides is fiscally sponsored by the Tenure Facility Fund,
-                a US 501c3 subsidiary of the International Land & Forest Tenure
-                Facility */}
                 Turning Tides is legally and fiscally hosted by{" "}
                 <strong>the Tenure Facility Fund</strong>
               </p>
@@ -84,15 +159,21 @@ export function Footer() {
           <div className="lg:col-span-7 space-y-11">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {footerSections.map((section) => (
-                <div key={section.title}>
+                <div key={section.id}>
                   <h3 className="text-base font-semibold mb-4 text-[#C4DF99]">
                     {section.title}
                   </h3>
                   <ul className="space-y-2">
-                    {section.links.map((link, i) => (
-                      <li key={`${link.href}-${i}`}>
+                    {section.links.map((link) => (
+                      <li key={link.id}>
                         <Link
                           href={link.href}
+                          target={link.target === "BLANK" ? "_blank" : "_self"}
+                          rel={
+                            link.target === "BLANK"
+                              ? "noopener noreferrer"
+                              : undefined
+                          }
                           className="text-sm text-white hover:text-[#C4DF99] transition-colors"
                         >
                           {link.label}
@@ -103,36 +184,8 @@ export function Footer() {
                 </div>
               ))}
             </div>
-            <div className="bg-[#150B28] p-6 flex items-center justify-between gap-20 rounded hidden">
-              <p className="text-white text-sm font-work-sans font-semibold leading-[150%] tracking-[0%]">
-                Connect with us to co-create solutions that protect rights,
-                sustain livelihoods, and centre local voices.
-              </p>
-              <Link
-                href="/contact"
-                className="py-4 px-6 border border-[#FFFFFF] rounded shrink-0 text-white text-sm"
-              >
-                Contact Us
-              </Link>
-            </div>
           </div>
-
-          {/* Connect with us Section - Right */}
-          {/* <div className="lg:col-span-3">
-            <P className="text-white text-sm leading-relaxed mb-6">
-              Connect with us to co-create solutions that protect rights,
-              sustain livelihoods, and centre local voices.
-            </P>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 border border-white text-white text-sm font-medium rounded-md hover:bg-white hover:text-gray-900 transition-colors"
-            >
-              Contact Us
-            </Link>
-          </div> */}
         </div>
-
-        {/* Horizontal Divider */}
       </div>
       <div className="py-8 bg-[#111416]">
         <p className="text-center text-base font-work-sans font-normal text-white/50">

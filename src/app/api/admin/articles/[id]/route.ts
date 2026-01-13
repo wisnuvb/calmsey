@@ -99,8 +99,15 @@ export async function PUT(
     if (!authResult.success) return authResult.response;
 
     const body = await request.json();
-    const { slug, status, featuredImage, translations, categories, tags } =
-      body;
+    const {
+      slug,
+      status,
+      featuredImage,
+      location,
+      translations,
+      categories,
+      tags,
+    } = body;
 
     // Check if article exists and user has permission
     const existingArticle = await prisma.article.findUnique({
@@ -121,7 +128,9 @@ export async function PUT(
     // HYBRID APPROACH: Update English content in Article, SEO fields in translations
     const updatedArticle = await prisma.$transaction(async (tx) => {
       // Get English translation for main content
-      const englishTranslation = translations?.find((t: any) => t.languageId === "en");
+      const englishTranslation = translations?.find(
+        (t: any) => t.languageId === "en"
+      );
 
       // Update main article
       const article = await tx.article.update({
@@ -130,6 +139,7 @@ export async function PUT(
           slug,
           status,
           featuredImage,
+          location,
           publishedAt:
             status === "PUBLISHED" && !existingArticle.publishedAt
               ? new Date()
@@ -159,7 +169,10 @@ export async function PUT(
               .map((translation: any) => ({
                 articleId: id,
                 title: translation.title,
-                slug: translation.languageId === 'en' ? null : translation.slug || null,
+                slug:
+                  translation.languageId === "en"
+                    ? null
+                    : translation.slug || null,
                 excerpt: translation.excerpt || null,
                 seoTitle: translation.seoTitle || null,
                 seoDescription: translation.seoDescription || null,
