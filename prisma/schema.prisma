@@ -124,6 +124,12 @@ model Article {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
+  // Story/Partner Story specific fields
+  videoUrl            String? // Video URL for story detail page
+  posterImage         String? // Video poster/thumbnail image
+  partnerOrganization Json? // JSON: {name, logo, fullName}
+  photos              Json? // JSON: [{id, src, alt}]
+
   // Relations
   authorId     String
   author       User                 @relation(fields: [authorId], references: [id])

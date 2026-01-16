@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
  * GET /api/public/footer
  * Public API to fetch footer sections with links
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const sections = await prisma.footerSection.findMany({
       where: { isActive: true },

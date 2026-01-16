@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from "react";
 import TranslationTabs from "@/components/admin/TranslationTabs";
+import { MediaPickerModal } from "@/components/admin/MediaPickerModal";
+import { File, Image as ImageIcon } from "lucide-react";
 
 interface Translation {
   languageId: string;
@@ -31,6 +33,14 @@ interface ArticleFormData {
   location: string;
   categories: string[];
   tags: string[];
+  videoUrl: string;
+  posterImage: string;
+  partnerOrganization: {
+    name: string;
+    logo: string;
+    fullName: string;
+  } | null;
+  photos: Array<{ id: string; src: string; alt: string }>;
 }
 
 interface ArticleFormProps {
@@ -44,6 +54,14 @@ interface ArticleFormProps {
     tags: string[];
     content?: string;
     translations: Translation[];
+    videoUrl?: string | null;
+    posterImage?: string | null;
+    partnerOrganization?: {
+      name: string;
+      logo: string;
+      fullName: string;
+    } | null;
+    photos?: Array<{ id: string; src: string; alt: string }> | null;
   };
   onSave: (data: {
     slug: string;
@@ -54,6 +72,14 @@ interface ArticleFormProps {
     tags: string[];
     content: string;
     translations: Translation[];
+    videoUrl?: string | null;
+    posterImage?: string | null;
+    partnerOrganization?: {
+      name: string;
+      logo: string;
+      fullName: string;
+    } | null;
+    photos?: Array<{ id: string; src: string; alt: string }> | null;
   }) => Promise<void>;
   onDelete?: () => Promise<void>;
   isEdit?: boolean;
@@ -76,6 +102,10 @@ export default function ArticleForm({
     location: initialData?.location || "",
     categories: initialData?.categories || [],
     tags: initialData?.tags || [],
+    videoUrl: initialData?.videoUrl || "",
+    posterImage: initialData?.posterImage || "",
+    partnerOrganization: initialData?.partnerOrganization || null,
+    photos: initialData?.photos || [],
   });
 
   const [translations, setTranslations] = useState<Translation[]>(
@@ -93,6 +123,11 @@ export default function ArticleForm({
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number | null>(
+    null
+  );
+  const [isAddingMultiplePhotos, setIsAddingMultiplePhotos] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -215,6 +250,10 @@ export default function ArticleForm({
       tags: articleData.tags,
       translations: translations.filter((t) => t.title.trim()),
       content: englishTranslation.content, // Ambil content dari English translation
+      videoUrl: articleData.videoUrl || null,
+      posterImage: articleData.posterImage || null,
+      partnerOrganization: articleData.partnerOrganization,
+      photos: articleData.photos.length > 0 ? articleData.photos : null,
     });
   };
 
@@ -343,6 +382,277 @@ export default function ArticleForm({
               Optional: Add the location where this article is about or was
               written
             </p>
+          </div>
+
+          {/* Story/Partner Story Fields */}
+          <div className="border-t pt-6 mt-6">
+            <h4 className="text-sm font-medium text-gray-900 mb-4">
+              Story/Partner Story Fields (Optional)
+            </h4>
+            <div className="space-y-6">
+              {/* Video URL */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Video URL
+                </label>
+                <input
+                  type="url"
+                  value={articleData.videoUrl}
+                  onChange={(e) =>
+                    setArticleData((prev) => ({
+                      ...prev,
+                      videoUrl: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://example.com/video.mp4"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Optional: Video URL for story detail page
+                </p>
+              </div>
+
+              {/* Poster Image */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Video Poster Image URL
+                </label>
+                <input
+                  type="url"
+                  value={articleData.posterImage}
+                  onChange={(e) =>
+                    setArticleData((prev) => ({
+                      ...prev,
+                      posterImage: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://example.com/poster.jpg"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Optional: Thumbnail/poster image for video
+                </p>
+              </div>
+
+              {/* Partner Organization */}
+              <div className="border border-gray-200 rounded-lg p-4">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Partner Organization
+                </label>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Organization Name
+                    </label>
+                    <input
+                      type="text"
+                      value={articleData.partnerOrganization?.name || ""}
+                      onChange={(e) =>
+                        setArticleData((prev) => ({
+                          ...prev,
+                          partnerOrganization: {
+                            name: e.target.value,
+                            logo:
+                              prev.partnerOrganization?.logo || "",
+                            fullName:
+                              prev.partnerOrganization?.fullName || "",
+                          },
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Yayasan Konservasi Laut"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Organization Logo URL
+                    </label>
+                    <input
+                      type="url"
+                      value={articleData.partnerOrganization?.logo || ""}
+                      onChange={(e) =>
+                        setArticleData((prev) => ({
+                          ...prev,
+                          partnerOrganization: {
+                            name:
+                              prev.partnerOrganization?.name || "",
+                            logo: e.target.value,
+                            fullName:
+                              prev.partnerOrganization?.fullName || "",
+                          },
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="https://example.com/logo.png"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Full Organization Name
+                    </label>
+                    <input
+                      type="text"
+                      value={articleData.partnerOrganization?.fullName || ""}
+                      onChange={(e) =>
+                        setArticleData((prev) => ({
+                          ...prev,
+                          partnerOrganization: {
+                            name:
+                              prev.partnerOrganization?.name || "",
+                            logo:
+                              prev.partnerOrganization?.logo || "",
+                            fullName: e.target.value,
+                          },
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="YKL YAYASAN KONSERVASI LAUT INDONESIA"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setArticleData((prev) => ({
+                        ...prev,
+                        partnerOrganization: null,
+                      }))
+                    }
+                    className="text-xs text-red-600 hover:text-red-800"
+                  >
+                    Clear Partner Organization
+                  </button>
+                </div>
+              </div>
+
+              {/* Photos */}
+              <div className="border border-gray-200 rounded-lg p-4">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Photos
+                </label>
+                <div className="space-y-3">
+                  {articleData.photos.map((photo, index) => (
+                    <div
+                      key={photo.id || index}
+                      className="flex gap-2 items-start border border-gray-200 rounded p-3"
+                    >
+                      <div className="flex-1 space-y-2">
+                        <input
+                          type="text"
+                          value={photo.id}
+                          onChange={(e) => {
+                            const newPhotos = [...articleData.photos];
+                            newPhotos[index] = {
+                              ...photo,
+                              id: e.target.value,
+                            };
+                            setArticleData((prev) => ({
+                              ...prev,
+                              photos: newPhotos,
+                            }));
+                          }}
+                          className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
+                          placeholder="Photo ID"
+                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="url"
+                            value={photo.src}
+                            onChange={(e) => {
+                              const newPhotos = [...articleData.photos];
+                              newPhotos[index] = {
+                                ...photo,
+                                src: e.target.value,
+                              };
+                              setArticleData((prev) => ({
+                                ...prev,
+                                photos: newPhotos,
+                              }));
+                            }}
+                            className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
+                            placeholder="Photo URL"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurrentPhotoIndex(index);
+                              setMediaPickerOpen(true);
+                            }}
+                            className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 flex items-center gap-1 whitespace-nowrap"
+                          >
+                            <ImageIcon className="w-3 h-3" />
+                            Browse
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={photo.alt}
+                          onChange={(e) => {
+                            const newPhotos = [...articleData.photos];
+                            newPhotos[index] = {
+                              ...photo,
+                              alt: e.target.value,
+                            };
+                            setArticleData((prev) => ({
+                              ...prev,
+                              photos: newPhotos,
+                            }));
+                          }}
+                          className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
+                          placeholder="Alt text"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newPhotos = articleData.photos.filter(
+                            (_, i) => i !== index
+                          );
+                          setArticleData((prev) => ({
+                            ...prev,
+                            photos: newPhotos,
+                          }));
+                        }}
+                        className="text-red-600 hover:text-red-800 text-xs px-2 py-1"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setArticleData((prev) => ({
+                          ...prev,
+                          photos: [
+                            ...prev.photos,
+                            { id: `photo-${Date.now()}`, src: "", alt: "" },
+                          ],
+                        }));
+                      }}
+                      className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+                    >
+                      + Add Photo
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentPhotoIndex(null);
+                        setIsAddingMultiplePhotos(true);
+                        setMediaPickerOpen(true);
+                      }}
+                      className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2 whitespace-nowrap"
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                      Browse from Media
+                    </button>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  Optional: Add photos for story detail page
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -503,6 +813,50 @@ export default function ArticleForm({
           {saving ? "Publishing..." : "Publish Now"}
         </button>
       </div>
+
+      {/* Media Picker Modal */}
+      <MediaPickerModal
+        isOpen={mediaPickerOpen}
+        onClose={() => {
+          setMediaPickerOpen(false);
+          setCurrentPhotoIndex(null);
+          setIsAddingMultiplePhotos(false);
+        }}
+        onSelect={(selectedUrls) => {
+          if (isAddingMultiplePhotos && selectedUrls.length > 0) {
+            // Add multiple photos from media library
+            const newPhotos = selectedUrls.map((url, idx) => ({
+              id: `photo-${Date.now()}-${idx}`,
+              src: url,
+              alt: "",
+            }));
+            setArticleData((prev) => ({
+              ...prev,
+              photos: [...prev.photos, ...newPhotos],
+            }));
+            setIsAddingMultiplePhotos(false);
+          } else if (
+            currentPhotoIndex !== null &&
+            selectedUrls.length > 0
+          ) {
+            // Update specific photo
+            const newPhotos = [...articleData.photos];
+            newPhotos[currentPhotoIndex] = {
+              ...newPhotos[currentPhotoIndex],
+              src: selectedUrls[0],
+            };
+            setArticleData((prev) => ({
+              ...prev,
+              photos: newPhotos,
+            }));
+            setCurrentPhotoIndex(null);
+          }
+          setMediaPickerOpen(false);
+        }}
+        mode={isAddingMultiplePhotos ? "multiple" : "single"}
+        allowedTypes={["images"]}
+        initialFilter="images"
+      />
     </div>
   );
 }

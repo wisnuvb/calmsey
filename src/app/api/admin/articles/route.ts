@@ -140,6 +140,10 @@ export async function POST(request: NextRequest) {
       translations,
       categories,
       tags,
+      videoUrl,
+      posterImage,
+      partnerOrganization,
+      photos,
     } = body;
 
     // Validation
@@ -180,6 +184,10 @@ export async function POST(request: NextRequest) {
         status: status || "DRAFT",
         featuredImage: featuredImage || null,
         location: location || null,
+        videoUrl: videoUrl || null,
+        posterImage: posterImage || null,
+        partnerOrganization: partnerOrganization || null,
+        photos: photos || null,
         publishedAt: status === "PUBLISHED" ? new Date() : null,
         authorId: session!.user.id,
 

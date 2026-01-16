@@ -352,6 +352,8 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
             location: "Tasmania, Australia",
             image:
               "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
+            biography:
+              "Philippa is an applied environmental social scientist and inclusive governance advisor for 25 years. Her work has focused on small-scale fisheries, coastal communities, and women in fisheries. She is an islander – living and working in Australia (Tasmania), Tonga, Fiji, Solomon Islands and Malaysia (Penang).\n\nPhilippa completed her PhD on equitable oceans and has worked extensively with communities, governments, and organizations to support inclusive and sustainable coastal resource management.",
             linkedinUrl: "https://linkedin.com/in/philippa-cohen",
           },
           {
@@ -424,6 +426,15 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
           placeholder: "/path/to/image.jpg",
         },
         {
+          key: "biography",
+          label: "Biography",
+          type: "textarea",
+          required: false,
+          placeholder: "Enter biography text here...",
+          helpText:
+            "Biography text displayed in the modal. Supports multi-paragraph text.",
+        },
+        {
           key: "linkedinUrl",
           label: "LinkedIn URL",
           type: "text",
@@ -432,7 +443,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
         },
       ],
       helpText:
-        'Array of team member objects with id, name, role, location, image, and optional linkedinUrl. Example: [{"id": "1", "name": "John Doe", "role": "Director", "location": "New York, USA", "image": "/path/to/image.jpg", "linkedinUrl": "https://linkedin.com/in/john-doe"}]',
+        'Array of team member objects with id, name, role, location, image, optional biography, and optional linkedinUrl. Example: [{"id": "1", "name": "John Doe", "role": "Director", "location": "New York, USA", "image": "/path/to/image.jpg", "biography": "Biography text here...", "linkedinUrl": "https://linkedin.com/in/john-doe"}]',
     },
 
     // Genesis Section

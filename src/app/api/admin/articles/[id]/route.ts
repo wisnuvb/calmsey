@@ -107,6 +107,10 @@ export async function PUT(
       translations,
       categories,
       tags,
+      videoUrl,
+      posterImage,
+      partnerOrganization,
+      photos,
     } = body;
 
     // Check if article exists and user has permission
@@ -140,6 +144,16 @@ export async function PUT(
           status,
           featuredImage,
           location,
+          videoUrl: videoUrl !== undefined ? videoUrl : existingArticle.videoUrl,
+          posterImage:
+            posterImage !== undefined
+              ? posterImage
+              : existingArticle.posterImage,
+          partnerOrganization:
+            partnerOrganization !== undefined
+              ? partnerOrganization
+              : existingArticle.partnerOrganization,
+          photos: photos !== undefined ? photos : existingArticle.photos,
           publishedAt:
             status === "PUBLISHED" && !existingArticle.publishedAt
               ? new Date()

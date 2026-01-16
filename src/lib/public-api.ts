@@ -11,7 +11,23 @@ export interface PublicArticle {
   excerpt?: string;
   featuredImage?: string;
   location?: string;
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   publishedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  // Story/Partner Story specific fields
+  videoUrl?: string;
+  posterImage?: string;
+  partnerOrganization?: {
+    name: string;
+    logo: string;
+    fullName: string;
+  };
+  photos?: Array<{
+    id: string;
+    src: string;
+    alt: string;
+  }>;
   author: {
     name: string;
   };
@@ -443,15 +459,78 @@ export class PublicAPI {
       publishedAt = new Date(); // Fallback to current date if invalid
     }
 
+    // Ensure createdAt and updatedAt are Date objects
+    let createdAt: Date;
+    if (article.createdAt instanceof Date) {
+      createdAt = article.createdAt;
+    } else if (typeof article.createdAt === "string") {
+      createdAt = new Date(article.createdAt);
+    } else {
+      createdAt = new Date(article.createdAt);
+    }
+
+    let updatedAt: Date;
+    if (article.updatedAt instanceof Date) {
+      updatedAt = article.updatedAt;
+    } else if (typeof article.updatedAt === "string") {
+      updatedAt = new Date(article.updatedAt);
+    } else {
+      updatedAt = new Date(article.updatedAt);
+    }
+
+    // Parse JSON fields
+    let partnerOrganization:
+      | { name: string; logo: string; fullName: string }
+      | undefined;
+    if (article.partnerOrganization) {
+      if (typeof article.partnerOrganization === "string") {
+        try {
+          partnerOrganization = JSON.parse(article.partnerOrganization);
+        } catch {
+          partnerOrganization = undefined;
+        }
+      } else {
+        partnerOrganization = article.partnerOrganization as {
+          name: string;
+          logo: string;
+          fullName: string;
+        };
+      }
+    }
+
+    let photos: Array<{ id: string; src: string; alt: string }> | undefined;
+    if (article.photos) {
+      if (typeof article.photos === "string") {
+        try {
+          photos = JSON.parse(article.photos);
+        } catch {
+          photos = undefined;
+        }
+      } else {
+        photos = article.photos as Array<{
+          id: string;
+          src: string;
+          alt: string;
+        }>;
+      }
+    }
+
     return {
       id: article.id,
       slug: article.slug,
-      title: translation?.title || "Untitled",
-      content: translation?.content || "",
-      excerpt: translation?.excerpt,
+      title: translation?.title || article.title || "Untitled",
+      content: translation?.content || article.content || "",
+      excerpt: translation?.excerpt || article.excerpt,
       featuredImage: article.featuredImage,
       location: article.location,
+      status: article.status,
       publishedAt,
+      createdAt,
+      updatedAt,
+      videoUrl: article.videoUrl,
+      posterImage: article.posterImage,
+      partnerOrganization,
+      photos,
       author: {
         name: article.author.name || "Anonymous",
       },
@@ -461,7 +540,7 @@ export class PublicAPI {
         slug: ac.category.slug,
       })),
       tags:
-        article.ArticleTag?.map((at: any) => ({
+        article.articleTag?.map((at: any) => ({
           id: at.tag.id,
           name: at.tag.name,
         })) || [],

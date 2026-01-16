@@ -120,6 +120,8 @@ export default function ArticlesAdminPage() {
     );
   }
 
+  console.log({ articles });
+
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -169,124 +171,127 @@ export default function ArticlesAdminPage() {
       {/* Articles Table */}
       <div className="mt-8 bg-white shadow rounded-lg overflow-hidden">
         {articles.length > 0 ? (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Article
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Translations
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Categories
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Author
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Modified
-                </th>
-                <th className="relative px-6 py-3">
-                  <span className="sr-only">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {articles.map((article) => (
-                <tr key={article.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <DocumentTextIcon className="h-5 w-5 text-gray-400 mr-3" />
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {article.title}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          /articles/{article.slug}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Article
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Translations
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Categories
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Author
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Last Modified
+                  </th>
+                  <th className="relative px-6 py-3">
+                    <span className="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {articles.map((article) => (
+                  <tr key={article.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <DocumentTextIcon className="h-5 w-5 text-gray-400 mr-3" />
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {article.title}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            /articles/{article.slug}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(
-                        article.status
-                      )}`}
-                    >
-                      {article.status.toLowerCase()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center space-x-2">
-                      <GlobeAltIcon className="h-4 w-4 text-gray-400" />
-                      <TranslationStatusCard
-                        status={article.translationStatus}
-                        availableLanguages={availableLanguages}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {article.translationStatus.languages.join(", ")}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
-                      {article.categories.slice(0, 2).map((category) => (
-                        <span
-                          key={category.id}
-                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
-                        >
-                          {category.name}
-                        </span>
-                      ))}
-                      {article.categories.length > 2 && (
-                        <span className="text-xs text-gray-500">
-                          +{article.categories.length - 2} more
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {article.author.name || article.author.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(article.updatedAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end space-x-2">
-                      {article.status === "PUBLISHED" && (
-                        <a
-                          href={`/articles/${article.slug}`}
-                          target="_blank"
-                          className="text-gray-600 hover:text-gray-900"
-                          title="View article"
-                        >
-                          <EyeIcon className="h-4 w-4" />
-                        </a>
-                      )}
-                      <Link
-                        href={`/admin/articles/${article.id}/edit`}
-                        className="text-blue-600 hover:text-blue-900"
-                        title="Edit article"
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(
+                          article.status
+                        )}`}
                       >
-                        <PencilIcon className="h-4 w-4" />
-                      </Link>
-                      <button
-                        onClick={() => deleteArticle(article.id)}
-                        className="text-red-600 hover:text-red-900"
-                        title="Delete article"
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        {article.status.toLowerCase()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
+                        <GlobeAltIcon className="h-4 w-4 text-gray-400" />
+                        <TranslationStatusCard
+                          status={article.translationStatus}
+                          availableLanguages={availableLanguages}
+                        />
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {article.translationStatus.languages.join(", ")}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-1">
+                        {article.categories.slice(0, 2).map((category) => (
+                          <span
+                            key={category.id}
+                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
+                          >
+                            {category.name}
+                          </span>
+                        ))}
+                        {article.categories.length > 2 && (
+                          <span className="text-xs text-gray-500">
+                            +{article.categories.length - 2} more
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {article.author.name || article.author.email}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(article.updatedAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end space-x-2">
+                        {article.status === "PUBLISHED" && (
+                          <a
+                            href={`/articles/${article.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-600 hover:text-gray-900 p-1 rounded hover:bg-gray-100 transition-colors inline-flex items-center"
+                            title="View article"
+                          >
+                            <EyeIcon className="h-4 w-4" />
+                          </a>
+                        )}
+                        <Link
+                          href={`/admin/articles/${article.id}/edit`}
+                          className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors inline-flex items-center"
+                          title="Edit article"
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </Link>
+                        <button
+                          onClick={() => deleteArticle(article.id)}
+                          className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors inline-flex items-center"
+                          title="Delete article"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="text-center py-12">
             <DocumentTextIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />

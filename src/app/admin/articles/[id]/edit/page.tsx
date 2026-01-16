@@ -26,6 +26,14 @@ interface ArticleData {
   tags: string[];
   translations: Translation[];
   content: string;
+  videoUrl?: string | null;
+  posterImage?: string | null;
+  partnerOrganization?: {
+    name: string;
+    logo: string;
+    fullName: string;
+  } | null;
+  photos?: Array<{ id: string; src: string; alt: string }> | null;
 }
 
 export default function EditArticlePage() {
@@ -87,6 +95,31 @@ export default function EditArticlePage() {
           });
         }
 
+        // Parse JSON fields
+        let partnerOrganization = null;
+        if (result.article.partnerOrganization) {
+          try {
+            partnerOrganization =
+              typeof result.article.partnerOrganization === "string"
+                ? JSON.parse(result.article.partnerOrganization)
+                : result.article.partnerOrganization;
+          } catch (e) {
+            console.error("Error parsing partnerOrganization:", e);
+          }
+        }
+
+        let photos: Array<{ id: string; src: string; alt: string }> = [];
+        if (result.article.photos) {
+          try {
+            photos =
+              typeof result.article.photos === "string"
+                ? JSON.parse(result.article.photos)
+                : result.article.photos;
+          } catch (e) {
+            console.error("Error parsing photos:", e);
+          }
+        }
+
         // Transform the data to match our form structure
         const transformedData: ArticleData = {
           id: result.article.id,
@@ -98,6 +131,10 @@ export default function EditArticlePage() {
           tags: result.article.articleTag?.map((t: any) => t.tagId) || [],
           translations: transformedTranslations,
           content: result.article.content || "",
+          videoUrl: (result.article as any).videoUrl || null,
+          posterImage: (result.article as any).posterImage || null,
+          partnerOrganization,
+          photos,
         };
 
         setArticleData(transformedData);
@@ -117,10 +154,19 @@ export default function EditArticlePage() {
     slug: string;
     status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
     featuredImage: string;
+    location: string;
     categories: string[];
     tags: string[];
     translations: Translation[];
     content: string;
+    videoUrl?: string | null;
+    posterImage?: string | null;
+    partnerOrganization?: {
+      name: string;
+      logo: string;
+      fullName: string;
+    } | null;
+    photos?: Array<{ id: string; src: string; alt: string }> | null;
   }) => {
     setSaving(true);
     try {

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { FaLinkedin } from "react-icons/fa";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContent } from "@/contexts/PageContentContext";
@@ -14,6 +14,7 @@ interface TeamMember {
   location: string;
   image: string;
   linkedinUrl?: string;
+  biography?: string;
 }
 
 interface TeamSectionProps {
@@ -30,6 +31,8 @@ const defaultMembers: TeamMember[] = [
     location: "Tasmania, Australia",
     image:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
+    biography:
+      "Philippa is an applied environmental social scientist and inclusive governance advisor for 25 years. Her work has focused on small-scale fisheries, coastal communities, and women in fisheries. She is an islander – living and working in Australia (Tasmania), Tonga, Fiji, Solomon Islands and Malaysia (Penang).\n\nPhilippa completed her PhD on equitable oceans and has worked extensively with communities, governments, and organizations to support inclusive and sustainable coastal resource management.",
     linkedinUrl: "https://linkedin.com/in/philippa-cohen",
   },
   {
@@ -128,6 +131,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
     propMembers || defaultMembers
   );
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const itemsPerPage = 4;
   const totalPages = Math.ceil(members.length / itemsPerPage);
 
@@ -164,7 +168,19 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
         {/* Team Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {currentMembers.map((member) => (
-            <div key={member.id} className="text-center">
+            <div
+              key={member.id}
+              className="text-left cursor-pointer"
+              role="button"
+              tabIndex={0}
+              onClick={() => setSelectedMember(member)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setSelectedMember(member);
+                }
+              }}
+            >
               {/* Photo with LinkedIn Icon */}
               <div className="relative inline-block mb-4 w-full max-w-[250px] mx-auto">
                 <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-200">
@@ -195,13 +211,13 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
               </div>
 
               {/* Member Info */}
-              <h3 className="text-lg font-bold text-[#010107] mb-1 font-nunito-sans">
+              <h3 className="text-xl font-bold text-[#010107] mb-3 font-nunito-sans leading-[140%] tracking-normal">
                 {member.name}
               </h3>
-              <p className="text-base text-[#060726CC] mb-1 font-work-sans">
+              <p className="text-base text-[#3C62ED] mb-[2px] font-work-sans font-normal leading-[150%] tracking-normal">
                 {member.role}
               </p>
-              <p className="text-sm text-[#060726CC] font-work-sans">
+              <p className="text-base text-[#3C62ED] font-work-sans font-normal leading-[150%] tracking-normal">
                 {member.location}
               </p>
             </div>
@@ -234,6 +250,97 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
           </div>
         )}
       </div>
+
+      {/* Team Member Modal */}
+      {selectedMember && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          onClick={() => setSelectedMember(null)}
+        >
+          <div
+            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col lg:flex-row shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedMember(null)}
+              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Close modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Left Section - Image */}
+            <div className="w-full lg:w-1/2 relative h-64 lg:h-auto">
+              <Image
+                src={getImageUrl(selectedMember.image)}
+                alt={selectedMember.name}
+                fill
+                className="object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    selectedMember.name
+                  )}&size=400&background=random`;
+                }}
+              />
+            </div>
+
+            {/* Right Section - Content */}
+            <div className="w-full lg:w-1/2 p-6 sm:p-8 flex flex-col">
+              {/* Title */}
+              <p className="text-xs uppercase tracking-wider text-gray-400 mb-2 font-work-sans">
+                {selectedMember.role.toUpperCase()}
+              </p>
+
+              {/* Name */}
+              <h3 className="text-3xl sm:text-4xl font-bold text-[#010107] mb-2 font-nunito-sans">
+                {selectedMember.name}
+              </h3>
+
+              {/* Location */}
+              <p className="text-base text-gray-400 mb-6 font-work-sans">
+                {selectedMember.location}
+              </p>
+
+              {/* Biography - Scrollable */}
+              {selectedMember.biography ? (
+                <div className="flex-1 mb-6 overflow-y-auto pr-2 min-h-0">
+                  <div
+                    className="text-base text-gray-700 leading-relaxed font-work-sans whitespace-pre-line"
+                    dangerouslySetInnerHTML={{
+                      __html: selectedMember.biography
+                        .replace(/\n\n/g, "<br /><br />")
+                        .replace(/\n/g, "<br />"),
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="flex-1 mb-6">
+                  <div className="text-base text-gray-500 italic font-work-sans">
+                    Biography not available.
+                  </div>
+                </div>
+              )}
+
+              {/* LinkedIn Button */}
+              {selectedMember.linkedinUrl && (
+                <a
+                  href={selectedMember.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-6 py-3 border-2 border-[#0077B5] bg-white text-[#0077B5] rounded-lg hover:bg-[#0077B5] hover:text-white transition-colors font-semibold font-work-sans mt-auto"
+                >
+                  <div className="w-6 h-6 bg-[#0077B5] rounded flex items-center justify-center">
+                    <FaLinkedin className="w-4 h-4 text-white" />
+                  </div>
+                  <span>Linkedin Profile</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

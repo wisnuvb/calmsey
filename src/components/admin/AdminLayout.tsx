@@ -16,13 +16,14 @@ import {
   XMarkIcon,
   ArrowRightOnRectangleIcon,
   PencilSquareIcon,
+  QueueListIcon,
 } from "@heroicons/react/24/outline";
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: HomeIcon },
   // { name: "Menus", href: "/admin/menus", icon: Bars3Icon },
   { name: "Page Content", href: "/admin/page-content", icon: PencilSquareIcon },
-  { name: "Footer", href: "/admin/footer", icon: PencilSquareIcon },
+  { name: "Footer", href: "/admin/footer", icon: QueueListIcon },
   // { name: "Pages", href: "/admin/pages", icon: DocumentTextIcon },
   { name: "Articles", href: "/admin/articles", icon: DocumentTextIcon },
   { name: "Categories", href: "/admin/categories", icon: FolderIcon },

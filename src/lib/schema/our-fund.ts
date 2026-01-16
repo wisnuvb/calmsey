@@ -102,6 +102,72 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           helpText:
             'Optional practices list. Format: One practice per line as JSON object. Example: {"id": "1", "text": "Practice text"}. Leave empty if no practices.',
         },
+        {
+          key: "infoBlocks",
+          label: "Info Blocks",
+          type: "textarea",
+          required: false,
+          placeholder:
+            '{"id": "1", "icon": "shield", "text": "Info block text"}\n{"id": "2", "icon": "flag", "text": "Another info block"}',
+          helpText:
+            'Optional info blocks with icons. Format: One block per line as JSON. Icon options: "shield", "flag", "info". Example: {"id": "1", "icon": "shield", "text": "Your text here"}. Leave empty if no info blocks.',
+        },
+        {
+          key: "numberedListTitle",
+          label: "Numbered List Title/Sub-header",
+          type: "text",
+          required: false,
+          placeholder: "We consider tenure to encompass",
+          helpText:
+            "Optional title/sub-header displayed before the numbered list. Leave empty if not needed.",
+        },
+        {
+          key: "numberedList",
+          label: "Numbered List",
+          type: "textarea",
+          required: false,
+          placeholder:
+            '{"id": "1", "number": "01", "text": "First item"}\n{"id": "2", "number": "02", "text": "Second item"}',
+          helpText:
+            'Optional numbered list. Format: One item per line as JSON. Example: {"id": "1", "number": "01", "text": "Item text"}. Leave empty if no numbered list.',
+        },
+        {
+          key: "numberedListFooter",
+          label: "Numbered List Footer/Concluding Text",
+          type: "textarea",
+          required: false,
+          placeholder:
+            "Additional text after numbered list (supports **bold** text)",
+          helpText:
+            "Optional concluding text displayed after the numbered list. Supports **bold** formatting. Leave empty if not needed.",
+        },
+        {
+          key: "infoBlockFooter",
+          label: "Footer Info Block",
+          type: "textarea",
+          required: false,
+          placeholder: '{"icon": "info", "text": "Read more about..."}',
+          helpText:
+            'Optional footer info block (usually green). Format: JSON object. Example: {"icon": "info", "text": "Your footer text"}. Leave empty if not needed.',
+        },
+        {
+          key: "downloadButtonText",
+          label: "Download Button Text",
+          type: "text",
+          required: false,
+          placeholder: "Download Now",
+          helpText:
+            "Optional text for download button (for framework section). Leave empty if no download button.",
+        },
+        {
+          key: "downloadButtonUrl",
+          label: "Download Button URL",
+          type: "file",
+          required: false,
+          placeholder: "/downloads/framework.pdf",
+          helpText:
+            "Optional PDF file URL for download button. Leave empty if no download button.",
+        },
       ],
       defaultValue: JSON.stringify(
         [
@@ -113,8 +179,8 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
               "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
             imageAlt: "Grantmaking approach",
             paragraphs:
-              "Turning Tides implements and advocates for liberatory approaches to partnership and grantmaking – empowering and centering local communities, small-scale fishers and fish workers, and Indigenous Peoples and their supporting groups, rather than maintaining hierarchical relationships.\n\nWe are accountable to our partners and work to change systems that create barriers to tenure security. Our practices include multi-year flexible funding, streamlined processes, and partnership support that extends beyond financial contributions.",
-            practicesTitle: "What we practice",
+              "Turning Tides implements and advocates for liberatory approaches to partnership and grant-making. This means working together with Indigenous Peoples, local communities, small-scale fishers and fish workers through reciprocal transformation where both we and our partners work to change the systems and power structures that create barriers to tenure security.\n\nOur practices include multi-year flexible funding, streamlined processes, and partnership support that extends beyond financial contributions.",
+            practicesTitle: "",
             practices:
               '{"id": "1", "text": "Shared decision-making in strategy and grantmaking"}\n{"id": "2", "text": "Partner-centered grantmaking processes (language justice, administrative burden shifting, feedback integration)"}\n{"id": "3", "text": "Rights-based safeguarding and ethical engagement (FPIC, data sovereignty, cultural protocols)"}\n{"id": "4", "text": "Multi-year flexible funding with partnership support beyond financial contributions"}',
           },
@@ -122,15 +188,25 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
             id: "tenure",
             label: "What we understand by tenure",
             contentTitle: "What we understand by tenure",
-            paragraphs:
-              "Tenure refers to the relationship, whether legally or customarily defined, among people with respect to land, water, and resources. It determines who can use what resources, for how long, and under what conditions.",
+            paragraphs: "",
+            infoBlocks:
+              '{"id": "1", "icon": "shield", "text": "Turning Tides\' investments will be designed to **support the conditions and processes** necessary to move from rights and tenure insecurity, toward tenure security and full recognition of associated rights (e.g., the right to a healthy environment, the right to food, the right to self-determination, the right to maintain cultural tradition and knowledge)."}\n{"id": "2", "icon": "flag", "text": "We use a broad definition to accommodate the multiple ways that tenure can be viewed and experienced. We consider tenure as: \\"The ways in which societies define and govern (including through cultures and laws) people\'s relationships with land, coasts, shores, waterbodies, and associated natural resources.\\""}',
+            numberedListTitle: "We consider tenure to encompass",
+            numberedList:
+              '{"id": "1", "number": "01", "text": "A bundle of rights, powers and relationships - including, but often extending beyond, access and use rights"}\n{"id": "2", "number": "02", "text": "Community-based and collective tenure, incorporating the systems that govern them"}\n{"id": "3", "number": "03", "text": "Self-determination in defining relationships and futures within territories and across environments."}',
+            numberedListFooter:
+              "**Tenure security** is a critical foundation, and often a precursor for other **human rights** (i.e., to food, cultural practice, self-determination) and as the critical enabler to effective locally-led environmental stewardship, climate adaptation, and inclusive economies.",
+            infoBlockFooter:
+              '{"icon": "info", "text": "Read more about the diverse ways in which we have come to consider tenure, and tenure security and rights recognition, in our Scoping Study and our brief (**forthcoming**)."}',
           },
           {
             id: "framework",
             label: "Our Grantmaking Framework",
             contentTitle: "Our Grantmaking Framework",
             paragraphs:
-              "Our grantmaking framework is designed to support communities in securing and strengthening their tenure rights through flexible, partner-centered approaches.",
+              "Our grantmaking framework outlines Turning Tides' funding priorities and approach. It explains what work we support, what we don't fund, and why - all organized around pathways toward tenure security for Indigenous Peoples, local communities, small-scale fishers and fish workers. Groups interested in partnering with Turning Tides can use it to assess mutual fit for partnership.\n\nTurning Tides aims to provide fiscal and other supports that lead local communities, small-scale fishers and fish workers, and Indigenous Peoples to fully experiencing their rights and agency in the allocation, use, conservation, management and development of coastal lands, shorelines, oceans, lakes, rivers, and associated resources - toward better environmental and societal outcomes. The Turning Tides' Grantmaking Framework is intended to keep focus on the niche, need and opportunity.\n\nThe strategies and actions that we consider within our funding priorities are those that are known to contribute toward tenure security. We recognise that strategies used likely vary based on specific contexts.\n\nWe are also very deliberate and considered in what we reflect as being outside of our funding scope. Whilst we recognise those actions, and their proponents have values and benefits of their own (even toward the security of certain rights) they are - in our assessment - relatively well funded and supported.",
+            downloadButtonText: "Download Now",
+            downloadButtonUrl: "/downloads/grantmaking-framework.pdf",
           },
         ],
         null,
