@@ -271,9 +271,25 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       type: "textarea",
       section: "Where We Work",
       defaultValue:
-        "We have **developed action plans** for Latin America and Africa, and **mobilizing grants** for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda.",
+        "We have **developed action plans for Latin America and Africa**, and **mobilizing grants** for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda.",
       helpText:
         "Text describing action plans (use **text** for bold formatting)",
+    },
+    {
+      key: "whereWeWork.actionPlansLinkText",
+      label: "Action Plans Link Text",
+      type: "text",
+      section: "Where We Work",
+      defaultValue: "See Action Plans",
+      helpText: "Text for the action plans link",
+    },
+    {
+      key: "whereWeWork.actionPlansLinkUrl",
+      label: "Action Plans Link URL",
+      type: "text",
+      section: "Where We Work",
+      defaultValue: "#",
+      helpText: "URL for the action plans",
     },
     {
       key: "whereWeWork.explorationText",
@@ -281,25 +297,9 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       type: "textarea",
       section: "Where We Work",
       defaultValue:
-        "We are also in the **exploration and engagement phase** – Brazil, India, Indonesia, Sri Lanka, Thailand.",
+        "We are also in **the exploration and engagement phase** – Brazil, India, Indonesia, Sri Lanka, Thailand.",
       helpText:
         "Text describing exploration phase (use **text** for bold formatting)",
-    },
-    {
-      key: "whereWeWork.explorationLinkText",
-      label: "Exploration Link Text",
-      type: "text",
-      section: "Where We Work",
-      defaultValue: "View Report",
-      helpText: "Text for the exploration report link",
-    },
-    {
-      key: "whereWeWork.explorationLinkUrl",
-      label: "Exploration Link URL",
-      type: "text",
-      section: "Where We Work",
-      defaultValue: "#",
-      helpText: "URL for the exploration report",
     },
     {
       key: "whereWeWork.mapImage",
@@ -315,9 +315,25 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       type: "textarea",
       section: "Where We Work",
       defaultValue:
-        'Our **"Partners Piloting"** partners are Bangladesh, Thailand, Indonesia, Honduras, Senegal.',
+        'Our **"Partners Piloting"** partners were in Bangladesh, Thailand, Indonesia, Honduras, Senegal.',
       helpText:
         "Text describing pilot partners (use **text** for bold formatting)",
+    },
+    {
+      key: "whereWeWork.partnersLinkText",
+      label: "Partners Link Text",
+      type: "text",
+      section: "Where We Work",
+      defaultValue: "View Report",
+      helpText: "Text for the partners report link",
+    },
+    {
+      key: "whereWeWork.partnersLinkUrl",
+      label: "Partners Link URL",
+      type: "text",
+      section: "Where We Work",
+      defaultValue: "#",
+      helpText: "URL for the partners report",
     },
 
     // Team Section

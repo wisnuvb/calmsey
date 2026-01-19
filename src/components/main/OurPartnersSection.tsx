@@ -247,7 +247,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
         </div>
 
         {/* Call to Action */}
-        <div className="text-center">
+        {/* <div className="text-center">
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
             <p className="text-gray-900 text-lg md:text-xl font-medium">
               {callToActionText}
@@ -260,7 +260,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
               {buttonText}
             </a>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

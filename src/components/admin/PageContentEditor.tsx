@@ -530,7 +530,7 @@ export function PageContentEditor({
         </div>
 
         {/* Actions */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 -mx-6 mt-8 flex items-center justify-between">
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 -mx-6 mt-8 flex items-center justify-between z-50">
           <div className="flex items-center gap-4">
             <button
               type="button"

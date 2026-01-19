@@ -126,6 +126,8 @@ export const GOVERNANCE_SCHEMA: PageContentSchema = {
             "https://s7d1.scene7.com/is/image/wbcollab/Myrna-Cunningham-2?qlt=75&resMode=sharp2",
           imageAlt: "Myrna Cunningham Kain",
           linkedinUrl: "https://linkedin.com/in/myrna-cunningham",
+          biography:
+            '<p>I have been an applied environmental social scientist and <strong>inclusive governance advisor for 25 years</strong>. I have always focused on small-scale fisheries, coastal communities, and women in fisheries – from research, processing, trading and governance. I am an islander – living and working in Australia (Tasmania), Tonga, Fiji, Solomon Islands and Malaysia (Penang).</p><p>Lorem ipsum dolor sit amet consectetur. Nascetur maecenas viverra diam habitant interdum orci in ridiculus sagittis. Vulputate orci ut convallis felis urna consequat et laoreet velit. Amet id molestie a enim vitae senectus in porta et. Quam velit elementum facilisi dui egestas rhoncus ipsum vestibulum. Nec a ut consectetur lorem. Egestas orci fringilla urna ultrices. Condimentum mi et fermentum pulvinar dignissim donec pellentesque congue pharetra. Ac eget porttitor proin sed viverra sit. Quis sit dignissim morbi amet amet. Nisl massa vitae.</p>',
         },
         {
           id: "vivienne-solis",
@@ -162,6 +164,7 @@ export const GOVERNANCE_SCHEMA: PageContentSchema = {
         { key: "image", type: "image", label: "Photo", required: true },
         { key: "imageAlt", type: "text", label: "Photo Alt Text" },
         { key: "linkedinUrl", type: "text", label: "LinkedIn URL" },
+        { key: "biography", type: "html", label: "Biography" },
       ],
     },
     {
@@ -248,69 +251,79 @@ export const GOVERNANCE_SCHEMA: PageContentSchema = {
           id: "our-strategy",
           title: "Our Strategy",
           content:
-            "Our strategy lays our vision, goal, values and principles. As we learn with partners, we may update our Strategy from time to time. When changes are made, we will update the date listed on the documents. Please review this page periodically for any updates.",
-          linkText: "Our strategy",
-          linkHref: "/strategy",
+            '<p><a href="https://turningtidesfacility.org/strategy">Our strategy</a> lays our vision, goal, values and principles. As we learn with partners, we may update our Strategy from time to time. When changes are made, we will update the date listed on the documents. Please review this page periodically for any updates.</p>',
         },
         {
           id: "fiscal-sponsorship",
           title: "Fiscal Sponsorship Agreement",
           content:
-            "This agreement outlines the terms and conditions for fiscal sponsorship partnerships with Turning Tides.",
+            '<p>Turning Tides operated under the <a href="https://turningtidesfacility.org/fiscal-sponsorship">fiscal sponsorship</a> of The Tenure Facility Fund, a US 501(c)3 not for profit subsidiary of the International Land and Forest Tenure Facility.</p>',
         },
         {
           id: "social-contract",
           title: "Social Contract",
           content:
-            "Our social contract defines the mutual commitments and expectations between Turning Tides and our partners.",
+            '<p>Over and above legal and financial good governance, the partnership with The Tenure Facility Fund, and the International Land and Forest Tenure Facility has been established to improve our services to partners. The spirit of this collaboration, and ties to partners, This partnership, are laid out in the <a href="https://turningtidesfacility.org/social-contract">Social Contract</a>.</p>',
         },
         {
           id: "conflict-of-interest",
           title: "Conflict of Interest",
           content:
-            "This policy addresses potential conflicts of interest and ensures transparency in all our partnerships.",
+            '<p>The <a href="https://turningtidesfacility.org/conflict-of-interest">Conflict of Interest</a> policy protects the interests and values of Turning Tides when it is contemplating entering a transaction or grantmaking process that might benefit the private interest of staff/contractors/consultants, Steering Committee members and any advisory committee/ council members of Turning Tides or might result in a possible excess benefit transaction. This policy is intended to supplement but not replace any applicable local and federal laws governing conflict of interest applicable to nonprofit and charitable organizations.</p>',
         },
         {
           id: "funding-acceptance",
           title: "Funding Acceptance",
           content:
-            "Guidelines for accepting and managing funding from various sources while maintaining our values.",
+            '<p>At Turning Tides, we prioritize upholding high standards of ethics, integrity, and transparency in all aspects of our operations. <a href="https://turningtidesfacility.org/funding-acceptance">Our Funding Acceptance</a> Policy serves as a safeguard, helping Turning Tides make informed decisions regarding external funding acceptance – allowing us to increase funds accessible to local communities, small-scale fisheries, fisher workers and Indigenous Peoples, while maintaining our commitment to ethical conduct, financial prudence, and mission alignment</p>',
         },
         {
           id: "grievance-mechanism",
           title: "Grievance Mechanism",
           content:
-            "Procedures for addressing concerns and grievances in a fair and transparent manner.",
+            '<p>We recognize that disputes or concerns may arise during the course of our work. We are committed to resolving any issues in a fair, transparent, and timely manner. Grievances: If you believe you have been treated unfairly, or if you have concerns regarding the handling of a grant decision or partnership with Turning Tides, please contact us at <a href="mailto:turningtides@tenureFacility.org">turningtides@tenureFacility.org</a>. We will acknowledge receipt within 10 business days and aim to resolve the issue within 60 business days or less. Appeals: If you are unsatisfied with the outcome of your grievance, you may appeal the decision by submitting a formal request to our Steering Committee at <a href="mailto:SteeringCommittee@TurningTidesFacility.org">SteeringCommittee@TurningTidesFacility.org</a></p>',
         },
         {
           id: "non-discrimination",
           title: "Non-Discrimination Policy",
           content:
-            "Our commitment to non-discrimination and equal treatment for all partners and stakeholders.",
+            '<p>Turning Tides is committed to ensuring that all individuals and organizations, regardless of race, gender, sexual orientation, age, disability, religion, or any other characteristic, have equal access to our programs and services. We value diversity and inclusivity in all our operations, and our decision-making processes are designed to uphold the principles of justice and fairness.</p>',
         },
         {
           id: "steering-committee",
           title: "Turning Tides' Steering Committee",
           content:
-            "Information about our steering committee structure, roles, and responsibilities.",
+            '<p>Turning Tides is guided by a <a href="https://turningtidesfacility.org/steering-committee">Steering Committee</a> who play a pivotal role in setting strategic direction and providing oversight. These Terms of Reference outline the roles, responsibilities, composition, and functioning of the Steering Committee of Turning Tides, ensuring alignment with the organization\'s vision, goals, values and principles.</p>',
         },
         {
           id: "other-policies",
           title: "Policies not listed here",
           content:
-            "Additional policies and guidelines that may apply to specific partnerships or situations.",
+            '<p>Where Turning Tides policies are not listed here, they may be in development. We are governed by the legal and financial obligations of our 501(c)3 fiscal sponsor – The Tenure Facility Fund, and/or we defer to the operational and procedural policies of the International Land and Forest Tenure Facility.</p>',
         },
         {
           id: "amendments",
           title: "Amendments to Policies",
           content:
-            "Process for updating and amending our policies to ensure they remain relevant and effective.",
+            '<p>We may update our policies from time to time to reflect changes in our practices, legal requirements, or organizational needs. When changes are made, we will update the "Last Revised" date at the top of this page. Please review this page periodically for any updates.</p>',
+        },
+        {
+          id: "grievance-redress",
+          title: "Grievance and Redress Policy",
+          content:
+            '<p>Turning Tides\' Grievance and Redress Policy provides a clear, transparent process for raising concerns and resolving complaints, strengthening trust and accountability with an <a href="https://turningtidesfacility.org/grievance-redress">established</a>, <a href="https://turningtidesfacility.org/feedback">Give feedback</a></p>',
+        },
+        {
+          id: "consent-rights",
+          title: "Consent and Rights Policy",
+          content:
+            '<p>TurningTides is committed to transparency and trust through a clear <a href="https://turningtidesfacility.org/consent-rights">Consent and Rights Policy</a>.</p>',
         },
         {
           id: "contact-info",
           title: "Contact Information",
           content:
-            "How to reach us for questions about our policies or to provide feedback.",
+            '<p>If you have any questions about our policies or need further clarification, please reach out to us:</p><ul><li>Email: <a href="mailto:info@turningTidesFacility.org">info@turningTidesFacility.org</a></li><li>Phone: +62 838 329 80063 (also available for whatsapp contact)</li><li>Mailing Address: 190 Varick Street, FL2, New York, NY 10002 USA</li></ul>',
         },
       ]),
       itemSchema: [
@@ -318,12 +331,10 @@ export const GOVERNANCE_SCHEMA: PageContentSchema = {
         { key: "title", type: "text", label: "Policy Title", required: true },
         {
           key: "content",
-          type: "textarea",
+          type: "html",
           label: "Policy Content",
           required: true,
         },
-        { key: "linkText", type: "text", label: "Link Text" },
-        { key: "linkHref", type: "text", label: "Link URL" },
       ],
     },
 

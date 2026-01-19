@@ -10,22 +10,26 @@ import { useState } from "react";
 interface WhereWeWorkSectionProps {
   title?: string;
   actionPlansText?: string;
+  actionPlansLinkText?: string;
+  actionPlansLinkUrl?: string;
   explorationText?: string;
-  explorationLinkText?: string;
-  explorationLinkUrl?: string;
   mapImage?: string;
   partnersText?: string;
+  partnersLinkText?: string;
+  partnersLinkUrl?: string;
   content?: string;
 }
 
 export function WhereWeWorkSection({
   title: propTitle,
   actionPlansText: propActionPlansText,
+  actionPlansLinkText: propActionPlansLinkText,
+  actionPlansLinkUrl: propActionPlansLinkUrl,
   explorationText: propExplorationText,
-  explorationLinkText: propExplorationLinkText,
-  explorationLinkUrl: propExplorationLinkUrl,
   mapImage: propMapImage,
   partnersText: propPartnersText,
+  partnersLinkText: propPartnersLinkText,
+  partnersLinkUrl: propPartnersLinkUrl,
 }: WhereWeWorkSectionProps = {}) {
   const [imageError, setImageError] = useState(false);
 
@@ -69,25 +73,25 @@ export function WhereWeWorkSection({
   const actionPlansText = getValue(
     "whereWeWork.actionPlansText",
     propActionPlansText,
-    "We have **developed action plans** for Latin America and Africa, and **mobilizing grants** for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda."
+    "We have **developed action plans for Latin America and Africa**, and **mobilizing grants** for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda."
+  );
+
+  const actionPlansLinkText = getValue(
+    "whereWeWork.actionPlansLinkText",
+    propActionPlansLinkText,
+    "See Action Plans"
+  );
+
+  const actionPlansLinkUrl = getValue(
+    "whereWeWork.actionPlansLinkUrl",
+    propActionPlansLinkUrl,
+    "#"
   );
 
   const explorationText = getValue(
     "whereWeWork.explorationText",
     propExplorationText,
-    "We are also in the **exploration and engagement phase** – Brazil, India, Indonesia, Sri Lanka, Thailand."
-  );
-
-  const explorationLinkText = getValue(
-    "whereWeWork.explorationLinkText",
-    propExplorationLinkText,
-    "View Report"
-  );
-
-  const explorationLinkUrl = getValue(
-    "whereWeWork.explorationLinkUrl",
-    propExplorationLinkUrl,
-    "#"
+    "We are also in **the exploration and engagement phase** – Brazil, India, Indonesia, Sri Lanka, Thailand."
   );
 
   const mapImage = getValue(
@@ -102,7 +106,19 @@ export function WhereWeWorkSection({
   const partnersText = getValue(
     "whereWeWork.partnersText",
     propPartnersText,
-    'Our **"Partners Piloting"** partners are Bangladesh, Thailand, Indonesia, Honduras, Senegal.'
+    'Our **"Partners Piloting"** partners were in Bangladesh, Thailand, Indonesia, Honduras, Senegal.'
+  );
+
+  const partnersLinkText = getValue(
+    "whereWeWork.partnersLinkText",
+    propPartnersLinkText,
+    "View Report"
+  );
+
+  const partnersLinkUrl = getValue(
+    "whereWeWork.partnersLinkUrl",
+    propPartnersLinkUrl,
+    "#"
   );
 
   return (
@@ -116,22 +132,31 @@ export function WhereWeWorkSection({
         </div>
 
         {/* Legend Blocks */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-12 lg:mb-16 max-w-5xl mx-auto">
-          {/* Left Block - Action Plans */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12 lg:mb-16 max-w-6xl mx-auto">
+          {/* Block 1 - Action Plans */}
           <div className="flex items-start gap-4">
             <div className="w-4 h-4 bg-[#3C62ED] flex-shrink-0 mt-1" />
-            <p className="text-base text-gray-900 font-work-sans leading-relaxed">
-              {actionPlansText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
-                // Every odd index is the text inside **
-                if (index % 2 === 1) {
-                  return <strong key={index}>{part}</strong>;
-                }
-                return <span key={index}>{part}</span>;
-              })}
-            </p>
+            <div className="text-base text-gray-900 font-work-sans leading-relaxed">
+              <p className="mb-2">
+                {actionPlansText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
+                  // Every odd index is the text inside **
+                  if (index % 2 === 1) {
+                    return <strong key={index}>{part}</strong>;
+                  }
+                  return <span key={index}>{part}</span>;
+                })}
+              </p>
+              <Link
+                href={actionPlansLinkUrl}
+                className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
+              >
+                <span>{actionPlansLinkText}</span>
+                <ExternalLink className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </Link>
+            </div>
           </div>
 
-          {/* Right Block - Exploration Phase */}
+          {/* Block 2 - Exploration Phase */}
           <div className="flex items-start gap-4">
             <div className="w-4 h-4 bg-[#7db5bb] flex-shrink-0 mt-1" />
             <p className="text-base text-gray-900 font-work-sans leading-relaxed">
@@ -141,20 +166,36 @@ export function WhereWeWorkSection({
                   return <strong key={index}>{part}</strong>;
                 }
                 return <span key={index}>{part}</span>;
-              })}{" "}
+              })}
+            </p>
+          </div>
+
+          {/* Block 3 - Partners Piloting */}
+          <div className="flex items-start gap-4">
+            <div className="w-4 h-4 bg-[#C4B5FD] flex-shrink-0 mt-1" />
+            <div className="text-base text-gray-900 font-work-sans leading-relaxed">
+              <p className="mb-2">
+                {partnersText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
+                  // Every odd index is the text inside **
+                  if (index % 2 === 1) {
+                    return <strong key={index}>{part}</strong>;
+                  }
+                  return <span key={index}>{part}</span>;
+                })}
+              </p>
               <Link
-                href={explorationLinkUrl}
+                href={partnersLinkUrl}
                 className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
               >
-                <span>{explorationLinkText}</span>
+                <span>{partnersLinkText}</span>
                 <ExternalLink className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </Link>
-            </p>
+            </div>
           </div>
         </div>
 
         {/* World Map */}
-        <div className="relative w-full mb-12 lg:mb-16">
+        <div className="relative w-full">
           <div className="relative w-full aspect-[16/9] lg:aspect-[2/1]">
             {!imageError ? (
               <Image
@@ -173,19 +214,6 @@ export function WhereWeWorkSection({
               </div>
             )}
           </div>
-        </div>
-
-        {/* Bottom Text */}
-        <div className="text-center max-w-[417px] mx-auto">
-          <p className="text-base text-[#060726CC]">
-            {partnersText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
-              // Every odd index is the text inside **
-              if (index % 2 === 1) {
-                return <strong key={index}>{part}</strong>;
-              }
-              return <span key={index}>{part}</span>;
-            })}
-          </p>
         </div>
       </div>
     </section>

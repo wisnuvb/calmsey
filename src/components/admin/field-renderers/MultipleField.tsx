@@ -13,6 +13,7 @@ import { TextField } from "./TextField";
 import { TextareaField } from "./TextareaField";
 import { NumberField } from "./NumberField";
 import { BooleanField } from "./BooleanField";
+import { HtmlField } from "./HtmlField";
 import { getImageUrl } from "@/lib/utils";
 
 interface MultipleFieldProps {
@@ -208,6 +209,38 @@ export function MultipleField({
               handleMultipleItemChange(itemIndex, itemField.key, val)
             }
             error={error}
+          />
+        );
+
+      case "html":
+        return (
+          <HtmlField
+            field={itemField as FieldDefinition}
+            value={itemFieldValue}
+            onChange={(val) =>
+              handleMultipleItemChange(itemIndex, itemField.key, val)
+            }
+            onImageUpload={async (file: File): Promise<string> => {
+              const formData = new FormData();
+              formData.append("file", file);
+
+              try {
+                const response = await fetch("/api/admin/media/upload", {
+                  method: "POST",
+                  body: formData,
+                });
+
+                if (!response.ok) {
+                  throw new Error("Upload failed");
+                }
+
+                const data = await response.json();
+                return data.url;
+              } catch (err) {
+                console.error("Image upload error:", err);
+                throw err;
+              }
+            }}
           />
         );
 

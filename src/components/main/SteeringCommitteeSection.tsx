@@ -5,14 +5,17 @@ import Image from "next/image";
 import { Linkedin, ChevronLeft, ChevronRight } from "lucide-react";
 import { H2, P } from "@/components/ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
+import { usePageContent } from "@/contexts/PageContentContext";
+import { MemberDetailModal } from "@/components/ui/MemberDetailModal";
 
 interface CommitteeMember {
   id: string;
   name: string;
   country: string;
   image: string;
-  imageAlt: string;
+  imageAlt?: string;
   linkedinUrl?: string;
+  biography?: string;
 }
 
 interface SteeringCommitteeSectionProps {
@@ -24,54 +27,128 @@ interface SteeringCommitteeSectionProps {
   backgroundColor?: string;
 }
 
+const defaultMembers: CommitteeMember[] = [
+  {
+    id: "myrna-cunningham",
+    name: "Myrna Cunningham Kain",
+    country: "Nicaragua",
+    image:
+      "https://s7d1.scene7.com/is/image/wbcollab/Myrna-Cunningham-2?qlt=75&resMode=sharp2",
+    imageAlt: "Myrna Cunningham Kain",
+    linkedinUrl: "https://linkedin.com/in/myrna-cunningham",
+    biography:
+      '<p>I have been an applied environmental social scientist and <strong>inclusive governance advisor for 25 years</strong>. I have always focused on small-scale fisheries, coastal communities, and women in fisheries – from research, processing, trading and governance. I am an islander – living and working in Australia (Tasmania), Tonga, Fiji, Solomon Islands and Malaysia (Penang).</p><p>Lorem ipsum dolor sit amet consectetur. Nascetur maecenas viverra diam habitant interdum orci in ridiculus sagittis. Vulputate orci ut convallis felis urna consequat et laoreet velit. Amet id molestie a enim vitae senectus in porta et. Quam velit elementum facilisi dui egestas rhoncus ipsum vestibulum. Nec a ut consectetur lorem. Egestas orci fringilla urna ultrices. Condimentum mi et fermentum pulvinar dignissim donec pellentesque congue pharetra. Ac eget porttitor proin sed viverra sit. Quis sit dignissim morbi amet amet. Nisl massa vitae.</p>',
+  },
+  {
+    id: "vivienne-solis",
+    name: "Vivienne Solis Rivera",
+    country: "Costa Rica",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7YGBwVSD-KJDpMbdJJQ8r7OdC5Rv4keEyNA&s",
+    imageAlt: "Vivienne Solis Rivera",
+    linkedinUrl: "https://linkedin.com/in/vivienne-solis",
+  },
+  {
+    id: "hugh-govan",
+    name: "Hugh Govan",
+    country: "Spain",
+    image:
+      "https://www.unigib.edu.gi/wp-content/uploads/2024/11/Untitled-design-3-2.png",
+    imageAlt: "Hugh Govan",
+    linkedinUrl: "https://linkedin.com/in/hugh-govan",
+  },
+  {
+    id: "aarthi-sridhar",
+    name: "Aarthi Sridhar",
+    country: "India",
+    image:
+      "https://dakshin.org/wp-content/uploads/2019/02/IMG_20200919_113143-479x525.jpg",
+    imageAlt: "Aarthi Sridhar",
+    linkedinUrl: "https://linkedin.com/in/aarthi-sridhar",
+  },
+];
+
 export const SteeringCommitteeSection: React.FC<
   SteeringCommitteeSectionProps
 > = ({
-  title = "The Steering Committee",
-  description = "Turning Tides is governed by a Steering Committee who are responsible for setting strategic direction and values alignment",
-  additionalDescription = "The implementation of our strategy and organizational priorities—composed of small-scale fisher leaders, Indigenous Peoples, and rights experts who bring both deep expertise and accountability to those we serve. The Steering Committee has governed the initiative since the first months of its inception and is critical to the accountability and efficacy",
-  members = [
-    {
-      id: "myrna-cunningham",
-      name: "Myrna Cunningham Kain",
-      country: "Nicaragua",
-      image:
-        "https://s7d1.scene7.com/is/image/wbcollab/Myrna-Cunningham-2?qlt=75&resMode=sharp2",
-      imageAlt: "Myrna Cunningham Kain",
-      linkedinUrl: "https://linkedin.com/in/myrna-cunningham",
-    },
-    {
-      id: "vivienne-solis",
-      name: "Vivienne Solis Rivera",
-      country: "Costa Rica",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7YGBwVSD-KJDpMbdJJQ8r7OdC5Rv4keEyNA&s",
-      imageAlt: "Vivienne Solis Rivera",
-      linkedinUrl: "https://linkedin.com/in/vivienne-solis",
-    },
-    {
-      id: "hugh-govan",
-      name: "Hugh Govan",
-      country: "Spain",
-      image:
-        "https://www.unigib.edu.gi/wp-content/uploads/2024/11/Untitled-design-3-2.png",
-      imageAlt: "Hugh Govan",
-      linkedinUrl: "https://linkedin.com/in/hugh-govan",
-    },
-    {
-      id: "aarthi-sridhar",
-      name: "Aarthi Sridhar",
-      country: "India",
-      image:
-        "https://dakshin.org/wp-content/uploads/2019/02/IMG_20200919_113143-479x525.jpg",
-      imageAlt: "Aarthi Sridhar",
-      linkedinUrl: "https://linkedin.com/in/aarthi-sridhar",
-    },
-  ],
-  bottomText,
+  title: propTitle,
+  description: propDescription,
+  additionalDescription: propAdditionalDescription,
+  members: propMembers,
+  bottomText: propBottomText,
   backgroundColor = "bg-white",
 }) => {
+  // Try to get content from context, fallback to empty object if not available
+  let pageContent: Record<string, string> = {};
+  try {
+    const context = usePageContent();
+    pageContent = context.content;
+  } catch {
+    // Not in PageContentProvider, use props only
+  }
+
+  // Helper to get value from content
+  const getContentValue = (key: string, defaultValue: string = ""): string => {
+    return pageContent[key] || defaultValue;
+  };
+
+  // Helper to get JSON value from content
+  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
+    const value = pageContent[key];
+    if (!value) return defaultValue;
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return defaultValue;
+    }
+  };
+
+  // Helper function to get value with priority: context > props > default
+  const getValue = (
+    contentKey: string,
+    propValue?: string,
+    defaultValue: string = ""
+  ): string => {
+    const contentValue = getContentValue(contentKey, "");
+    if (contentValue && contentValue.trim() !== "") {
+      return contentValue;
+    }
+    if (propValue && propValue.trim() !== "") {
+      return propValue;
+    }
+    return defaultValue;
+  };
+
+  // Get all values with priority: context > props > default
+  const title = getValue(
+    "steeringCommittee.title",
+    propTitle,
+    "The Steering Committee"
+  );
+  const description = getValue(
+    "steeringCommittee.description",
+    propDescription,
+    "Turning Tides is governed by a Steering Committee who are responsible for setting strategic direction and values alignment"
+  );
+  const additionalDescription = getValue(
+    "steeringCommittee.additionalDescription",
+    propAdditionalDescription,
+    "The implementation of our strategy and organizational priorities—composed of small-scale fisher leaders, Indigenous Peoples, and rights experts who bring both deep expertise and accountability to those we serve. The Steering Committee has governed the initiative since the first months of its inception and is critical to the accountability and efficacy"
+  );
+  const bottomText = getValue(
+    "steeringCommittee.bottomText",
+    propBottomText,
+    ""
+  );
+  const members = getContentJSON<CommitteeMember[]>(
+    "steeringCommittee.members",
+    propMembers || defaultMembers
+  );
+
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedMember, setSelectedMember] = useState<CommitteeMember | null>(
+    null
+  );
   const membersPerPage = 4;
   const totalPages = Math.ceil(members.length / membersPerPage);
 
@@ -142,12 +219,24 @@ export const SteeringCommitteeSection: React.FC<
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {currentMembers.map((member) => (
-              <div key={member.id} className="flex flex-col">
+              <div
+                key={member.id}
+                className="flex flex-col cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedMember(member)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedMember(member);
+                  }
+                }}
+              >
                 <div className="relative mb-4">
                   <div className="relative w-full aspect-[3/4] overflow-hidden rounded">
                     <Image
                       src={getImageUrl(member.image)}
-                      alt={member.imageAlt}
+                      alt={member.imageAlt || member.name}
                       fill
                       className="object-cover"
                     />
@@ -159,6 +248,7 @@ export const SteeringCommitteeSection: React.FC<
                         rel="noopener noreferrer"
                         className="absolute bottom-3 left-3 w-9 h-9 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center hover:shadow-lg transition-shadow duration-200"
                         aria-label={`${member.name}'s LinkedIn profile`}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <Linkedin className="w-4 h-4 text-[#3C62ED]" />
                       </a>
@@ -211,6 +301,12 @@ export const SteeringCommitteeSection: React.FC<
           </div>
         )}
       </div>
+
+      {/* Member Detail Modal */}
+      <MemberDetailModal
+        member={selectedMember}
+        onClose={() => setSelectedMember(null)}
+      />
     </section>
   );
 };

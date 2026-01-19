@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FaLinkedin } from "react-icons/fa";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContent } from "@/contexts/PageContentContext";
+import { MemberDetailModal } from "@/components/ui/MemberDetailModal";
 
 interface TeamMember {
   id: string;
@@ -252,95 +253,10 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
       </div>
 
       {/* Team Member Modal */}
-      {selectedMember && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          onClick={() => setSelectedMember(null)}
-        >
-          <div
-            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col lg:flex-row shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
-            <button
-              onClick={() => setSelectedMember(null)}
-              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Left Section - Image */}
-            <div className="w-full lg:w-1/2 relative h-64 lg:h-auto">
-              <Image
-                src={getImageUrl(selectedMember.image)}
-                alt={selectedMember.name}
-                fill
-                className="object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    selectedMember.name
-                  )}&size=400&background=random`;
-                }}
-              />
-            </div>
-
-            {/* Right Section - Content */}
-            <div className="w-full lg:w-1/2 p-6 sm:p-8 flex flex-col">
-              {/* Title */}
-              <p className="text-xs uppercase tracking-wider text-gray-400 mb-2 font-work-sans">
-                {selectedMember.role.toUpperCase()}
-              </p>
-
-              {/* Name */}
-              <h3 className="text-3xl sm:text-4xl font-bold text-[#010107] mb-2 font-nunito-sans">
-                {selectedMember.name}
-              </h3>
-
-              {/* Location */}
-              <p className="text-base text-gray-400 mb-6 font-work-sans">
-                {selectedMember.location}
-              </p>
-
-              {/* Biography - Scrollable */}
-              {selectedMember.biography ? (
-                <div className="flex-1 mb-6 overflow-y-auto pr-2 min-h-0">
-                  <div
-                    className="text-base text-gray-700 leading-relaxed font-work-sans whitespace-pre-line"
-                    dangerouslySetInnerHTML={{
-                      __html: selectedMember.biography
-                        .replace(/\n\n/g, "<br /><br />")
-                        .replace(/\n/g, "<br />"),
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="flex-1 mb-6">
-                  <div className="text-base text-gray-500 italic font-work-sans">
-                    Biography not available.
-                  </div>
-                </div>
-              )}
-
-              {/* LinkedIn Button */}
-              {selectedMember.linkedinUrl && (
-                <a
-                  href={selectedMember.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-6 py-3 border-2 border-[#0077B5] bg-white text-[#0077B5] rounded-lg hover:bg-[#0077B5] hover:text-white transition-colors font-semibold font-work-sans mt-auto"
-                >
-                  <div className="w-6 h-6 bg-[#0077B5] rounded flex items-center justify-center">
-                    <FaLinkedin className="w-4 h-4 text-white" />
-                  </div>
-                  <span>Linkedin Profile</span>
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <MemberDetailModal
+        member={selectedMember}
+        onClose={() => setSelectedMember(null)}
+      />
     </section>
   );
 };

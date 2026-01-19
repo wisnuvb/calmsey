@@ -85,7 +85,7 @@ We support ongoing efforts to build accountability, respect and awareness amongs
     "Theory of Change diagram showing how change happens"
   );
 
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded] = useState(true);
 
   return (
     <section
@@ -133,7 +133,7 @@ We support ongoing efforts to build accountability, respect and awareness amongs
           </p>
 
           {/* Show More Button */}
-          <div className="mt-6 text-center">
+          {/* <div className="mt-6 text-center">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium font-work-sans"
@@ -145,7 +145,7 @@ We support ongoing efforts to build accountability, respect and awareness amongs
                 <ChevronsRight className="w-4 h-4" />
               )}
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

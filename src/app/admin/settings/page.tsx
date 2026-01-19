@@ -163,7 +163,7 @@ export default function SettingsPage() {
           <button
             onClick={saveSettings}
             disabled={saving || !unsavedChanges}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 z-[50]"
           >
             {saving ? (
               <>

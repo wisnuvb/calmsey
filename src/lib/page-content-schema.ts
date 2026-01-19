@@ -36,6 +36,7 @@ export interface MultipleItemField {
   type:
     | "text"
     | "textarea"
+    | "html"
     | "image"
     | "number"
     | "url"
