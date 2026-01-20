@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Download, X } from "lucide-react";
 import { H5 } from "../ui/typography";
-import { usePageContent } from "@/contexts/PageContentContext";
 import { useLanguage } from "../public/LanguageProvider";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";

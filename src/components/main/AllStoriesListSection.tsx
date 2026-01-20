@@ -13,7 +13,6 @@ import {
   Filter,
 } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
-import { usePageContent } from "@/contexts/PageContentContext";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface Story {

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { H2, P } from "@/components/ui/typography";
-import { usePageContent } from "@/contexts/PageContentContext";
 import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 

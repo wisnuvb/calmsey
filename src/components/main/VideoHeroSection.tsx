@@ -3,7 +3,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { H1, P } from "../ui/typography";
-import { usePageContent } from "@/contexts/PageContentContext";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface VideoHeroSectionProps {

@@ -1,7 +1,6 @@
 "use client";
 
 import { H2, P } from "@/components/ui/typography";
-import { usePageContent } from "@/contexts/PageContentContext";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface FeedbackCalloutSectionProps {

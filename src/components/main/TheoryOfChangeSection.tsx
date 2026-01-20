@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { cn, getImageUrl } from "@/lib/utils";
-import { usePageContent } from "@/contexts/PageContentContext";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface TheoryOfChangeSectionProps {
