@@ -198,7 +198,7 @@ export function PartnerStoriesSection({
               });
 
               // Build URL from slug
-              const articleUrl = `/${language}/articles/${article.slug}`;
+              const articleUrl = `/${language}/stories/${article.slug}`;
 
               return {
                 id: article.id,
@@ -309,86 +309,86 @@ export function PartnerStoriesSection({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
           {loading
             ? // Loading Skeletons
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex flex-col gap-4 animate-pulse">
-                  <div className="w-full aspect-[16/10] bg-white/20 rounded-lg" />
-                  <div className="h-6 w-3/4 bg-white/20 rounded" />
-                  <div className="h-4 w-1/2 bg-white/20 rounded" />
-                </div>
-              ))
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex flex-col gap-4 animate-pulse">
+                <div className="w-full aspect-[16/10] bg-white/20 rounded-lg" />
+                <div className="h-6 w-3/4 bg-white/20 rounded" />
+                <div className="h-4 w-1/2 bg-white/20 rounded" />
+              </div>
+            ))
             : stories.map((story) => (
-                <div key={story.id} className="group flex flex-col gap-4">
-                  {/* Thumbnail Container */}
-                  <Link href={story.url} className="block relative w-full">
-                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-sm bg-gray-200">
-                      {!hasError(story.id) ? (
-                        <Image
-                          src={getImageUrl(story.imageSrc)}
-                          alt={story.imageAlt}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          onError={() => handleError(story.id)}
-                          unoptimized
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-300">
-                          <span className="text-gray-500 text-sm">
-                            No image
-                          </span>
+              <div key={story.id} className="group flex flex-col gap-4">
+                {/* Thumbnail Container */}
+                <Link href={story.url} className="block relative w-full">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-sm bg-gray-200">
+                    {!hasError(story.id) ? (
+                      <Image
+                        src={getImageUrl(story.imageSrc)}
+                        alt={story.imageAlt}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        onError={() => handleError(story.id)}
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                        <span className="text-gray-500 text-sm">
+                          No image
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Video Overlay Elements */}
+                    {story.type === "video" && (
+                      <>
+                        {/* Center Play Button */}
+                        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110">
+                            <Play className="w-6 h-6 text-black fill-black ml-1" />
+                          </div>
                         </div>
-                      )}
 
-                      {/* Video Overlay Elements */}
-                      {story.type === "video" && (
-                        <>
-                          {/* Center Play Button */}
-                          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110">
-                              <Play className="w-6 h-6 text-black fill-black ml-1" />
-                            </div>
+                        {/* Bottom Left Video Badge */}
+                        <div className="absolute bottom-4 left-4 z-10">
+                          <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-md">
+                            <Play className="w-3 h-3 text-black fill-black" />
+                            <span className="text-[10px] font-bold text-black uppercase tracking-wider leading-none">
+                              Video
+                            </span>
                           </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </Link>
 
-                          {/* Bottom Left Video Badge */}
-                          <div className="absolute bottom-4 left-4 z-10">
-                            <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full shadow-md">
-                              <Play className="w-3 h-3 text-black fill-black" />
-                              <span className="text-[10px] font-bold text-black uppercase tracking-wider leading-none">
-                                Video
-                              </span>
-                            </div>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </Link>
-
-                  {/* Content */}
-                  <div className="flex flex-col gap-2">
-                    <Link href={story.url}>
-                      <h3
-                        className={cn(
-                          "text-xl sm:text-2xl font-bold leading-tight transition-colors hover:text-white/80 font-nunito-sans",
-                          textColor
-                        )}
-                      >
-                        {story.title}
-                      </h3>
-                    </Link>
-
-                    {/* Meta Info */}
-                    <div
+                {/* Content */}
+                <div className="flex flex-col gap-2">
+                  <Link href={story.url}>
+                    <h3
                       className={cn(
-                        "flex items-center text-sm font-medium tracking-wide uppercase font-work-sans",
-                        isBlueBackground ? "text-blue-200" : "text-gray-500"
+                        "text-xl sm:text-2xl font-bold leading-tight transition-colors hover:text-white/80 font-nunito-sans",
+                        textColor
                       )}
                     >
-                      <span>{story.date}</span>
-                      <span className="mx-2 opacity-60">|</span>
-                      <span>{story.location}</span>
-                    </div>
+                      {story.title}
+                    </h3>
+                  </Link>
+
+                  {/* Meta Info */}
+                  <div
+                    className={cn(
+                      "flex items-center text-sm font-medium tracking-wide uppercase font-work-sans",
+                      isBlueBackground ? "text-blue-200" : "text-gray-500"
+                    )}
+                  >
+                    <span>{story.date}</span>
+                    <span className="mx-2 opacity-60">|</span>
+                    <span>{story.location}</span>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
         </div>
       </div>
     </section>
