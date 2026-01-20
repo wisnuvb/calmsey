@@ -18,8 +18,8 @@ module.exports = {
       kill_timeout: 15000,
       listen_timeout: 10000,
       // Logging
-      output: "/var/www/html/project/turningtidesfacility/logs/out.log",
-      error: "/var/www/html/project/turningtidesfacility/logs/error.log",
+      output: "/var/www/html/projects/turningtidesfacility/logs/out.log",
+      error: "/var/www/html/projects/turningtidesfacility/logs/error.log",
       log_date_format: "YYYY-MM-DD HH:mm:ss Z",
       max_size: "10M",
       max_file: 5,
