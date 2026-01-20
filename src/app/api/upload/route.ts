@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ImageUploadService } from "@/lib/upload";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ROLE_AUTHOR } from "@/lib/auth-helpers";
+import { formatFileSize, MEDIA_CONFIG } from "@/lib/media-types";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +16,13 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+
+    if (file.size > MEDIA_CONFIG.MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: `File size exceeds ${formatFileSize(MEDIA_CONFIG.MAX_FILE_SIZE)} limit` },
+        { status: 400 }
+      );
     }
 
     // Upload dan compress

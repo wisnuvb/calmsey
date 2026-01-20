@@ -1,6 +1,8 @@
 import { Footer, Navbar } from "@/components/layout";
 import SessionProvider from "@/components/providers/SessionProvider";
 import { LanguageProvider } from "@/components/public/LanguageProvider";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 import React from "react";
 import Script from "next/script";
 
@@ -11,6 +13,26 @@ interface LanguageLayoutProps {
 
 const FrontendLayout = async ({ children, params }: LanguageLayoutProps) => {
   const { lang } = await params;
+
+  // Check maintenance mode
+  // Note: redirect() throws NEXT_REDIRECT error which is expected behavior in Next.js
+  // We only catch database errors, not redirect errors
+  let isMaintenanceMode = false;
+  try {
+    const maintenanceSetting = await prisma.siteSetting.findUnique({
+      where: { key: "maintenance_mode" },
+    });
+
+    isMaintenanceMode = maintenanceSetting?.value === "true";
+  } catch (error) {
+    // If error checking maintenance mode, continue normally
+    console.error("Error checking maintenance mode:", error);
+  }
+
+  // If maintenance mode is active, redirect (this will throw NEXT_REDIRECT which is expected)
+  if (isMaintenanceMode) {
+    redirect("/maintenance");
+  }
 
   return (
     <SessionProvider>

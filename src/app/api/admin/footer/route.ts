@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
           const { links, ...sectionData } = section;
 
           // Remove id if present (we're creating new records)
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { id, ...sectionDataWithoutId } = sectionData;
 
           const createdSection = await tx.footerSection.create({
@@ -92,6 +93,7 @@ export async function POST(request: NextRequest) {
             await Promise.all(
               links.map(async (link: any, linkIndex: number) => {
                 // Remove id if present
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { id: linkId, ...linkDataWithoutId } = link;
 
                 await tx.footerLink.create({

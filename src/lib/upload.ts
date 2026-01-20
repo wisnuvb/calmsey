@@ -46,11 +46,10 @@ export class ImageUploadService {
       // Generate unique filename
       const fileExtension = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const uniqueFilename = `${uuidv4()}.${fileExtension}`;
-      const key = `${folder}/${new Date().getFullYear()}/${
-        new Date().getMonth() + 1
-      }/${uniqueFilename}`;
+      const key = `${folder}/${new Date().getFullYear()}/${new Date().getMonth() + 1
+        }/${uniqueFilename}`;
 
-      // Compress image dengan Sharp
+      // Compress image with Sharp
       let processedBuffer: Buffer;
       let finalMimeType: string;
 
@@ -60,9 +59,8 @@ export class ImageUploadService {
           withoutEnlargement: true,
         });
 
-        // Convert ke JPEG untuk size yang lebih kecil
+        // Convert to JPEG for smaller size
         if (fileExtension === "png" && file.size > 500000) {
-          // 500KB
           processedBuffer = await sharpImage
             .jpeg({ quality, progressive: true })
             .toBuffer();
@@ -86,7 +84,7 @@ export class ImageUploadService {
         finalMimeType = file.type;
       }
 
-      // Upload ke DigitalOcean Spaces
+      // Upload to DigitalOcean Spaces
       const uploadParams = {
         Bucket: this.bucketName,
         Key: key,
@@ -98,7 +96,7 @@ export class ImageUploadService {
 
       const uploadResult = await s3.upload(uploadParams).promise();
 
-      // Return result dengan CDN URL jika available
+      // Return result with CDN URL if available
       const finalUrl = this.cdnUrl
         ? `${this.cdnUrl}/${key}`
         : uploadResult.Location;
@@ -122,7 +120,7 @@ export class ImageUploadService {
       const key = url
         .replace(
           this.cdnUrl ||
-            `https://${this.bucketName}.${process.env.DO_SPACES_ENDPOINT}`,
+          `https://${this.bucketName}.${process.env.DO_SPACES_ENDPOINT}`,
           ""
         )
         .substring(1);
@@ -140,10 +138,10 @@ export class ImageUploadService {
   }
 
   static generateThumbnail(originalUrl: string): string {
-    // Jika pakai CDN yang support image transformation (seperti ImageKit)
+    // If using CDN that supports image transformation (like ImageKit)
     // return `${originalUrl}?tr=w-${width},q-80`;
 
-    // Untuk sekarang return original URL
+    // For now return original URL
     return originalUrl;
   }
 }

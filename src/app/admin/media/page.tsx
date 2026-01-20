@@ -28,6 +28,7 @@ import {
 } from "@/lib/media";
 import { useMedia } from "@/hooks/useMedia";
 import { getImageUrl } from "@/lib/utils";
+import { Pagination } from "@/components/common/Pagination";
 
 export default function MediaPage() {
   const {
@@ -36,6 +37,9 @@ export default function MediaPage() {
     stats,
     loading,
     uploading,
+    pagination,
+    currentPage,
+    handlePageChange,
 
     // State
     search,
@@ -65,167 +69,6 @@ export default function MediaPage() {
   const handleSelectAll = useCallback(() => {
     selectAllFiles(filteredFiles.map((file) => file.id));
   }, [selectAllFiles, filteredFiles]);
-
-  // const fileInputRef = useRef<HTMLInputElement>(null);
-  // const [dragOver, setDragOver] = useState(false);
-
-  // useEffect(() => {
-  //   fetchMediaFiles();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [search, filter]);
-
-  // const fetchMediaFiles = async () => {
-  //   try {
-  //     const params = new URLSearchParams({
-  //       search,
-  //       filter: filter === "all" ? "" : filter,
-  //     });
-
-  //     const response = await fetch(`/api/admin/media?${params}`);
-  //     const data = await response.json();
-  //     setMediaFiles(data.data || []);
-  //     setStats(data.stats || stats);
-  //   } catch (error) {
-  //     console.error("Failed to fetch media files:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const formatFileSize = (bytes: number) => {
-  //   if (bytes === 0) return "0 Bytes";
-  //   const k = 1024;
-  //   const sizes = ["Bytes", "KB", "MB", "GB"];
-  //   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  //   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  // };
-
-  // const handleFileUpload = async (files: FileList) => {
-  //   if (!files.length) return;
-
-  //   setUploading(true);
-  //   const formData = new FormData();
-
-  //   Array.from(files).forEach((file) => {
-  //     formData.append("files", file);
-  //   });
-
-  //   try {
-  //     const response = await fetch("/api/admin/media", {
-  //       method: "POST",
-  //       body: formData,
-  //     });
-
-  //     if (response.ok) {
-  //       fetchMediaFiles();
-  //       setShowUploadModal(false);
-  //     } else {
-  //       const error = await response.json();
-  //       alert(error.error || "Failed to upload files");
-  //     }
-  //   } catch (error) {
-  //     console.error("Upload error:", error);
-  //     alert("Failed to upload files");
-  //   } finally {
-  //     setUploading(false);
-  //   }
-  // };
-
-  // const handleDrop = (e: React.DragEvent) => {
-  //   e.preventDefault();
-  //   setDragOver(false);
-  //   const files = e.dataTransfer.files;
-  //   if (files.length) {
-  //     handleFileUpload(files);
-  //   }
-  // };
-
-  // const handleDragOver = (e: React.DragEvent) => {
-  //   e.preventDefault();
-  //   setDragOver(true);
-  // };
-
-  // const handleDragLeave = (e: React.DragEvent) => {
-  //   e.preventDefault();
-  //   setDragOver(false);
-  // };
-
-  // const deleteFile = async (fileId: string, filename: string) => {
-  //   if (!confirm(`Are you sure you want to delete "${filename}"?`)) return;
-
-  //   try {
-  //     const response = await fetch(`/api/admin/media/${fileId}`, {
-  //       method: "DELETE",
-  //     });
-
-  //     if (response.ok) {
-  //       fetchMediaFiles();
-  //       setSelectedFiles((prev) => {
-  //         const newSet = new Set(prev);
-  //         newSet.delete(fileId);
-  //         return newSet;
-  //       });
-  //     } else {
-  //       const error = await response.json();
-  //       alert(error.error || "Failed to delete file");
-  //     }
-  //   } catch (error) {
-  //     console.error("Delete error:", error);
-  //     alert("Failed to delete file");
-  //   }
-  // };
-
-  // const bulkDeleteFiles = async () => {
-  //   if (selectedFiles.size === 0) return;
-
-  //   if (!confirm(`Delete ${selectedFiles.size} selected files?`)) return;
-
-  //   try {
-  //     const promises = Array.from(selectedFiles).map((fileId) =>
-  //       fetch(`/api/admin/media/${fileId}`, { method: "DELETE" })
-  //     );
-
-  //     await Promise.all(promises);
-  //     fetchMediaFiles();
-  //     setSelectedFiles(new Set());
-  //     setBulkActionMode(false);
-  //   } catch (error) {
-  //     console.error("Bulk delete error:", error);
-  //     alert("Failed to delete some files");
-  //   }
-  // };
-
-  // const toggleFileSelection = (fileId: string) => {
-  //   const newSet = new Set(selectedFiles);
-  //   if (newSet.has(fileId)) {
-  //     newSet.delete(fileId);
-  //   } else {
-  //     newSet.add(fileId);
-  //   }
-  //   setSelectedFiles(newSet);
-  // };
-
-  // const selectAllFiles = () => {
-  //   if (selectedFiles.size === filteredFiles.length) {
-  //     setSelectedFiles(new Set());
-  //   } else {
-  //     setSelectedFiles(new Set(filteredFiles.map((file) => file.id)));
-  //   }
-  // };
-
-  // Filter files based on type
-  // const filteredFiles = mediaFiles.filter((file) => {
-  //   if (filter === "images") return file.mimeType.startsWith("image/");
-  //   if (filter === "documents")
-  //     return (
-  //       !file.mimeType.startsWith("image/") &&
-  //       !file.mimeType.startsWith("video/") &&
-  //       !file.mimeType.startsWith("audio/")
-  //     );
-  //   if (filter === "videos") return file.mimeType.startsWith("video/");
-  //   if (filter === "audio") return file.mimeType.startsWith("audio/");
-  //   return true;
-  // });
 
   if (loading) {
     return (
@@ -363,11 +206,10 @@ export default function MediaPage() {
                 <button
                   key={filterOption.key}
                   onClick={() => setFilter(filterOption.key)}
-                  className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap ${
-                    filter === filterOption.key
-                      ? "bg-blue-100 text-blue-700 border border-blue-300"
-                      : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                  }`}
+                  className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap ${filter === filterOption.key
+                    ? "bg-blue-100 text-blue-700 border border-blue-300"
+                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                    }`}
                 >
                   <filterOption.icon className="h-4 w-4 mr-1" />
                   {filterOption.label}
@@ -380,21 +222,19 @@ export default function MediaPage() {
           <div className="flex justify-end space-x-1">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-md ${
-                viewMode === "grid"
-                  ? "bg-blue-100 text-blue-700"
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
+              className={`p-2 rounded-md ${viewMode === "grid"
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-400 hover:text-gray-600"
+                }`}
             >
               <Squares2X2Icon className="h-5 w-5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2 rounded-md ${
-                viewMode === "list"
-                  ? "bg-blue-100 text-blue-700"
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
+              className={`p-2 rounded-md ${viewMode === "list"
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-400 hover:text-gray-600"
+                }`}
             >
               <ListBulletIcon className="h-5 w-5" />
             </button>
@@ -430,69 +270,97 @@ export default function MediaPage() {
       {/* Files Grid/List */}
       <div className="mt-6">
         {filteredFiles.length > 0 ? (
-          viewMode === "grid" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {filteredFiles.map((file) => (
-                <MediaCard
-                  key={file.id}
-                  file={file}
-                  selected={selectedFiles.has(file.id)}
-                  bulkMode={bulkActionMode}
-                  onSelect={() => toggleFileSelection(file.id)}
-                  onDelete={() => deleteFile(file.id, file.originalName)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white shadow rounded-lg overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    {bulkActionMode && (
-                      <th className="px-6 py-3 text-left">
-                        <input
-                          type="checkbox"
-                          checked={
-                            selectedFiles.size === filteredFiles.length &&
-                            filteredFiles.length > 0
-                          }
-                          onChange={handleSelectAll}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
+          <>
+            {viewMode === "grid" ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                {filteredFiles.map((file) => (
+                  <MediaCard
+                    key={file.id}
+                    file={file}
+                    selected={selectedFiles.has(file.id)}
+                    bulkMode={bulkActionMode}
+                    onSelect={() => toggleFileSelection(file.id)}
+                    onDelete={() => deleteFile(file.id, file.originalName)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white shadow rounded-lg overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      {bulkActionMode && (
+                        <th className="px-6 py-3 text-left">
+                          <input
+                            type="checkbox"
+                            checked={
+                              selectedFiles.size === filteredFiles.length &&
+                              filteredFiles.length > 0
+                            }
+                            onChange={handleSelectAll}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                        </th>
+                      )}
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        File
                       </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Size
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Uploaded
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredFiles.map((file) => (
+                      <MediaRow
+                        key={file.id}
+                        file={file}
+                        selected={selectedFiles.has(file.id)}
+                        bulkMode={bulkActionMode}
+                        onSelect={() => toggleFileSelection(file.id)}
+                        onDelete={() => deleteFile(file.id, file.originalName)}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {pagination && pagination.totalPages > 1 && (
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-sm text-gray-700">
+                  Showing{" "}
+                  <span className="font-medium">
+                    {(pagination.page - 1) * pagination.limit + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.totalCount
                     )}
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      File
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Size
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Uploaded
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredFiles.map((file) => (
-                    <MediaRow
-                      key={file.id}
-                      file={file}
-                      selected={selectedFiles.has(file.id)}
-                      bulkMode={bulkActionMode}
-                      onSelect={() => toggleFileSelection(file.id)}
-                      onDelete={() => deleteFile(file.id, file.originalName)}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )
+                  </span>{" "}
+                  of <span className="font-medium">{pagination.totalCount}</span>{" "}
+                  results
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={pagination.totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-12 bg-white shadow rounded-lg">
             <PhotoIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -565,9 +433,8 @@ function MediaCard({
 
   return (
     <div
-      className={`bg-white border rounded-lg p-4 hover:shadow-md transition-shadow ${
-        selected ? "ring-2 ring-blue-500 border-blue-300" : "border-gray-200"
-      }`}
+      className={`bg-white border rounded-lg p-4 hover:shadow-md transition-shadow ${selected ? "ring-2 ring-blue-500 border-blue-300" : "border-gray-200"
+        }`}
     >
       {bulkMode && (
         <div className="mb-3">
@@ -799,11 +666,10 @@ function UploadModal({
         <div className="p-6">
           {/* Drag and Drop Area */}
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragOver
-                ? "border-blue-400 bg-blue-50"
-                : "border-gray-300 hover:border-gray-400"
-            }`}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragOver
+              ? "border-blue-400 bg-blue-50"
+              : "border-gray-300 hover:border-gray-400"
+              }`}
             onDrop={handleDrop}
             onDragOver={(e) => {
               e.preventDefault();
@@ -870,7 +736,7 @@ function UploadModal({
                 <p>
                   <strong>Upload Limits:</strong>
                 </p>
-                <p>• Maximum file size: 10MB per file</p>
+                <p>• Maximum file size: 2MB per file</p>
                 <p>• Maximum 10 files per upload</p>
               </div>
             </div>

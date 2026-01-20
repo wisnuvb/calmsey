@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import TranslationTabs from "@/components/admin/TranslationTabs";
 import { MediaPickerModal } from "@/components/admin/MediaPickerModal";
-import { File, Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 
 interface Translation {
   languageId: string;
@@ -730,52 +730,52 @@ export default function ArticleForm({
           {/* Selected Categories & Tags Preview */}
           {(articleData.categories.length > 0 ||
             articleData.tags.length > 0) && (
-            <div className="border-t pt-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">
-                Selected Items:
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {/* Selected Categories */}
-                {articleData.categories.map((categoryId) => {
-                  const category = categories.find((c) => c.id === categoryId);
-                  return (
-                    <span
-                      key={categoryId}
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                    >
-                      📁 {category?.name}
-                      <button
-                        type="button"
-                        onClick={() => handleCategoryChange(categoryId, false)}
-                        className="ml-1 text-blue-600 hover:text-blue-800"
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">
+                  Selected Items:
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {/* Selected Categories */}
+                  {articleData.categories.map((categoryId) => {
+                    const category = categories.find((c) => c.id === categoryId);
+                    return (
+                      <span
+                        key={categoryId}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
                       >
-                        x
-                      </button>
-                    </span>
-                  );
-                })}
-                {/* Selected Tags */}
-                {articleData.tags.map((tagId) => {
-                  const tag = tags.find((t) => t.id === tagId);
-                  return (
-                    <span
-                      key={tagId}
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                    >
-                      🏷️ {tag?.name}
-                      <button
-                        type="button"
-                        onClick={() => handleTagChange(tagId, false)}
-                        className="ml-1 text-green-600 hover:text-green-800"
+                        📁 {category?.name}
+                        <button
+                          type="button"
+                          onClick={() => handleCategoryChange(categoryId, false)}
+                          className="ml-1 text-blue-600 hover:text-blue-800"
+                        >
+                          x
+                        </button>
+                      </span>
+                    );
+                  })}
+                  {/* Selected Tags */}
+                  {articleData.tags.map((tagId) => {
+                    const tag = tags.find((t) => t.id === tagId);
+                    return (
+                      <span
+                        key={tagId}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
                       >
-                        x
-                      </button>
-                    </span>
-                  );
-                })}
+                        🏷️ {tag?.name}
+                        <button
+                          type="button"
+                          onClick={() => handleTagChange(tagId, false)}
+                          className="ml-1 text-green-600 hover:text-green-800"
+                        >
+                          x
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
 

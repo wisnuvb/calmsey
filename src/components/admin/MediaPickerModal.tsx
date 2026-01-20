@@ -226,11 +226,10 @@ export function MediaPickerModal({
               {allowedTypes.includes("all") && (
                 <button
                   onClick={() => setFilter("all")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    filter === "all"
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "all"
                       ? "bg-blue-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   All
                 </button>
@@ -238,11 +237,10 @@ export function MediaPickerModal({
               {allowedTypes.includes("images") && (
                 <button
                   onClick={() => setFilter("images")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    filter === "images"
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "images"
                       ? "bg-blue-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   Images
                 </button>
@@ -250,11 +248,10 @@ export function MediaPickerModal({
               {allowedTypes.includes("documents") && (
                 <button
                   onClick={() => setFilter("documents")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    filter === "documents"
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "documents"
                       ? "bg-blue-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   Documents
                 </button>
@@ -262,11 +259,10 @@ export function MediaPickerModal({
               {allowedTypes.includes("videos") && (
                 <button
                   onClick={() => setFilter("videos")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    filter === "videos"
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "videos"
                       ? "bg-blue-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   Videos
                 </button>
@@ -274,11 +270,10 @@ export function MediaPickerModal({
               {allowedTypes.includes("audio") && (
                 <button
                   onClick={() => setFilter("audio")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    filter === "audio"
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "audio"
                       ? "bg-blue-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   Audios
                 </button>
@@ -307,11 +302,10 @@ export function MediaPickerModal({
                     <div
                       key={file.id}
                       onClick={() => handleFileClick(file)}
-                      className={`relative group cursor-pointer rounded-lg border-2 overflow-hidden transition-all ${
-                        isSelected
+                      className={`relative group cursor-pointer rounded-lg border-2 overflow-hidden transition-all ${isSelected
                           ? "border-blue-600 ring-2 ring-blue-200"
                           : "border-gray-200 hover:border-blue-400"
-                      }`}
+                        }`}
                     >
                       {/* Checkbox for multiple mode */}
                       {mode === "multiple" && (
@@ -319,7 +313,7 @@ export function MediaPickerModal({
                           <input
                             type="checkbox"
                             checked={isSelected}
-                            onChange={() => {}}
+                            onChange={() => { }}
                             className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                           />
                         </div>
@@ -417,11 +411,10 @@ export function MediaPickerModal({
             <div className="p-6">
               {/* Drag and Drop Area */}
               <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                  dragOver
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragOver
                     ? "border-blue-400 bg-blue-50"
                     : "border-gray-300 hover:border-gray-400"
-                }`}
+                  }`}
                 onDrop={handleDrop}
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -494,7 +487,7 @@ export function MediaPickerModal({
                     <p>
                       <strong>Upload Limits:</strong>
                     </p>
-                    <p>• Maximum file size: 10MB per file</p>
+                    <p>• Maximum file size: 2MB per file</p>
                     <p>• Maximum 10 files per upload</p>
                   </div>
                 </div>

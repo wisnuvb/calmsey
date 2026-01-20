@@ -1,8 +1,8 @@
 // src/lib/media-types.ts
 export const MEDIA_CONFIG = {
   // File size limits (in bytes)
-  MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
-  MAX_FILES_PER_UPLOAD: 10,
+  MAX_FILE_SIZE: 2 * 1024 * 1024, // 2MB
+  MAX_FILES_PER_UPLOAD: 2,
 
   // Image processing settings
   IMAGE_QUALITY: 85,

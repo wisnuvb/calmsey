@@ -128,9 +128,9 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
   title: propTitle,
   description: propDescription,
   partners: propPartners,
-  callToActionText: propCallToActionText,
-  buttonText: propButtonText,
-  buttonLink: propButtonLink,
+  // callToActionText: propCallToActionText,
+  // buttonText: propButtonText,
+  // buttonLink: propButtonLink,
   backgroundColor: propBackgroundColor,
 }) => {
   // Try to get content from context, fallback to empty object if not available
@@ -181,21 +181,21 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
     propDescription,
     "Turning Tides engages with a diversity of partners – across multiple levels"
   );
-  const callToActionText = getValue(
-    "partners.callToActionText",
-    propCallToActionText,
-    "Interested Working Together With Us to Transforming Coastal Right?"
-  );
-  const buttonText = getValue(
-    "partners.buttonText",
-    propButtonText,
-    "Get Involved"
-  );
-  const buttonLink = getValue(
-    "partners.buttonLink",
-    propButtonLink,
-    "/get-involved"
-  );
+  // const callToActionText = getValue(
+  //   "partners.callToActionText",
+  //   propCallToActionText,
+  //   "Interested Working Together With Us to Transforming Coastal Right?"
+  // );
+  // const buttonText = getValue(
+  //   "partners.buttonText",
+  //   propButtonText,
+  //   "Get Involved"
+  // );
+  // const buttonLink = getValue(
+  //   "partners.buttonLink",
+  //   propButtonLink,
+  //   "/get-involved"
+  // );
   const backgroundColor = getValue(
     "partners.backgroundColor",
     propBackgroundColor,

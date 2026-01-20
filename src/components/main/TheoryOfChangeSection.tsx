@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { ChevronsRight, ChevronsDown } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContent } from "@/contexts/PageContentContext";
 
@@ -20,7 +19,7 @@ export function TheoryOfChangeSection({
   title: propTitle,
   subtitle: propSubtitle,
   description: propDescription,
-  showMoreText: propShowMoreText,
+  // showMoreText: propShowMoreText,
   imageSrc: propImageSrc,
   imageAlt: propImageAlt,
   className,
@@ -68,11 +67,6 @@ export function TheoryOfChangeSection({
     `Self-determination, meaningful participation and locally led action become possible diverse rights of local communities, small-scale fishers, fish workers, and Indigenous Peoples are recognized. To move toward secure tenure and recognized rights it is these peoples that must be centered in resourcing and actions – with direct funding and greater control in fund distribution. We engage with a diversity of partners – across multiple levels – who are affecting governance of oceans, coasts, rivers, lakes, climate responses, conservation and food systems.\n
 We collaborate most closely with local communities, small-scale fishers, fish workers, Indigenous Peoples, and their representative groups and allies. Throughout these partnerships we pay particular attention to strategies that promote social inclusion and gender equity. We employ and support targeted strategies with women, non-elite and economically disadvantaged peoples. We collaborate with partners who support different social groups and peoples to improve their experiences, agency and power within established legal, economic and social systems. The work we support will lead to greater quality and accessibility of services for facilitation, negotiation, documentation, registration, conflict resolution, and remedy.\n
 We support ongoing efforts to build accountability, respect and awareness amongst governments, NGOs, funders and the private sector, ensuring rights recognition and tenure sensitivity in the policies and processes they employ. We support work that evaluates and diversifies the values and knowledge systems that are influencing these decision makers. We support work that changes and/or challenges (including via strategic litigation) inequitable or unjust legal, economic and social conditions, processes or policies that are undermining tenure security and rights in the governance of oceans, coasts, lakes, shorelines, and other aquatic systems.`
-  );
-  const showMoreText = getValue(
-    "theoryOfChange.showMoreText",
-    propShowMoreText,
-    "Show More"
   );
   const imageSrc = getValue(
     "theoryOfChange.image",

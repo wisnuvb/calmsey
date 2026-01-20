@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { MediaUploadService } from "@/lib/media-upload";
 import { requireAuth, ROLE_AUTHOR } from "@/lib/auth-helpers";
+import { formatFileSize, MEDIA_CONFIG } from "@/lib/media-types";
 
 export async function GET(request: NextRequest) {
   try {
@@ -182,8 +183,8 @@ export async function POST(request: NextRequest) {
     for (const file of files) {
       try {
         // Validate file size (10MB limit)
-        if (file.size > 10 * 1024 * 1024) {
-          errors.push(`${file.name}: File size exceeds 10MB limit`);
+        if (file.size > MEDIA_CONFIG.MAX_FILE_SIZE) {
+          errors.push(`${file.name}: File size exceeds ${formatFileSize(MEDIA_CONFIG.MAX_FILE_SIZE)} limit`);
           continue;
         }
 
@@ -268,9 +269,8 @@ export async function POST(request: NextRequest) {
       success: true,
       data: uploadResults,
       errors,
-      message: `Uploaded ${uploadResults.length} files${
-        errors.length > 0 ? ` with ${errors.length} errors` : ""
-      }`,
+      message: `Uploaded ${uploadResults.length} files${errors.length > 0 ? ` with ${errors.length} errors` : ""
+        }`,
     });
   } catch (error) {
     console.error("Media upload error:", error);

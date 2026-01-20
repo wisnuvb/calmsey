@@ -4,10 +4,11 @@ import type { NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Skip middleware for API routes, admin routes, and static files
+  // Skip middleware for API routes, admin routes, maintenance page, and static files
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/admin/") ||
+    pathname.startsWith("/maintenance") ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/favicon.ico") ||
     pathname.match(/\.(jpg|jpeg|png|gif|svg|css|js|ico|woff|woff2|ttf|eot)$/) ||
@@ -15,6 +16,9 @@ export async function middleware(request: NextRequest) {
   ) {
     return NextResponse.next();
   }
+
+  // Maintenance mode check is handled in [lang]/layout.tsx
+  // This middleware only handles language routing
 
   // Temporary: Use hardcoded languages that match database
   const supportedLanguages = [

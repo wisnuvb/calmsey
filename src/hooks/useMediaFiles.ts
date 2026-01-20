@@ -26,12 +26,22 @@ interface MediaStats {
   totalSize: number;
 }
 
+interface PaginationInfo {
+  page: number;
+  limit: number;
+  totalCount: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 type FileFilter = "all" | "images" | "documents" | "videos" | "audio";
 
 interface UseMediaFilesOptions {
   initialSearch?: string;
   initialFilter?: FileFilter;
   autoFetch?: boolean;
+  itemsPerPage?: number;
 }
 
 export function useMediaFiles(options: UseMediaFilesOptions = {}) {
@@ -39,12 +49,22 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
     initialSearch = "",
     initialFilter = "all",
     autoFetch = true,
+    itemsPerPage = 24,
   } = options;
 
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(autoFetch);
   const [search, setSearch] = useState(initialSearch);
   const [filter, setFilter] = useState<FileFilter>(initialFilter);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    limit: itemsPerPage,
+    totalCount: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
   const [stats, setStats] = useState<MediaStats>({
     total: 0,
     images: 0,
@@ -60,6 +80,8 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
       const params = new URLSearchParams({
         search,
         filter: filter === "all" ? "" : filter,
+        page: currentPage.toString(),
+        limit: itemsPerPage.toString(),
       });
 
       const response = await fetch(`/api/admin/media?${params}`);
@@ -77,6 +99,10 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
             totalSize: 0,
           }
         );
+        // Set pagination info dari response
+        if (data.pagination) {
+          setPagination(data.pagination);
+        }
       } else {
         console.error("Failed to fetch media files:", data.error);
       }
@@ -85,40 +111,41 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
     } finally {
       setLoading(false);
     }
-  }, [search, filter]); // Remove stats from dependency array
+  }, [search, filter, currentPage, itemsPerPage]);
 
-  // Filter files based on type
-  const filteredFiles = mediaFiles.filter((file) => {
-    if (filter === "images") return file.mimeType.startsWith("image/");
-    if (filter === "documents")
-      return (
-        !file.mimeType.startsWith("image/") &&
-        !file.mimeType.startsWith("video/") &&
-        !file.mimeType.startsWith("audio/")
-      );
-    if (filter === "videos") return file.mimeType.startsWith("video/");
-    if (filter === "audio") return file.mimeType.startsWith("audio/");
-    return true;
-  });
+  // Handler untuk page change
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+    // Scroll ke atas saat ganti page
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  // Reset ke page 1 saat search atau filter berubah
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filter]);
 
   useEffect(() => {
     if (autoFetch) {
       fetchMediaFiles();
     }
-  }, [search, filter, autoFetch, fetchMediaFiles]);
+  }, [search, filter, currentPage, autoFetch, fetchMediaFiles]);
 
   return {
     // Data
     mediaFiles,
-    filteredFiles,
+    filteredFiles: mediaFiles, // Untuk backward compatibility
     stats,
     loading,
+    pagination,
 
     // Filters
     search,
     setSearch,
     filter,
     setFilter,
+    currentPage,
+    handlePageChange,
 
     // Actions
     refreshMediaFiles: fetchMediaFiles,
