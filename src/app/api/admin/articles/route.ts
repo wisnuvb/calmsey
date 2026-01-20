@@ -25,85 +25,180 @@ export async function GET(request: NextRequest) {
       where.authorId = session!.user.id;
     }
 
-    const [articles, total] = await Promise.all([
-      prisma.article.findMany({
-        where,
-        include: {
-          author: {
-            select: { id: true, name: true, email: true },
-          },
-          translations: {
-            select: {
-              languageId: true,
-              title: true,
-              excerpt: true,
+    let articles, total;
+    try {
+      [articles, total] = await Promise.all([
+        prisma.article.findMany({
+          where,
+          include: {
+            author: {
+              select: { id: true, name: true, email: true },
             },
-          },
-          categories: {
-            include: {
-              category: {
-                include: {
-                  translations: {
-                    where: { languageId: "en" },
-                    take: 1,
+            translations: {
+              select: {
+                languageId: true,
+                title: true,
+                excerpt: true,
+              },
+            },
+            categories: {
+              include: {
+                category: {
+                  include: {
+                    translations: {
+                      where: { languageId: "en" },
+                      take: 1,
+                    },
                   },
                 },
               },
             },
-          },
-          articleTag: {
-            include: {
-              tag: true,
+            articleTag: {
+              include: {
+                tag: true,
+              },
             },
           },
-        },
-        orderBy: { updatedAt: "desc" },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      prisma.article.count({ where }),
-    ]);
+          orderBy: { updatedAt: "desc" },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        prisma.article.count({ where }),
+      ]);
+    } catch (dbError) {
+      console.error("Complex query failed, trying simple query:", dbError);
+
+      // Fallback to simpler query without nested includes
+      try {
+        [articles, total] = await Promise.all([
+          prisma.article.findMany({
+            where,
+            include: {
+              author: {
+                select: { id: true, name: true, email: true },
+              },
+              translations: true,
+              categories: {
+                include: {
+                  category: true,
+                },
+              },
+              articleTag: {
+                include: {
+                  tag: true,
+                },
+              },
+            },
+            orderBy: { updatedAt: "desc" },
+            skip: (page - 1) * limit,
+            take: limit,
+          }),
+          prisma.article.count({ where }),
+        ]);
+        console.log("Simple query succeeded");
+      } catch (simpleQueryError) {
+        console.error("Even simple query failed:", simpleQueryError);
+        throw new Error(
+          `Database query failed: ${simpleQueryError instanceof Error
+            ? simpleQueryError.message
+            : "Unknown error"
+          }`
+        );
+      }
+    }
 
     // Format response with translation status
     const formattedArticles = articles.map((article) => {
-      // Get English translation for primary display
-      const englishTranslation = article.translations.find(
-        (t) => t.languageId === "en"
-      );
+      try {
+        // Get English translation for primary display
+        const englishTranslation = article.translations?.find(
+          (t) => t.languageId === "en"
+        );
 
-      return {
-        id: article.id,
-        slug: article.slug,
-        status: article.status,
-        featuredImage: article.featuredImage,
-        publishedAt: article.publishedAt,
-        createdAt: article.createdAt,
-        updatedAt: article.updatedAt,
-        author: article.author,
+        return {
+          id: article.id,
+          slug: article.slug,
+          status: article.status,
+          featuredImage: article.featuredImage,
+          publishedAt: article.publishedAt,
+          createdAt: article.createdAt,
+          updatedAt: article.updatedAt,
+          author: article.author || {
+            id: "unknown",
+            name: "Unknown Author",
+            email: "",
+          },
 
-        // Primary content (English)
-        title: englishTranslation?.title || "Untitled",
-        excerpt: englishTranslation?.excerpt || "",
+          // Primary content (English)
+          title:
+            englishTranslation?.title || article.title || "Untitled Article",
+          excerpt: englishTranslation?.excerpt || article.excerpt || "",
 
-        // Translation status
-        translationStatus: {
-          total: article.translations.length,
-          languages: article.translations.map((t) => t.languageId),
-          isComplete: article.translations.every(
-            (t) => t.title && t.title.trim()
-          ),
-        },
+          // Translation status
+          translationStatus: {
+            total: article.translations?.length || 0,
+            languages: article.translations?.map((t) => t.languageId) || [],
+            isComplete:
+              article.translations?.every((t) => t.title && t.title.trim()) ||
+              false,
+          },
 
-        // Categories and tags
-        categories: article.categories.map((ac) => ({
-          id: ac.category.id,
-          name: ac.category.translations[0]?.name || "Untitled Category",
-        })),
-        tags: article.articleTag.map((at) => ({
-          id: at.tag.id,
-          name: at.tag.name,
-        })),
-      };
+          // Categories and tags - with safety checks
+          categories:
+            article.categories
+              ?.map((ac) => {
+                if (!ac.category) return null;
+                return {
+                  id: ac.category.id,
+                  name:
+                    ("translations" in ac.category &&
+                      ac.category.translations?.[0]?.name) ||
+                    ac.category.slug ||
+                    "Untitled Category",
+                };
+              })
+              .filter((c) => c !== null) || [],
+          tags:
+            article.articleTag
+              ?.map((at) => {
+                if (!at.tag) return null;
+                return {
+                  id: at.tag.id,
+                  name: at.tag.name || "Untitled Tag",
+                };
+              })
+              .filter((t) => t !== null) || [],
+        };
+      } catch (formatError) {
+        console.error(
+          `Error formatting article ${article.id}:`,
+          formatError
+        );
+        // Return minimal article data if formatting fails
+        return {
+          id: article.id,
+          slug: article.slug,
+          status: article.status,
+          featuredImage: article.featuredImage,
+          publishedAt: article.publishedAt,
+          createdAt: article.createdAt,
+          updatedAt: article.updatedAt,
+          author: {
+            id: "unknown",
+            name: "Unknown Author",
+            email: "",
+          },
+          title: article.title || "Untitled Article",
+          excerpt: article.excerpt || "",
+          translationStatus: {
+            total: 0,
+            languages: [],
+            isComplete: false,
+          },
+          categories: [],
+          tags: [],
+        };
+      }
     });
 
     return NextResponse.json({
@@ -117,8 +212,15 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Articles API error:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
-      { error: "Failed to fetch articles" },
+      {
+        error: "Failed to fetch articles",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }
@@ -218,20 +320,20 @@ export async function POST(request: NextRequest) {
         categories:
           categories && categories.length > 0
             ? {
-                create: categories.map((categoryId: string) => ({
-                  categoryId,
-                })),
-              }
+              create: categories.map((categoryId: string) => ({
+                categoryId,
+              })),
+            }
             : undefined,
 
         // Link tags
         articleTag:
           tags && tags.length > 0
             ? {
-                create: tags.map((tagId: string) => ({
-                  tagId,
-                })),
-              }
+              create: tags.map((tagId: string) => ({
+                tagId,
+              })),
+            }
             : undefined,
       },
       include: {

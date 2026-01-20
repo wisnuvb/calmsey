@@ -2,7 +2,7 @@ import { PageContentSchema } from "../page-content-schema";
 
 export const OUR_APPROACH_SCHEMA: PageContentSchema = {
   pageType: "OUR_APPROACH",
-  sections: ["Hero", "Support", "Theory of Change"],
+  sections: ["Hero", "Support", "Theory of Change", "Feedback Callout"],
   fields: [
     // Hero Section
     {
@@ -34,8 +34,6 @@ export const OUR_APPROACH_SCHEMA: PageContentSchema = {
     },
 
     // Support Section
-    // Note: SupportSection memiliki konten hardcoded dalam navigationItems array
-    // Jika ingin dynamic, bisa tambahkan field untuk customize navigation items
     {
       key: "support.title",
       label: "Support Section Title",
@@ -50,191 +48,229 @@ export const OUR_APPROACH_SCHEMA: PageContentSchema = {
       label: "Navigation Items",
       type: "multiple",
       section: "Support",
-      defaultValue: JSON.stringify(
-        [
-          {
-            id: "what-we-support",
-            title: "Our approach to Grantmaking​",
-            content: {
-              title: "Our approach to Grantmaking​",
-              description: [
-                "Turning Tides implements and advocates for liberatory approaches to partnership and grant-making. This means working together with Indigenous Peoples, local communities, small-scale fishers and fish workers through reciprocal transformation where both we and our partners work to change the systems and power structures that create barriers to tenure security.",
-                "Our practices include multi-year flexible funding, streamlined processes, and partnership support that extends beyond financial contributions.",
-              ],
-              titleItem: "What we practice",
-              items: [
-                {
-                  icon: "CheckCircle2",
-                  text: "Empowering local communities, small-scale fishers and fish workers, and Indigenous peoples to experience security of tenure, certainty of livelihoods and leadership in environmental stewardship.",
-                },
-                {
-                  icon: "CheckCircle2",
-                  text: "Promoting awareness and action on rights and tenure in aquatic environments.",
-                },
-                {
-                  icon: "CheckCircle2",
-                  text: "Advocating for diverse knowledge systems and inclusive decision-making.",
-                },
-                {
-                  icon: "CheckCircle2",
-                  text: "Challenging inequitable policies, practices and processes influencing aquatic governance.",
-                },
-                {
-                  icon: "CheckCircle2",
-                  text: "Enhancing services for negotiation, conflict resolution, and accountability.",
-                },
-              ],
-            },
-          },
-          {
-            id: "tenure-rights",
-            title: "What we understand by tenure",
-            content: {
-              title:
-                "What we understand by tenure security and rights recognition",
-              descriptionAsCards: true,
-              description: [
-                {
-                  icon: "Shield",
-                  text: "Turning Tides' investments will be designed to support the conditions and processes necessary to move from rights and tenure insecurity, toward tenure security and full recognition of associated rights (e.g., the right to a healthy environment, the right to food, the right to self-determination, the right to maintain cultural tradition and knowledge).",
-                },
-                {
-                  icon: "BookMarked",
-                  text: 'We use a broad definition to accommodate the multiple ways that tenure can be viewed and experienced. We consider tenure as: "The ways in which societies define and govern (including through cultures and laws) people\'s relationships with land, coasts, shores, waterbodies, and associated natural resources."',
-                },
-              ],
-              titleItem: "We consider tenure to encompass",
-              numberedItems: [
-                {
-                  number: "01",
-                  text: "A bundle of rights, powers and relationships – including, but often extending beyond, access and use rights",
-                },
-                {
-                  number: "02",
-                  text: "Community-based and collective tenure, incorporating the systems that govern them",
-                },
-                {
-                  number: "03",
-                  text: "Self-determination in defining relationships and futures within territories and across environments",
-                },
-              ],
-              calloutText:
-                "Tenure security is a critical foundation, and often a precursor for other human rights",
-              infoBox: {
-                text: "Read more about the diverse ways in which we have come to consider tenure, and tenure security and rights recognition, in our Scoping Study and our brief ",
-                linkText: "(forthcoming)",
-              },
-            },
-          },
-          {
-            id: "tenure-security",
-            title: "Our Grantmaking Framework",
-            content: {
-              title: "Our Grantmaking Framework",
-              description: [
-                "Our grantmaking framework outlines Turning Tides' funding priorities and approach. It explains what work we support, what we don't fund, and why - all organized around pathways toward tenure security for Indigenous Peoples, local communities, small-scale fishers and fish workers. Groups interested in partnering with Turning Tides can use it to assess mutual fit for partnership",
-                "Turning Tides aims to provide fiscal and other supports that lead local communities, small-scale fishers and fish workers, and Indigenous Peoples to fully experiencing their rights and agency in the allocation, use, conservation, management and development of coastal lands, shorelines, oceans, lakes, rivers, and associated resources - toward better environmental and societal outcomes. The Turning Tides' Grantmaking Framework is intended to keep focus on the niche, need and opportunity.",
-                "The strategies and actions that we consider within our funding priorities are those that are known to contribute toward tenure security. We recognise that strategies used likely vary based on specific contexts.",
-                "We are also very deliberate and considered in what we reflect as being outside of our funding scope. Whilst we recognise those actions, and their proponents have values and benefits of their own (even toward the security of certain rights) they are – in our assessment – relatively well funded and supported.",
-              ],
-              downloadSection: {
-                text: "Read the full-version of our Grantmaking Framework",
-                buttonText: "Download Now",
-                buttonUrl: "/downloads/grantmaking-framework.pdf",
-              },
-            },
-          },
-        ],
-        null,
-        2
-      ),
+      helpText:
+        "Manage navigation items for the Support section. Each item represents a tab with its own content.",
       itemLabel: "Navigation Item",
       itemSchema: [
         {
-          key: "title",
-          label: "Navigation Title",
+          key: "id",
+          label: "Item ID",
+          type: "text",
+          required: true,
+          placeholder: "what-we-support",
+          helpText:
+            "Unique identifier for this navigation item (e.g., what-we-support, tenure-rights, framework)",
+        },
+        {
+          key: "label",
+          label: "Navigation Label",
           type: "text",
           required: true,
           placeholder: "Our approach to Grantmaking",
+          helpText: "Text displayed in the navigation button",
         },
         {
-          key: "content.title",
+          key: "contentTitle",
           label: "Content Title",
           type: "text",
           required: true,
-          placeholder: "Our approach to Grantmaking​",
+          placeholder: "Our approach to Grantmaking",
+          helpText: "Main title displayed in the content area",
         },
         {
-          key: "content.descriptionAsCards",
-          label: "Render Descriptions as Cards",
-          type: "boolean",
+          key: "imageSrc",
+          label: "Image URL",
+          type: "image",
           required: false,
-          helpText:
-            "Enable card-based layout for descriptions (used in tenure tab)",
+          placeholder: "/images/example.jpg",
+          helpText: "Optional image displayed in the content area",
         },
         {
-          key: "content.description",
-          label: "Description Content",
+          key: "imageAlt",
+          label: "Image Alt Text",
+          type: "text",
+          required: false,
+          placeholder: "Image description",
+          helpText: "Alternative text for the image (for accessibility)",
+        },
+        {
+          key: "paragraphs",
+          label: "Content Paragraphs",
           type: "textarea",
-          required: true,
-          placeholder: "Description text or card items",
+          required: false,
+          placeholder:
+            "First paragraph here.\n\nSecond paragraph here.\n\nThird paragraph here.",
           helpText:
-            "Can be paragraphs (when descriptionAsCards=false) or card items with icon and text",
+            "Content paragraphs. Separate multiple paragraphs with a blank line (double newline). Each paragraph will be displayed separately.",
         },
         {
-          key: "content.titleItem",
-          label: "Items Section Title",
+          key: "practicesTitle",
+          label: "Practices Section Title",
           type: "text",
           required: false,
           placeholder: "What we practice",
-        },
-        {
-          key: "content.items",
-          label: "Items List",
-          type: "textarea",
-          required: false,
-          placeholder: "List of items (one per line)",
           helpText:
-            "For regular list with icons (what-we-support tab). Format: text only",
+            "Optional title for the practices list (leave empty if no practices)",
         },
         {
-          key: "content.numberedItems",
-          label: "Numbered Items",
-          type: "textarea",
+          key: "practices",
+          label: "Practices List",
+          type: "multiple",
           required: false,
-          placeholder: "Numbered list items (one per line)",
+          itemLabel: "Practice",
           helpText:
-            "For numbered list display (tenure-rights tab). Automatically numbered 01, 02, 03...",
+            "Optional practices list. Add practices with check icon.",
+          itemSchema: [
+            {
+              key: "id",
+              label: "ID",
+              type: "text",
+              required: true,
+              placeholder: "1",
+              helpText: "Unique identifier for this practice",
+            },
+            {
+              key: "text",
+              label: "Practice Text",
+              type: "textarea",
+              required: true,
+              placeholder: "Enter practice description",
+              helpText: "Text displayed for this practice",
+            },
+          ],
         },
         {
-          key: "content.calloutText",
-          label: "Callout Text",
+          key: "infoBlocks",
+          label: "Info Blocks",
+          type: "multiple",
+          required: false,
+          itemLabel: "Info Block",
+          helpText:
+            "Optional info blocks (alert boxes). Add info blocks with icons.",
+          itemSchema: [
+            {
+              key: "id",
+              label: "ID",
+              type: "text",
+              required: true,
+              placeholder: "1",
+              helpText: "Unique identifier for this info block",
+            },
+            {
+              key: "icon",
+              label: "Icon",
+              type: "text",
+              required: true,
+              placeholder: "info",
+              helpText: 'Icon type: "shield", "flag", or "info"',
+            },
+            {
+              key: "text",
+              label: "Info Block Text",
+              type: "textarea",
+              required: true,
+              placeholder: "Enter info block text",
+              helpText: "Text displayed in the info block",
+            },
+          ],
+        },
+        {
+          key: "numberedListTitle",
+          label: "Numbered List Title",
           type: "text",
           required: false,
-          placeholder: "Bold text to emphasize",
-          helpText: "Text to display as bold callout (tenure-rights tab)",
+          placeholder: "We consider tenure to encompass",
+          helpText:
+            "Optional title for the numbered list (leave empty if no numbered list)",
         },
         {
-          key: "content.infoBox",
-          label: "Info Box",
-          type: "textarea",
+          key: "numberedList",
+          label: "Numbered List",
+          type: "multiple",
           required: false,
-          placeholder: "Info box text with optional link",
+          itemLabel: "Numbered Item",
           helpText:
-            'Info box with green accent. Format: text|linkText (e.g., "Read more|(forthcoming)")',
+            "Optional numbered list. Add numbered items with numbers and text.",
+          itemSchema: [
+            {
+              key: "id",
+              label: "ID",
+              type: "text",
+              required: true,
+              placeholder: "1",
+              helpText: "Unique identifier for this numbered item",
+            },
+            {
+              key: "number",
+              label: "Number",
+              type: "text",
+              required: true,
+              placeholder: "01",
+              helpText: "Number displayed (e.g., 01, 02, 03)",
+            },
+            {
+              key: "text",
+              label: "Item Text",
+              type: "textarea",
+              required: true,
+              placeholder: "Enter item text",
+              helpText: "Text displayed for this numbered item",
+            },
+          ],
         },
         {
-          key: "content.downloadSection",
-          label: "Download Section",
+          key: "numberedListFooter",
+          label: "Numbered List Footer Text",
           type: "textarea",
           required: false,
-          placeholder: "Download section info",
+          placeholder: "Footer text after numbered list",
           helpText:
-            'Download button section. Format: text|buttonText|buttonUrl (e.g., "Read full framework|Download Now|/path/to/file.pdf")',
+            "Optional footer text displayed after the numbered list. Supports **bold** formatting.",
+        },
+        {
+          key: "infoBlockFooterIcon",
+          label: "Footer Info Block Icon",
+          type: "text",
+          required: false,
+          placeholder: "info",
+          helpText:
+            'Optional icon for footer info block. Options: "shield", "flag", or "info". Leave empty if no footer info block.',
+        },
+        {
+          key: "infoBlockFooterText",
+          label: "Footer Info Block Text",
+          type: "textarea",
+          required: false,
+          placeholder: "Footer info block text",
+          helpText:
+            "Optional text for footer info block (usually with green background). Supports **bold** formatting. Leave empty if no footer info block.",
+        },
+        {
+          key: "downloadButtonLabel",
+          label: "Download Button Label Text",
+          type: "text",
+          required: false,
+          placeholder: "Read the full-version of our Grantmaking Framework",
+          helpText:
+            "Optional label text displayed before the download button",
+        },
+        {
+          key: "downloadButtonText",
+          label: "Download Button Text",
+          type: "text",
+          required: false,
+          placeholder: "Download Now",
+          helpText: "Text displayed on the download button",
+        },
+        {
+          key: "downloadButtonUrl",
+          label: "Download Button URL",
+          type: "text",
+          required: false,
+          placeholder: "/documents/framework.pdf",
+          helpText: "URL or path to the downloadable file",
         },
       ],
-      helpText:
-        "Navigation items for the support section tabs. Supports multiple layout types: regular items, numbered items, card descriptions, callout text, info box, and download section.",
     },
 
     // Theory of Change Section
@@ -286,6 +322,57 @@ export const OUR_APPROACH_SCHEMA: PageContentSchema = {
       section: "Theory of Change",
       defaultValue: "Show More",
       helpText: "Text displayed on the expand/collapse button",
+    },
+
+    // Feedback Callout Section
+    {
+      key: "feedbackCallout.title",
+      label: "Feedback Callout Title",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "We value your support",
+      helpText: "Main title displayed in the feedback callout section",
+    },
+    {
+      key: "feedbackCallout.description",
+      label: "Feedback Callout Description",
+      type: "textarea",
+      section: "Feedback Callout",
+      defaultValue:
+        "Connect with us to co-create solutions that protect rights, sustain livelihoods, and centre local voices.",
+      helpText: "Description text displayed below the title",
+    },
+    {
+      key: "feedbackCallout.feedbackButtonText",
+      label: "Feedback Button Text",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "Give Feedback",
+      helpText: "Text displayed on the feedback button",
+    },
+    {
+      key: "feedbackCallout.feedbackButtonLink",
+      label: "Feedback Button Link",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "/feedback",
+      helpText: "URL for the feedback button",
+    },
+    {
+      key: "feedbackCallout.learnMoreButtonText",
+      label: "Learn More Button Text",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "Learn More",
+      helpText: "Text displayed on the learn more button",
+    },
+    {
+      key: "feedbackCallout.learnMoreButtonLink",
+      label: "Learn More Button Link",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "/governance",
+      helpText: "URL for the learn more button",
     },
   ],
 };

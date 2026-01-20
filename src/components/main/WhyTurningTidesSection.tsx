@@ -107,7 +107,7 @@ export function WhyTurningTidesSection({
   const ctaLink = getValue("whyUs.ctaLink", propCtaLink, "/our-fund");
 
   return (
-    <section className="py-16 lg:py-20 bg-white">
+    <section className="py-16 lg:py-16 bg-white">
       <div className="container mx-auto px-4">
         {/* Main Content - Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 mb-16">

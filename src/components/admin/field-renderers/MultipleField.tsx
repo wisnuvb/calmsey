@@ -427,6 +427,201 @@ export function MultipleField({
           />
         );
 
+      case "multiple":
+        // Handle nested multiple field
+        if (!itemField.itemSchema || itemField.itemSchema.length === 0) {
+          return (
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded">
+              <p className="text-yellow-800 text-sm">
+                Nested multiple field requires itemSchema configuration
+              </p>
+            </div>
+          );
+        }
+
+        // Parse nested items
+        let nestedItems: Record<string, any>[] = [];
+        try {
+          if (itemFieldValue && typeof itemFieldValue === "string" && itemFieldValue.trim()) {
+            const parsed = JSON.parse(itemFieldValue);
+            if (Array.isArray(parsed)) {
+              nestedItems = parsed;
+            }
+          }
+        } catch {
+          nestedItems = [];
+        }
+
+        const handleNestedAdd = () => {
+          const newItem: Record<string, any> = {};
+          itemField.itemSchema?.forEach((nestedField) => {
+            newItem[nestedField.key] = nestedField.defaultValue || "";
+          });
+          const newItems = [...nestedItems, newItem];
+          handleMultipleItemChange(
+            itemIndex,
+            itemField.key,
+            JSON.stringify(newItems, null, 2)
+          );
+        };
+
+        const handleNestedRemove = (nestedIndex: number) => {
+          const newItems = nestedItems.filter((_, i) => i !== nestedIndex);
+          handleMultipleItemChange(
+            itemIndex,
+            itemField.key,
+            JSON.stringify(newItems, null, 2)
+          );
+        };
+
+        const handleNestedItemChange = (
+          nestedIndex: number,
+          nestedFieldKey: string,
+          nestedValue: string
+        ) => {
+          const newItems = [...nestedItems];
+          if (!newItems[nestedIndex]) {
+            newItems[nestedIndex] = {};
+          }
+          newItems[nestedIndex][nestedFieldKey] = nestedValue;
+          handleMultipleItemChange(
+            itemIndex,
+            itemField.key,
+            JSON.stringify(newItems, null, 2)
+          );
+        };
+
+        return (
+          <div className="border border-gray-200 rounded-lg p-4 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm text-gray-600">
+                {itemField.helpText || "Manage nested items"}
+              </p>
+            </div>
+
+            {nestedItems.length === 0 ? (
+              <div className="p-4 text-center border-2 border-dashed border-gray-300 rounded-lg">
+                <p className="text-gray-500 text-sm">
+                  No items yet. Click &quot;Add {itemField.itemLabel || "Item"}&quot; to get started.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {nestedItems.map((nestedItem, nestedIndex) => (
+                  <div
+                    key={nestedIndex}
+                    className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <GripVertical className="w-4 h-4 text-gray-400" />
+                        <span className="text-xs font-medium text-gray-700">
+                          {itemField.itemLabel || "Item"} {nestedIndex + 1}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleNestedRemove(nestedIndex)}
+                        className="p-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded transition-colors"
+                        title="Remove item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {itemField.itemSchema?.map((nestedField) => {
+                        const nestedFieldValue =
+                          nestedItem[nestedField.key] || nestedField.defaultValue || "";
+
+                        return (
+                          <div key={nestedField.key}>
+                            <label className="block mb-1">
+                              <span className="text-xs font-medium text-gray-700">
+                                {nestedField.label}
+                                {nestedField.required && (
+                                  <span className="text-red-500 ml-1">*</span>
+                                )}
+                              </span>
+                            </label>
+                            {nestedField.type === "text" ||
+                            nestedField.type === "url" ||
+                            nestedField.type === "email" ? (
+                              <input
+                                type={nestedField.type === "email" ? "email" : "text"}
+                                value={nestedFieldValue}
+                                onChange={(e) =>
+                                  handleNestedItemChange(
+                                    nestedIndex,
+                                    nestedField.key,
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={nestedField.placeholder}
+                                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                  error ? "border-red-500" : "border-gray-300"
+                                }`}
+                                required={nestedField.required}
+                              />
+                            ) : nestedField.type === "textarea" ? (
+                              <textarea
+                                value={nestedFieldValue}
+                                onChange={(e) =>
+                                  handleNestedItemChange(
+                                    nestedIndex,
+                                    nestedField.key,
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={nestedField.placeholder}
+                                rows={3}
+                                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                  error ? "border-red-500" : "border-gray-300"
+                                }`}
+                                required={nestedField.required}
+                              />
+                            ) : (
+                              <input
+                                type="text"
+                                value={nestedFieldValue}
+                                onChange={(e) =>
+                                  handleNestedItemChange(
+                                    nestedIndex,
+                                    nestedField.key,
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={nestedField.placeholder}
+                                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                  error ? "border-red-500" : "border-gray-300"
+                                }`}
+                                required={nestedField.required}
+                              />
+                            )}
+                            {nestedField.helpText && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                {nestedField.helpText}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleNestedAdd}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-xs font-medium mt-3 w-full"
+            >
+              <Plus className="w-3 h-3" />
+              Add {itemField.itemLabel || "Item"}
+            </button>
+          </div>
+        );
+
       default:
         return (
           <input

@@ -36,6 +36,7 @@ interface TabContent {
   numberedList?: NumberedListItem[];
   numberedListFooter?: string;
   infoBlockFooter?: InfoBlock;
+  downloadButtonLabel?: string;
   downloadButtonText?: string;
   downloadButtonUrl?: string;
 }
@@ -60,7 +61,10 @@ interface MultipleFieldItem {
   numberedListTitle?: string;
   numberedList?: string;
   numberedListFooter?: string;
-  infoBlockFooter?: string;
+  infoBlockFooter?: string; // Old format (JSON string) - kept for backward compatibility
+  infoBlockFooterIcon?: string;
+  infoBlockFooterText?: string;
+  downloadButtonLabel?: string;
   downloadButtonText?: string;
   downloadButtonUrl?: string;
 }
@@ -70,6 +74,7 @@ interface GrantmakingSectionProps {
   activeSectionId?: string;
   onNavigationChange?: (id: string) => void;
   className?: string;
+  contentKey?: string; // Key to read from pageContent context (e.g., "grantmaking.navigationItems" or "support.navigationItems")
 }
 
 const defaultNavigationItems: NavigationItem[] = [
@@ -135,6 +140,7 @@ export function GrantmakingSection({
   activeSectionId: propActiveSectionId,
   onNavigationChange: propOnNavigationChange,
   className,
+  contentKey = "grantmaking.navigationItems",
 }: GrantmakingSectionProps = {}) {
   // Try to get content from context, fallback to empty object if not available
   let pageContent: Record<string, string> = {};
@@ -176,80 +182,171 @@ export function GrantmakingSection({
           );
         }
 
-        // Parse practices (one JSON object per line)
+        // Parse practices (JSON array format from multiple field)
         const practices: { id: string; text: string }[] = [];
         if (item.practices && typeof item.practices === "string") {
-          const practiceLines = item.practices
-            .split("\n")
-            .map((line: string) => line.trim())
-            .filter((line: string) => line.length > 0);
-
-          practiceLines.forEach((line: string) => {
-            try {
-              const practice = JSON.parse(line);
-              if (practice.id && practice.text) {
-                practices.push({
-                  id: String(practice.id),
-                  text: String(practice.text),
-                });
-              }
-            } catch {
-              // Skip invalid JSON lines
+          try {
+            // Try parsing as JSON array first (from multiple field)
+            const parsed = JSON.parse(item.practices);
+            if (Array.isArray(parsed)) {
+              parsed.forEach((practice: unknown) => {
+                if (
+                  practice &&
+                  typeof practice === "object" &&
+                  "id" in practice &&
+                  "text" in practice
+                ) {
+                  practices.push({
+                    id: String((practice as { id: unknown; text: unknown }).id),
+                    text: String((practice as { id: unknown; text: unknown }).text),
+                  });
+                }
+              });
             }
-          });
+          } catch {
+            // Fallback to old format (one JSON object per line)
+            const practiceLines = item.practices
+              .split("\n")
+              .map((line: string) => line.trim())
+              .filter((line: string) => line.length > 0);
+
+            practiceLines.forEach((line: string) => {
+              try {
+                const practice = JSON.parse(line);
+                if (practice.id && practice.text) {
+                  practices.push({
+                    id: String(practice.id),
+                    text: String(practice.text),
+                  });
+                }
+              } catch {
+                // Skip invalid JSON lines
+              }
+            });
+          }
         }
 
-        // Parse info blocks
+        // Parse info blocks (JSON array format from multiple field)
         const infoBlocks: InfoBlock[] = [];
         if (item.infoBlocks && typeof item.infoBlocks === "string") {
-          const infoBlockLines = item.infoBlocks
-            .split("\n")
-            .map((line: string) => line.trim())
-            .filter((line: string) => line.length > 0);
-
-          infoBlockLines.forEach((line: string) => {
-            try {
-              const block = JSON.parse(line);
-              if (block.id && block.icon && block.text) {
-                infoBlocks.push({
-                  id: String(block.id),
-                  icon: block.icon as "shield" | "flag" | "info",
-                  text: String(block.text),
-                });
-              }
-            } catch {
-              // Skip invalid JSON lines
+          try {
+            // Try parsing as JSON array first (from multiple field)
+            const parsed = JSON.parse(item.infoBlocks);
+            if (Array.isArray(parsed)) {
+              parsed.forEach((block: unknown) => {
+                if (
+                  block &&
+                  typeof block === "object" &&
+                  "id" in block &&
+                  "icon" in block &&
+                  "text" in block
+                ) {
+                  const blockObj = block as {
+                    id: unknown;
+                    icon: unknown;
+                    text: unknown;
+                  };
+                  infoBlocks.push({
+                    id: String(blockObj.id),
+                    icon: String(blockObj.icon) as "shield" | "flag" | "info",
+                    text: String(blockObj.text),
+                  });
+                }
+              });
             }
-          });
+          } catch {
+            // Fallback to old format (one JSON object per line)
+            const infoBlockLines = item.infoBlocks
+              .split("\n")
+              .map((line: string) => line.trim())
+              .filter((line: string) => line.length > 0);
+
+            infoBlockLines.forEach((line: string) => {
+              try {
+                const block = JSON.parse(line);
+                if (block.id && block.icon && block.text) {
+                  infoBlocks.push({
+                    id: String(block.id),
+                    icon: block.icon as "shield" | "flag" | "info",
+                    text: String(block.text),
+                  });
+                }
+              } catch {
+                // Skip invalid JSON lines
+              }
+            });
+          }
         }
 
-        // Parse numbered list
+        // Parse numbered list (JSON array format from multiple field)
         const numberedList: NumberedListItem[] = [];
         if (item.numberedList && typeof item.numberedList === "string") {
-          const numberedLines = item.numberedList
-            .split("\n")
-            .map((line: string) => line.trim())
-            .filter((line: string) => line.length > 0);
-
-          numberedLines.forEach((line: string) => {
-            try {
-              const item = JSON.parse(line);
-              if (item.id && item.number && item.text) {
-                numberedList.push({
-                  id: String(item.id),
-                  number: String(item.number),
-                  text: String(item.text),
-                });
-              }
-            } catch {
-              // Skip invalid JSON lines
+          try {
+            // Try parsing as JSON array first (from multiple field)
+            const parsed = JSON.parse(item.numberedList);
+            if (Array.isArray(parsed)) {
+              parsed.forEach((listItem: unknown) => {
+                if (
+                  listItem &&
+                  typeof listItem === "object" &&
+                  "id" in listItem &&
+                  "number" in listItem &&
+                  "text" in listItem
+                ) {
+                  const itemObj = listItem as {
+                    id: unknown;
+                    number: unknown;
+                    text: unknown;
+                  };
+                  numberedList.push({
+                    id: String(itemObj.id),
+                    number: String(itemObj.number),
+                    text: String(itemObj.text),
+                  });
+                }
+              });
             }
-          });
+          } catch {
+            // Fallback to old format (one JSON object per line)
+            const numberedLines = item.numberedList
+              .split("\n")
+              .map((line: string) => line.trim())
+              .filter((line: string) => line.length > 0);
+
+            numberedLines.forEach((line: string) => {
+              try {
+                const listItem = JSON.parse(line);
+                if (listItem.id && listItem.number && listItem.text) {
+                  numberedList.push({
+                    id: String(listItem.id),
+                    number: String(listItem.number),
+                    text: String(listItem.text),
+                  });
+                }
+              } catch {
+                // Skip invalid JSON lines
+              }
+            });
+          }
         }
 
-        // Parse footer info block
+        // Parse footer info block (from separate fields)
         let infoBlockFooter: InfoBlock | undefined;
-        if (item.infoBlockFooter && typeof item.infoBlockFooter === "string") {
+        if (
+          item.infoBlockFooterIcon &&
+          item.infoBlockFooterText &&
+          typeof item.infoBlockFooterIcon === "string" &&
+          typeof item.infoBlockFooterText === "string" &&
+          item.infoBlockFooterIcon.trim() &&
+          item.infoBlockFooterText.trim()
+        ) {
+          infoBlockFooter = {
+            id: "footer",
+            icon: item.infoBlockFooterIcon.trim() as "shield" | "flag" | "info",
+            text: String(item.infoBlockFooterText),
+          };
+        } else if (item.infoBlockFooter && typeof item.infoBlockFooter === "string") {
+          // Fallback to old format (JSON object)
           try {
             const footer = JSON.parse(item.infoBlockFooter);
             if (footer.icon && footer.text) {
@@ -286,6 +383,9 @@ export function GrantmakingSection({
               numberedListFooter: String(item.numberedListFooter),
             }),
             ...(infoBlockFooter && { infoBlockFooter }),
+            ...(item.downloadButtonLabel && {
+              downloadButtonLabel: String(item.downloadButtonLabel),
+            }),
             ...(item.downloadButtonText && {
               downloadButtonText: String(item.downloadButtonText),
             }),
@@ -299,7 +399,7 @@ export function GrantmakingSection({
 
   // Get navigationItems with priority: context > props > default
   const contextNavigationItemsRaw = getContentJSON<MultipleFieldItem[]>(
-    "grantmaking.navigationItems",
+    contentKey,
     []
   );
   const contextNavigationItems = transformMultipleToNavigationItems(
@@ -337,279 +437,289 @@ export function GrantmakingSection({
   };
 
   return (
-    <section className={cn("bg-white py-16 lg:py-24", className)}>
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          {/* Left Navigation */}
-          <aside className="lg:w-[478px] flex-shrink-0">
-            <nav className="space-y-2">
-              {navigationItems.map((item) => {
-                const isActive = item.id === activeId;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleNavClick(item.id)}
-                    className={cn(
-                      "w-full text-left px-4 py-3 rounded-md transition-colors text-xl font-bold font-nunito-sans p-6",
-                      isActive
-                        ? "bg-[#3C62ED] text-white font-medium"
-                        : "text-gray-900 hover:bg-gray-50"
-                    )}
-                  >
-                    {item.label}
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
+    <>
+      <hr className="border-[#C3D7E8] container mx-auto px-4" />
+      <section className={cn("bg-white py-16 lg:py-24", className)}>
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+            {/* Left Navigation */}
+            <aside className="lg:w-[478px] flex-shrink-0">
+              <nav className="space-y-2">
+                {navigationItems.map((item) => {
+                  const isActive = item.id === activeId;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavClick(item.id)}
+                      className={cn(
+                        "w-full text-left px-4 py-3 rounded-md transition-colors text-xl font-bold font-nunito-sans p-6",
+                        isActive
+                          ? "bg-[#3C62ED] text-white font-medium"
+                          : "text-gray-900 hover:bg-gray-50"
+                      )}
+                    >
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </nav>
+            </aside>
 
-          {/* Right Content - Dynamic based on active tab */}
-          <div className="flex-1 space-y-8 sm:space-y-11">
-            {activeContent ? (
-              <>
-                {/* Title */}
-                <h1 className="text-3xl sm:text-[38px] font-bold text-[#010107] font-nunito-sans mb-6">
-                  {activeContent.title}
-                </h1>
+            {/* Right Content - Dynamic based on active tab */}
+            <div className="flex-1 space-y-8 sm:space-y-11">
+              {activeContent ? (
+                <>
+                  {/* Title */}
+                  <h1 className="text-3xl sm:text-[38px] font-bold text-[#010107] font-nunito-sans mb-6">
+                    {activeContent.title}
+                  </h1>
 
-                {/* Image */}
-                {activeContent.imageSrc && (
-                  <div className="mb-8">
-                    <Image
-                      src={getImageUrl(activeContent.imageSrc)}
-                      alt={activeContent.imageAlt || activeContent.title}
-                      width={1200}
-                      height={600}
-                      className="w-full h-auto rounded-lg object-cover"
-                    />
-                  </div>
-                )}
+                  {/* Image */}
+                  {activeContent.imageSrc && (
+                    <div className="mb-8">
+                      <Image
+                        src={getImageUrl(activeContent.imageSrc)}
+                        alt={activeContent.imageAlt || activeContent.title}
+                        width={1200}
+                        height={600}
+                        className="w-full h-auto rounded-lg object-cover"
+                      />
+                    </div>
+                  )}
 
-                {/* Content with dark background if image exists */}
-                <div
-                  className="!text-gray-700"
+                  {/* Content with dark background if image exists */}
+                  <div
+                    className="!text-gray-700"
                   // className={cn(
                   //   activeContent.imageSrc &&
                   //     "bg-[#010107] text-white p-6 sm:p-8 rounded-lg"
                   // )}
-                >
-                  {/* Paragraphs */}
-                  {activeContent.paragraphs &&
-                    activeContent.paragraphs.length > 0 && (
-                      <div className="space-y-6 mb-8">
-                        {activeContent.paragraphs.map((paragraph, index) => (
-                          <p
-                            key={index}
-                            className={cn(
-                              "text-lg leading-relaxed text-gray-700"
-                              // activeContent.imageSrc
-                              //   ? "text-white/90"
-                              //   : "text-gray-700"
-                            )}
-                            dangerouslySetInnerHTML={{
-                              __html: paragraph.replace(
-                                /\*\*(.*?)\*\*/g,
-                                "<strong>$1</strong>"
-                              ),
-                            }}
-                          />
-                        ))}
-                      </div>
-                    )}
-
-                  {/* Practices Section */}
-                  {activeContent.practices &&
-                    activeContent.practices.length > 0 && (
-                      <div className="mb-8">
-                        <ul className="space-y-4">
-                          {activeContent.practices.map((practice) => (
-                            <li
-                              key={practice.id}
-                              className="flex items-start gap-4"
-                            >
-                              <CheckCircle2
-                                className={cn(
-                                  "w-6 h-6 flex-shrink-0 mt-0.5",
-                                  activeContent.imageSrc
-                                    ? "text-[#5ABF87]"
-                                    : "text-[#5ABF87]"
-                                )}
-                              />
-                              <span
-                                className={cn(
-                                  "text-lg text-gray-700"
-                                  // activeContent.imageSrc
-                                  //   ? "text-white/90"
-                                  //   : "text-gray-700"
-                                )}
-                              >
-                                {practice.text}
-                              </span>
-                            </li>
+                  >
+                    {/* Paragraphs */}
+                    {activeContent.paragraphs &&
+                      activeContent.paragraphs.length > 0 && (
+                        <div className="space-y-6 mb-8">
+                          {activeContent.paragraphs.map((paragraph, index) => (
+                            <p
+                              key={index}
+                              className={cn(
+                                "text-lg leading-relaxed text-gray-700"
+                                // activeContent.imageSrc
+                                //   ? "text-white/90"
+                                //   : "text-gray-700"
+                              )}
+                              dangerouslySetInnerHTML={{
+                                __html: paragraph.replace(
+                                  /\*\*(.*?)\*\*/g,
+                                  "<strong>$1</strong>"
+                                ),
+                              }}
+                            />
                           ))}
-                        </ul>
-                      </div>
-                    )}
+                        </div>
+                      )}
 
-                  {/* Info Blocks */}
-                  {activeContent.infoBlocks &&
-                    activeContent.infoBlocks.length > 0 && (
-                      <div className="space-y-4 mb-8">
-                        {activeContent.infoBlocks.map((block) => {
-                          const IconComponent =
-                            block.icon === "shield"
-                              ? Shield
-                              : block.icon === "flag"
-                              ? Flag
-                              : Info;
-                          return (
-                            <div
-                              key={block.id}
-                              className="bg-gray-100 rounded-lg p-4 sm:p-6 flex gap-4 items-start"
-                            >
-                              <div className="flex-shrink-0">
-                                <div className="w-12 h-12 bg-[#3C62ED] rounded-lg flex items-center justify-center">
-                                  <IconComponent className="w-6 h-6 text-white" />
-                                </div>
-                              </div>
-                              <div className="flex-1">
-                                <p
-                                  className="text-gray-700 text-base leading-relaxed"
-                                  dangerouslySetInnerHTML={{
-                                    __html: block.text
-                                      .replace(
-                                        /\*\*(.*?)\*\*/g,
-                                        "<strong>$1</strong>"
-                                      )
-                                      .replace(/\\"/g, '"'),
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                  {/* Numbered List */}
-                  {activeContent.numberedList &&
-                    activeContent.numberedList.length > 0 && (
-                      <div
-                        className={cn(
-                          "mb-6",
-                          !activeContent.imageSrc && "space-y-6"
-                        )}
-                      >
-                        {/* Numbered List Title/Sub-header */}
-                        {activeContent.numberedListTitle && (
-                          <h3 className="text-xl font-bold text-gray-900 mb-6">
-                            {activeContent.numberedListTitle}
-                          </h3>
-                        )}
-                        <ul className="space-y-6">
-                          {activeContent.numberedList.map((item) => (
-                            <li
-                              key={item.id}
-                              className="flex gap-4 items-start"
-                            >
-                              <div className="flex-shrink-0">
-                                <div className="w-12 h-12 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
-                                  <span className="text-gray-900 font-bold text-lg">
-                                    {item.number}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="flex-1 pt-2">
-                                <p
+                    {/* Practices Section */}
+                    {activeContent.practices &&
+                      activeContent.practices.length > 0 && (
+                        <div className="mb-8">
+                          {/* Practices Title */}
+                          {activeContent.practicesTitle && (
+                            <h3 className="text-xl font-bold text-gray-900 mb-6">
+                              {activeContent.practicesTitle}
+                            </h3>
+                          )}
+                          <ul className="space-y-4">
+                            {activeContent.practices.map((practice) => (
+                              <li
+                                key={practice.id}
+                                className="flex items-start gap-4"
+                              >
+                                <CheckCircle2
                                   className={cn(
-                                    "text-lg leading-relaxed",
+                                    "w-6 h-6 flex-shrink-0 mt-0.5",
                                     activeContent.imageSrc
-                                      ? "text-white/90"
-                                      : "text-gray-700"
+                                      ? "text-[#5ABF87]"
+                                      : "text-[#5ABF87]"
+                                  )}
+                                />
+                                <span
+                                  className={cn(
+                                    "text-lg text-gray-700"
+                                    // activeContent.imageSrc
+                                    //   ? "text-white/90"
+                                    //   : "text-gray-700"
                                   )}
                                 >
-                                  {item.text}
-                                </p>
+                                  {practice.text}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                    {/* Info Blocks */}
+                    {activeContent.infoBlocks &&
+                      activeContent.infoBlocks.length > 0 && (
+                        <div className="space-y-4 mb-8">
+                          {activeContent.infoBlocks.map((block) => {
+                            const IconComponent =
+                              block.icon === "shield"
+                                ? Shield
+                                : block.icon === "flag"
+                                  ? Flag
+                                  : Info;
+                            return (
+                              <div
+                                key={block.id}
+                                className="bg-gray-100 rounded-lg p-4 sm:p-6 flex gap-4 items-start"
+                              >
+                                <div className="flex-shrink-0">
+                                  <div className="w-12 h-12 bg-[#3C62ED] rounded-lg flex items-center justify-center">
+                                    <IconComponent className="w-6 h-6 text-white" />
+                                  </div>
+                                </div>
+                                <div className="flex-1">
+                                  <p
+                                    className="text-gray-700 text-base leading-relaxed"
+                                    dangerouslySetInnerHTML={{
+                                      __html: block.text
+                                        .replace(
+                                          /\*\*(.*?)\*\*/g,
+                                          "<strong>$1</strong>"
+                                        )
+                                        .replace(/\\"/g, '"'),
+                                    }}
+                                  />
+                                </div>
                               </div>
-                            </li>
-                          ))}
-                        </ul>
-                        {activeContent.numberedListFooter && (
+                            );
+                          })}
+                        </div>
+                      )}
+
+                    {/* Numbered List */}
+                    {activeContent.numberedList &&
+                      activeContent.numberedList.length > 0 && (
+                        <div
+                          className={cn(
+                            "mb-6",
+                            !activeContent.imageSrc && "space-y-6"
+                          )}
+                        >
+                          {/* Numbered List Title/Sub-header */}
+                          {activeContent.numberedListTitle && (
+                            <h3 className="text-xl font-bold text-gray-900 mb-6">
+                              {activeContent.numberedListTitle}
+                            </h3>
+                          )}
+                          <ul className="space-y-6">
+                            {activeContent.numberedList.map((item) => (
+                              <li
+                                key={item.id}
+                                className="flex gap-4 items-start"
+                              >
+                                <div className="flex-shrink-0">
+                                  <div className="w-12 h-12 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
+                                    <span className="text-gray-900 font-bold text-lg">
+                                      {item.number}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex-1 pt-2">
+                                  <p
+                                    className={cn(
+                                      "text-lg leading-relaxed",
+                                      activeContent.imageSrc
+                                        ? "text-white/90"
+                                        : "text-gray-700"
+                                    )}
+                                  >
+                                    {item.text}
+                                  </p>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                          {activeContent.numberedListFooter && (
+                            <p
+                              className={cn(
+                                "mt-6 text-lg leading-relaxed",
+                                activeContent.imageSrc
+                                  ? "text-white/90"
+                                  : "text-gray-700"
+                              )}
+                              dangerouslySetInnerHTML={{
+                                __html: activeContent.numberedListFooter.replace(
+                                  /\*\*(.*?)\*\*/g,
+                                  "<strong>$1</strong>"
+                                ),
+                              }}
+                            />
+                          )}
+                        </div>
+                      )}
+
+                    {/* Footer Info Block */}
+                    {activeContent.infoBlockFooter && (
+                      <div className="bg-[#5ABF87] rounded-lg p-4 sm:p-6 flex gap-4 items-start mt-8">
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                            <Info className="w-5 h-5 text-[#5ABF87]" />
+                          </div>
+                        </div>
+                        <div className="flex-1">
                           <p
-                            className={cn(
-                              "mt-6 text-lg leading-relaxed",
-                              activeContent.imageSrc
-                                ? "text-white/90"
-                                : "text-gray-700"
-                            )}
+                            className="text-white text-base leading-relaxed"
                             dangerouslySetInnerHTML={{
-                              __html: activeContent.numberedListFooter.replace(
+                              __html: activeContent.infoBlockFooter.text.replace(
                                 /\*\*(.*?)\*\*/g,
                                 "<strong>$1</strong>"
                               ),
                             }}
                           />
-                        )}
-                      </div>
-                    )}
-
-                  {/* Footer Info Block */}
-                  {activeContent.infoBlockFooter && (
-                    <div className="bg-[#5ABF87] rounded-lg p-4 sm:p-6 flex gap-4 items-start mt-8">
-                      <div className="flex-shrink-0">
-                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                          <Info className="w-5 h-5 text-[#5ABF87]" />
                         </div>
                       </div>
-                      <div className="flex-1">
-                        <p
-                          className="text-white text-base leading-relaxed"
-                          dangerouslySetInnerHTML={{
-                            __html: activeContent.infoBlockFooter.text.replace(
-                              /\*\*(.*?)\*\*/g,
-                              "<strong>$1</strong>"
-                            ),
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Download Button */}
-                  {activeContent.downloadButtonText &&
-                    activeContent.downloadButtonUrl && (
-                      <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <p
-                          className={cn(
-                            "text-lg font-bold",
-                            activeContent.imageSrc
-                              ? "text-white"
-                              : "text-gray-900"
-                          )}
-                        >
-                          Read the full-version of our Grantmaking Framework
-                        </p>
-                        <a
-                          href={activeContent.downloadButtonUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-[#3C62ED] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2d4fd6] transition-colors flex items-center gap-2 whitespace-nowrap"
-                        >
-                          <FileDown className="w-5 h-5" />
-                          {activeContent.downloadButtonText}
-                        </a>
-                      </div>
                     )}
+
+                    {/* Download Button */}
+                    {activeContent.downloadButtonText &&
+                      activeContent.downloadButtonUrl && (
+                        <div className="mt-8 bg-gray-50 rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                          <p
+                            className={cn(
+                              "text-lg font-bold",
+                              activeContent.imageSrc
+                                ? "text-white"
+                                : "text-gray-900"
+                            )}
+                          >
+                            {activeContent.downloadButtonLabel ||
+                              "Read the full-version of our Grantmaking Framework"}
+                          </p>
+                          <a
+                            href={activeContent.downloadButtonUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-[#3C62ED] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2d4fd6] transition-colors flex items-center gap-2 whitespace-nowrap"
+                          >
+                            <FileDown className="w-5 h-5" />
+                            {activeContent.downloadButtonText}
+                          </a>
+                        </div>
+                      )}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No content available</p>
                 </div>
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-gray-500">No content available</p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

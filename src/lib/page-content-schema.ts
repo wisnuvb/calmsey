@@ -42,11 +42,14 @@ export interface MultipleItemField {
     | "url"
     | "email"
     | "boolean"
-    | "file";
+    | "file"
+    | "multiple";
   required?: boolean;
   placeholder?: string;
   helpText?: string;
   defaultValue?: string;
+  itemSchema?: MultipleItemField[]; // For nested multiple fields
+  itemLabel?: string; // Label for nested multiple items
 }
 
 export interface FieldDefinition {

@@ -1,6 +1,7 @@
 import {
+  FeedbackCalloutSection,
+  GrantmakingSection,
   HeroSection,
-  SupportSection,
   TheoryOfChangeSection,
 } from "@/components/main";
 import { PageContentProvider } from "@/contexts/PageContentContext";
@@ -31,8 +32,13 @@ const OurApproachPage = async ({ params }: OurApproachPageProps) => {
         className="h-[590px] !min-h-[590px]"
       />
 
-      <SupportSection />
+      {/* <SupportSection /> */}
+      <GrantmakingSection contentKey="support.navigationItems" />
       <TheoryOfChangeSection />
+      <FeedbackCalloutSection
+        title="We value your support"
+        description="Connect with us to co-create solutions that protect rights, sustain livelihoods, and centre local voices."
+      />
     </PageContentProvider>
   );
 };
