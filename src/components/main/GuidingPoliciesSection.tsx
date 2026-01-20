@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Handshake, ChevronDown, ChevronUp } from "lucide-react";
-import { usePageContent } from "@/contexts/PageContentContext";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface Policy {
   id: string;
@@ -107,43 +107,7 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
   policies: propPolicies,
   backgroundColor = "bg-white",
 }) => {
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
-
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
-
-  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
-    const value = pageContent[key];
-    if (!value) return defaultValue;
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return defaultValue;
-    }
-  };
-
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+  const { getContentJSON, getValue } = usePageContentHelpers();
 
   // Get values from context > props > defaults
   const title = getValue(
@@ -215,11 +179,10 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
             >
               <button
                 onClick={() => togglePolicy(policy.id)}
-                className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors duration-200 ${
-                  expandedPolicy === policy.id
-                    ? "bg-blue-50 text-blue-900"
-                    : "bg-gray-50 text-gray-900 hover:bg-gray-100"
-                }`}
+                className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors duration-200 ${expandedPolicy === policy.id
+                  ? "bg-blue-50 text-blue-900"
+                  : "bg-gray-50 text-gray-900 hover:bg-gray-100"
+                  }`}
               >
                 <div className="flex items-center gap-4">
                   <span className="text-lg font-semibold">{policy.title}</span>

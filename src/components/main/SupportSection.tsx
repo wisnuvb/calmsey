@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { CheckCircle2, Shield, BookMarked, Info, Download } from "lucide-react";
 import { H2, H5, H6, P } from "../ui/typography";
-import { usePageContent } from "@/contexts/PageContentContext";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface ContentItem {
   icon?: React.ReactNode;
@@ -215,25 +215,7 @@ export const SupportSection: React.FC<SupportSectionProps> = ({
 }) => {
   const [activeSection, setActiveSection] = useState("what-we-support");
 
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
-
-  // Helper to get JSON value from content
-  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
-    const value = pageContent[key];
-    if (!value) return defaultValue;
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return defaultValue;
-    }
-  };
+  const { getContentJSON } = usePageContentHelpers()
 
   // Get navigation items from context or props or default, then normalize icons
   const navigationItems = normalizeNavigationItems(
@@ -258,11 +240,10 @@ export const SupportSection: React.FC<SupportSectionProps> = ({
                 <div key={item.id}>
                   <button
                     onClick={() => setActiveSection(item.id)}
-                    className={`w-full text-left p-4 transition-all duration-200 ${
-                      activeSection === item.id
-                        ? "bg-[#3C62ED] text-white rounded-sm shadow-md"
-                        : "text-[#010107]"
-                    }`}
+                    className={`w-full text-left p-4 transition-all duration-200 ${activeSection === item.id
+                      ? "bg-[#3C62ED] text-white rounded-sm shadow-md"
+                      : "text-[#010107]"
+                      }`}
                   >
                     <H6 style="h6bold" className="font-medium text-lg">
                       {item.title}

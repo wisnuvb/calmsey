@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { getImageUrl, cn } from "@/lib/utils";
 import { H2, P } from "@/components/ui/typography";
-import { usePageContent } from "@/contexts/PageContentContext";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface ValueItem {
   id: string;
@@ -70,46 +70,7 @@ export const OurValuesSection: React.FC<OurValuesSectionProps> = ({
   description: propDescription,
   values: propValues,
 }) => {
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
-
-  // Helper to get value from content
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
-
-  // Helper to get JSON value from content
-  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
-    const value = pageContent[key];
-    if (!value) return defaultValue;
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return defaultValue;
-    }
-  };
-
-  // Helper function to get value with priority: context > props > default
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+  const { getValue, getContentJSON } = usePageContentHelpers()
 
   // Get all values with priority: context > props > default
   const title = getValue("values.title", propTitle, "Our Values");

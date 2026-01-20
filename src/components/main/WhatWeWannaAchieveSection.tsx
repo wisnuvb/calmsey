@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { H3, P } from "@/components/ui/typography";
-import { usePageContent } from "@/contexts/PageContentContext";
 import { getImageUrl } from "@/lib/utils";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface WhatWeWannaAchieveSectionProps {
   tag?: string;
@@ -18,35 +18,7 @@ export function WhatWeWannaAchieveSection({
   image: propImage,
   imageAlt: propImageAlt,
 }: WhatWeWannaAchieveSectionProps = {}) {
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
-
-  // Helper to get value from content
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
-
-  // Helper function to get value with priority: context > props > default
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+  const { getValue } = usePageContentHelpers()
 
   // Get all values with priority: context > props > default
   const tag = getValue("achieve.tag", propTag, "WHAT WE WANNA ACHIEVE");

@@ -4,6 +4,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { H1, P } from "../ui/typography";
 import { usePageContent } from "@/contexts/PageContentContext";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface VideoHeroSectionProps {
   videoUrl?: string;
@@ -20,18 +21,7 @@ export function VideoHeroSection({
   subtitle: propSubtitle,
   className,
 }: VideoHeroSectionProps) {
-  // Try to get content from context
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider
-  }
-
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
+  const { getContentValue } = usePageContentHelpers()
 
   const title =
     propTitle ||

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContent } from "@/contexts/PageContentContext";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface Story {
   id: string;
@@ -48,46 +49,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
   categories: propCategories = [],
   defaultCategory: propDefaultCategory,
 }) => {
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
-
-  // Helper to get value from content
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
-
-  // Helper to get JSON value from content
-  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
-    const value = pageContent[key];
-    if (!value) return defaultValue;
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return defaultValue;
-    }
-  };
-
-  // Helper function to get value with priority: context > props > default
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+  const { getValue, getContentJSON, getContentValue } = usePageContentHelpers()
 
   // Get all values with priority: context > props > default
   const title = getValue(

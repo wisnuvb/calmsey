@@ -9,7 +9,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
-import { usePageContent } from "@/contexts/PageContentContext";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface Activity {
   id: string;
@@ -50,35 +50,7 @@ export function LatestActivitySection({
   itemsPerPage = 9,
   className,
 }: LatestActivitySectionProps = {}) {
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
-
-  // Helper to get value from content
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
-
-  // Helper function to get value with priority: context > props > default
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+  const { getValue, getContentValue } = usePageContentHelpers()
 
   // Helper to get number value from content
   const getContentNumber = (

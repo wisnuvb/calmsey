@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
-import { usePageContent } from "@/contexts/PageContentContext";
 import { getImageUrl } from "@/lib/utils";
 import { useState } from "react";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface WhereWeWorkSectionProps {
   title?: string;
@@ -33,35 +33,7 @@ export function WhereWeWorkSection({
 }: WhereWeWorkSectionProps = {}) {
   const [imageError, setImageError] = useState(false);
 
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
-
-  // Helper to get value from content
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
-
-  // Helper function to get value with priority: context > props > default
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+  const { getValue } = usePageContentHelpers()
 
   // Get all values with priority: context > props > default
   const title = getValue(

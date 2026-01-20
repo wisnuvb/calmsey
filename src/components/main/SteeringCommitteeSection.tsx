@@ -5,8 +5,8 @@ import Image from "next/image";
 import { Linkedin, ChevronLeft, ChevronRight } from "lucide-react";
 import { H2, P } from "@/components/ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
-import { usePageContent } from "@/contexts/PageContentContext";
 import { MemberDetailModal } from "@/components/ui/MemberDetailModal";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface CommitteeMember {
   id: string;
@@ -78,235 +78,196 @@ export const SteeringCommitteeSection: React.FC<
   bottomText: propBottomText,
   backgroundColor = "bg-white",
 }) => {
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
+    const { getValue, getContentJSON } = usePageContentHelpers()
 
-  // Helper to get value from content
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
+    // Get all values with priority: context > props > default
+    const title = getValue(
+      "steeringCommittee.title",
+      propTitle,
+      "The Steering Committee"
+    );
+    const description = getValue(
+      "steeringCommittee.description",
+      propDescription,
+      "Turning Tides is governed by a Steering Committee who are responsible for setting strategic direction and values alignment"
+    );
+    const additionalDescription = getValue(
+      "steeringCommittee.additionalDescription",
+      propAdditionalDescription,
+      "The implementation of our strategy and organizational priorities—composed of small-scale fisher leaders, Indigenous Peoples, and rights experts who bring both deep expertise and accountability to those we serve. The Steering Committee has governed the initiative since the first months of its inception and is critical to the accountability and efficacy"
+    );
+    const bottomText = getValue(
+      "steeringCommittee.bottomText",
+      propBottomText,
+      ""
+    );
+    const members = getContentJSON<CommitteeMember[]>(
+      "steeringCommittee.members",
+      propMembers || defaultMembers
+    );
 
-  // Helper to get JSON value from content
-  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
-    const value = pageContent[key];
-    if (!value) return defaultValue;
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return defaultValue;
-    }
-  };
+    const [currentPage, setCurrentPage] = useState(0);
+    const [selectedMember, setSelectedMember] = useState<CommitteeMember | null>(
+      null
+    );
+    const membersPerPage = 4;
+    const totalPages = Math.ceil(members.length / membersPerPage);
 
-  // Helper function to get value with priority: context > props > default
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+    const startIndex = currentPage * membersPerPage;
+    const endIndex = startIndex + membersPerPage;
+    const currentMembers = members.slice(startIndex, endIndex);
 
-  // Get all values with priority: context > props > default
-  const title = getValue(
-    "steeringCommittee.title",
-    propTitle,
-    "The Steering Committee"
-  );
-  const description = getValue(
-    "steeringCommittee.description",
-    propDescription,
-    "Turning Tides is governed by a Steering Committee who are responsible for setting strategic direction and values alignment"
-  );
-  const additionalDescription = getValue(
-    "steeringCommittee.additionalDescription",
-    propAdditionalDescription,
-    "The implementation of our strategy and organizational priorities—composed of small-scale fisher leaders, Indigenous Peoples, and rights experts who bring both deep expertise and accountability to those we serve. The Steering Committee has governed the initiative since the first months of its inception and is critical to the accountability and efficacy"
-  );
-  const bottomText = getValue(
-    "steeringCommittee.bottomText",
-    propBottomText,
-    ""
-  );
-  const members = getContentJSON<CommitteeMember[]>(
-    "steeringCommittee.members",
-    propMembers || defaultMembers
-  );
+    const handlePrevPage = () => {
+      setCurrentPage((prev) => (prev > 0 ? prev - 1 : totalPages - 1));
+    };
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [selectedMember, setSelectedMember] = useState<CommitteeMember | null>(
-    null
-  );
-  const membersPerPage = 4;
-  const totalPages = Math.ceil(members.length / membersPerPage);
+    const handleNextPage = () => {
+      setCurrentPage((prev) => (prev < totalPages - 1 ? prev + 1 : 0));
+    };
 
-  const startIndex = currentPage * membersPerPage;
-  const endIndex = startIndex + membersPerPage;
-  const currentMembers = members.slice(startIndex, endIndex);
+    const handlePageClick = (pageIndex: number) => {
+      setCurrentPage(pageIndex);
+    };
 
-  const handlePrevPage = () => {
-    setCurrentPage((prev) => (prev > 0 ? prev - 1 : totalPages - 1));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prev) => (prev < totalPages - 1 ? prev + 1 : 0));
-  };
-
-  const handlePageClick = (pageIndex: number) => {
-    setCurrentPage(pageIndex);
-  };
-
-  return (
-    <section className={cn("w-full pb-16 lg:pb-24", backgroundColor)}>
-      <div className="container mx-auto px-4">
-        {/* Title and Description */}
-        <div className="mb-12 lg:mb-16 space-y-10">
-          <H2
-            style="h2bold"
-            className="text-[#010107] text-3xl sm:text-[38px] leading-[120%] tracking-normal"
-          >
-            {title}
-          </H2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-            <P
-              style="p1reg"
-              className="text-[#060726CC] text-2xl font-normal leading-[140%]"
+    return (
+      <section className={cn("w-full pb-16 lg:pb-24", backgroundColor)}>
+        <div className="container mx-auto px-4">
+          {/* Title and Description */}
+          <div className="mb-12 lg:mb-16 space-y-10">
+            <H2
+              style="h2bold"
+              className="text-[#010107] text-3xl sm:text-[38px] leading-[120%] tracking-normal"
             >
-              {description}
-            </P>
-            <P
-              style="p1reg"
-              className="text-[#06072680] text-base leading-[150%]"
-            >
-              {additionalDescription}
-            </P>
+              {title}
+            </H2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
+              <P
+                style="p1reg"
+                className="text-[#060726CC] text-2xl font-normal leading-[140%]"
+              >
+                {description}
+              </P>
+              <P
+                style="p1reg"
+                className="text-[#06072680] text-base leading-[150%]"
+              >
+                {additionalDescription}
+              </P>
+            </div>
           </div>
-        </div>
 
-        {/* Committee Members Grid */}
-        <div className="relative">
-          {/* Navigation Buttons */}
-          {totalPages > 1 && (
-            <>
-              <button
-                onClick={handlePrevPage}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
-                aria-label="Previous page"
-              >
-                <ChevronLeft className="w-5 h-5 text-[#3C62ED]" />
-              </button>
-              <button
-                onClick={handleNextPage}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
-                aria-label="Next page"
-              >
-                <ChevronRight className="w-5 h-5 text-[#3C62ED]" />
-              </button>
-            </>
-          )}
+          {/* Committee Members Grid */}
+          <div className="relative">
+            {/* Navigation Buttons */}
+            {totalPages > 1 && (
+              <>
+                <button
+                  onClick={handlePrevPage}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft className="w-5 h-5 text-[#3C62ED]" />
+                </button>
+                <button
+                  onClick={handleNextPage}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  aria-label="Next page"
+                >
+                  <ChevronRight className="w-5 h-5 text-[#3C62ED]" />
+                </button>
+              </>
+            )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {currentMembers.map((member) => (
-              <div
-                key={member.id}
-                className="flex flex-col cursor-pointer"
-                role="button"
-                tabIndex={0}
-                onClick={() => setSelectedMember(member)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setSelectedMember(member);
-                  }
-                }}
-              >
-                <div className="relative mb-4">
-                  <div className="relative w-full aspect-[3/4] overflow-hidden rounded">
-                    <Image
-                      src={getImageUrl(member.image)}
-                      alt={member.imageAlt || member.name}
-                      fill
-                      className="object-cover"
-                    />
-                    {/* LinkedIn Badge */}
-                    {member.linkedinUrl && (
-                      <a
-                        href={member.linkedinUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute bottom-3 left-3 w-9 h-9 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center hover:shadow-lg transition-shadow duration-200"
-                        aria-label={`${member.name}'s LinkedIn profile`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Linkedin className="w-4 h-4 text-[#3C62ED]" />
-                      </a>
-                    )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              {currentMembers.map((member) => (
+                <div
+                  key={member.id}
+                  className="flex flex-col cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedMember(member)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedMember(member);
+                    }
+                  }}
+                >
+                  <div className="relative mb-4">
+                    <div className="relative w-full aspect-[3/4] overflow-hidden rounded">
+                      <Image
+                        src={getImageUrl(member.image)}
+                        alt={member.imageAlt || member.name}
+                        fill
+                        className="object-cover"
+                      />
+                      {/* LinkedIn Badge */}
+                      {member.linkedinUrl && (
+                        <a
+                          href={member.linkedinUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="absolute bottom-3 left-3 w-9 h-9 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center hover:shadow-lg transition-shadow duration-200"
+                          aria-label={`${member.name}'s LinkedIn profile`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Linkedin className="w-4 h-4 text-[#3C62ED]" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Member Info */}
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold text-[#010107] font-nunito-sans">
+                      {member.name}
+                    </h3>
+                    <p className="text-base text-[#3C62ED] font-work-sans">
+                      {member.country}
+                    </p>
                   </div>
                 </div>
-
-                {/* Member Info */}
-                <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-[#010107] font-nunito-sans">
-                    {member.name}
-                  </h3>
-                  <p className="text-base text-[#3C62ED] font-work-sans">
-                    {member.country}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Pagination Indicator */}
-        {totalPages > 1 && (
-          <div className="flex justify-center mb-12">
-            <div className="flex gap-3">
-              {Array.from({ length: totalPages }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => handlePageClick(index)}
-                  className={cn(
-                    "w-12 h-1.5 rounded-full transition-all duration-300",
-                    currentPage === index
-                      ? "bg-[#3C62ED]"
-                      : "bg-[#E5E7EB] hover:bg-[#D1D5DB]"
-                  )}
-                  aria-label={`Go to page ${index + 1}`}
-                  aria-current={currentPage === index ? "true" : "false"}
-                />
               ))}
             </div>
           </div>
-        )}
 
-        {/* Bottom Text */}
-        {bottomText && (
-          <div className="max-w-4xl mx-auto text-center">
-            <P style="p1reg" className="text-[#06072680] leading-relaxed">
-              {bottomText}
-            </P>
-          </div>
-        )}
-      </div>
+          {/* Pagination Indicator */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mb-12">
+              <div className="flex gap-3">
+                {Array.from({ length: totalPages }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handlePageClick(index)}
+                    className={cn(
+                      "w-12 h-1.5 rounded-full transition-all duration-300",
+                      currentPage === index
+                        ? "bg-[#3C62ED]"
+                        : "bg-[#E5E7EB] hover:bg-[#D1D5DB]"
+                    )}
+                    aria-label={`Go to page ${index + 1}`}
+                    aria-current={currentPage === index ? "true" : "false"}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
-      {/* Member Detail Modal */}
-      <MemberDetailModal
-        member={selectedMember}
-        onClose={() => setSelectedMember(null)}
-      />
-    </section>
-  );
-};
+          {/* Bottom Text */}
+          {bottomText && (
+            <div className="max-w-4xl mx-auto text-center">
+              <P style="p1reg" className="text-[#06072680] leading-relaxed">
+                {bottomText}
+              </P>
+            </div>
+          )}
+        </div>
+
+        {/* Member Detail Modal */}
+        <MemberDetailModal
+          member={selectedMember}
+          onClose={() => setSelectedMember(null)}
+        />
+      </section>
+    );
+  };

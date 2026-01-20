@@ -2,8 +2,8 @@
 
 import { ArrowRight } from "lucide-react";
 import { H2, P } from "@/components/ui/typography";
-import { usePageContent } from "@/contexts/PageContentContext";
 import { cn } from "@/lib/utils";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface FundingAcceptancePolicySectionProps {
   title?: string;
@@ -20,30 +20,7 @@ export function FundingAcceptancePolicySection({
   buttonLink: propButtonLink,
   backgroundColor = "bg-[#1E0F39]",
 }: FundingAcceptancePolicySectionProps = {}) {
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {}
-
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
-
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+  const { getValue, getContentJSON } = usePageContentHelpers()
 
   const title = getValue(
     "fundingAcceptancePolicy.title",
@@ -62,16 +39,6 @@ export function FundingAcceptancePolicySection({
     propButtonLink,
     "/governance/funding-policy"
   );
-
-  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
-    const value = pageContent[key];
-    if (!value) return defaultValue;
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return defaultValue;
-    }
-  };
 
   const defaultParagraphs = [
     "We prioritize upholding high standards of ethics, integrity, and transparency in all aspects of our operations. To this end, we have established a policy to guide our decision-making regarding the acceptance of external funding.",

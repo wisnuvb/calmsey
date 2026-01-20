@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { CheckCircle2, Shield, Flag, Info, FileDown } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
-import { usePageContent } from "@/contexts/PageContentContext";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface PracticeItem {
   id: string;
@@ -142,25 +142,7 @@ export function GrantmakingSection({
   className,
   contentKey = "grantmaking.navigationItems",
 }: GrantmakingSectionProps = {}) {
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
-
-  // Helper to get JSON value from content
-  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
-    const value = pageContent[key];
-    if (!value) return defaultValue;
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return defaultValue;
-    }
-  };
+  const { getContentJSON } = usePageContentHelpers()
 
   // Transform multiple field format to NavigationItem format
   const transformMultipleToNavigationItems = (

@@ -2,6 +2,7 @@
 
 import { H2, P } from "@/components/ui/typography";
 import { usePageContent } from "@/contexts/PageContentContext";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface FeedbackCalloutSectionProps {
   title?: string;
@@ -22,30 +23,7 @@ export function FeedbackCalloutSection({
   learnMoreLink: propLearnMoreLink,
   backgroundColor = "bg-[#3C62ED]",
 }: FeedbackCalloutSectionProps = {}) {
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {}
-
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
-
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+  const { getValue } = usePageContentHelpers()
 
   const title = getValue(
     "feedbackCallout.title",

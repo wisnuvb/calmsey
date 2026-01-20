@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowRight, Waves, Globe, Zap, Lightbulb } from "lucide-react";
 import { H2, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
-import { usePageContent } from "@/contexts/PageContentContext";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface FundData {
   id: string;
@@ -106,46 +106,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
   funds: propFunds,
   className,
 }) => {
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
-
-  // Helper to get value from content
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
-
-  // Helper to get JSON value from content
-  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
-    const value = pageContent[key];
-    if (!value) return defaultValue;
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return defaultValue;
-    }
-  };
-
-  // Helper function to get value with priority: context > props > default
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+  const { getValue, getContentJSON } = usePageContentHelpers()
 
   // Get all values with priority: context > props > default
   const title = getValue("fourFunds.title", propTitle, "Our Four Funds");
@@ -228,14 +189,14 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
                     {fund.description}
                   </P>
                 </div>
-                {fund.id!=='rapid-response-fund'&&
-                <Link
-                  href={fund.learnMoreLink}
-                  className="inline-flex items-center gap-2 px-8 py-5 bg-white border border-gray-300 text-[#3C62ED] rounded-md hover:bg-gray-50 transition-colors duration-300 font-normal w-fit mt-2 text-base"
-                >
-                  <span>Learn More</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+                {fund.id !== 'rapid-response-fund' &&
+                  <Link
+                    href={fund.learnMoreLink}
+                    className="inline-flex items-center gap-2 px-8 py-5 bg-white border border-gray-300 text-[#3C62ED] rounded-md hover:bg-gray-50 transition-colors duration-300 font-normal w-fit mt-2 text-base"
+                  >
+                    <span>Learn More</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
                 }
               </div>
             </div>

@@ -6,6 +6,7 @@ import { H5 } from "../ui/typography";
 import { usePageContent } from "@/contexts/PageContentContext";
 import { useLanguage } from "../public/LanguageProvider";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface DownloadFile {
   language: string;
@@ -35,46 +36,7 @@ export function StrategyDownloadSection({
   const { language: currentLanguage } = useLanguage();
   const { languages: activeLanguages } = useActiveLanguages();
 
-  // Try to get content from context, fallback to empty object if not available
-  let pageContent: Record<string, string> = {};
-  try {
-    const context = usePageContent();
-    pageContent = context.content;
-  } catch {
-    // Not in PageContentProvider, use props only
-  }
-
-  // Helper to get value from content
-  const getContentValue = (key: string, defaultValue: string = ""): string => {
-    return pageContent[key] || defaultValue;
-  };
-
-  // Helper to get JSON value from content
-  const getContentJSON = <T,>(key: string, defaultValue: T): T => {
-    const value = pageContent[key];
-    if (!value) return defaultValue;
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return defaultValue;
-    }
-  };
-
-  // Helper function to get value with priority: context > props > default
-  const getValue = (
-    contentKey: string,
-    propValue?: string,
-    defaultValue: string = ""
-  ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
-    }
-    if (propValue && propValue.trim() !== "") {
-      return propValue;
-    }
-    return defaultValue;
-  };
+  const { getValue, getContentJSON } = usePageContentHelpers()
 
   // Helper function to ensure URL has https:// protocol
   const ensureHttpsUrl = (url: string): string => {
@@ -125,8 +87,8 @@ export function StrategyDownloadSection({
     downloadFiles.length > 0
       ? downloadFiles
       : legacyDownloadUrl
-      ? [{ language: "en", url: legacyDownloadUrl }]
-      : [{ language: "en", url: "/downloads/strategy-2030.pdf" }];
+        ? [{ language: "en", url: legacyDownloadUrl }]
+        : [{ language: "en", url: "/downloads/strategy-2030.pdf" }];
 
   const downloadButtonText = getValue(
     "strategy.buttonText",
@@ -231,11 +193,10 @@ export function StrategyDownloadSection({
                 <button
                   key={file.language}
                   onClick={() => handleLanguageSelect(file)}
-                  className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${
-                    file.language === currentLanguage
-                      ? "border-blue-500 bg-blue-50 text-blue-900"
-                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
-                  }`}
+                  className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${file.language === currentLanguage
+                    ? "border-blue-500 bg-blue-50 text-blue-900"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium">
