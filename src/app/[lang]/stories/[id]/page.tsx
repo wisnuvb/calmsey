@@ -207,6 +207,7 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
         description={storyData.description}
         photos={storyData.photos}
         relatedArticles={storyData.relatedArticles}
+        videoUrl={storyData.videoUrl}
       />
       <LatestStoriesSection language={language} />
       <FeedbackCalloutSection

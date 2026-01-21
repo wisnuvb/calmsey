@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import TranslationTabs from "@/components/admin/TranslationTabs";
 import { MediaPickerModal } from "@/components/admin/MediaPickerModal";
 import { Image as ImageIcon } from "lucide-react";
+import { useToast } from "../ui/toast";
 
 interface Translation {
   languageId: string;
@@ -104,6 +105,8 @@ export default function ArticleForm({
   loading = false,
   saving = false,
 }: ArticleFormProps) {
+  const { addToast } = useToast();
+
   // Helper function to safely parse JSON arrays
   const safeParseArray = (value: any): any[] => {
     if (Array.isArray(value)) return value;
@@ -155,6 +158,7 @@ export default function ArticleForm({
     null
   );
   const [isAddingMultiplePhotos, setIsAddingMultiplePhotos] = useState(false);
+  const [isSelectingPartnerLogo, setIsSelectingPartnerLogo] = useState(false);
   const [relatedArticlesSearch, setRelatedArticlesSearch] = useState("");
 
   useEffect(() => {
@@ -250,7 +254,11 @@ export default function ArticleForm({
 
   const removeTranslation = (languageId: string) => {
     if (languageId === "en") {
-      alert("Cannot remove the default language translation");
+      addToast({
+        type: "warning",
+        title: "Cannot Remove",
+        description: "The default language translation cannot be removed",
+      });
       return;
     }
     setTranslations((prev) => prev.filter((t) => t.languageId !== languageId));
@@ -278,12 +286,20 @@ export default function ArticleForm({
     // Validation
     const englishTranslation = translations.find((t) => t.languageId === "en");
     if (!englishTranslation?.title.trim()) {
-      alert("Please enter a title for the English version");
+      addToast({
+        type: "error",
+        title: "Validation Error",
+        description: "Please enter a title for the English version",
+      });
       return;
     }
 
     if (!englishTranslation?.content.trim()) {
-      alert("Please enter content for the English version");
+      addToast({
+        type: "error",
+        title: "Validation Error",
+        description: "Please enter content for the English version",
+      });
       return;
     }
 
@@ -514,24 +530,37 @@ export default function ArticleForm({
                     <label className="block text-xs text-gray-600 mb-1">
                       Organization Logo URL
                     </label>
-                    <input
-                      type="url"
-                      value={articleData.partnerOrganization?.logo || ""}
-                      onChange={(e) =>
-                        setArticleData((prev) => ({
-                          ...prev,
-                          partnerOrganization: {
-                            name:
-                              prev.partnerOrganization?.name || "",
-                            logo: e.target.value,
-                            fullName:
-                              prev.partnerOrganization?.fullName || "",
-                          },
-                        }))
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="https://example.com/logo.png"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="url"
+                        value={articleData.partnerOrganization?.logo || ""}
+                        onChange={(e) =>
+                          setArticleData((prev) => ({
+                            ...prev,
+                            partnerOrganization: {
+                              name:
+                                prev.partnerOrganization?.name || "",
+                              logo: e.target.value,
+                              fullName:
+                                prev.partnerOrganization?.fullName || "",
+                            },
+                          }))
+                        }
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="https://example.com/logo.png"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsSelectingPartnerLogo(true);
+                          setMediaPickerOpen(true);
+                        }}
+                        className="px-3 py-2 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 flex items-center gap-1 whitespace-nowrap"
+                      >
+                        <ImageIcon className="w-3 h-3" />
+                        Browse
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">
@@ -993,9 +1022,21 @@ export default function ArticleForm({
           setMediaPickerOpen(false);
           setCurrentPhotoIndex(null);
           setIsAddingMultiplePhotos(false);
+          setIsSelectingPartnerLogo(false);
         }}
         onSelect={(selectedUrls) => {
-          if (isAddingMultiplePhotos && selectedUrls.length > 0) {
+          if (isSelectingPartnerLogo && selectedUrls.length > 0) {
+            // Update partner organization logo
+            setArticleData((prev) => ({
+              ...prev,
+              partnerOrganization: {
+                name: prev.partnerOrganization?.name || "",
+                logo: selectedUrls[0],
+                fullName: prev.partnerOrganization?.fullName || "",
+              },
+            }));
+            setIsSelectingPartnerLogo(false);
+          } else if (isAddingMultiplePhotos && selectedUrls.length > 0) {
             // Add multiple photos from media library
             const newPhotos = selectedUrls.map((url, idx) => ({
               id: `photo-${Date.now()}-${idx}`,

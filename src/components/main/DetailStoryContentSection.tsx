@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { H2, H3, H5, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
+import { shareContent } from "@/lib/share-utils";
 import Image from "next/image";
 
 interface PartnerOrganization {
@@ -40,6 +41,7 @@ interface DetailStoryContentSectionProps {
   photos?: Photo[];
   relatedArticles?: RelatedArticle[];
   className?: string;
+  videoUrl?: string;
 }
 
 export function DetailStoryContentSection({
@@ -49,13 +51,41 @@ export function DetailStoryContentSection({
   photos,
   relatedArticles,
   className,
+  videoUrl,
 }: DetailStoryContentSectionProps) {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const [showCopyNotification, setShowCopyNotification] = useState(false);
 
   // Default values
   const photosList = photos || [];
   const relatedArticlesList = relatedArticles || [];
+
+  // Share handler
+  const handleShare = async () => {
+    const success = await shareContent(
+      {
+        title: document.title,
+        text: description.substring(0, 200) + "...",
+        url: window.location.href,
+      },
+      {
+        onSuccess: () => {
+          setShowCopyNotification(true);
+          setTimeout(() => setShowCopyNotification(false), 2000);
+        },
+        onError: (error) => {
+          console.error("Share failed:", error);
+        },
+      }
+    );
+
+    // Show notification even if share was successful via native share
+    if (success) {
+      setShowCopyNotification(true);
+      setTimeout(() => setShowCopyNotification(false), 2000);
+    }
+  };
 
   // Handle keyboard navigation in gallery
   useEffect(() => {
@@ -66,11 +96,11 @@ export function DetailStoryContentSection({
         setIsGalleryOpen(false);
       } else if (e.key === "ArrowLeft") {
         setSelectedPhotoIndex((prev) =>
-          prev > 0 ? prev - 1 : photosList.length - 1
+          prev > 0 ? prev - 1 : photosList.length - 1,
         );
       } else if (e.key === "ArrowRight") {
         setSelectedPhotoIndex((prev) =>
-          prev < photosList.length - 1 ? prev + 1 : 0
+          prev < photosList.length - 1 ? prev + 1 : 0,
         );
       }
     };
@@ -90,13 +120,13 @@ export function DetailStoryContentSection({
 
   const goToPrevious = () => {
     setSelectedPhotoIndex((prev) =>
-      prev > 0 ? prev - 1 : photosList.length - 1
+      prev > 0 ? prev - 1 : photosList.length - 1,
     );
   };
 
   const goToNext = () => {
     setSelectedPhotoIndex((prev) =>
-      prev < photosList.length - 1 ? prev + 1 : 0
+      prev < photosList.length - 1 ? prev + 1 : 0,
     );
   };
 
@@ -109,12 +139,12 @@ export function DetailStoryContentSection({
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-8">
                 {/* Partner Organization */}
-                {partnerOrganization && (
+                {partnerOrganization&&(partnerOrganization.logo || partnerOrganization.name||country) && (
                   <div className="bg-gray-50 border border-[#D7E4EF] p-6 sm:p-11 rounded-lg">
                     <div className="space-y-3">
                       <H3
                         style="h5bold"
-                        className="text-[#010107] font-semibold text-xs leading-[15.] tracking-normal uppercase"
+                        className="text-[#010107] font-semibold text-xs leading-[150%] tracking-normal uppercase"
                       >
                         Partner Organization
                       </H3>
@@ -173,13 +203,25 @@ export function DetailStoryContentSection({
 
                 {/* Action Buttons */}
                 <div className="flex items-center justify-between gap-3">
-                  <button className="w-full flex items-center justify-center space-x-2 px-4 py-5 border border-[#CADBEA] text-[#010107] rounded-lg hover:bg-gray-50 transition-colors">
-                    <Play className="w-4 h-4" />
-                    <span className="font-work-sans font-medium">Trailer</span>
-                  </button>
-                  <button className="w-full flex items-center justify-center space-x-2 px-4 py-5 bg-[#06020C] text-white rounded-lg hover:bg-gray-800 transition-colors">
+                  {!!videoUrl && (
+                    <button className="w-full flex items-center justify-center space-x-2 px-4 py-5 border border-[#CADBEA] text-[#010107] rounded-lg hover:bg-gray-50 transition-colors">
+                      <Play className="w-4 h-4" />
+                      <span className="font-work-sans font-medium">
+                        Trailer
+                      </span>
+                    </button>
+                  )}
+                  <button 
+                    onClick={handleShare}
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-5 bg-[#06020C] text-white rounded-lg hover:bg-gray-800 transition-colors relative"
+                  >
                     <Share2 className="w-4 h-4" />
-                    <span className="font-work-sans font-medium">Share</span>
+                    <span className="font-work-sans font-medium">Share  </span>
+                    {showCopyNotification && (
+                      <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white text-xs px-3 py-1 rounded whitespace-nowrap">
+                        Link copied!
+                      </span>
+                    )}
                   </button>
                 </div>
               </div>
@@ -190,7 +232,9 @@ export function DetailStoryContentSection({
           <div
             className={cn(
               "space-y-12",
-              partnerOrganization || country ? "lg:col-span-2" : "lg:col-span-3"
+              partnerOrganization || country
+                ? "lg:col-span-2"
+                : "lg:col-span-3",
             )}
           >
             {/* Description */}

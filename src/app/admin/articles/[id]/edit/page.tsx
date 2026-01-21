@@ -6,6 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import ArticleForm from "@/components/admin/ArticleForm";
+import { useToast } from "@/components/ui/toast";
 
 interface Translation {
   languageId: string;
@@ -46,6 +47,8 @@ export default function EditArticlePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { addToast } = useToast();
+
   useEffect(() => {
     if (articleId) {
       fetchArticle();
@@ -77,12 +80,12 @@ export default function EditArticlePage() {
               ...t,
               content: "",
             };
-          }
+          },
         );
 
         // Jika tidak ada English translation, buat satu dengan content dari article
         const englishTranslation = transformedTranslations.find(
-          (t: any) => t.languageId === "en"
+          (t: any) => t.languageId === "en",
         );
         if (!englishTranslation) {
           transformedTranslations.push({
@@ -179,14 +182,25 @@ export default function EditArticlePage() {
       if (response.ok) {
         // Refresh the article data
         await fetchArticle();
-        alert("Article updated successfully!");
+        addToast({
+          type: "success",
+          title: "Article Updated",
+          description: "The article has been updated successfully.",
+        });
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to update article");
+        addToast({
+          type: "error",
+          title: "Update Failed",
+          description: errorData.error || "Failed to update article",
+        });
       }
-    } catch (error) {
-      console.error("Save error:", error);
-      alert("Failed to update article");
+    } catch {
+      addToast({
+        type: "error",
+        title: "Update Failed",
+        description: "Failed to update article",
+      });
     } finally {
       setSaving(false);
     }
@@ -195,7 +209,7 @@ export default function EditArticlePage() {
   const handleDelete = async () => {
     if (
       !confirm(
-        "Are you sure you want to delete this article? This action cannot be undone."
+        "Are you sure you want to delete this article? This action cannot be undone.",
       )
     ) {
       return;
@@ -210,11 +224,19 @@ export default function EditArticlePage() {
         router.push("/admin/articles");
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to delete article");
+        addToast({
+          type: "error",
+          title: "Delete Failed",
+          description: errorData.error || "Failed to delete article",
+        });
       }
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Failed to delete article");
+      addToast({
+        type: "error",
+        title: "Delete Failed",
+        description: "Failed to delete article",
+      });
     }
   };
 
