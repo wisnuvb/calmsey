@@ -111,6 +111,7 @@ export async function PUT(
       posterImage,
       partnerOrganization,
       photos,
+      relatedArticles,
     } = body;
 
     // Check if article exists and user has permission
@@ -154,6 +155,7 @@ export async function PUT(
               ? partnerOrganization
               : existingArticle.partnerOrganization,
           photos: photos !== undefined ? photos : existingArticle.photos,
+          relatedArticles: relatedArticles !== undefined ? relatedArticles : existingArticle.relatedArticles,
           publishedAt:
             status === "PUBLISHED" && !existingArticle.publishedAt
               ? new Date()

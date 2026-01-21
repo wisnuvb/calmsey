@@ -129,6 +129,7 @@ model Article {
   posterImage         String? // Video poster/thumbnail image
   partnerOrganization Json? // JSON: {name, logo, fullName}
   photos              Json? // JSON: [{id, src, alt}]
+  relatedArticles     Json? // JSON: [{id, title, url}]
 
   // Relations
   authorId     String

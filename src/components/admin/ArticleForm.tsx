@@ -26,6 +26,12 @@ interface Tag {
   name: string;
 }
 
+interface RelatedArticle {
+  id: string;
+  title: string;
+  url: string;
+}
+
 interface ArticleFormData {
   slug: string;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
@@ -41,6 +47,7 @@ interface ArticleFormData {
     fullName: string;
   } | null;
   photos: Array<{ id: string; src: string; alt: string }>;
+  relatedArticles: RelatedArticle[];
 }
 
 interface ArticleFormProps {
@@ -62,6 +69,7 @@ interface ArticleFormProps {
       fullName: string;
     } | null;
     photos?: Array<{ id: string; src: string; alt: string }> | null;
+    relatedArticles?: RelatedArticle[] | null;
   };
   onSave: (data: {
     slug: string;
@@ -80,6 +88,7 @@ interface ArticleFormProps {
       fullName: string;
     } | null;
     photos?: Array<{ id: string; src: string; alt: string }> | null;
+    relatedArticles?: RelatedArticle[] | null;
   }) => Promise<void>;
   onDelete?: () => Promise<void>;
   isEdit?: boolean;
@@ -95,6 +104,20 @@ export default function ArticleForm({
   loading = false,
   saving = false,
 }: ArticleFormProps) {
+  // Helper function to safely parse JSON arrays
+  const safeParseArray = (value: any): any[] => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === "string") {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
   const [articleData, setArticleData] = useState<ArticleFormData>({
     slug: initialData?.slug || "",
     status: initialData?.status || "DRAFT",
@@ -105,7 +128,8 @@ export default function ArticleForm({
     videoUrl: initialData?.videoUrl || "",
     posterImage: initialData?.posterImage || "",
     partnerOrganization: initialData?.partnerOrganization || null,
-    photos: initialData?.photos || [],
+    photos: safeParseArray(initialData?.photos),
+    relatedArticles: safeParseArray(initialData?.relatedArticles),
   });
 
   const [translations, setTranslations] = useState<Translation[]>(
@@ -123,16 +147,38 @@ export default function ArticleForm({
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [availableArticles, setAvailableArticles] = useState<
+    Array<{ id: string; slug: string; title: string }>
+  >([]);
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number | null>(
     null
   );
   const [isAddingMultiplePhotos, setIsAddingMultiplePhotos] = useState(false);
+  const [relatedArticlesSearch, setRelatedArticlesSearch] = useState("");
 
   useEffect(() => {
     fetchCategories();
     fetchTags();
+    fetchAvailableArticles();
   }, []);
+
+  const fetchAvailableArticles = async () => {
+    try {
+      const response = await fetch("/api/admin/articles?limit=100&status=PUBLISHED");
+      const data = await response.json();
+      const articles = (data.data || [])
+        .map((article: any) => ({
+          id: article.id,
+          slug: article.slug,
+          title: article.title,
+        }))
+        .filter((article: any) => article.id !== initialData?.id); // Exclude current article
+      setAvailableArticles(articles);
+    } catch (error) {
+      console.error("Failed to fetch available articles:", error);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -254,6 +300,7 @@ export default function ArticleForm({
       posterImage: articleData.posterImage || null,
       partnerOrganization: articleData.partnerOrganization,
       photos: articleData.photos.length > 0 ? articleData.photos : null,
+      relatedArticles: articleData.relatedArticles.length > 0 ? articleData.relatedArticles : null,
     });
   };
 
@@ -652,6 +699,131 @@ export default function ArticleForm({
                   Optional: Add photos for story detail page
                 </p>
               </div>
+            </div>
+
+            {/* Related Articles */}
+            <div className="border border-gray-200 rounded-lg p-4">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Related Links About This Story
+              </label>
+              <div className="space-y-3">
+                {/* Article Picker */}
+                <div>
+                  <label className="block text-xs text-gray-600 mb-2">
+                    Search and Select Articles
+                  </label>
+                  <input
+                    type="text"
+                    value={relatedArticlesSearch}
+                    onChange={(e) => setRelatedArticlesSearch(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Search articles by title..."
+                  />
+                  {relatedArticlesSearch && (
+                    <div className="mt-2 max-h-48 overflow-y-auto border border-gray-300 rounded-md bg-white">
+                      {availableArticles
+                        .filter((article) =>
+                          article.title
+                            .toLowerCase()
+                            .includes(relatedArticlesSearch.toLowerCase())
+                        )
+                        .map((article) => (
+                          <button
+                            key={article.id}
+                            type="button"
+                            onClick={() => {
+                              const isAlreadyAdded = articleData.relatedArticles.some(
+                                (ra) => ra.id === article.id
+                              );
+                              if (!isAlreadyAdded) {
+                                setArticleData((prev) => ({
+                                  ...prev,
+                                  relatedArticles: [
+                                    ...prev.relatedArticles,
+                                    {
+                                      id: article.id,
+                                      title: article.title,
+                                      url: `/stories/${article.slug}`,
+                                    },
+                                  ],
+                                }));
+                                setRelatedArticlesSearch("");
+                              }
+                            }}
+                            className="w-full text-left px-3 py-2 hover:bg-blue-50 border-b border-gray-200 last:border-b-0"
+                          >
+                            <div className="text-sm text-gray-900">
+                              {article.title}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {article.slug}
+                            </div>
+                          </button>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Selected Related Articles */}
+                {articleData.relatedArticles.length > 0 && (
+                  <div className="border-t pt-3">
+                    <label className="block text-xs text-gray-600 mb-2 font-medium">
+                      Selected Articles ({articleData.relatedArticles.length})
+                    </label>
+                    <div className="space-y-2">
+                      {articleData.relatedArticles.map((article, index) => (
+                        <div
+                          key={article.id || index}
+                          className="flex gap-2 items-start border border-gray-200 rounded p-3 bg-gray-50"
+                        >
+                          <div className="flex-1 space-y-1">
+                            <div className="text-sm font-medium text-gray-900">
+                              {article.title}
+                            </div>
+                            <input
+                              type="text"
+                              value={article.url}
+                              onChange={(e) => {
+                                const newRelated = [
+                                  ...articleData.relatedArticles,
+                                ];
+                                newRelated[index] = {
+                                  ...article,
+                                  url: e.target.value,
+                                };
+                                setArticleData((prev) => ({
+                                  ...prev,
+                                  relatedArticles: newRelated,
+                                }));
+                              }}
+                              className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
+                              placeholder="https://example.com/story"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newRelated = articleData.relatedArticles.filter(
+                                (_, i) => i !== index
+                              );
+                              setArticleData((prev) => ({
+                                ...prev,
+                                relatedArticles: newRelated,
+                              }));
+                            }}
+                            className="text-red-600 hover:text-red-800 text-xs px-2 py-1 whitespace-nowrap"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                Optional: Search and select published articles to display as related links. URL will auto-populate, but can be customized.
+              </p>
             </div>
           </div>
 

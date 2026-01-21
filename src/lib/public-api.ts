@@ -28,6 +28,11 @@ export interface PublicArticle {
     src: string;
     alt: string;
   }>;
+  relatedArticles?: Array<{
+    id: string;
+    title: string;
+    url: string;
+  }>;
   author: {
     name: string;
   };
@@ -515,6 +520,23 @@ export class PublicAPI {
       }
     }
 
+    let relatedArticles: Array<{ id: string; title: string; url: string }> | undefined;
+    if (article.relatedArticles) {
+      if (typeof article.relatedArticles === "string") {
+        try {
+          relatedArticles = JSON.parse(article.relatedArticles);
+        } catch {
+          relatedArticles = undefined;
+        }
+      } else {
+        relatedArticles = article.relatedArticles as Array<{
+          id: string;
+          title: string;
+          url: string;
+        }>;
+      }
+    }
+
     return {
       id: article.id,
       slug: article.slug,
@@ -531,6 +553,7 @@ export class PublicAPI {
       posterImage: article.posterImage,
       partnerOrganization,
       photos,
+      relatedArticles,
       author: {
         name: article.author.name || "Anonymous",
       },

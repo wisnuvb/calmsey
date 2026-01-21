@@ -246,6 +246,7 @@ export async function POST(request: NextRequest) {
       posterImage,
       partnerOrganization,
       photos,
+      relatedArticles,
     } = body;
 
     // Validation
@@ -290,6 +291,7 @@ export async function POST(request: NextRequest) {
         posterImage: posterImage || null,
         partnerOrganization: partnerOrganization || null,
         photos: photos || null,
+        relatedArticles: relatedArticles || null,
         publishedAt: status === "PUBLISHED" ? new Date() : null,
         authorId: session!.user.id,
 

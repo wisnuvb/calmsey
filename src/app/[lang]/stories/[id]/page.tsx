@@ -21,7 +21,8 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
   const { lang, id } = await params;
   const language = lang || "en";
 
-  const content = await getPageContentServer("DETAIL_STORY", language);
+  // Use STORIES page type or pass empty content if not needed
+  const content = await getPageContentServer("STORIES", language).catch(() => ({}));
 
   // Fetch article by slug
   const article = await prisma.article.findUnique({
@@ -107,45 +108,63 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
     }
   }
 
-  // Get related articles (same category, exclude current article)
-  const primaryCategory = article.categories?.[0]?.category;
-  const relatedArticlesData = primaryCategory
-    ? await prisma.article.findMany({
-        where: {
-          status: "PUBLISHED",
-          publishedAt: { not: null },
-          id: { not: article.id },
-          categories: {
-            some: {
-              categoryId: primaryCategory.id,
-            },
-          },
-        },
-        include: {
-          translations: {
-            where: {
-              languageId: language,
-            },
-            take: 1,
-          },
-        },
-        orderBy: {
-          publishedAt: "desc",
-        },
-        take: 3,
-      })
-    : [];
+  // Get stored related articles from the database field
+  let storedRelatedArticles: Array<{ id: string; title: string; url: string }> = [];
+  if (articleWithJson.relatedArticles) {
+    try {
+      storedRelatedArticles =
+        typeof articleWithJson.relatedArticles === "string"
+          ? JSON.parse(articleWithJson.relatedArticles)
+          : articleWithJson.relatedArticles;
+    } catch (e) {
+      console.error("Error parsing relatedArticles:", e);
+    }
+  }
 
-  const relatedArticles = relatedArticlesData.map((related) => {
-    const relatedTranslation = related.translations?.[0];
-    const relatedTitle = relatedTranslation?.title || related.title;
-    const relatedSlug = relatedTranslation?.slug || related.slug;
-    return {
-      id: related.id,
-      title: relatedTitle,
-      url: `/${language}/stories/${relatedSlug}`,
-    };
-  });
+  // Use stored related articles if available, otherwise fallback to same-category articles
+  let relatedArticles = storedRelatedArticles;
+
+  // If no stored related articles, get related articles by same category
+  if (relatedArticles.length === 0) {
+    const primaryCategory = article.categories?.[0]?.category;
+    const relatedArticlesData = primaryCategory
+      ? await prisma.article.findMany({
+          where: {
+            status: "PUBLISHED",
+            publishedAt: { not: null },
+            id: { not: article.id },
+            categories: {
+              some: {
+                categoryId: primaryCategory.id,
+              },
+            },
+          },
+          include: {
+            translations: {
+              where: {
+                languageId: language,
+              },
+              take: 1,
+            },
+          },
+          orderBy: {
+            publishedAt: "desc",
+          },
+          take: 3,
+        })
+      : [];
+
+    relatedArticles = relatedArticlesData.map((related) => {
+      const relatedTranslation = related.translations?.[0];
+      const relatedTitle = relatedTranslation?.title || related.title;
+      const relatedSlug = relatedTranslation?.slug || related.slug;
+      return {
+        id: related.id,
+        title: relatedTitle,
+        url: `/${language}/stories/${relatedSlug}`,
+      };
+    });
+  }
 
   metadata.title = title;
   metadata.description = excerpt;
