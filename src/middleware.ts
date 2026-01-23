@@ -147,6 +147,8 @@ function handleLanguageRouting(
 ) {
   const pathname = request.nextUrl.pathname;
   const searchParams = request.nextUrl.search;
+  // Use the origin from the request to ensure correct domain
+  const origin = request.nextUrl.origin;
 
   // Check if pathname starts with a language code
   const pathnameHasValidLocale = supportedLanguages.some(
@@ -165,8 +167,8 @@ function handleLanguageRouting(
       possibleLang.length === 2 &&
       !supportedLanguages.includes(possibleLang)
     ) {
-      // Preserve search params and construct new URL
-      const newUrl = new URL(`/${defaultLanguage}${pathname}`, request.url);
+      // Preserve search params and construct new URL using correct origin
+      const newUrl = new URL(`/${defaultLanguage}${pathname}`, origin);
       newUrl.search = searchParams;
       // Use HTML response with client-side redirect to preserve hash fragment
       return createRedirectResponse(newUrl.toString());
@@ -174,8 +176,8 @@ function handleLanguageRouting(
 
     // If no language specified and not root, add default language
     if (pathname !== "/") {
-      // Preserve search params and construct new URL
-      const newUrl = new URL(`/${defaultLanguage}${pathname}`, request.url);
+      // Preserve search params and construct new URL using correct origin
+      const newUrl = new URL(`/${defaultLanguage}${pathname}`, origin);
       newUrl.search = searchParams;
       // Use HTML response with client-side redirect to preserve hash fragment
       return createRedirectResponse(newUrl.toString());
