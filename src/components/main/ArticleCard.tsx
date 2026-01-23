@@ -47,7 +47,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
   if (link) {
     return (
-      <a href={link} className="block">
+      <a href={link} className="block" aria-label={`Read more about ${title}`}>
         {CardContent}
       </a>
     );

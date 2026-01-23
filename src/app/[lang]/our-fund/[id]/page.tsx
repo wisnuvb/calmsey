@@ -1,7 +1,7 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import { FundDetailHeader, FundDetailContent } from "@/components/main";
-import { getFundDetailBySlug } from "@/lib/fund-details";
+import { getFundDetailBySlug, getAllFundSlugs } from "@/lib/fund-details";
 
 interface PageProps {
   params: Promise<{
@@ -10,13 +10,39 @@ interface PageProps {
   }>;
 }
 
+// Enable dynamic rendering for routes not in generateStaticParams
+export const dynamicParams = true;
+
+// Generate static params for all fund slugs
+export async function generateStaticParams() {
+  try {
+    // Get all fund slugs for default language (en)
+    // In production, you might want to generate for all languages
+    const slugs = await getAllFundSlugs("en");
+    console.log("Generated static params for funds:", slugs);
+    return slugs.map((slug) => ({
+      id: slug,
+    }));
+  } catch (error) {
+    console.error("Error generating static params for funds:", error);
+    // Return empty array to allow dynamic rendering
+    return [];
+  }
+}
+
 export default async function DetailOurFundPage({ params }: PageProps) {
-  const { id } = await params;
-  const fund = getFundDetailBySlug(id);
+  const { lang, id } = await params;
+
+  console.log(`Fetching fund detail for slug: ${id}, language: ${lang}`);
+
+  const fund = await getFundDetailBySlug(id, lang);
 
   if (!fund) {
+    console.warn(`Fund not found: slug=${id}, lang=${lang}`);
     notFound();
   }
+
+  console.log(`Fund found: ${fund.id} - ${fund.header.title}`);
 
   return (
     <>

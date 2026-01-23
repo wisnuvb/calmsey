@@ -54,9 +54,14 @@ export function FeedbackCalloutSection({
     propLearnMoreLink,
     "/governance"
   );
+  const backgroundColorValue = getValue(
+    "feedbackCallout.backgroundColor",
+    backgroundColor,
+    "bg-[#3C62ED]"
+  );
 
   return (
-    <section className={`${backgroundColor} py-12 lg:py-16`}>
+    <section className={`${backgroundColorValue} py-12 lg:py-16`}>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left: Title + Description */}
@@ -86,6 +91,7 @@ export function FeedbackCalloutSection({
             <a
               href={learnMoreLink}
               className="inline-flex items-center justify-center gap-3 border border-white/80 text-white px-6 py-5 rounded-lg hover:bg-white/10 transition-colors duration-200 w-full sm:w-[231px]"
+              aria-label={`Learn more about ${title}`}
             >
               {learnMoreText}
             </a>

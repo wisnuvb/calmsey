@@ -3,13 +3,12 @@
 import { useState, useEffect } from "react";
 import {
   MapPin,
-  Play,
-  Share2,
   Link as LinkIcon,
   ArrowUpRight,
   X,
   ChevronLeft,
   ChevronRight,
+  Forward,
 } from "lucide-react";
 import { H2, H3, H5, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
@@ -139,7 +138,7 @@ export function DetailStoryContentSection({
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-8">
                 {/* Partner Organization */}
-                {partnerOrganization&&(partnerOrganization.logo || partnerOrganization.name||country) && (
+                {partnerOrganization && (partnerOrganization.logo || partnerOrganization.name || country) && (
                   <div className="bg-gray-50 border border-[#D7E4EF] p-6 sm:p-11 rounded-lg">
                     <div className="space-y-3">
                       <H3
@@ -151,7 +150,7 @@ export function DetailStoryContentSection({
                       {partnerOrganization.logo && (
                         <Image
                           src={getImageUrl(partnerOrganization.logo)}
-                          alt={partnerOrganization.name}
+                          alt={partnerOrganization.name || "Partner Organization"}
                           width={128}
                           height={128}
                           className="rounded"
@@ -203,20 +202,20 @@ export function DetailStoryContentSection({
 
                 {/* Action Buttons */}
                 <div className="flex items-center justify-between gap-3">
-                  {!!videoUrl && (
+                  {/* {!!videoUrl && (
                     <button className="w-full flex items-center justify-center space-x-2 px-4 py-5 border border-[#CADBEA] text-[#010107] rounded-lg hover:bg-gray-50 transition-colors">
                       <Play className="w-4 h-4" />
                       <span className="font-work-sans font-medium">
                         Trailer
                       </span>
                     </button>
-                  )}
-                  <button 
+                  )} */}
+                  <button
                     onClick={handleShare}
-                    className="w-full flex items-center justify-center space-x-2 px-4 py-5 bg-[#06020C] text-white rounded-lg hover:bg-gray-800 transition-colors relative"
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-5 bg-[#3C62ED] text-white rounded-lg hover:bg-gray-800 transition-colors relative"
                   >
-                    <Share2 className="w-4 h-4" />
-                    <span className="font-work-sans font-medium">Share  </span>
+                    <span className="font-work-sans font-medium">Share on Social Media</span>
+                    <Forward className="w-4 h-4" />
                     {showCopyNotification && (
                       <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white text-xs px-3 py-1 rounded whitespace-nowrap">
                         Link copied!
@@ -277,6 +276,15 @@ export function DetailStoryContentSection({
                     <div
                       key={photo.id}
                       onClick={() => openGallery(index)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          openGallery(index);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`View photo ${index + 1}`}
                       className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
                     >
                       <Image
@@ -330,6 +338,12 @@ export function DetailStoryContentSection({
         <div
           className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
           onClick={closeGallery}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") closeGallery();
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="Close gallery modal"
         >
           <div className="relative max-w-7xl max-h-full w-full">
             {/* Close button */}

@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { CheckCircle2, Shield, Flag, Info, FileDown } from "lucide-react";
+import { CheckCircle2, Shield, Flag, Info, FileDown, X } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
+import { useLanguage } from "../public/LanguageProvider";
+import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 
 interface PracticeItem {
   id: string;
@@ -23,6 +25,11 @@ interface NumberedListItem {
   text: string;
 }
 
+interface DownloadFile {
+  language: string;
+  url: string;
+}
+
 interface TabContent {
   id: string;
   title: string;
@@ -38,7 +45,8 @@ interface TabContent {
   infoBlockFooter?: InfoBlock;
   downloadButtonLabel?: string;
   downloadButtonText?: string;
-  downloadButtonUrl?: string;
+  downloadButtonUrl?: string; // Legacy support
+  downloadFiles?: DownloadFile[]; // New structure for multi-language
 }
 
 interface NavigationItem {
@@ -66,7 +74,8 @@ interface MultipleFieldItem {
   infoBlockFooterText?: string;
   downloadButtonLabel?: string;
   downloadButtonText?: string;
-  downloadButtonUrl?: string;
+  downloadButtonUrl?: string; // Legacy support
+  downloadFiles?: string; // JSON string from multiple field
 }
 
 interface GrantmakingSectionProps {
@@ -142,7 +151,11 @@ export function GrantmakingSection({
   className,
   contentKey = "grantmaking.navigationItems",
 }: GrantmakingSectionProps = {}) {
-  const { getContentJSON } = usePageContentHelpers()
+  const { getContentJSON } = usePageContentHelpers();
+  const { language: currentLanguage } = useLanguage();
+  const { languages: activeLanguages } = useActiveLanguages();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalDownloadFiles, setModalDownloadFiles] = useState<DownloadFile[]>([]);
 
   // Transform multiple field format to NavigationItem format
   const transformMultipleToNavigationItems = (
@@ -343,6 +356,40 @@ export function GrantmakingSection({
           }
         }
 
+        // Parse downloadFiles (JSON array format from multiple field)
+        const downloadFiles: DownloadFile[] = [];
+        if (item.downloadFiles && typeof item.downloadFiles === "string") {
+          try {
+            const parsed = JSON.parse(item.downloadFiles);
+            if (Array.isArray(parsed)) {
+              parsed.forEach((file: unknown) => {
+                if (
+                  file &&
+                  typeof file === "object" &&
+                  "language" in file &&
+                  "url" in file
+                ) {
+                  downloadFiles.push({
+                    language: String((file as { language: unknown; url: unknown }).language),
+                    url: String((file as { language: unknown; url: unknown }).url),
+                  });
+                }
+              });
+            }
+          } catch {
+            // Skip invalid JSON
+          }
+        }
+
+        // Legacy support: if downloadButtonUrl is provided but no downloadFiles, create one
+        const legacyDownloadUrl = item.downloadButtonUrl;
+        const finalDownloadFiles =
+          downloadFiles.length > 0
+            ? downloadFiles
+            : legacyDownloadUrl
+              ? [{ language: "en", url: String(legacyDownloadUrl) }]
+              : [];
+
         return {
           id: String(item.id),
           label: String(item.label),
@@ -371,9 +418,12 @@ export function GrantmakingSection({
             ...(item.downloadButtonText && {
               downloadButtonText: String(item.downloadButtonText),
             }),
-            ...(item.downloadButtonUrl && {
-              downloadButtonUrl: String(item.downloadButtonUrl),
+            // Legacy support: keep downloadButtonUrl for backward compatibility
+            ...(legacyDownloadUrl && {
+              downloadButtonUrl: String(legacyDownloadUrl),
             }),
+            // New structure: downloadFiles
+            ...(finalDownloadFiles.length > 0 && { downloadFiles: finalDownloadFiles }),
           },
         };
       });
@@ -418,6 +468,70 @@ export function GrantmakingSection({
     }
   };
 
+  // Helper function to ensure URL has https:// protocol
+  const ensureHttpsUrl = (url: string): string => {
+    if (!url || url.trim() === "") {
+      return url;
+    }
+
+    const trimmedUrl = url.trim();
+
+    // Jika sudah memiliki protokol (http:// atau https://), return as-is
+    if (/^https?:\/\//i.test(trimmedUrl)) {
+      return trimmedUrl;
+    }
+
+    // Jika dimulai dengan // (protocol-relative), tambahkan https:
+    if (trimmedUrl.startsWith("//")) {
+      return `https:${trimmedUrl}`;
+    }
+
+    // Jika tidak ada protokol, tambahkan https://
+    return `https://${trimmedUrl}`;
+  };
+
+  // Get language name helper
+  const getLanguageName = (langCode: string): string => {
+    const lang = activeLanguages.find((l) => l.id === langCode);
+    return lang?.name || langCode.toUpperCase();
+  };
+
+  // Handle download click
+  const handleDownloadClick = (e: React.MouseEvent, downloadFiles?: DownloadFile[], downloadButtonUrl?: string) => {
+    e.preventDefault();
+
+    // New structure: use downloadFiles if available
+    const files = downloadFiles && downloadFiles.length > 0
+      ? downloadFiles
+      : downloadButtonUrl
+        ? [{ language: "en", url: downloadButtonUrl }]
+        : [];
+
+    if (files.length === 0) {
+      return;
+    }
+
+    if (files.length === 1) {
+      // If only one file, download directly
+      const file = files[0];
+      const url = file.url.startsWith("/")
+        ? file.url
+        : ensureHttpsUrl(file.url);
+      window.open(url, "_blank");
+    } else {
+      // Show modal to select language
+      setModalDownloadFiles(files);
+      setIsModalOpen(true);
+    }
+  };
+
+  // Handle language selection
+  const handleLanguageSelect = (file: DownloadFile) => {
+    const url = file.url.startsWith("/") ? file.url : ensureHttpsUrl(file.url);
+    window.open(url, "_blank");
+    setIsModalOpen(false);
+  };
+
   return (
     <>
       <hr className="border-[#C3D7E8] container mx-auto px-4" />
@@ -452,9 +566,9 @@ export function GrantmakingSection({
               {activeContent ? (
                 <>
                   {/* Title */}
-                  <h1 className="text-3xl sm:text-[38px] font-bold text-[#010107] font-nunito-sans mb-6">
+                  <h2 className="text-3xl sm:text-[38px] font-bold text-[#010107] font-nunito-sans mb-6">
                     {activeContent.title}
-                  </h1>
+                  </h2>
 
                   {/* Image */}
                   {activeContent.imageSrc && (
@@ -667,7 +781,7 @@ export function GrantmakingSection({
 
                     {/* Download Button */}
                     {activeContent.downloadButtonText &&
-                      activeContent.downloadButtonUrl && (
+                      ((activeContent.downloadFiles && activeContent.downloadFiles.length > 0) || activeContent.downloadButtonUrl) && (
                         <div className="mt-8 bg-gray-50 rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                           <p
                             className={cn(
@@ -680,15 +794,17 @@ export function GrantmakingSection({
                             {activeContent.downloadButtonLabel ||
                               "Read the full-version of our Grantmaking Framework"}
                           </p>
-                          <a
-                            href={activeContent.downloadButtonUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            onClick={(e) => handleDownloadClick(
+                              e,
+                              activeContent.downloadFiles,
+                              activeContent.downloadButtonUrl
+                            )}
                             className="bg-[#3C62ED] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2d4fd6] transition-colors flex items-center gap-2 whitespace-nowrap"
                           >
                             <FileDown className="w-5 h-5" />
                             {activeContent.downloadButtonText}
-                          </a>
+                          </button>
                         </div>
                       )}
                   </div>
@@ -702,6 +818,56 @@ export function GrantmakingSection({
           </div>
         </div>
       </section>
+
+      {/* Language Selection Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Select Language
+              </h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Close modal"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Choose your preferred language to download the document:
+            </p>
+            <div className="space-y-2">
+              {modalDownloadFiles.map((file) => (
+                <button
+                  key={file.language}
+                  onClick={() => handleLanguageSelect(file)}
+                  className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${file.language === currentLanguage
+                    ? "border-blue-500 bg-blue-50 text-blue-900"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
+                    }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">
+                      {getLanguageName(file.language)}
+                    </span>
+                    {file.language === currentLanguage && (
+                      <span className="text-xs text-blue-600">(Current)</span>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="mt-6 w-full px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

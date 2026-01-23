@@ -24,49 +24,49 @@ const defaultPolicies: Policy[] = [
     id: "our-strategy",
     title: "Our Strategy",
     content:
-      '<p><a href="https://turningtidesfacility.org/strategy">Our strategy</a> lays our vision, goal, values and principles. As we learn with partners, we may update our Strategy from time to time. When changes are made, we will update the date listed on the documents. Please review this page periodically for any updates.</p>',
+      '<p><a href="https://turningtidesfacility.org/strategy" aria-label="Read more about Our strategy">Our strategy</a> lays our vision, goal, values and principles. As we learn with partners, we may update our Strategy from time to time. When changes are made, we will update the date listed on the documents. Please review this page periodically for any updates.</p>',
   },
   {
     id: "fiscal-sponsorship",
     title: "Fiscal Sponsorship Agreement",
     content:
-      '<p>Turning Tides operated under the <a href="https://turningtidesfacility.org/fiscal-sponsorship">fiscal sponsorship</a> of The Tenure Facility Fund, a US 501(c)3 not for profit subsidiary of the International Land and Forest Tenure Facility.</p>',
+      '<p>Turning Tides operated under the <a href="https://turningtidesfacility.org/fiscal-sponsorship" aria-label="Read more about Fiscal Sponsorship Agreement">fiscal sponsorship</a> of The Tenure Facility Fund, a US 501(c)3 not for profit subsidiary of the International Land and Forest Tenure Facility.</p>',
   },
   {
     id: "social-contract",
     title: "Social Contract",
     content:
-      '<p>Over and above legal and financial good governance, the partnership with The Tenure Facility Fund, and the International Land and Forest Tenure Facility has been established to improve our services to partners. The spirit of this collaboration, and ties to partners, This partnership, are laid out in the <a href="https://turningtidesfacility.org/social-contract">Social Contract</a>.</p>',
+      '<p>Over and above legal and financial good governance, the partnership with The Tenure Facility Fund, and the International Land and Forest Tenure Facility has been established to improve our services to partners. The spirit of this collaboration, and ties to partners, This partnership, are laid out in the <a href="https://turningtidesfacility.org/social-contract" aria-label="Read more about Social Contract">Social Contract</a>.</p>',
   },
   {
     id: "conflict-of-interest",
     title: "Conflict of Interest",
     content:
-      '<p>The <a href="https://turningtidesfacility.org/conflict-of-interest">Conflict of Interest</a> policy protects the interests and values of Turning Tides when it is contemplating entering a transaction or grantmaking process that might benefit the private interest of staff/contractors/consultants, Steering Committee members and any advisory committee/ council members of Turning Tides or might result in a possible excess benefit transaction. This policy is intended to supplement but not replace any applicable local and federal laws governing conflict of interest applicable to nonprofit and charitable organizations.</p>',
+      '<p>The <a href="https://turningtidesfacility.org/conflict-of-interest" aria-label="conflict">Conflict of Interest</a> policy protects the interests and values of Turning Tides when it is contemplating entering a transaction or grantmaking process that might benefit the private interest of staff/contractors/consultants, Steering Committee members and any advisory committee/ council members of Turning Tides or might result in a possible excess benefit transaction. This policy is intended to supplement but not replace any applicable local and federal laws governing conflict of interest applicable to nonprofit and charitable organizations.</p>',
   },
   {
     id: "funding-acceptance",
     title: "Funding Acceptance",
     content:
-      '<p>At Turning Tides, we prioritize upholding high standards of ethics, integrity, and transparency in all aspects of our operations. <a href="https://turningtidesfacility.org/funding-acceptance">Our Funding Acceptance</a> Policy serves as a safeguard, helping Turning Tides make informed decisions regarding external funding acceptance – allowing us to increase funds accessible to local communities, small-scale fisheries, fisher workers and Indigenous Peoples, while maintaining our commitment to ethical conduct, financial prudence, and mission alignment</p>',
+      '<p>At Turning Tides, we prioritize upholding high standards of ethics, integrity, and transparency in all aspects of our operations. <a href="https://turningtidesfacility.org/funding-acceptance" aria-label="tides">Our Funding Acceptance</a> Policy serves as a safeguard, helping Turning Tides make informed decisions regarding external funding acceptance - allowing us to increase funds accessible to local communities, small-scale fisheries, fisher workers and Indigenous Peoples, while maintaining our commitment to ethical conduct, financial prudence, and mission alignment</p>',
   },
   {
     id: "grievance-mechanism",
     title: "Grievance Mechanism",
     content:
-      '<p>We recognize that disputes or concerns may arise during the course of our work. We are committed to resolving any issues in a fair, transparent, and timely manner. Grievances: If you believe you have been treated unfairly, or if you have concerns regarding the handling of a grant decision or partnership with Turning Tides, please contact us at <a href="mailto:turningtides@tenureFacility.org">turningtides@tenureFacility.org</a>. We will acknowledge receipt within 10 business days and aim to resolve the issue within 60 business days or less. Appeals: If you are unsatisfied with the outcome of your grievance, you may appeal the decision by submitting a formal request to our Steering Committee at <a href="mailto:SteeringCommittee@TurningTidesFacility.org">SteeringCommittee@TurningTidesFacility.org</a></p>',
+      '<p>We recognize that disputes or concerns may arise during the course of our work. We are committed to resolving any issues in a fair, transparent, and timely manner. Grievances: If you believe you have been treated unfairly, or if you have concerns regarding the handling of a grant decision or partnership with Turning Tides, please contact us at <a href="mailto:turningtides@tenureFacility.org" aria-label="recognize">turningtides@tenureFacility.org</a>. We will acknowledge receipt within 10 business days and aim to resolve the issue within 60 business days or less. Appeals: If you are unsatisfied with the outcome of your grievance, you may appeal the decision by submitting a formal request to our Steering Committee at <a href="mailto:SteeringCommittee@TurningTidesFacility.org">SteeringCommittee@TurningTidesFacility.org</a></p>',
   },
   {
     id: "non-discrimination",
     title: "Non-Discrimination Policy",
     content:
-      '<p>Turning Tides is committed to ensuring that all individuals and organizations, regardless of race, gender, sexual orientation, age, disability, religion, or any other characteristic, have equal access to our programs and services. We value diversity and inclusivity in all our operations, and our decision-making processes are designed to uphold the principles of justice and fairness.</p>',
+      '<p>Turning Tides is committed to ensuring that all individuals and organizations, regardless of race, gender, sexual orientation, age, disability, religion, or any other characteristic, have equal access to our programs and services. We value diversity and inclusivity in all our operations, and our decision-making processes are designed to uphold the principles of justice and fairness. <a href="https://turningtidesfacility.org/non-discrimination" aria-label="Read more about Non-Discrimination Policy">Non-Discrimination Policy</a></p>',
   },
   {
     id: "steering-committee",
     title: "Turning Tides' Steering Committee",
     content:
-      '<p>Turning Tides is guided by a <a href="https://turningtidesfacility.org/steering-committee">Steering Committee</a> who play a pivotal role in setting strategic direction and providing oversight. These Terms of Reference outline the roles, responsibilities, composition, and functioning of the Steering Committee of Turning Tides, ensuring alignment with the organization\'s vision, goals, values and principles.</p>',
+      '<p>Turning Tides is guided by a <a href="https://turningtidesfacility.org/steering-committee" aria-label="Read more about Steering Committee Policy">Steering Committee</a> who play a pivotal role in setting strategic direction and providing oversight. These Terms of Reference outline the roles, responsibilities, composition, and functioning of the Steering Committee of Turning Tides, ensuring alignment with the organization\'s vision, goals, values and principles.</p>',
   },
   {
     id: "other-policies",
@@ -84,19 +84,19 @@ const defaultPolicies: Policy[] = [
     id: "grievance-redress",
     title: "Grievance and Redress Policy",
     content:
-      '<p>Turning Tides\' Grievance and Redress Policy provides a clear, transparent process for raising concerns and resolving complaints, strengthening trust and accountability with an <a href="https://turningtidesfacility.org/grievance-redress">established</a>, <a href="https://turningtidesfacility.org/feedback">Give feedback</a></p>',
+      '<p>Turning Tides\' Grievance and Redress Policy provides a clear, transparent process for raising concerns and resolving complaints, strengthening trust and accountability with an <a href="https://turningtidesfacility.org/grievance-redress" aria-label="Read more about Grievance and Redress Policy">established</a>, <a href="https://turningtidesfacility.org/feedback" aria-label="Give feedback">Give feedback</a></p>',
   },
   {
     id: "consent-rights",
     title: "Consent and Rights Policy",
     content:
-      '<p>TurningTides is committed to transparency and trust through a clear <a href="https://turningtidesfacility.org/consent-rights">Consent and Rights Policy</a>.</p>',
+      '<p>TurningTides is committed to transparency and trust through a clear <a href="https://turningtidesfacility.org/consent-rights" aria-label="Read more about Consent and Rights Policy">Consent and Rights Policy</a>.</p>',
   },
   {
     id: "contact-info",
     title: "Contact Information",
     content:
-      '<p>If you have any questions about our policies or need further clarification, please reach out to us:</p><ul><li>Email: <a href="mailto:info@turningTidesFacility.org">info@turningTidesFacility.org</a></li><li>Phone: +62 838 329 80063 (also available for whatsapp contact)</li><li>Mailing Address: 190 Varick Street, FL2, New York, NY 10002 USA</li></ul>',
+      '<p>If you have any questions about our policies or need further clarification, please reach out to us:</p><ul><li>Email: <a href="mailto:info@turningTidesFacility.org" aria-label="Send email to info@turningTidesFacility.org">info@turningTidesFacility.org</a></li><li>Phone: +62 838 329 80063 (also available for whatsapp contact)</li><li>Mailing Address: 190 Varick Street, FL2, New York, NY 10002 USA</li></ul>',
   },
 ];
 

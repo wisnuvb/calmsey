@@ -129,29 +129,29 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
     const primaryCategory = article.categories?.[0]?.category;
     const relatedArticlesData = primaryCategory
       ? await prisma.article.findMany({
-          where: {
-            status: "PUBLISHED",
-            publishedAt: { not: null },
-            id: { not: article.id },
-            categories: {
-              some: {
-                categoryId: primaryCategory.id,
-              },
+        where: {
+          status: "PUBLISHED",
+          publishedAt: { not: null },
+          id: { not: article.id },
+          categories: {
+            some: {
+              categoryId: primaryCategory.id,
             },
           },
-          include: {
-            translations: {
-              where: {
-                languageId: language,
-              },
-              take: 1,
+        },
+        include: {
+          translations: {
+            where: {
+              languageId: language,
             },
+            take: 1,
           },
-          orderBy: {
-            publishedAt: "desc",
-          },
-          take: 3,
-        })
+        },
+        orderBy: {
+          publishedAt: "desc",
+        },
+        take: 3,
+      })
       : [];
 
     relatedArticles = relatedArticlesData.map((related) => {
@@ -195,7 +195,7 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
       <DetailStoryHeroSection
         title={storyData.title}
         date={storyData.date}
-        backgroundImage={storyData.backgroundImage}
+        backgroundImage="/assets/cover-stories.webp"//{storyData.backgroundImage}
       />
       <DetailStoryVideoSection
         videoUrl={storyData.videoUrl}

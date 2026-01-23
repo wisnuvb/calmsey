@@ -166,6 +166,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="absolute bottom-2 left-2 w-8 h-8 bg-[#0077B5] rounded flex items-center justify-center hover:bg-[#005885] transition-colors shadow-md"
+                    aria-label={`View LinkedIn profile of ${member.name}`}
                   >
                     <FaLinkedin className="w-4 h-4 text-white" />
                   </a>

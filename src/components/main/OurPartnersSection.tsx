@@ -194,6 +194,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full h-20 flex items-center justify-center"
+                aria-label={`Visit ${partner.name} website`}
               >
                 <Image
                   src={getImageUrl(partner.logo)}

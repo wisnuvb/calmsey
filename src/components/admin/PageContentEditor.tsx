@@ -24,6 +24,7 @@ import {
   MultipleField,
   FileField,
   MarkdownField,
+  SelectField,
 } from "@/components/admin/field-renderers";
 
 interface PageContentEditorProps {
@@ -54,6 +55,8 @@ export function PageContentEditor({
     fieldKey: string;
     itemIndex: number;
     itemFieldKey: string;
+    nestedIndex?: number; // For nested multiple field
+    nestedFieldKey?: string; // For nested multiple field
   } | null>(null);
 
   const { addToast } = useToast();
@@ -228,12 +231,16 @@ export function PageContentEditor({
     const handleMultipleFieldOpen = (
       fieldKey: string,
       itemIndex: number,
-      itemFieldKey: string
+      itemFieldKey: string,
+      nestedIndex?: number,
+      nestedFieldKey?: string
     ) => {
       setCurrentMultipleField({
         fieldKey,
         itemIndex,
         itemFieldKey,
+        nestedIndex,
+        nestedFieldKey,
       });
       setCurrentImageField(null);
       setCurrentFileField(null);
@@ -345,6 +352,16 @@ export function PageContentEditor({
           />
         );
 
+      case "select":
+        return (
+          <SelectField
+            field={field}
+            value={value}
+            onChange={handleFieldChange}
+            error={error}
+          />
+        );
+
       case "multiple":
         return (
           <MultipleField
@@ -448,10 +465,9 @@ export function PageContentEditor({
                   onClick={() => setActiveTab(index)}
                   className={`
                     whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors
-                    ${
-                      isActive
-                        ? "border-blue-600 text-blue-600"
-                        : hasErrors
+                    ${isActive
+                      ? "border-blue-600 text-blue-600"
+                      : hasErrors
                         ? "border-red-300 text-red-600 hover:border-red-400"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                     }
@@ -599,9 +615,48 @@ export function PageContentEditor({
               }
 
               if (items[currentMultipleField.itemIndex]) {
-                items[currentMultipleField.itemIndex][
-                  currentMultipleField.itemFieldKey
-                ] = selectedUrls[0];
+                // Check if this is a nested multiple field
+                if (
+                  currentMultipleField.nestedIndex !== undefined &&
+                  currentMultipleField.nestedFieldKey
+                ) {
+                  // Handle nested multiple field
+                  const itemField = field.itemSchema.find(
+                    (f) => f.key === currentMultipleField.itemFieldKey
+                  );
+                  if (itemField?.type === "multiple" && itemField.itemSchema) {
+                    // Parse nested items
+                    let nestedItems: Record<string, any>[] = [];
+                    const nestedValue =
+                      items[currentMultipleField.itemIndex][
+                      currentMultipleField.itemFieldKey
+                      ] || "[]";
+                    try {
+                      const parsed = JSON.parse(nestedValue);
+                      if (Array.isArray(parsed)) {
+                        nestedItems = parsed;
+                      }
+                    } catch {
+                      nestedItems = [];
+                    }
+
+                    // Update nested item
+                    if (nestedItems[currentMultipleField.nestedIndex]) {
+                      nestedItems[currentMultipleField.nestedIndex][
+                        currentMultipleField.nestedFieldKey
+                      ] = selectedUrls[0];
+                      // Update parent item with updated nested items
+                      items[currentMultipleField.itemIndex][
+                        currentMultipleField.itemFieldKey
+                      ] = JSON.stringify(nestedItems, null, 2);
+                    }
+                  }
+                } else {
+                  // Handle regular multiple field item
+                  items[currentMultipleField.itemIndex][
+                    currentMultipleField.itemFieldKey
+                  ] = selectedUrls[0];
+                }
                 handleChange(
                   currentMultipleField.fieldKey,
                   JSON.stringify(items, null, 2)
@@ -621,33 +676,69 @@ export function PageContentEditor({
           currentFileField
             ? ["all"]
             : currentMultipleField
-            ? (() => {
+              ? (() => {
                 // Check if the current field in multiple is file type
                 const field = schema?.fields.find(
                   (f) => f.key === currentMultipleField.fieldKey
                 );
-                const itemField = field?.itemSchema?.find(
-                  (f) => f.key === currentMultipleField.itemFieldKey
-                );
-                return itemField?.type === "file" ? ["all"] : ["images"];
+                if (
+                  currentMultipleField.nestedIndex !== undefined &&
+                  currentMultipleField.nestedFieldKey
+                ) {
+                  // Handle nested multiple field
+                  const itemField = field?.itemSchema?.find(
+                    (f) => f.key === currentMultipleField.itemFieldKey
+                  );
+                  if (itemField?.type === "multiple" && itemField.itemSchema) {
+                    const nestedField = itemField.itemSchema.find(
+                      (f) => f.key === currentMultipleField.nestedFieldKey
+                    );
+                    return nestedField?.type === "file" ? ["all"] : ["images"];
+                  }
+                } else {
+                  // Handle regular multiple field
+                  const itemField = field?.itemSchema?.find(
+                    (f) => f.key === currentMultipleField.itemFieldKey
+                  );
+                  return itemField?.type === "file" ? ["all"] : ["images"];
+                }
+                return ["images"];
               })()
-            : ["images"]
+              : ["images"]
         }
         initialFilter={
           currentFileField
             ? "all"
             : currentMultipleField
-            ? (() => {
+              ? (() => {
                 // Check if the current field in multiple is file type
                 const field = schema?.fields.find(
                   (f) => f.key === currentMultipleField.fieldKey
                 );
-                const itemField = field?.itemSchema?.find(
-                  (f) => f.key === currentMultipleField.itemFieldKey
-                );
-                return itemField?.type === "file" ? "all" : "images";
+                if (
+                  currentMultipleField.nestedIndex !== undefined &&
+                  currentMultipleField.nestedFieldKey
+                ) {
+                  // Handle nested multiple field
+                  const itemField = field?.itemSchema?.find(
+                    (f) => f.key === currentMultipleField.itemFieldKey
+                  );
+                  if (itemField?.type === "multiple" && itemField.itemSchema) {
+                    const nestedField = itemField.itemSchema.find(
+                      (f) => f.key === currentMultipleField.nestedFieldKey
+                    );
+                    return nestedField?.type === "file" ? "all" : "images";
+                  }
+                } else {
+                  // Handle regular multiple field
+                  const itemField = field?.itemSchema?.find(
+                    (f) => f.key === currentMultipleField.itemFieldKey
+                  );
+                  return itemField?.type === "file" ? "all" : "images";
+                }
+                return "images";
               })()
-            : "images"
+              : "images"
         }
       />
     </div>

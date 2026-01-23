@@ -55,7 +55,7 @@ export function MarkdownField({
       // Links
       .replace(
         /\[([^\]]+)\]\(([^)]+)\)/gim,
-        '<a href="$2" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>'
+        '<a href="$2" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" aria-label="Open link in new tab">$1</a>'
       )
       // Code blocks
       .replace(

@@ -266,7 +266,8 @@ export default function ArticlesAdminPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-gray-600 hover:text-gray-900 p-1 rounded hover:bg-gray-100 transition-colors inline-flex items-center"
-                            title="View article"
+                            title="View article" 
+                            aria-label="View article"
                           >
                             <EyeIcon className="h-4 w-4" />
                           </a>
@@ -295,9 +296,9 @@ export default function ArticlesAdminPage() {
         ) : (
           <div className="text-center py-12">
             <DocumentTextIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h2 className="text-lg font-medium text-gray-900 mb-2">
               No articles found
-            </h3>
+            </h2>
             <p className="text-gray-500 mb-6">
               Get started by creating your first multilingual article.
             </p>
@@ -314,9 +315,9 @@ export default function ArticlesAdminPage() {
 
       {/* Translation Summary */}
       <div className="mt-8 bg-blue-50 rounded-lg p-6">
-        <h3 className="text-lg font-medium text-blue-900 mb-4">
+        <h2 className="text-lg font-medium text-blue-900 mb-4">
           Translation Overview
-        </h3>
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg p-4">
             <div className="text-2xl font-bold text-gray-900">

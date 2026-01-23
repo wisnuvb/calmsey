@@ -107,6 +107,7 @@ export const FourFundsSection: React.FC<FourFundsSectionProps> = ({
                   <a
                     href={fund.learnMoreLink}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-900 font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                    aria-label={`Learn more about ${fund.title}`}
                   >
                     Learn More
                     <ArrowRight className="w-4 h-4" />

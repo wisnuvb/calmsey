@@ -382,11 +382,39 @@ export const HOME_SCHEMA: PageContentSchema = {
         },
         {
           key: "downloadButtonUrl",
-          label: "Download Button URL",
+          label: "Download Button URL (Legacy)",
           type: "text",
           required: false,
           placeholder: "/documents/framework.pdf",
-          helpText: "URL or path to the downloadable file",
+          helpText: "Legacy: Single file URL. Use 'Download Files' below for multi-language support.",
+        },
+        {
+          key: "downloadFiles",
+          label: "Download Files",
+          type: "multiple",
+          required: false,
+          itemLabel: "Download File",
+          helpText:
+            "Manage downloadable files for different languages. Users will be able to choose their preferred language when downloading. Leave empty to use legacy single URL above.",
+          itemSchema: [
+            {
+              key: "language",
+              label: "Language Code",
+              type: "text",
+              required: true,
+              placeholder: "en",
+              helpText:
+                "Language code (e.g., 'en' for English, 'id' for Indonesian)",
+            },
+            {
+              key: "url",
+              label: "File URL",
+              type: "file",
+              required: true,
+              placeholder: "/downloads/framework-en.pdf",
+              helpText: "URL to the file for this language",
+            },
+          ],
         },
       ],
     },

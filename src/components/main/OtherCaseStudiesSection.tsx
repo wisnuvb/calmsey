@@ -64,6 +64,7 @@ const CaseStudyCard: React.FC<CaseStudy> = ({
         <a
           href={`/case-study/${slug}`}
           className="block w-full text-center py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors duration-200"
+          aria-label={`Read more about ${title}`}
         >
           Read More
         </a>

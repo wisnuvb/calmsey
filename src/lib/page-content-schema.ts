@@ -28,26 +28,29 @@ export type ContentFieldType =
   | "color"
   | "boolean"
   | "multiple"
-  | "markdown";
+  | "markdown"
+  | "select";
 
 export interface MultipleItemField {
   key: string;
   label: string;
   type:
-    | "text"
-    | "textarea"
-    | "html"
-    | "image"
-    | "number"
-    | "url"
-    | "email"
-    | "boolean"
-    | "file"
-    | "multiple";
+  | "text"
+  | "textarea"
+  | "html"
+  | "image"
+  | "number"
+  | "url"
+  | "email"
+  | "boolean"
+  | "file"
+  | "multiple"
+  | "select";
   required?: boolean;
   placeholder?: string;
   helpText?: string;
   defaultValue?: string;
+  options?: Array<{ value: string; label: string }>; // For select type
   itemSchema?: MultipleItemField[]; // For nested multiple fields
   itemLabel?: string; // Label for nested multiple items
 }
@@ -61,6 +64,7 @@ export interface FieldDefinition {
   defaultValue?: string;
   helpText?: string;
   placeholder?: string;
+  options?: Array<{ value: string; label: string }>; // For select type
   validation?: {
     min?: number;
     max?: number;

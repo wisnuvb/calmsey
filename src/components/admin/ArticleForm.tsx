@@ -336,9 +336,9 @@ export default function ArticleForm({
       {/* Article Settings */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+          <h2 className="text-lg font-medium text-gray-900">
             Article Settings
-          </h3>
+          </h2>
         </div>
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -449,9 +449,9 @@ export default function ArticleForm({
 
           {/* Story/Partner Story Fields */}
           <div className="border-t pt-6 mt-6">
-            <h4 className="text-sm font-medium text-gray-900 mb-4">
+            <h3 className="text-sm font-medium text-gray-900 mb-4">
               Story/Partner Story Fields (Optional)
-            </h4>
+            </h3>
             <div className="space-y-6">
               {/* Video URL */}
               <div>
@@ -931,10 +931,10 @@ export default function ArticleForm({
           {/* Selected Categories & Tags Preview */}
           {(articleData.categories.length > 0 ||
             articleData.tags.length > 0) && (
-              <div className="border-t pt-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
-                  Selected Items:
-                </h4>
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">
+                Selected Items:
+              </h3>
                 <div className="flex flex-wrap gap-2">
                   {/* Selected Categories */}
                   {articleData.categories.map((categoryId) => {

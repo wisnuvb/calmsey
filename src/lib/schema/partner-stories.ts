@@ -182,13 +182,31 @@ export const PARTNER_STORIES_SCHEMA: PageContentSchema = {
       section: "Feedback Callout",
       defaultValue: "/about",
     },
+
     // Feedback Callout Section
+    {
+      key: "feedbackCallout.title",
+      label: "Title",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "We value your feedback",
+      helpText: "Main title of the feedback section",
+    },
+    {
+      key: "feedbackCallout.description",
+      label: "Description",
+      type: "textarea",
+      section: "Feedback Callout",
+      defaultValue:
+        "Share your thoughts to help us continually improve our governance, practices and accountability.",
+      helpText: "Description text below the title",
+    },
     {
       key: "feedbackCallout.title",
       label: "Feedback Callout Title",
       type: "text",
       section: "Feedback Callout",
-      defaultValue: "We value your support",
+      defaultValue: "We value your feedback",
       helpText: "Main title displayed in the feedback callout section",
     },
     {
@@ -197,7 +215,7 @@ export const PARTNER_STORIES_SCHEMA: PageContentSchema = {
       type: "textarea",
       section: "Feedback Callout",
       defaultValue:
-        "Connect with us to co-create solutions that protect rights, sustain livelihoods, and centre local voices.",
+        "Share your thoughts to help us continually improve our governance, practices and accountability.",
       helpText: "Description text displayed below the title",
     },
     {
@@ -214,7 +232,7 @@ export const PARTNER_STORIES_SCHEMA: PageContentSchema = {
       type: "text",
       section: "Feedback Callout",
       defaultValue: "/feedback",
-      helpText: "URL for the feedback button",
+      helpText: "URL for the feedback button (can be relative path like /feedback or full URL)",
     },
     {
       key: "feedbackCallout.learnMoreButtonText",
@@ -230,7 +248,15 @@ export const PARTNER_STORIES_SCHEMA: PageContentSchema = {
       type: "text",
       section: "Feedback Callout",
       defaultValue: "/governance",
-      helpText: "URL for the learn more button",
+      helpText: "URL for the learn more button (can be relative path like /governance or full URL)",
+    },
+    {
+      key: "feedbackCallout.backgroundColor",
+      label: "Background Color",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "bg-[#3C62ED]",
+      helpText: "Background color class for the section (e.g., bg-[#3C62ED], bg-blue-500)",
     },
   ],
 };

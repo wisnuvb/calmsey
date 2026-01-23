@@ -71,11 +71,11 @@ export function DetailStoryVideoSection({
   return (
     <section
       className={cn(
-        "relative -mt-20 lg:-mt-32 z-20 max-w-4xl mx-auto px-4",
+        "relative -mt-20 lg:-mt-32 z-20 container mx-auto px-4",
         className
       )}
     >
-      <div className="relative aspect-[16/9] rounded-lg overflow-hidden shadow-2xl bg-white">
+      <div className="relative aspect-[2/1] rounded-lg overflow-hidden shadow-2xl bg-white">
         {isImageOnly ? (
           // Show as regular image if no video URL
           <div className="absolute inset-0 z-0">

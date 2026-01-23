@@ -406,6 +406,7 @@ export const SupportSection: React.FC<SupportSectionProps> = ({
                       href={activeContent.downloadSection.buttonUrl}
                       download
                       className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-[#3C62ED] text-white rounded-lg hover:bg-[#2F4FD9] transition-colors font-medium whitespace-nowrap"
+                      aria-label={`Download ${activeContent.downloadSection.buttonText}`}
                     >
                       {activeContent.downloadSection.buttonIcon}
                       {activeContent.downloadSection.buttonText}

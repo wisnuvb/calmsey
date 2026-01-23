@@ -185,9 +185,9 @@ export function ArticlePage({
         {/* Tags */}
         {article.tags.length > 0 && (
           <div className="mb-12 pt-8 border-t border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
               {language === "en" ? "Tags" : "Tag"}
-            </h3>
+            </h2>
             <div className="flex flex-wrap gap-2">
               {article.tags.map((tag) => (
                 <span
@@ -203,9 +203,9 @@ export function ArticlePage({
 
         {/* Social Share */}
         <div className="mb-12 pt-8 border-t border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
             {language === "en" ? "Share this article" : "Bagikan artikel ini"}
-          </h3>
+          </h2>
           <ShareButtons
             title={article.title}
             excerpt={article.excerpt}
@@ -217,9 +217,9 @@ export function ArticlePage({
         {/* Related Articles */}
         {relatedArticles.length > 0 && (
           <section className="pt-12 border-t border-gray-200">
-            <h3 className="text-2xl font-bold text-gray-900 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">
               {language === "en" ? "Related Articles" : "Artikel Terkait"}
-            </h3>
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedArticles.slice(0, 3).map((relatedArticle) => (
                 <ArticleCard
@@ -236,6 +236,9 @@ export function ArticlePage({
                 <a
                   href={`${prefix}/articles`}
                   className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200"
+                  aria-label={language === "en"
+                    ? "View More Articles"
+                    : "Lihat Artikel Lainnya"}
                 >
                   {language === "en"
                     ? "View More Articles"
@@ -264,6 +267,9 @@ export function ArticlePage({
           <a
             href={`${prefix}/articles`}
             className="inline-flex items-center text-blue-600 hover:text-blue-800"
+            aria-label={language === "en"
+              ? "Back to Articles"
+              : "Kembali ke Artikel"}
           >
             <svg
               className="w-4 h-4 mr-2"

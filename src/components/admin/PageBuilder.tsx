@@ -478,6 +478,7 @@ function PageSectionPreview({ section }: { section: PageSection }) {
             <a
               href={section.content.buttonUrl}
               className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700"
+              aria-label={`CTA button to ${section.content.buttonUrl}`}
             >
               {section.content.buttonText || "Learn More"}
             </a>

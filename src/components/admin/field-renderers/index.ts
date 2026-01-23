@@ -9,3 +9,4 @@ export { ColorField } from "./ColorField";
 export { MultipleField } from "./MultipleField";
 export { FileField } from "./FileField";
 export { MarkdownField } from "./MarkdownField";
+export { SelectField } from "./SelectField";

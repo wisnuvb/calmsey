@@ -56,12 +56,12 @@ const PAGE_TYPES = [
     description: "How to help and opportunities",
     icon: "🤝",
   },
-  {
-    type: "CONTACT" as PageType,
-    name: "Contact",
-    description: "Contact information and office hours",
-    icon: "📞",
-  },
+  // {
+  //   type: "CONTACT" as PageType,
+  //   name: "Contact",
+  //   description: "Contact information and office hours",
+  //   icon: "📞",
+  // },
 ];
 
 export default function PageContentManagerPage() {
@@ -95,9 +95,9 @@ export default function PageContentManagerPage() {
             />
           </svg>
           <div>
-            <h3 className="text-sm font-medium text-blue-900 mb-1">
+            <h2 className="text-sm font-medium text-blue-900 mb-1">
               Headless CMS Approach
-            </h3>
+            </h2>
             <p className="text-sm text-blue-800">
               This system uses a headless CMS approach where the frontend design
               is controlled by developers, but content is fully editable by you
@@ -122,9 +122,9 @@ export default function PageContentManagerPage() {
               </div>
             </div>
 
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
               {page.name}
-            </h3>
+            </h2>
 
             <p className="text-sm text-gray-600 mb-4">{page.description}</p>
 
@@ -150,9 +150,9 @@ export default function PageContentManagerPage() {
 
       {/* Quick Links */}
       <div className="mt-8 p-6 bg-gray-50 border border-gray-200 rounded-lg">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Quick Links
-        </h3>
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link

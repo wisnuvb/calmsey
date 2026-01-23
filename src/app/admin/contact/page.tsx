@@ -417,11 +417,11 @@ export default function ContactPage() {
         ) : (
           <div className="text-center py-12 bg-white shadow rounded-lg">
             <ChatBubbleLeftRightIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h2 className="text-lg font-medium text-gray-900 mb-2">
               {search || statusFilter !== "all"
                 ? "No messages found"
                 : "No contact messages"}
-            </h3>
+            </h2>
             <p className="text-gray-500 mb-6">
               {search || statusFilter !== "all"
                 ? "Try adjusting your search or filters."
@@ -598,9 +598,9 @@ function MessageModal({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <StatusIcon className="h-6 w-6 text-gray-400" />
-              <h3 className="text-lg font-medium text-gray-900">
+              <h2 className="text-lg font-medium text-gray-900">
                 Contact Message
-              </h3>
+              </h2>
               <span
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(
                   message.status
@@ -646,6 +646,7 @@ function MessageModal({
               <a
                 href={`mailto:${message.email}`}
                 className="text-sm text-blue-600 hover:text-blue-800"
+                aria-label={`Send email to ${message.email}`}
               >
                 {message.email}
               </a>
@@ -711,6 +712,7 @@ function MessageModal({
               <a
                 href={`mailto:${message.email}?subject=Re: Contact Form Submission&body=Hello ${message.name},%0D%0A%0D%0AThank you for contacting us.%0D%0A%0D%0ABest regards`}
                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
+                aria-label={`Reply to ${message.email}`}
               >
                 Reply via Email
               </a>

@@ -53,6 +53,7 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({
       <a
         href={link}
         className="block hover:shadow-lg transition-shadow duration-300"
+        aria-label={`Read more about ${title}`}
       >
         {CardContent}
       </a>

@@ -146,6 +146,7 @@ function handleLanguageRouting(
   defaultLanguage: string
 ) {
   const pathname = request.nextUrl.pathname;
+  const searchParams = request.nextUrl.search;
 
   // Check if pathname starts with a language code
   const pathnameHasValidLocale = supportedLanguages.some(
@@ -164,18 +165,57 @@ function handleLanguageRouting(
       possibleLang.length === 2 &&
       !supportedLanguages.includes(possibleLang)
     ) {
+      // Preserve search params and construct new URL
       const newUrl = new URL(`/${defaultLanguage}${pathname}`, request.url);
-      return NextResponse.redirect(newUrl);
+      newUrl.search = searchParams;
+      // Use HTML response with client-side redirect to preserve hash fragment
+      return createRedirectResponse(newUrl.toString());
     }
 
     // If no language specified and not root, add default language
     if (pathname !== "/") {
+      // Preserve search params and construct new URL
       const newUrl = new URL(`/${defaultLanguage}${pathname}`, request.url);
-      return NextResponse.redirect(newUrl);
+      newUrl.search = searchParams;
+      // Use HTML response with client-side redirect to preserve hash fragment
+      return createRedirectResponse(newUrl.toString());
     }
   }
 
   return NextResponse.next();
+}
+
+/**
+ * Create a response that redirects client-side to preserve hash fragments
+ * Hash fragments are not available in server-side middleware, so we use
+ * client-side JavaScript to perform the redirect while preserving the hash
+ */
+function createRedirectResponse(targetUrl: string): NextResponse {
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // Preserve hash fragment from current URL
+    const currentHash = window.location.hash;
+    const targetUrl = ${JSON.stringify(targetUrl)};
+    const finalUrl = currentHash ? targetUrl + currentHash : targetUrl;
+    window.location.replace(finalUrl);
+  </script>
+  <meta http-equiv="refresh" content="0;url=${targetUrl}">
+</head>
+<body>
+  <p>Redirecting... <a href="${targetUrl}" aria-label="Redirect to ${targetUrl}">Click here if you are not redirected.</a></p>
+</body>
+</html>`;
+
+  return new NextResponse(html, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+    },
+  });
 }
 
 export const config = {

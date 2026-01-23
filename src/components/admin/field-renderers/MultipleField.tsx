@@ -14,6 +14,7 @@ import { TextareaField } from "./TextareaField";
 import { NumberField } from "./NumberField";
 import { BooleanField } from "./BooleanField";
 import { HtmlField } from "./HtmlField";
+import { SelectField } from "./SelectField";
 import { getImageUrl } from "@/lib/utils";
 
 interface MultipleFieldProps {
@@ -23,7 +24,9 @@ interface MultipleFieldProps {
   onOpenMediaPicker: (
     fieldKey: string,
     itemIndex: number,
-    itemFieldKey: string
+    itemFieldKey: string,
+    nestedIndex?: number,
+    nestedFieldKey?: string
   ) => void;
   error?: string;
 }
@@ -173,17 +176,16 @@ export function MultipleField({
     // Ensure itemValue is an object
     const safeItemValue =
       typeof itemValue === "object" &&
-      itemValue !== null &&
-      !Array.isArray(itemValue)
+        itemValue !== null &&
+        !Array.isArray(itemValue)
         ? itemValue
         : {};
 
     const itemFieldValue =
       safeItemValue[itemField.key] || itemField.defaultValue || "";
 
-    const itemCommonClasses = `w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-      error ? "border-red-500" : "border-gray-300"
-    }`;
+    const itemCommonClasses = `w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? "border-red-500" : "border-gray-300"
+      }`;
 
     switch (itemField.type) {
       case "text":
@@ -407,6 +409,7 @@ export function MultipleField({
                     rel="noopener noreferrer"
                     className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                     title="Open file"
+                    aria-label="Open file in new tab"
                   >
                     <Download className="w-4 h-4" />
                   </a>
@@ -424,6 +427,18 @@ export function MultipleField({
             onChange={(val) =>
               handleMultipleItemChange(itemIndex, itemField.key, val)
             }
+          />
+        );
+
+      case "select":
+        return (
+          <SelectField
+            field={itemField as FieldDefinition}
+            value={itemFieldValue}
+            onChange={(val) =>
+              handleMultipleItemChange(itemIndex, itemField.key, val)
+            }
+            error={error}
           />
         );
 
@@ -534,6 +549,54 @@ export function MultipleField({
                         const nestedFieldValue =
                           nestedItem[nestedField.key] || nestedField.defaultValue || "";
 
+                        // Helper to get file info for file type
+                        const getFileInfo = (url: string) => {
+                          if (!url || !url.trim()) {
+                            return { filename: "", extension: "" };
+                          }
+
+                          let pathname = url;
+                          try {
+                            if (url.startsWith("http://") || url.startsWith("https://")) {
+                              const urlObj = new URL(url);
+                              pathname = urlObj.pathname;
+                            } else {
+                              pathname = url;
+                            }
+                          } catch {
+                            pathname = url;
+                          }
+
+                          const pathParts = pathname.split("/");
+                          const filename =
+                            pathParts[pathParts.length - 1] || pathname || "file";
+                          const lastDotIndex = filename.lastIndexOf(".");
+                          const extension =
+                            lastDotIndex > 0
+                              ? filename.substring(lastDotIndex + 1).toLowerCase()
+                              : "";
+
+                          return { filename, extension };
+                        };
+
+                        const fileInfo =
+                          nestedField.type === "file" && nestedFieldValue && nestedFieldValue.trim()
+                            ? getFileInfo(nestedFieldValue)
+                            : null;
+
+                        const getFileTypeIcon = (extension: string) => {
+                          const imageExts = ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp"];
+                          const videoExts = ["mp4", "webm", "ogg", "mov", "avi"];
+                          const audioExts = ["mp3", "wav", "ogg", "m4a", "aac"];
+                          const docExts = ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx"];
+
+                          if (imageExts.includes(extension)) return "🖼️";
+                          if (videoExts.includes(extension)) return "🎥";
+                          if (audioExts.includes(extension)) return "🎵";
+                          if (docExts.includes(extension)) return "📄";
+                          return "📎";
+                        };
+
                         return (
                           <div key={nestedField.key}>
                             <label className="block mb-1">
@@ -545,8 +608,8 @@ export function MultipleField({
                               </span>
                             </label>
                             {nestedField.type === "text" ||
-                            nestedField.type === "url" ||
-                            nestedField.type === "email" ? (
+                              nestedField.type === "url" ||
+                              nestedField.type === "email" ? (
                               <input
                                 type={nestedField.type === "email" ? "email" : "text"}
                                 value={nestedFieldValue}
@@ -558,9 +621,8 @@ export function MultipleField({
                                   )
                                 }
                                 placeholder={nestedField.placeholder}
-                                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                  error ? "border-red-500" : "border-gray-300"
-                                }`}
+                                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? "border-red-500" : "border-gray-300"
+                                  }`}
                                 required={nestedField.required}
                               />
                             ) : nestedField.type === "textarea" ? (
@@ -575,11 +637,76 @@ export function MultipleField({
                                 }
                                 placeholder={nestedField.placeholder}
                                 rows={3}
-                                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                  error ? "border-red-500" : "border-gray-300"
-                                }`}
+                                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? "border-red-500" : "border-gray-300"
+                                  }`}
                                 required={nestedField.required}
                               />
+                            ) : nestedField.type === "file" ? (
+                              <div>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={nestedFieldValue}
+                                    onChange={(e) =>
+                                      handleNestedItemChange(
+                                        nestedIndex,
+                                        nestedField.key,
+                                        e.target.value
+                                      )
+                                    }
+                                    placeholder={nestedField.placeholder || "/files/example.pdf"}
+                                    className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 ${error ? "border-red-500" : "border-gray-300"
+                                      }`}
+                                    required={nestedField.required}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      // For nested multiple field, pass nestedIndex and nestedFieldKey
+                                      // The handler will need to be updated to accept these parameters
+                                      // For now, we'll use a workaround by passing them in the fieldKey
+                                      onOpenMediaPicker(
+                                        field.key,
+                                        itemIndex,
+                                        itemField.key,
+                                        nestedIndex,
+                                        nestedField.key
+                                      );
+                                    }}
+                                    className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2 whitespace-nowrap text-sm"
+                                  >
+                                    <File className="w-4 h-4" />
+                                    Select from Media
+                                  </button>
+                                </div>
+                                {fileInfo && (
+                                  <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded-md">
+                                    <div className="flex items-center gap-2">
+                                      <div className="text-lg">
+                                        {getFileTypeIcon(fileInfo.extension)}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-medium text-gray-900 truncate">
+                                          {fileInfo.filename}
+                                        </p>
+                                        <p className="text-xs text-gray-500 uppercase">
+                                          {fileInfo.extension || "unknown"} file
+                                        </p>
+                                      </div>
+                                      <a
+                                        href={nestedFieldValue}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-1 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                        title="Open file"
+                                        aria-label="Open file in new tab"
+                                      >
+                                        <Download className="w-3 h-3" />
+                                      </a>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             ) : (
                               <input
                                 type="text"
@@ -592,9 +719,8 @@ export function MultipleField({
                                   )
                                 }
                                 placeholder={nestedField.placeholder}
-                                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                  error ? "border-red-500" : "border-gray-300"
-                                }`}
+                                className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? "border-red-500" : "border-gray-300"
+                                  }`}
                                 required={nestedField.required}
                               />
                             )}

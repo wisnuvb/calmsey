@@ -100,6 +100,7 @@ export const OurFundersSection: React.FC<OurFundersSectionProps> = ({
           <a
             href={buttonLink}
             className="inline-flex items-center px-8 py-4 bg-white text-[#060726] hover:bg-[#CADBEA] transition-colors duration-200 rounded-lg font-semibold text-lg"
+            aria-label={`Become a Funder - ${buttonText}`}
           >
             {buttonText}
           </a>

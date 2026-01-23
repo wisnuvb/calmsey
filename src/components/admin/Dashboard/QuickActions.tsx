@@ -48,6 +48,7 @@ export function QuickActions() {
             href={action.href}
             target={action.external ? "_blank" : undefined}
             className="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+            aria-label={`${action.name} - ${action.description}`}
           >
             <div className={`${action.color} rounded-lg p-2`}>
               <action.icon className="h-6 w-6 text-white" />

@@ -241,11 +241,39 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
     },
     {
       key: "goal.strategyDownloadUrl",
-      label: "Strategy Download URL",
+      label: "Strategy Download URL (Legacy)",
       type: "file",
       section: "Our Goal",
       defaultValue: "/downloads/strategy-2030.pdf",
-      helpText: "URL to the strategy PDF file for download",
+      helpText: "Legacy: Single file URL. Use 'Strategy Download Files' below for multi-language support.",
+    },
+    {
+      key: "goal.strategyDownloadFiles",
+      label: "Strategy Download Files",
+      type: "multiple",
+      section: "Our Goal",
+      helpText:
+        "Manage downloadable files for different languages. Users will be able to choose their preferred language when downloading. Leave empty to use legacy single URL above.",
+      itemLabel: "Download File",
+      itemSchema: [
+        {
+          key: "language",
+          label: "Language Code",
+          type: "text",
+          required: true,
+          placeholder: "en",
+          helpText:
+            "Language code (e.g., 'en' for English, 'id' for Indonesian)",
+        },
+        {
+          key: "url",
+          label: "File URL",
+          type: "file",
+          required: true,
+          placeholder: "/downloads/strategy-2030-en.pdf",
+          helpText: "URL to the file for this language",
+        },
+      ],
     },
     {
       key: "goal.strategyDownloadText",
@@ -630,44 +658,11 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       helpText: "Description text below the title",
     },
     {
-      key: "feedbackCallout.feedbackText",
-      label: "Feedback Button Text",
-      type: "text",
-      section: "Feedback Callout",
-      defaultValue: "Give Feedback",
-      helpText: "Text for the feedback button",
-    },
-    {
-      key: "feedbackCallout.feedbackLink",
-      label: "Feedback Button Link",
-      type: "text",
-      section: "Feedback Callout",
-      defaultValue: "/feedback",
-      helpText: "URL for the feedback button",
-    },
-    {
-      key: "feedbackCallout.learnMoreText",
-      label: "Learn More Button Text",
-      type: "text",
-      section: "Feedback Callout",
-      defaultValue: "Learn More",
-      helpText: "Text for the learn more button",
-    },
-    {
-      key: "feedbackCallout.learnMoreLink",
-      label: "Learn More Button Link",
-      type: "text",
-      section: "Feedback Callout",
-      defaultValue: "/governance",
-      helpText: "URL for the learn more button",
-    },
-    // Feedback Callout Section
-    {
       key: "feedbackCallout.title",
       label: "Feedback Callout Title",
       type: "text",
       section: "Feedback Callout",
-      defaultValue: "We value your support",
+      defaultValue: "We value your feedback",
       helpText: "Main title displayed in the feedback callout section",
     },
     {
@@ -676,7 +671,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       type: "textarea",
       section: "Feedback Callout",
       defaultValue:
-        "Connect with us to co-create solutions that protect rights, sustain livelihoods, and centre local voices.",
+        "Share your thoughts to help us continually improve our governance, practices and accountability.",
       helpText: "Description text displayed below the title",
     },
     {
@@ -693,7 +688,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       type: "text",
       section: "Feedback Callout",
       defaultValue: "/feedback",
-      helpText: "URL for the feedback button",
+      helpText: "URL for the feedback button (can be relative path like /feedback or full URL)",
     },
     {
       key: "feedbackCallout.learnMoreButtonText",
@@ -709,7 +704,15 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       type: "text",
       section: "Feedback Callout",
       defaultValue: "/governance",
-      helpText: "URL for the learn more button",
+      helpText: "URL for the learn more button (can be relative path like /governance or full URL)",
+    },
+    {
+      key: "feedbackCallout.backgroundColor",
+      label: "Background Color",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "bg-[#3C62ED]",
+      helpText: "Background color class for the section (e.g., bg-[#3C62ED], bg-blue-500)",
     },
   ],
 };

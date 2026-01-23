@@ -43,6 +43,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
             baseButtonClasses,
             "bg-[#3C62ED] text-white hover:bg-[#2d4fd6]"
           )}
+          aria-label={`Download ${cta.text}`}
         >
           <FileText className="w-5 h-5" />
           <span>{cta.text}</span>

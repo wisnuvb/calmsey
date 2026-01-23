@@ -116,6 +116,7 @@ export function FileField({
               rel="noopener noreferrer"
               className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
               title="Open file"
+              aria-label="Open file in new tab"
             >
               <Download className="w-4 h-4" />
             </a>

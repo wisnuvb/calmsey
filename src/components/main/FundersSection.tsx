@@ -124,9 +124,9 @@ export function FundersSection({
 
         {/* Funders Logos */}
         <div className="flex flex-wrap justify-center items-center gap-6 lg:gap-8">
-          {funders.map((funder) => (
+          {funders.map((funder, i) => (
             <div
-              key={funder.id}
+              key={`founder-${i}`}
               className="flex items-center justify-center h-[110px] w-[140px] lg:w-[180px]"
             >
               <Image

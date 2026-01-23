@@ -110,6 +110,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 px-6 py-3 border-2 border-[#0077B5] bg-white text-[#0077B5] rounded-lg hover:bg-[#0077B5] hover:text-white transition-colors font-semibold font-work-sans mt-auto"
+              aria-label={`View LinkedIn profile of ${member.name}`}
             >
               <div className="w-6 h-6 bg-[#0077B5] rounded flex items-center justify-center">
                 <FaLinkedin className="w-4 h-4 text-white" />

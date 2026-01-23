@@ -53,9 +53,9 @@ export function GenesisSection({
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
-        <h1 className="text-center text-3xl sm:text-4xl lg:text-[38px] font-bold text-[#3C62ED] font-nunito-sans mb-8">
+        <h2 className="text-center text-3xl sm:text-4xl lg:text-[38px] font-bold text-[#3C62ED] font-nunito-sans mb-8">
           {title}
-        </h1>
+        </h2>
 
         {/* Intro Paragraph */}
         <div className="max-w-4xl mx-auto mb-12 lg:mb-16">

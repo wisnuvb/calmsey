@@ -28,12 +28,15 @@ export const Lightbox: React.FC<LightboxProps> = ({
       onClick={closeLightbox}
       onKeyDown={handleKeyDown}
       tabIndex={0}
+      role="button"
+      aria-label="Close lightbox"
     >
       <div className="relative max-w-7xl max-h-full">
         {/* Close button */}
         <button
           onClick={closeLightbox}
           className="absolute top-4 right-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all duration-200"
+          aria-label="Close"
         >
           <svg
             className="w-6 h-6"
@@ -57,6 +60,7 @@ export const Lightbox: React.FC<LightboxProps> = ({
             goToPrevious();
           }}
           className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all duration-200"
+          aria-label="Previous image"
         >
           <svg
             className="w-6 h-6"
@@ -79,6 +83,7 @@ export const Lightbox: React.FC<LightboxProps> = ({
             goToNext();
           }}
           className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all duration-200"
+          aria-label="Next image"
         >
           <svg
             className="w-6 h-6"

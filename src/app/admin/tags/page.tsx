@@ -350,9 +350,9 @@ export default function TagsPage() {
         ) : (
           <div className="text-center py-12 bg-white shadow rounded-lg">
             <TagIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h2 className="text-lg font-medium text-gray-900 mb-2">
               {search || filter !== "all" ? "No tags found" : "No tags yet"}
-            </h3>
+            </h2>
             <p className="text-gray-500 mb-6">
               {search || filter !== "all"
                 ? "Try adjusting your search or filters."
@@ -426,9 +426,9 @@ function TagCard({
 
           <div className="flex items-center space-x-2 mb-2">
             <TagIcon className="h-4 w-4 text-gray-400" />
-            <h3 className="text-sm font-medium text-gray-900 truncate">
+            <h2 className="text-sm font-medium text-gray-900 truncate">
               {tag.name}
-            </h3>
+            </h2>
           </div>
 
           <div className="flex items-center justify-between">
@@ -513,9 +513,9 @@ function TagModal({
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+          <h2 className="text-lg font-medium text-gray-900">
             {tag ? "Edit Tag" : "Create New Tag"}
-          </h3>
+          </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
@@ -576,7 +576,7 @@ function TagsStatistics({ tags }: { tags: Tag[] }) {
     <div className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6">
       <div className="flex items-center mb-4">
         <ChartBarIcon className="h-5 w-5 text-gray-500 mr-2" />
-        <h3 className="text-lg font-medium text-gray-900">Tag Statistics</h3>
+        <h2 className="text-lg font-medium text-gray-900">Tag Statistics</h2>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

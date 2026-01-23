@@ -364,9 +364,9 @@ export default function MediaPage() {
         ) : (
           <div className="text-center py-12 bg-white shadow rounded-lg">
             <PhotoIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h2 className="text-lg font-medium text-gray-900 mb-2">
               {search || filter !== "all" ? "No files found" : "No media files"}
-            </h3>
+            </h2>
             <p className="text-gray-500 mb-6">
               {search || filter !== "all"
                 ? "Try adjusting your search or filters."
@@ -464,12 +464,12 @@ function MediaCard({
       </div>
 
       <div className="space-y-2">
-        <h3
+        <h2
           className="text-sm font-medium text-gray-900 truncate"
           title={file.originalName}
         >
           {file.originalName}
-        </h3>
+        </h2>
         <div className="flex items-center justify-between text-xs text-gray-500">
           <span>{getFileTypeLabel(file.mimeType)}</span>
           <span>{formatFileSize(file.size)}</span>
@@ -484,6 +484,7 @@ function MediaCard({
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                 title="View file"
+                aria-label="View file"
               >
                 <EyeIcon className="h-4 w-4" />
               </a>
@@ -492,6 +493,7 @@ function MediaCard({
                 download={file.originalName}
                 className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
                 title="Download file"
+                aria-label="Download file"
               >
                 <DocumentArrowDownIcon className="h-4 w-4" />
               </a>
@@ -587,6 +589,7 @@ function MediaRow({
               rel="noopener noreferrer"
               className="text-blue-600 hover:text-blue-900"
               title="View file"
+              aria-label="View file"
             >
               <EyeIcon className="h-4 w-4" />
             </a>
@@ -595,6 +598,7 @@ function MediaRow({
               download={file.originalName}
               className="text-green-600 hover:text-green-900"
               title="Download file"
+              aria-label="Download file"
             >
               <DocumentArrowDownIcon className="h-4 w-4" />
             </a>
@@ -653,7 +657,7 @@ function UploadModal({
       <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">Upload Media</h3>
+            <h2 className="text-lg font-medium text-gray-900">Upload Media</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
@@ -681,9 +685,9 @@ function UploadModal({
             }}
           >
             <CloudArrowUpIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h4 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
               {dragOver ? "Drop files here" : "Upload your files"}
-            </h4>
+            </h3>
             <p className="text-sm text-gray-500 mb-4">
               Drag and drop files here, or click to select files
             </p>
@@ -716,9 +720,9 @@ function UploadModal({
 
           {/* Supported Formats */}
           <div className="mt-6">
-            <h5 className="text-sm font-medium text-gray-900 mb-3">
+            <h3 className="text-sm font-medium text-gray-900 mb-3">
               Supported Formats
-            </h5>
+            </h3>
             <div className="space-y-1">
               {supportedFormats.map((format, index) => (
                 <p key={index} className="text-sm text-gray-600">

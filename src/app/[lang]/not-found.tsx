@@ -5,7 +5,7 @@ export default async function NotFound() {
   const recentArticles = await PublicAPI.getRecentArticles("en", 3);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center pt-28 pb-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-md">
         <div className="text-center">
           <h1 className="text-6xl font-bold text-gray-900">404</h1>
