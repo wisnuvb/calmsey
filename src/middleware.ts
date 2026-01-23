@@ -147,8 +147,35 @@ function handleLanguageRouting(
 ) {
   const pathname = request.nextUrl.pathname;
   const searchParams = request.nextUrl.search;
-  // Use the origin from the request to ensure correct domain
-  const origin = request.nextUrl.origin;
+
+  // Get the correct origin, handling proxy/load balancer scenarios
+  // Priority: x-forwarded-host header > host header > nextUrl.origin
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+  const host = request.headers.get("host");
+
+  let origin: string;
+  if (forwardedHost) {
+    // Use forwarded host if available (common in production with proxy/load balancer)
+    origin = `${forwardedProto}://${forwardedHost}`;
+  } else if (host) {
+    // Fallback to host header
+    const protocol = request.nextUrl.protocol || forwardedProto;
+    origin = `${protocol}//${host}`;
+  } else {
+    // Last resort: use nextUrl.origin
+    origin = request.nextUrl.origin;
+  }
+
+  // Ensure origin doesn't contain localhost in production
+  // This is a safety check
+  if (process.env.NODE_ENV === "production" && origin.includes("localhost")) {
+    console.warn("Warning: Origin contains localhost in production:", origin);
+    // Try to construct from host header as fallback
+    if (host && !host.includes("localhost")) {
+      origin = `${forwardedProto}://${host}`;
+    }
+  }
 
   // Check if pathname starts with a language code
   const pathnameHasValidLocale = supportedLanguages.some(
@@ -193,6 +220,12 @@ function handleLanguageRouting(
  * client-side JavaScript to perform the redirect while preserving the hash
  */
 function createRedirectResponse(targetUrl: string): NextResponse {
+  // Ensure targetUrl is absolute and doesn't contain localhost in production
+  if (process.env.NODE_ENV === "production" && targetUrl.includes("localhost")) {
+    console.error("Error: Redirect URL contains localhost in production:", targetUrl);
+    // This should not happen, but if it does, we should log it
+  }
+
   const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -202,7 +235,30 @@ function createRedirectResponse(targetUrl: string): NextResponse {
     // Preserve hash fragment from current URL
     const currentHash = window.location.hash;
     const targetUrl = ${JSON.stringify(targetUrl)};
-    const finalUrl = currentHash ? targetUrl + currentHash : targetUrl;
+    
+    // Ensure we're using the correct protocol and domain
+    // If targetUrl is relative or has wrong domain, use current origin
+    let finalUrl = targetUrl;
+    if (currentHash) {
+      // Only add hash if targetUrl doesn't already have one
+      finalUrl = targetUrl.includes('#') ? targetUrl : targetUrl + currentHash;
+    }
+    
+    // Double check: if finalUrl contains localhost but we're not on localhost, fix it
+    if (finalUrl.includes('localhost') && !window.location.hostname.includes('localhost')) {
+      const currentOrigin = window.location.origin;
+      try {
+        const urlObj = new URL(finalUrl, window.location.href);
+        const urlPath = urlObj.pathname + urlObj.search;
+        finalUrl = currentOrigin + urlPath + (currentHash || '');
+      } catch (e) {
+        // If URL parsing fails, use current origin + path from targetUrl
+        const pathMatch = finalUrl.match(/\\/[^\\s]*/);
+        const path = pathMatch ? pathMatch[0] : '';
+        finalUrl = currentOrigin + path + (currentHash || '');
+      }
+    }
+    
     window.location.replace(finalUrl);
   </script>
   <meta http-equiv="refresh" content="0;url=${targetUrl}">
