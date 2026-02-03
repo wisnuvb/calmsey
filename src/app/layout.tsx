@@ -1,4 +1,3 @@
-// @ts-expect-error: Next.js expects the metadata object to be statically analyzable
 import "./globals.css";
 
 import { SimpleFontLoader } from "@/components/SimpleFontLoader";

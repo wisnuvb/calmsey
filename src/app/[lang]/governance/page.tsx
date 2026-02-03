@@ -1,4 +1,3 @@
-import { metadata } from "@/app/layout";
 import {
   FundingAcceptancePolicySection,
   GovernanceMeaningSection,

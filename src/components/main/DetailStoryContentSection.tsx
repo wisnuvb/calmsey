@@ -50,7 +50,6 @@ export function DetailStoryContentSection({
   photos,
   relatedArticles,
   className,
-  videoUrl,
 }: DetailStoryContentSectionProps) {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
@@ -76,7 +75,7 @@ export function DetailStoryContentSection({
         onError: (error) => {
           console.error("Share failed:", error);
         },
-      }
+      },
     );
 
     // Show notification even if share was successful via native share
@@ -138,49 +137,54 @@ export function DetailStoryContentSection({
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-8">
                 {/* Partner Organization */}
-                {partnerOrganization && (partnerOrganization.logo || partnerOrganization.name || country) && (
-                  <div className="bg-gray-50 border border-[#D7E4EF] p-6 sm:p-11 rounded-lg">
-                    <div className="space-y-3">
-                      <H3
-                        style="h5bold"
-                        className="text-[#010107] font-semibold text-xs leading-[150%] tracking-normal uppercase"
-                      >
-                        Partner Organization
-                      </H3>
-                      {partnerOrganization.logo && (
-                        <Image
-                          src={getImageUrl(partnerOrganization.logo)}
-                          alt={partnerOrganization.name || "Partner Organization"}
-                          width={128}
-                          height={128}
-                          className="rounded"
-                        />
-                      )}
-                      <p className="font-work-sans font-normal text-base text-[#06072680]">
-                        {partnerOrganization.name}
-                      </p>
-                    </div>
-
-                    {country && (
-                      <>
-                        <div className="border-b border-[#C3D7E8] my-11" />
-
+                {partnerOrganization &&
+                  (partnerOrganization.logo ||
+                    partnerOrganization.name ||
+                    country) && (
+                    <div className="bg-gray-50 border border-[#D7E4EF] p-6 sm:p-11 rounded-lg">
+                      <div className="space-y-3">
                         <H3
                           style="h5bold"
-                          className="text-[#010107] mb-3 tracking-wide text-base font-normal font-work-sans"
+                          className="text-[#010107] font-semibold text-xs leading-[150%] tracking-normal uppercase"
                         >
-                          Country
+                          Partner Organization
                         </H3>
-                        <div className="flex items-center space-x-2 text-[#010107]">
-                          <MapPin className="w-5 h-5" />
-                          <span className="font-work-sans text-xl font-bold leading-[1.4]">
-                            {country}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
+                        {partnerOrganization.logo && (
+                          <Image
+                            src={getImageUrl(partnerOrganization.logo)}
+                            alt={
+                              partnerOrganization.name || "Partner Organization"
+                            }
+                            width={128}
+                            height={128}
+                            className="rounded"
+                          />
+                        )}
+                        <p className="font-work-sans font-normal text-base text-[#06072680]">
+                          {partnerOrganization.name}
+                        </p>
+                      </div>
+
+                      {country && (
+                        <>
+                          <div className="border-b border-[#C3D7E8] my-11" />
+
+                          <H3
+                            style="h5bold"
+                            className="text-[#010107] mb-3 tracking-wide text-base font-normal font-work-sans"
+                          >
+                            Country
+                          </H3>
+                          <div className="flex items-center space-x-2 text-[#010107]">
+                            <MapPin className="w-5 h-5" />
+                            <span className="font-work-sans text-xl font-bold leading-[1.4]">
+                              {country}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
 
                 {/* Country only (if no partner organization) */}
                 {!partnerOrganization && country && (
@@ -214,7 +218,9 @@ export function DetailStoryContentSection({
                     onClick={handleShare}
                     className="w-full flex items-center justify-center space-x-2 px-4 py-5 bg-[#3C62ED] text-white rounded-lg hover:bg-gray-800 transition-colors relative"
                   >
-                    <span className="font-work-sans font-medium">Share on Social Media</span>
+                    <span className="font-work-sans font-medium">
+                      Share on Social Media
+                    </span>
                     <Forward className="w-4 h-4" />
                     {showCopyNotification && (
                       <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white text-xs px-3 py-1 rounded whitespace-nowrap">

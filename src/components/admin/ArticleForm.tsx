@@ -145,7 +145,7 @@ export default function ArticleForm({
         seoTitle: "",
         seoDescription: "",
       },
-    ]
+    ],
   );
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -155,7 +155,7 @@ export default function ArticleForm({
   >([]);
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number | null>(
-    null
+    null,
   );
   const [isAddingMultiplePhotos, setIsAddingMultiplePhotos] = useState(false);
   const [isSelectingPartnerLogo, setIsSelectingPartnerLogo] = useState(false);
@@ -165,11 +165,14 @@ export default function ArticleForm({
     fetchCategories();
     fetchTags();
     fetchAvailableArticles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchAvailableArticles = async () => {
     try {
-      const response = await fetch("/api/admin/articles?limit=100&status=PUBLISHED");
+      const response = await fetch(
+        "/api/admin/articles?limit=100&status=PUBLISHED",
+      );
       const data = await response.json();
       const articles = (data.data || [])
         .map((article: any) => ({
@@ -233,10 +236,10 @@ export default function ArticleForm({
 
   const updateTranslation = (
     languageId: string,
-    data: Partial<Translation>
+    data: Partial<Translation>,
   ) => {
     setTranslations((prev) =>
-      prev.map((t) => (t.languageId === languageId ? { ...t, ...data } : t))
+      prev.map((t) => (t.languageId === languageId ? { ...t, ...data } : t)),
     );
   };
 
@@ -316,7 +319,10 @@ export default function ArticleForm({
       posterImage: articleData.posterImage || null,
       partnerOrganization: articleData.partnerOrganization,
       photos: articleData.photos.length > 0 ? articleData.photos : null,
-      relatedArticles: articleData.relatedArticles.length > 0 ? articleData.relatedArticles : null,
+      relatedArticles:
+        articleData.relatedArticles.length > 0
+          ? articleData.relatedArticles
+          : null,
     });
   };
 
@@ -365,7 +371,7 @@ export default function ArticleForm({
                     type="button"
                     onClick={() => {
                       const englishTranslation = translations.find(
-                        (t) => t.languageId === "en"
+                        (t) => t.languageId === "en",
                       );
                       if (englishTranslation?.title) {
                         const newSlug = generateSlug(englishTranslation.title);
@@ -515,10 +521,8 @@ export default function ArticleForm({
                           ...prev,
                           partnerOrganization: {
                             name: e.target.value,
-                            logo:
-                              prev.partnerOrganization?.logo || "",
-                            fullName:
-                              prev.partnerOrganization?.fullName || "",
+                            logo: prev.partnerOrganization?.logo || "",
+                            fullName: prev.partnerOrganization?.fullName || "",
                           },
                         }))
                       }
@@ -538,8 +542,7 @@ export default function ArticleForm({
                           setArticleData((prev) => ({
                             ...prev,
                             partnerOrganization: {
-                              name:
-                                prev.partnerOrganization?.name || "",
+                              name: prev.partnerOrganization?.name || "",
                               logo: e.target.value,
                               fullName:
                                 prev.partnerOrganization?.fullName || "",
@@ -573,10 +576,8 @@ export default function ArticleForm({
                         setArticleData((prev) => ({
                           ...prev,
                           partnerOrganization: {
-                            name:
-                              prev.partnerOrganization?.name || "",
-                            logo:
-                              prev.partnerOrganization?.logo || "",
+                            name: prev.partnerOrganization?.name || "",
+                            logo: prev.partnerOrganization?.logo || "",
                             fullName: e.target.value,
                           },
                         }))
@@ -681,7 +682,7 @@ export default function ArticleForm({
                         type="button"
                         onClick={() => {
                           const newPhotos = articleData.photos.filter(
-                            (_, i) => i !== index
+                            (_, i) => i !== index,
                           );
                           setArticleData((prev) => ({
                             ...prev,
@@ -754,16 +755,17 @@ export default function ArticleForm({
                         .filter((article) =>
                           article.title
                             .toLowerCase()
-                            .includes(relatedArticlesSearch.toLowerCase())
+                            .includes(relatedArticlesSearch.toLowerCase()),
                         )
                         .map((article) => (
                           <button
                             key={article.id}
                             type="button"
                             onClick={() => {
-                              const isAlreadyAdded = articleData.relatedArticles.some(
-                                (ra) => ra.id === article.id
-                              );
+                              const isAlreadyAdded =
+                                articleData.relatedArticles.some(
+                                  (ra) => ra.id === article.id,
+                                );
                               if (!isAlreadyAdded) {
                                 setArticleData((prev) => ({
                                   ...prev,
@@ -832,9 +834,10 @@ export default function ArticleForm({
                           <button
                             type="button"
                             onClick={() => {
-                              const newRelated = articleData.relatedArticles.filter(
-                                (_, i) => i !== index
-                              );
+                              const newRelated =
+                                articleData.relatedArticles.filter(
+                                  (_, i) => i !== index,
+                                );
                               setArticleData((prev) => ({
                                 ...prev,
                                 relatedArticles: newRelated,
@@ -851,7 +854,8 @@ export default function ArticleForm({
                 )}
               </div>
               <p className="text-sm text-gray-500 mt-2">
-                Optional: Search and select published articles to display as related links. URL will auto-populate, but can be customized.
+                Optional: Search and select published articles to display as
+                related links. URL will auto-populate, but can be customized.
               </p>
             </div>
           </div>
@@ -935,48 +939,48 @@ export default function ArticleForm({
               <h3 className="text-sm font-medium text-gray-700 mb-2">
                 Selected Items:
               </h3>
-                <div className="flex flex-wrap gap-2">
-                  {/* Selected Categories */}
-                  {articleData.categories.map((categoryId) => {
-                    const category = categories.find((c) => c.id === categoryId);
-                    return (
-                      <span
-                        key={categoryId}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+              <div className="flex flex-wrap gap-2">
+                {/* Selected Categories */}
+                {articleData.categories.map((categoryId) => {
+                  const category = categories.find((c) => c.id === categoryId);
+                  return (
+                    <span
+                      key={categoryId}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                    >
+                      📁 {category?.name}
+                      <button
+                        type="button"
+                        onClick={() => handleCategoryChange(categoryId, false)}
+                        className="ml-1 text-blue-600 hover:text-blue-800"
                       >
-                        📁 {category?.name}
-                        <button
-                          type="button"
-                          onClick={() => handleCategoryChange(categoryId, false)}
-                          className="ml-1 text-blue-600 hover:text-blue-800"
-                        >
-                          x
-                        </button>
-                      </span>
-                    );
-                  })}
-                  {/* Selected Tags */}
-                  {articleData.tags.map((tagId) => {
-                    const tag = tags.find((t) => t.id === tagId);
-                    return (
-                      <span
-                        key={tagId}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                        x
+                      </button>
+                    </span>
+                  );
+                })}
+                {/* Selected Tags */}
+                {articleData.tags.map((tagId) => {
+                  const tag = tags.find((t) => t.id === tagId);
+                  return (
+                    <span
+                      key={tagId}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                    >
+                      🏷️ {tag?.name}
+                      <button
+                        type="button"
+                        onClick={() => handleTagChange(tagId, false)}
+                        className="ml-1 text-green-600 hover:text-green-800"
                       >
-                        🏷️ {tag?.name}
-                        <button
-                          type="button"
-                          onClick={() => handleTagChange(tagId, false)}
-                          className="ml-1 text-green-600 hover:text-green-800"
-                        >
-                          x
-                        </button>
-                      </span>
-                    );
-                  })}
-                </div>
+                        x
+                      </button>
+                    </span>
+                  );
+                })}
               </div>
-            )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -1048,10 +1052,7 @@ export default function ArticleForm({
               photos: [...prev.photos, ...newPhotos],
             }));
             setIsAddingMultiplePhotos(false);
-          } else if (
-            currentPhotoIndex !== null &&
-            selectedUrls.length > 0
-          ) {
+          } else if (currentPhotoIndex !== null && selectedUrls.length > 0) {
             // Update specific photo
             const newPhotos = [...articleData.photos];
             newPhotos[currentPhotoIndex] = {
