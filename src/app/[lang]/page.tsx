@@ -8,9 +8,28 @@ import {
 } from "@/components/main";
 import { getPageContentServer } from "@/lib/page-content-server";
 import { PageContentProviderWrapper } from "@/components/providers/PageContentProviderWrapper";
+import { Metadata } from "next";
 
 interface HomePageProps {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: HomePageProps): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    title: "Turning Tides Facility",
+    description:
+      "Turning Tides Facility - Supporting rights holders working to secure tenure over their territories.",
+    alternates: {
+      canonical: `/${lang}`,
+      languages: {
+        en: "/en",
+        id: "/id",
+      },
+    },
+  };
 }
 
 const HomePage = async ({ params }: HomePageProps) => {

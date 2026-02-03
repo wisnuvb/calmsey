@@ -10,9 +10,33 @@ import {
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
 import React from "react";
+import { Metadata } from "next";
 
 interface GovernancePageProps {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: GovernancePageProps): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    title:
+      lang === "id"
+        ? "Tata Kelola - Turning Tides Facility"
+        : "Governance - Turning Tides Facility",
+    description:
+      lang === "id"
+        ? "Tata Kelola Turning Tides Facility"
+        : "Governance of Turning Tides Facility",
+    alternates: {
+      canonical: `/${lang}/governance`,
+      languages: {
+        en: "/en/governance",
+        id: "/id/governance",
+      },
+    },
+  };
 }
 
 const GovernancePage = async ({ params }: GovernancePageProps) => {
@@ -20,9 +44,6 @@ const GovernancePage = async ({ params }: GovernancePageProps) => {
   const language = lang || "en";
 
   const content = await getPageContentServer("GOVERNANCE", language);
-
-  metadata.title = "Governance";
-  metadata.description = "Governance";
 
   return (
     <PageContentProvider

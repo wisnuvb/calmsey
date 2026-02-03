@@ -4,8 +4,31 @@ import {
   OtherCaseStudiesSection,
 } from "@/components/main";
 import React from "react";
+import { Metadata } from "next";
 
-const CaseStudyDetailPage = () => {
+interface CaseStudyPageProps {
+  params: Promise<{ lang: string; id: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: CaseStudyPageProps): Promise<Metadata> {
+  const { lang, id } = await params;
+  return {
+    title: "Case Study - Turning Tides Facility",
+    description: "Case Study Detail",
+    alternates: {
+      canonical: `/${lang}/case-study/${id}`,
+      languages: {
+        en: `/en/case-study/${id}`,
+        id: `/id/case-study/${id}`,
+      },
+    },
+  };
+}
+
+const CaseStudyDetailPage = async ({ params }: CaseStudyPageProps) => {
+  await params;
   return (
     <>
       <HeroSection

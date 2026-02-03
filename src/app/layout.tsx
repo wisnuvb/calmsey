@@ -1,7 +1,9 @@
+// @ts-expect-error: Next.js expects the metadata object to be statically analyzable
+import "./globals.css";
+
 import { SimpleFontLoader } from "@/components/SimpleFontLoader";
 import { ToastProvider } from "@/components/ui/toast";
-
-import "./globals.css";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 export const metadata = {
   title: "Turning Tides Facility",
@@ -24,6 +26,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <SimpleFontLoader />
         <ToastProvider>{children}</ToastProvider>
       </body>
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
     </html>
   );
 }

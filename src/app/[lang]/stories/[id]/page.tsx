@@ -1,4 +1,3 @@
-import { metadata } from "@/app/layout";
 import {
   DetailStoryHeroSection,
   DetailStoryVideoSection,
@@ -12,9 +11,55 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { notFound } from "next/navigation";
 import React from "react";
+import { Metadata } from "next";
+import { metadata } from "@/app/layout";
 
 interface DetailStoryPageProps {
   params: Promise<{ lang: string; id: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: DetailStoryPageProps): Promise<Metadata> {
+  const { lang, id } = await params;
+  const language = lang || "en";
+
+  const article = await prisma.article.findUnique({
+    where: {
+      slug: id,
+      status: "PUBLISHED",
+    },
+    include: {
+      translations: {
+        where: {
+          languageId: language,
+        },
+        take: 1,
+      },
+    },
+  });
+
+  if (!article) {
+    return {
+      title: "Story Not Found",
+    };
+  }
+
+  const translation = article.translations?.[0];
+  const title = translation?.title || article.title;
+  const description = translation?.excerpt || article.excerpt || "";
+
+  return {
+    title: title,
+    description: description,
+    alternates: {
+      canonical: `/${lang}/stories/${id}`,
+      languages: {
+        en: `/en/stories/${id}`,
+        id: `/id/stories/${id}`,
+      },
+    },
+  };
 }
 
 const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
@@ -22,7 +67,9 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
   const language = lang || "en";
 
   // Use STORIES page type or pass empty content if not needed
-  const content = await getPageContentServer("STORIES", language).catch(() => ({}));
+  const content = await getPageContentServer("STORIES", language).catch(
+    () => ({}),
+  );
 
   // Fetch article by slug
   const article = await prisma.article.findUnique({
@@ -109,7 +156,8 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
   }
 
   // Get stored related articles from the database field
-  let storedRelatedArticles: Array<{ id: string; title: string; url: string }> = [];
+  let storedRelatedArticles: Array<{ id: string; title: string; url: string }> =
+    [];
   if (articleWithJson.relatedArticles) {
     try {
       storedRelatedArticles =
@@ -129,29 +177,29 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
     const primaryCategory = article.categories?.[0]?.category;
     const relatedArticlesData = primaryCategory
       ? await prisma.article.findMany({
-        where: {
-          status: "PUBLISHED",
-          publishedAt: { not: null },
-          id: { not: article.id },
-          categories: {
-            some: {
-              categoryId: primaryCategory.id,
+          where: {
+            status: "PUBLISHED",
+            publishedAt: { not: null },
+            id: { not: article.id },
+            categories: {
+              some: {
+                categoryId: primaryCategory.id,
+              },
             },
           },
-        },
-        include: {
-          translations: {
-            where: {
-              languageId: language,
+          include: {
+            translations: {
+              where: {
+                languageId: language,
+              },
+              take: 1,
             },
-            take: 1,
           },
-        },
-        orderBy: {
-          publishedAt: "desc",
-        },
-        take: 3,
-      })
+          orderBy: {
+            publishedAt: "desc",
+          },
+          take: 3,
+        })
       : [];
 
     relatedArticles = relatedArticlesData.map((related) => {
@@ -195,7 +243,7 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
       <DetailStoryHeroSection
         title={storyData.title}
         date={storyData.date}
-        backgroundImage="/assets/cover-stories.webp"//{storyData.backgroundImage}
+        backgroundImage="/assets/cover-stories.webp" //{storyData.backgroundImage}
       />
       <DetailStoryVideoSection
         videoUrl={storyData.videoUrl}

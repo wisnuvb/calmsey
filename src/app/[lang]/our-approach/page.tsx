@@ -7,9 +7,33 @@ import {
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
 import React from "react";
+import { Metadata } from "next";
 
 interface OurApproachPageProps {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: OurApproachPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    title:
+      lang === "id"
+        ? "Pendekatan Kami - Turning Tides Facility"
+        : "Our Approach - Turning Tides Facility",
+    description:
+      lang === "id"
+        ? "Pendekatan Turning Tides Facility"
+        : "Our Approach - Turning Tides Facility",
+    alternates: {
+      canonical: `/${lang}/our-approach`,
+      languages: {
+        en: "/en/our-approach",
+        id: "/id/our-approach",
+      },
+    },
+  };
 }
 
 const OurApproachPage = async ({ params }: OurApproachPageProps) => {

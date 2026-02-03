@@ -12,9 +12,33 @@ import {
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
 import React from "react";
+import { Metadata } from "next";
 
 interface AboutUsPageProps {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: AboutUsPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    title:
+      lang === "id"
+        ? "Tentang Kami - Turning Tides Facility"
+        : "About Us - Turning Tides Facility",
+    description:
+      lang === "id"
+        ? "Tentang Turning Tides Facility"
+        : "About Turning Tides Facility",
+    alternates: {
+      canonical: `/${lang}/about-us`,
+      languages: {
+        en: "/en/about-us",
+        id: "/id/about-us",
+      },
+    },
+  };
 }
 
 const AboutUsPage = async ({ params }: AboutUsPageProps) => {

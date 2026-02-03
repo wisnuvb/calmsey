@@ -7,9 +7,33 @@ import {
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
 import React from "react";
+import { Metadata } from "next";
 
 interface OurWorkPageProps {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: OurWorkPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    title:
+      lang === "id"
+        ? "Pekerjaan Kami - Turning Tides Facility"
+        : "Our Work - Turning Tides Facility",
+    description:
+      lang === "id"
+        ? "Pekerjaan Turning Tides Facility"
+        : "Our Work - Turning Tides Facility",
+    alternates: {
+      canonical: `/${lang}/our-work`,
+      languages: {
+        en: "/en/our-work",
+        id: "/id/our-work",
+      },
+    },
+  };
 }
 
 const OurWorkPage = async ({ params }: OurWorkPageProps) => {

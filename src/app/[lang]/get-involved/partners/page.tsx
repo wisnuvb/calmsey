@@ -7,8 +7,37 @@ import {
   PotentialPartnersSection,
 } from "@/components/main";
 import React from "react";
+import { Metadata } from "next";
 
-const PartnersPage = () => {
+interface PageProps {
+  params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    title:
+      lang === "id"
+        ? "Mitra Kami - Turning Tides Facility"
+        : "Our Partners - Turning Tides Facility",
+    description:
+      lang === "id"
+        ? "Mitra Turning Tides Facility"
+        : "Partners of Turning Tides Facility",
+    alternates: {
+      canonical: `/${lang}/get-involved/partners`,
+      languages: {
+        en: "/en/get-involved/partners",
+        id: "/id/get-involved/partners",
+      },
+    },
+  };
+}
+
+const PartnersPage = async ({ params }: PageProps) => {
+  await params;
   return (
     <>
       <HeroSection

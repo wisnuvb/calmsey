@@ -7,9 +7,33 @@ import {
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
 import React from "react";
+import { Metadata } from "next";
 
 interface OurFundPageProps {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: OurFundPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    title:
+      lang === "id"
+        ? "Dana Kami - Turning Tides Facility"
+        : "Our Funds - Turning Tides Facility",
+    description:
+      lang === "id"
+        ? "Dana Turning Tides Facility"
+        : "Our Funds - Turning Tides Facility",
+    alternates: {
+      canonical: `/${lang}/our-fund`,
+      languages: {
+        en: "/en/our-fund",
+        id: "/id/our-fund",
+      },
+    },
+  };
 }
 
 const OurFundPage = async ({ params }: OurFundPageProps) => {

@@ -8,9 +8,31 @@ import {
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
 import { getStories, getStoriesCategories } from "@/lib/stories";
+import { Metadata } from "next";
 
 interface StoriesPageProps {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: StoriesPageProps): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    title:
+      lang === "id"
+        ? "Cerita - Turning Tides Facility"
+        : "Stories - Turning Tides Facility",
+    description:
+      lang === "id" ? "Cerita dari Mitra Kami" : "Stories From Our Partners",
+    alternates: {
+      canonical: `/${lang}/stories`,
+      languages: {
+        en: "/en/stories",
+        id: "/id/stories",
+      },
+    },
+  };
 }
 
 const StoriesPage = async ({ params }: StoriesPageProps) => {
