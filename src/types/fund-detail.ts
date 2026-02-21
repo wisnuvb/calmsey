@@ -1,4 +1,4 @@
-export type IconType = "check" | "x" | "arrow" | "file-pdf";
+export type IconType = "check" | "x" | "arrow" | "file-pdf" | "arrow-external";
 
 export type CTAType = "button" | "pdf-download" | "link";
 
@@ -59,12 +59,28 @@ export interface CTA {
   style: "primary" | "secondary" | "outline";
 }
 
+export interface HowToApplySection {
+  heading: string;
+  content: string[];
+  cta?: CTA;
+}
+
 export interface SupportedUnsupportedContent {
   type: "supported-unsupported";
   intro: string[];
+  supportedMainHeading?: string;
   supportedSection: SupportedSection;
   unsupportedSection: UnsupportedSection;
-  cta: CTA;
+  unsupportedConcluding?: string[];
+  howToApplySection?: HowToApplySection;
+  cta?: CTA;
+}
+
+export interface ActionPlanItem {
+  number: string;
+  title: string;
+  status: "link" | "in-development";
+  link?: string;
 }
 
 export interface PartnersWillContent {
@@ -87,6 +103,8 @@ export interface CustomSection {
   title?: string;
   content?: string | string[];
   items?: CustomSectionItem[];
+  sectionType?: "default" | "action-plans";
+  actionPlanItems?: ActionPlanItem[];
 }
 
 export interface CustomContent {

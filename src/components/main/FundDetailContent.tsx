@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, X, FileText, Download } from "lucide-react";
+import { CheckCircle2, X, FileText, Download, ArrowUpRight } from "lucide-react";
 import { H3, P } from "../ui/typography";
 import type { FundContent } from "@/types/fund-detail";
 import { cn } from "@/lib/utils";
@@ -53,25 +53,51 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
     }
 
     if (cta.type === "button") {
-      return (
-        <Link
-          href={cta.link || "#"}
-          className={cn(
-            baseButtonClasses,
-            cta.style === "primary"
-              ? "bg-[#3C62ED] text-white hover:bg-[#2d4fd6]"
-              : cta.style === "secondary"
-              ? "bg-gray-100 text-gray-900 hover:bg-gray-200"
-              : "bg-white border border-gray-300 text-gray-900 hover:bg-gray-50"
-          )}
-        >
+      const isExternal = cta.link?.startsWith("http") ?? false;
+      const showArrow = cta.icon === "arrow" || cta.icon === "arrow-external" || isExternal;
+      const buttonContent = (
+        <>
           {cta.text}
+          {showArrow && <ArrowUpRight className="w-5 h-5" />}
+        </>
+      );
+      const buttonClasses = cn(
+        baseButtonClasses,
+        cta.style === "primary"
+          ? "bg-[#3C62ED] text-white hover:bg-[#2d4fd6]"
+          : cta.style === "secondary"
+          ? "bg-gray-100 text-gray-900 hover:bg-gray-200"
+          : "bg-white border border-gray-300 text-gray-900 hover:bg-gray-50"
+      );
+      if (isExternal && cta.link) {
+        return (
+          <a
+            href={cta.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonClasses}
+          >
+            {buttonContent}
+          </a>
+        );
+      }
+      return (
+        <Link href={cta.link || "#"} className={buttonClasses}>
+          {buttonContent}
         </Link>
       );
     }
 
     return null;
   };
+
+  const renderParagraphWithHtml = (text: string, key?: string) => (
+    <div
+      key={key}
+      className="text-[#060726CC] text-lg leading-relaxed font-work-sans [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
+      dangerouslySetInnerHTML={{ __html: text }}
+    />
+  );
 
   // Render based on content type
   if (content.type === "supported-unsupported") {
@@ -92,9 +118,17 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
 
             {/* Supported Section */}
             <div className="space-y-6">
+              {content.supportedMainHeading && (
+                <H3
+                  style="h3bold"
+                  className="text-[#010107] text-2xl font-bold font-nunito-sans mb-2"
+                >
+                  {content.supportedMainHeading}
+                </H3>
+              )}
               <H3
                 style="h3bold"
-                className="text-[#010107] text-2xl font-bold font-nunito-sans mb-6"
+                className="text-[#010107] text-xl font-bold font-nunito-sans mb-6"
               >
                 {content.supportedSection.title}
               </H3>
@@ -141,10 +175,43 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                   </li>
                 ))}
               </ul>
+              {content.unsupportedConcluding?.map((paragraph, index) => (
+                <P
+                  key={index}
+                  style="p1reg"
+                  className="text-[#060726CC] leading-relaxed font-work-sans"
+                >
+                  {paragraph}
+                </P>
+              ))}
             </div>
 
-            {/* CTA */}
-            {content.cta && (
+            {/* How to Apply Section */}
+            {content.howToApplySection && (
+              <div className="space-y-6">
+                <H3
+                  style="h3bold"
+                  className="text-[#010107] text-2xl font-bold font-nunito-sans mb-6"
+                >
+                  {content.howToApplySection.heading}
+                </H3>
+                {content.howToApplySection.content.map((paragraph, index) => (
+                  <P
+                    key={index}
+                    style="p1reg"
+                    className="text-[#060726CC] text-lg leading-relaxed font-work-sans"
+                  >
+                    {paragraph}
+                  </P>
+                ))}
+                {content.howToApplySection.cta && (
+                  <div className="pt-2">{renderCTA(content.howToApplySection.cta)}</div>
+                )}
+              </div>
+            )}
+
+            {/* CTA (fallback if no how to apply) */}
+            {content.cta && !content.howToApplySection && (
               <div className="pt-6">{renderCTA(content.cta)}</div>
             )}
           </div>
@@ -213,6 +280,8 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
     );
   }
 
+  const hasHtml = (text: string) => /<a\s|<\/a>|<[a-z][\s\S]*>/i.test(text);
+
   if (content.type === "custom") {
     return (
       <section className="bg-white py-12 lg:py-16">
@@ -232,15 +301,21 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                 {section.content && (
                   <div className="space-y-4">
                     {Array.isArray(section.content) ? (
-                      section.content.map((para, index) => (
-                        <P
-                          key={index}
-                          style="p1reg"
-                          className="text-[#060726CC] text-lg leading-relaxed font-work-sans"
-                        >
-                          {para}
-                        </P>
-                      ))
+                      section.content.map((para, index) =>
+                        hasHtml(para) ? (
+                          renderParagraphWithHtml(para, `content-${index}`)
+                        ) : (
+                          <P
+                            key={index}
+                            style="p1reg"
+                            className="text-[#060726CC] text-lg leading-relaxed font-work-sans"
+                          >
+                            {para}
+                          </P>
+                        )
+                      )
+                    ) : hasHtml(section.content) ? (
+                      renderParagraphWithHtml(section.content)
                     ) : (
                       <P
                         style="p1reg"
@@ -252,7 +327,36 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                   </div>
                 )}
 
-                {section.items && (
+                {section.sectionType === "action-plans" && section.actionPlanItems && (
+                  <ol className="space-y-4 list-none">
+                    {section.actionPlanItems.map((item) => (
+                      <li
+                        key={item.number}
+                        className="flex items-center justify-between gap-4 flex-wrap"
+                      >
+                        <span className="font-nunito-sans font-semibold text-[#010107]">
+                          {item.number} {item.title}:
+                        </span>
+                        {item.status === "link" && item.link ? (
+                          <a
+                            href={item.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-4 py-2 rounded-md bg-[#3C62ED] text-white text-sm font-medium hover:bg-[#2d4fd6] transition-colors"
+                          >
+                            Hyperlink to public version
+                          </a>
+                        ) : (
+                          <span className="inline-flex items-center px-4 py-2 rounded-md bg-gray-200 text-gray-700 text-sm font-medium">
+                            In Development via Engagement phase
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                )}
+
+                {section.items && !section.actionPlanItems && (
                   <ul className="space-y-4">
                     {section.items.map((item) => (
                       <li key={item.id} className="flex items-start gap-4">

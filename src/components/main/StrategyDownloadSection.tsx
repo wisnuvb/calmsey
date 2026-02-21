@@ -161,7 +161,7 @@ export function StrategyDownloadSection({
             <a
               href={learnMoreButtonUrl.startsWith("/") ? `/${currentLanguage}${learnMoreButtonUrl}` : learnMoreButtonUrl}
               className="py-5 px-8 border border-white rounded w-full sm:w-[310px] text-white hover:bg-white/10 transition-colors text-center"
-              aria-label={`Learn more about ${learnMoreButtonText}`}
+              aria-label={learnMoreButtonText}
             >
               {learnMoreButtonText}
             </a>

@@ -187,15 +187,13 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
                     dangerouslySetInnerHTML={{ __html: fund.description }}
                   />
                 </div>
-                {fund.id !== "rapid-response-fund" && (
-                  <Link
-                    href={fund.learnMoreLink}
-                    className="inline-flex items-center gap-2 px-8 py-5 bg-white border border-gray-300 text-[#3C62ED] rounded-md hover:bg-gray-50 transition-colors duration-300 font-normal w-fit mt-2 text-base"
-                  >
-                    <span>Learn More</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                )}
+                <Link
+                  href={fund.learnMoreLink}
+                  className="inline-flex items-center gap-2 px-8 py-5 bg-white border border-gray-300 text-[#3C62ED] rounded-md hover:bg-gray-50 transition-colors duration-300 font-normal w-fit mt-2 text-base"
+                >
+                  <span>Learn More</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </div>
           ))}

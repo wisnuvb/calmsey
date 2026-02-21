@@ -251,6 +251,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={`/${language}${link.href}`}
+                aria-label={`Go to ${link.label} page`}
                 className={cn(
                   "transition-colors duration-300 text-base font-normal",
                   isHomePage

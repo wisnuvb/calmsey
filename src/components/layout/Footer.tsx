@@ -68,7 +68,7 @@ export function Footer() {
           links: [
             {
               id: "6",
-              label: "4 Supported Funds",
+              label: "Our Funds",
               href: "/our-fund",
               target: "SELF",
             },
@@ -78,7 +78,7 @@ export function Footer() {
               href: "/governance",
               target: "SELF",
             },
-            { id: "8", label: "Partners", href: "/our-fund", target: "SELF" },
+            { id: "8", label: "Partners", href: "/get-involved/partners", target: "SELF" },
           ],
         },
         {

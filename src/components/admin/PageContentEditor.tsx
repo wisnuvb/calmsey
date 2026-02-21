@@ -80,7 +80,25 @@ export function PageContentEditor({
       );
       if (response.ok) {
         const data = await response.json();
-        setContent(data.content || {});
+        let contentData = data.content || {};
+
+        // Hydrate empty multiple fields with schema defaults (e.g. "[]" -> defaultValue)
+        if (schema) {
+          schema.fields.forEach((field) => {
+            if (field.type === "multiple" && field.defaultValue) {
+              const value = contentData[field.key] ?? "";
+              const trimmed = (value || "").trim();
+              if (!trimmed || trimmed === "[]") {
+                contentData = {
+                  ...contentData,
+                  [field.key]: field.defaultValue,
+                };
+              }
+            }
+          });
+        }
+
+        setContent(contentData);
       }
     } catch (error) {
       console.error("Error fetching content:", error);
@@ -209,7 +227,18 @@ export function PageContentEditor({
   };
 
   const renderField = (field: FieldDefinition) => {
-    const value = content[field.key] || field.defaultValue || "";
+    let value = content[field.key] ?? "";
+    // For multiple fields: use defaultValue when stored value is empty array "[]"
+    if (field.type === "multiple" && field.defaultValue) {
+      const trimmed = (value || "").trim();
+      if (!trimmed || trimmed === "[]") {
+        value = field.defaultValue;
+      }
+    }
+    if (!value && field.defaultValue) {
+      value = field.defaultValue;
+    }
+    value = value || "";
     const error = errors[field.key];
 
     const handleFieldChange = (newValue: string) => {

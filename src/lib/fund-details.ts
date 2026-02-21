@@ -1,5 +1,6 @@
-import type { FundDetail, FundContent, SupportedUnsupportedContent, PartnersWillContent, CustomContent, CTA, IconType, CTAType } from "@/types/fund-detail";
+import type { FundDetail, FundContent, SupportedUnsupportedContent, PartnersWillContent, CustomContent, CTA, IconType, CTAType, HowToApplySection, ActionPlanItem } from "@/types/fund-detail";
 import { getPageContentServer } from "@/lib/page-content-server";
+import { getPageSchema } from "@/lib/page-content-schema";
 
 /**
  * Fund Details Data Structure
@@ -99,9 +100,49 @@ function transformFundData(fund: Record<string, unknown>): FundDetail | null {
         }
         : undefined;
 
+      // Parse unsupported concluding paragraphs
+      const unsupportedConcluding: string[] = [];
+      if (fund.unsupportedConcluding && typeof fund.unsupportedConcluding === "string") {
+        unsupportedConcluding.push(
+          ...fund.unsupportedConcluding
+            .split(/\n\s*\n/)
+            .map((p: string) => p.trim())
+            .filter((p: string) => p.length > 0)
+        );
+      }
+
+      // Parse how to apply section
+      let howToApplySection: HowToApplySection | undefined;
+      if (fund.howToApplyHeading && typeof fund.howToApplyHeading === "string") {
+        const howToApplyContent: string[] = [];
+        if (fund.howToApplyContent && typeof fund.howToApplyContent === "string") {
+          howToApplyContent.push(
+            ...fund.howToApplyContent
+              .split(/\n\s*\n/)
+              .map((p: string) => p.trim())
+              .filter((p: string) => p.length > 0)
+          );
+        }
+        howToApplySection = {
+          heading: String(fund.howToApplyHeading),
+          content: howToApplyContent,
+          cta:
+            fund.howToApplyCtaType && fund.howToApplyCtaText
+              ? {
+                  type: (fund.howToApplyCtaType as CTAType) || "button",
+                  text: String(fund.howToApplyCtaText),
+                  link: fund.howToApplyCtaLink ? String(fund.howToApplyCtaLink) : undefined,
+                  icon: "arrow-external" as IconType,
+                  style: "primary",
+                }
+              : undefined,
+        };
+      }
+
       fundContent = {
         type: "supported-unsupported",
         intro,
+        supportedMainHeading: fund.supportedMainHeading ? String(fund.supportedMainHeading) : undefined,
         supportedSection: {
           title: String(fund.supportedSectionTitle || ""),
           items: supportedItems,
@@ -110,6 +151,8 @@ function transformFundData(fund: Record<string, unknown>): FundDetail | null {
           title: String(fund.unsupportedSectionTitle || ""),
           items: unsupportedItems,
         },
+        unsupportedConcluding: unsupportedConcluding.length > 0 ? unsupportedConcluding : undefined,
+        howToApplySection,
         cta,
       } as SupportedUnsupportedContent;
     } else if (contentType === "partners-will") {
@@ -161,7 +204,7 @@ function transformFundData(fund: Record<string, unknown>): FundDetail | null {
       } as PartnersWillContent;
     } else if (contentType === "custom") {
       // Parse custom sections
-      const sections: Array<{ id: string; title?: string; content?: string | string[]; items?: Array<{ id: string; icon?: IconType; title?: string; description: string }> }> = [];
+      const sections: Array<{ id: string; title?: string; content?: string | string[]; items?: Array<{ id: string; icon?: IconType; title?: string; description: string }>; sectionType?: string; actionPlanItems?: ActionPlanItem[] }> = [];
       if (fund.customSections && typeof fund.customSections === "string") {
         try {
           const parsed = JSON.parse(fund.customSections);
@@ -190,11 +233,28 @@ function transformFundData(fund: Record<string, unknown>): FundDetail | null {
                 }
               }
 
+              // Parse action plan items (for sectionType "action-plans")
+              let actionPlanItems: ActionPlanItem[] | undefined;
+              if (section.actionPlanItems) {
+                try {
+                  const parsed = typeof section.actionPlanItems === "string"
+                    ? JSON.parse(section.actionPlanItems)
+                    : section.actionPlanItems;
+                  if (Array.isArray(parsed)) {
+                    actionPlanItems = parsed;
+                  }
+                } catch {
+                  // Skip invalid JSON
+                }
+              }
+
               sections.push({
                 id: section.id as string,
                 title: (section.title as string) || undefined,
                 content: sectionContent,
                 items: sectionItems.length > 0 ? sectionItems : undefined,
+                sectionType: (section.sectionType as string) || undefined,
+                actionPlanItems,
               });
             }
           }
@@ -243,6 +303,25 @@ function transformFundData(fund: Record<string, unknown>): FundDetail | null {
  * 2. Legacy JSON format: fundDetails.funds with header/content as JSON strings
  * 3. Legacy flat format: fund.{slug}.header and fund.{slug}.content (flat keys)
  */
+/**
+ * Get effective fund details JSON - use schema default when DB has empty array
+ */
+function getEffectiveFundDetailsJson(
+  content: Record<string, string>,
+  fundDetailsKey: string
+): string {
+  let json = content[fundDetailsKey] ?? "";
+  const trimmed = (json || "").trim();
+  if (!trimmed || trimmed === "[]") {
+    const schema = getPageSchema("OUR_FUND");
+    const field = schema?.fields.find((f) => f.key === fundDetailsKey);
+    if (field?.defaultValue) {
+      json = field.defaultValue;
+    }
+  }
+  return json;
+}
+
 export async function getFundDetailBySlug(
   slug: string,
   language: string = "en"
@@ -252,7 +331,7 @@ export async function getFundDetailBySlug(
 
     // Try new structured format first: fundDetails.funds (multiple field with individual fields)
     const fundDetailsKey = "fundDetails.funds";
-    const fundDetailsJson = content[fundDetailsKey];
+    const fundDetailsJson = getEffectiveFundDetailsJson(content, fundDetailsKey);
 
     if (fundDetailsJson) {
       try {
@@ -340,7 +419,7 @@ export async function getAllFundDetails(
 
     // Try new format first: fundDetails.funds (multiple field)
     const fundDetailsKey = "fundDetails.funds";
-    const fundDetailsJson = content[fundDetailsKey];
+    const fundDetailsJson = getEffectiveFundDetailsJson(content, fundDetailsKey);
 
     if (fundDetailsJson) {
       try {

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { H3, H5, P } from "@/components/ui/typography";
+import { H3, H4, P } from "@/components/ui/typography";
 import { Play, MapPin, Calendar } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { getImageUrl } from "@/lib/utils";
@@ -224,13 +224,13 @@ export const LatestStoriesSection: React.FC<LatestStoriesSectionProps> = ({
 
                 {/* Content */}
                 <div className="p-6">
-                  {/* Title */}
-                  <H5
+                  {/* Title - H4 for WCAG hierarchy (h3 Latest Stories → h4 card titles) */}
+                  <H4
                     style="h5bold"
                     className="text-[#010107] mb-4 font-nunito-sans leading-tight"
                   >
                     {story.title}
-                  </H5>
+                  </H4>
 
                   {/* Description */}
                   <P

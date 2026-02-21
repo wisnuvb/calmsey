@@ -79,7 +79,7 @@ export function FundersSection({
   const buttonText = getValue(
     "funders.buttonText",
     propButtonText,
-    "Become Funder"
+    "Get Involved"
   );
   const buttonLink = getValue(
     "funders.buttonLink",

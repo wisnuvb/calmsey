@@ -91,9 +91,9 @@ export function FeedbackCalloutSection({
             <a
               href={learnMoreLink}
               className="inline-flex items-center justify-center gap-3 border border-white/80 text-white px-6 py-5 rounded-lg hover:bg-white/10 transition-colors duration-200 w-full sm:w-[231px]"
-              aria-label={`Learn more about ${title}`}
+              aria-label={feedbackLink === learnMoreLink ? undefined : `Learn more about ${title}`}
             >
-              {learnMoreText}
+              {feedbackLink === learnMoreLink ? feedbackText : (learnMoreText || "Learn More")}
             </a>
           </div>
         </div>

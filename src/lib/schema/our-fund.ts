@@ -451,7 +451,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
               "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
             imageAlt: "People drying fish on racks",
             icon: "Waves",
-            learnMoreLink: "/funds/grassroot",
+            learnMoreLink: "/our-fund/grassroot",
             imagePosition: "left",
           },
           {
@@ -853,6 +853,15 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
         },
         // Supported Section (for supported-unsupported type)
         {
+          key: "supportedMainHeading",
+          label: "Supported Main Heading",
+          type: "text",
+          required: false,
+          placeholder: "What the fund covers",
+          helpText:
+            "Optional main heading before supported section (e.g. 'What the fund covers')",
+        },
+        {
           key: "supportedSectionTitle",
           label: "Supported Section Title",
           type: "text",
@@ -945,6 +954,56 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
             },
           ],
         },
+        {
+          key: "unsupportedConcluding",
+          label: "Unsupported Concluding Paragraphs",
+          type: "textarea",
+          required: false,
+          placeholder: "Funding is available to existing partners...",
+          helpText:
+            "Optional paragraphs after unsupported list (separated by double newline)",
+        },
+        // How to Apply Section (for supported-unsupported type)
+        {
+          key: "howToApplyHeading",
+          label: "How to Apply Heading",
+          type: "text",
+          required: false,
+          placeholder: "How to apply",
+          helpText: "Heading for the how to apply section",
+        },
+        {
+          key: "howToApplyContent",
+          label: "How to Apply Content",
+          type: "textarea",
+          required: false,
+          placeholder: "Please complete this form below...",
+          helpText: "Instructional content for how to apply",
+        },
+        {
+          key: "howToApplyCtaType",
+          label: "How to Apply CTA Type",
+          type: "text",
+          required: false,
+          placeholder: "button",
+          helpText: 'CTA type for how to apply: "button" or "link"',
+        },
+        {
+          key: "howToApplyCtaText",
+          label: "How to Apply CTA Text",
+          type: "text",
+          required: false,
+          placeholder: "Request Funding",
+          helpText: "Button text for how to apply CTA",
+        },
+        {
+          key: "howToApplyCtaLink",
+          label: "How to Apply CTA Link",
+          type: "url",
+          required: false,
+          placeholder: "/our-fund/rapid-response/request",
+          helpText: "URL for how to apply CTA button",
+        },
         // Partners Will Section (for partners-will type)
         {
           key: "partnersWillSectionTitle",
@@ -1014,6 +1073,15 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
               placeholder: "section-1",
             },
             {
+              key: "sectionType",
+              label: "Section Type",
+              type: "text",
+              required: false,
+              placeholder: "default",
+              helpText:
+                'Section type: "default" for standard content, "action-plans" for numbered list with badges',
+            },
+            {
               key: "title",
               label: "Section Title",
               type: "text",
@@ -1026,7 +1094,8 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
               type: "textarea",
               required: false,
               placeholder: "Content paragraph.\n\nAnother paragraph.",
-              helpText: "Content paragraphs (separated by double newline)",
+              helpText:
+                "Content paragraphs (separated by double newline). Supports HTML for links.",
             },
             {
               key: "items",
@@ -1066,6 +1135,15 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
                   placeholder: "Item description",
                 },
               ],
+            },
+            {
+              key: "actionPlanItems",
+              label: "Action Plan Items",
+              type: "textarea",
+              required: false,
+              placeholder: 'JSON array: [{"number":"01","title":"...","status":"link","link":"..."}]',
+              helpText:
+                'For sectionType "action-plans": JSON array of {number, title, status: "link"|"in-development", link?}',
             },
           ],
         },
@@ -1133,7 +1211,8 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
             headerHeroImageAlt: "Traditional boats on calm water",
             contentType: "supported-unsupported",
             intro:
-              "Funding from the Rapid Response Fund will be available to existing partners as well as groups and individuals working directly with them. We will prioritize recipients operating in restricted, high-risk, or rapidly shifting political contexts. In all cases, recipients must demonstrate a commitment to values in line with Turning Tides' commitment to the rights of Indigenous Peoples, local communities, small-scale fishers and fish workers and be actively working for the protection of rights and tenure across oceans, rivers, lakes, coasts, and shorelines.",
+              "The Rapid Response Fund addresses urgent needs, supporting partners and organizations facing threats that require timely support, particularly in contexts of shrinking civic space, political repression, and sudden crises. Through this fund, we can rapidly mobilize funds to support partners in the face of emergent threats.",
+            supportedMainHeading: "What the fund covers",
             supportedSectionTitle:
               "The Rapid Response Fund will support work in the following categories:",
             supportedItems: JSON.stringify(
@@ -1196,10 +1275,14 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
               null,
               2,
             ),
-            ctaType: "button",
-            ctaText: "Request Support",
-            ctaLink: "/our-fund/rapid-response/request",
-            ctaStyle: "primary",
+            unsupportedConcluding:
+              "Funding is available to existing partners as well as groups and individuals working directly with them.",
+            howToApplyHeading: "How to apply",
+            howToApplyContent:
+              "Please complete this form below to request funding. If you are unable to access this form, please provide the information below to your Turning Tides contact. This can be done via email, message, video, phone call, in person or other method. Once we receive your information, we are committed to responding within 1-5 business days, with funding available within two weeks.",
+            howToApplyCtaType: "button",
+            howToApplyCtaText: "Request Funding",
+            howToApplyCtaLink: "/our-fund/rapid-response/request",
           },
           {
             slug: "knowledge-action",
@@ -1266,60 +1349,46 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
                 {
                   id: "intro",
                   content:
-                    "Turning Tides deploys the majority of its resources through the Grassroots Fund supporting actions at regional, national, and local levels. This fund is designed to empower communities, small-scale fishers, fish workers, and Indigenous Peoples in their efforts to secure and strengthen tenure rights.",
+                    'Grassroots Fund Action Plans are influenced by our partners, and are in alignment with Turning Tides\' <a href="/our-approach" class="text-[#3C62ED] underline hover:text-[#2d4fd6]">Theory of Change</a> and <a href="/our-approach" class="text-[#3C62ED] underline hover:text-[#2d4fd6]">grantmaking framework</a>. These funds support on-the-ground efforts and opportunities to move toward tenure security and recognition of rights. Action Plans present a set of priorities and pathways that guide our grantmaking and relationship building over at least five years.',
                 },
                 {
-                  id: "focus-areas",
-                  title: "The Grassroot Fund focuses on:",
-                  items: JSON.stringify(
+                  id: "action-plans",
+                  sectionType: "action-plans",
+                  title:
+                    "Each year Action Plans are reflected upon and improved in with partners.",
+                  actionPlanItems: JSON.stringify(
                     [
                       {
-                        id: "community-led",
-                        icon: "check",
-                        title: "Community-led initiatives",
-                        description:
-                          "Supporting grassroots organizations and community groups working directly with rights holders to advance tenure security.",
+                        number: "01",
+                        title: "Latin America Regional Action Plan",
+                        status: "link",
+                        link: "#",
                       },
                       {
-                        id: "capacity-building",
-                        icon: "check",
-                        title: "Capacity building",
-                        description:
-                          "Strengthening organizational capacity, leadership development, and community organizing skills.",
+                        number: "02",
+                        title: "Africa Action Plan",
+                        status: "link",
+                        link: "#",
                       },
                       {
-                        id: "advocacy",
-                        icon: "check",
-                        title: "Local and national advocacy",
-                        description:
-                          "Supporting advocacy efforts at regional, national, and local levels to influence policy and practice.",
+                        number: "03",
+                        title: "South East Asia Action Plan",
+                        status: "in-development",
                       },
                       {
-                        id: "documentation",
-                        icon: "check",
-                        title: "Tenure documentation",
-                        description:
-                          "Supporting efforts to document, map, and secure recognition of traditional tenure systems.",
+                        number: "04",
+                        title: "South Asia Action Plan",
+                        status: "in-development",
                       },
                     ],
                     null,
                     2,
                   ),
                 },
-                {
-                  id: "approach",
-                  title: "Our Approach",
-                  content:
-                    "The Grassroot Fund operates through flexible, multi-year grants that respond to partners' expressed needs and priorities. We work in close collaboration with partners to ensure funding supports their self-determined goals and strategies for achieving tenure security and rights recognition.",
-                },
               ],
               null,
               2,
             ),
-            ctaType: "button",
-            ctaText: "Learn More",
-            ctaLink: "/our-fund/grassroot",
-            ctaStyle: "primary",
           },
           {
             slug: "civic-space",
@@ -1337,84 +1406,12 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
                 {
                   id: "intro",
                   content:
-                    "We deploy funding to support the self-identified capacity needs of our partners and to, more broadly, protect civic space. Our team will work in close collaboration with partners to identify needs and craft appropriate responses.",
-                },
-                {
-                  id: "capacity-support",
-                  title: "Capacity Support",
-                  items: JSON.stringify(
-                    [
-                      {
-                        id: "organizational-development",
-                        icon: "check",
-                        title: "Organizational development",
-                        description:
-                          "Supporting organizational strengthening, strategic planning, and institutional capacity building.",
-                      },
-                      {
-                        id: "leadership-development",
-                        icon: "check",
-                        title: "Leadership development",
-                        description:
-                          "Investing in leadership training, mentorship, and skills development for rights holders and their organizations.",
-                      },
-                      {
-                        id: "technical-capacity",
-                        icon: "check",
-                        title: "Technical capacity",
-                        description:
-                          "Building technical skills in areas such as legal advocacy, community organizing, financial management, and communications.",
-                      },
-                    ],
-                    null,
-                    2,
-                  ),
-                },
-                {
-                  id: "civic-space-protection",
-                  title: "Civic Space Protection",
-                  items: JSON.stringify(
-                    [
-                      {
-                        id: "advocacy-support",
-                        icon: "check",
-                        title: "Advocacy support",
-                        description:
-                          "Supporting partners' ability to advocate for their rights and interests in increasingly restrictive environments.",
-                      },
-                      {
-                        id: "legal-protection",
-                        icon: "check",
-                        title: "Legal protection",
-                        description:
-                          "Providing resources for legal defense, policy advocacy, and protection of civic space.",
-                      },
-                      {
-                        id: "network-building",
-                        icon: "check",
-                        title: "Network building",
-                        description:
-                          "Supporting coalition building and network strengthening to amplify voices and increase collective power.",
-                      },
-                    ],
-                    null,
-                    2,
-                  ),
-                },
-                {
-                  id: "approach",
-                  title: "Our Approach",
-                  content:
-                    "The Civic Space and Capacity Fund responds directly to partners' self-identified needs. We work collaboratively to understand capacity gaps and develop tailored support that strengthens partners' ability to achieve their goals while protecting the space in which they operate.",
+                    "Turning Tides acknowledges that a strong civil society - made up of leaders, organizations, networks and movements - is integral to our vision. Investing in the institutional and leadership strengths of partners to ensure they have the capacities to undertake their stated work, is critical to advancing our shared goals. Additionally, progress toward shared goals is constrained by underdeveloped and underfunded civil society infrastructure and threatened civic space.\n\nTurning Tides is committed to investing in the strength and resilience of our partners, through organizational strengthening and leadership development, supporting solidarity through movements and networks, and supporting safe and thriving spaces for our partners to operate.",
                 },
               ],
               null,
               2,
             ),
-            ctaType: "button",
-            ctaText: "Learn More",
-            ctaLink: "/our-fund/civic-space",
-            ctaStyle: "primary",
           },
         ],
         null,

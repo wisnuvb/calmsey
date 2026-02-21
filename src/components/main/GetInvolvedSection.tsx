@@ -308,7 +308,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
           Supporting rights and tenure of local communities, small scale
           fishers, fish workers, and Indigenous Peoples.
         </p>
-        <p className="text-base text-white/80 font-normal font-work-sans max-w-[697px]">
+        <p className="text-base text-white font-normal font-work-sans max-w-[697px]">
           If you are a group, organization, or collective that represents or
           directly serves local communities, small-scale fishers or fish
           workers, or Indigenous Peoples,{" "}

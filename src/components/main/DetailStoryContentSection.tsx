@@ -143,12 +143,12 @@ export function DetailStoryContentSection({
                     country) && (
                     <div className="bg-gray-50 border border-[#D7E4EF] p-6 sm:p-11 rounded-lg">
                       <div className="space-y-3">
-                        <H3
+                        <H2
                           style="h5bold"
                           className="text-[#010107] font-semibold text-xs leading-[150%] tracking-normal uppercase"
                         >
                           Partner Organization
-                        </H3>
+                        </H2>
                         {partnerOrganization.logo && (
                           <Image
                             src={getImageUrl(partnerOrganization.logo)}
@@ -244,12 +244,12 @@ export function DetailStoryContentSection({
           >
             {/* Description */}
             <div>
-              <H4
+              <H2
                 style="h5bold"
                 className="text-[#010107] font-nunito-sans mb-6"
               >
                 Description
-              </H4>
+              </H2>
               <P style="p1reg" className="text-[#060726CC] leading-relaxed">
                 {description}
               </P>
@@ -308,9 +308,9 @@ export function DetailStoryContentSection({
             {/* Related Articles */}
             {relatedArticlesList.length > 0 && (
               <div>
-                <H4 style="h5bold" className="text-[#010107] mb-6">
+                <H2 style="h5bold" className="text-[#010107] mb-6">
                   Related links about this story
-                </H4>
+                </H2>
                 <div className="space-y-4">
                   {relatedArticlesList.map((article) => (
                     <a

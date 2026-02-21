@@ -627,7 +627,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       label: "Button Text",
       type: "text",
       section: "Funders",
-      defaultValue: "Become Funder",
+      defaultValue: "Get Involved",
       helpText: "Text displayed on the CTA button",
     },
     {
