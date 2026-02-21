@@ -10,7 +10,7 @@ import {
   ChevronRight,
   Forward,
 } from "lucide-react";
-import { H2, H3, H5, P } from "../ui/typography";
+import { H2, H3, H4, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import { shareContent } from "@/lib/share-utils";
 import Image from "next/image";
@@ -160,7 +160,7 @@ export function DetailStoryContentSection({
                             className="rounded"
                           />
                         )}
-                        <p className="font-work-sans font-normal text-base text-[#06072680]">
+                        <p className="font-work-sans font-normal text-base text-[#060726CC]">
                           {partnerOrganization.name}
                         </p>
                       </div>
@@ -244,12 +244,12 @@ export function DetailStoryContentSection({
           >
             {/* Description */}
             <div>
-              <H5
+              <H4
                 style="h5bold"
                 className="text-[#010107] font-nunito-sans mb-6"
               >
                 Description
-              </H5>
+              </H4>
               <P style="p1reg" className="text-[#060726CC] leading-relaxed">
                 {description}
               </P>
@@ -308,9 +308,9 @@ export function DetailStoryContentSection({
             {/* Related Articles */}
             {relatedArticlesList.length > 0 && (
               <div>
-                <H5 style="h5bold" className="text-[#010107] mb-6">
+                <H4 style="h5bold" className="text-[#010107] mb-6">
                   Related links about this story
-                </H5>
+                </H4>
                 <div className="space-y-4">
                   {relatedArticlesList.map((article) => (
                     <a

@@ -106,14 +106,14 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
   funds: propFunds,
   className,
 }) => {
-  const { getValue, getContentJSON } = usePageContentHelpers()
+  const { getValue, getContentJSON } = usePageContentHelpers();
 
   // Get all values with priority: context > props > default
   const title = getValue("fourFunds.title", propTitle, "Our Four Funds");
   const description = getValue(
     "fourFunds.description",
     propDescription,
-    "Turning Tides supports partners through four interacting funds, each of which supports different pathways toward change. Each fund is governed separately to increase responsiveness to partners' expressed needs and opportunities to create change."
+    "Turning Tides supports partners through four interacting funds, each of which supports different pathways toward change. Each fund is governed separately to increase responsiveness to partners' expressed needs and opportunities to create change.",
   );
 
   // Get funds with priority: context > props > default
@@ -157,7 +157,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
                 "flex flex-col items-start gap-6 sm:gap-16",
                 fund.imagePosition === "left"
                   ? "lg:flex-row"
-                  : "lg:flex-row-reverse"
+                  : "lg:flex-row-reverse",
               )}
             >
               {/* Image */}
@@ -182,14 +182,12 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
                   <h3 className="text-2xl sm:text-[32px] leading-[120%] tracking-normal font-bold font-nunito-sans text-[#3C62ED]">
                     {fund.title}
                   </h3>
-                  <P
-                    style="p1reg"
+                  <p
                     className="text-[#060726CC] text-base font-normal leading-relaxed"
-                  >
-                    {fund.description}
-                  </P>
+                    dangerouslySetInnerHTML={{ __html: fund.description }}
+                  />
                 </div>
-                {fund.id !== 'rapid-response-fund' &&
+                {fund.id !== "rapid-response-fund" && (
                   <Link
                     href={fund.learnMoreLink}
                     className="inline-flex items-center gap-2 px-8 py-5 bg-white border border-gray-300 text-[#3C62ED] rounded-md hover:bg-gray-50 transition-colors duration-300 font-normal w-fit mt-2 text-base"
@@ -197,7 +195,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
                     <span>Learn More</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
-                }
+                )}
               </div>
             </div>
           ))}

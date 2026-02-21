@@ -61,7 +61,7 @@ const HomePage = async ({ params }: HomePageProps) => {
         tag="COMMUNITY ECHOES"
         title="Stories From Our Partners"
         description="Turning Tides engages with a diversity of partners"
-        buttonText="All Stories"
+        buttonText="Partner Stories"
         buttonUrl="/stories"
         backgroundColor="blue"
       />

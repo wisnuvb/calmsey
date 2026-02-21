@@ -68,8 +68,6 @@ export default async function DetailOurFundPage({ params }: PageProps) {
     notFound();
   }
 
-  console.log(`Fund found: ${fund.id} - ${fund.header.title}`);
-
   return (
     <>
       <FundDetailHeader header={fund.header} />

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Download, X } from "lucide-react";
 import Image from "next/image";
-import { H2, H6, P } from "../ui/typography";
+import { H2, H3, P } from "../ui/typography";
 import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { useLanguage } from "../public/LanguageProvider";
@@ -218,9 +218,9 @@ export function OurGoalSection({
               />
 
               <div className="space-y-3">
-                <H6 style="h6bold" className="text-[#3C62ED]">
+                <H3 style="h6bold" className="text-[#3C62ED]">
                   {strategyTitle}
-                </H6>
+                </H3>
 
                 <P style="p1reg" className="text-[#06072680] leading-[150%]">
                   {strategyDescription}

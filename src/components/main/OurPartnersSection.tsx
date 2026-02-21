@@ -183,7 +183,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
         </div>
 
         {/* Partners Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-8 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 justify-items-center items-center gap-8 mb-12">
           {partners.map((partner) => (
             <div
               key={partner.id}
@@ -194,7 +194,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full h-20 flex items-center justify-center"
-                aria-label={`Visit ${partner.name} website`}
+                aria-label={`Visit ${partner.name} website (opens in a new tab)`}
               >
                 <Image
                   src={getImageUrl(partner.logo)}

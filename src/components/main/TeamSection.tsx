@@ -130,22 +130,22 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
         {/* Team Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {currentMembers.map((member) => (
-            <div
-              key={member.id}
-              className="text-left cursor-pointer"
-              role="button"
-              tabIndex={0}
-              onClick={() => setSelectedMember(member)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  setSelectedMember(member);
-                }
-              }}
-            >
-              {/* Photo with LinkedIn Icon */}
-              <div className="relative inline-block mb-4 w-full max-w-[250px] mx-auto">
-                <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-200">
+            <div key={member.id} className="text-left">
+              {/* Photo with LinkedIn Icon - LinkedIn link is sibling to avoid nested interactive elements */}
+              <div className="relative inline-block mb-4 w-full max-w-[250px] mx-auto cursor-pointer">
+                <div
+                  className="relative aspect-square rounded-lg overflow-hidden bg-gray-200"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedMember(member)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedMember(member);
+                    }
+                  }}
+                  aria-label={`View details for ${member.name}`}
+                >
                   <Image
                     src={getImageUrl(member.image)}
                     alt={member.name}
@@ -159,30 +159,44 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
                     }}
                   />
                 </div>
-                {/* LinkedIn Icon Overlay */}
                 {member.linkedinUrl && (
                   <a
                     href={member.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="absolute bottom-2 left-2 w-8 h-8 bg-[#0077B5] rounded flex items-center justify-center hover:bg-[#005885] transition-colors shadow-md"
-                    aria-label={`View LinkedIn profile of ${member.name}`}
+                    className="absolute bottom-2 left-2 w-8 h-8 bg-[#0077B5] rounded flex items-center justify-center hover:bg-[#005885] transition-colors shadow-md z-10"
+                    aria-label={`View LinkedIn profile of ${member.name} (opens in a new tab)`}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <FaLinkedin className="w-4 h-4 text-white" />
                   </a>
                 )}
               </div>
 
-              {/* Member Info */}
-              <h3 className="text-xl font-bold text-[#010107] mb-3 font-nunito-sans leading-[140%] tracking-normal">
-                {member.name}
-              </h3>
+              {/* Member Info - clickable to open modal */}
+              <div
+                className="cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedMember(member)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedMember(member);
+                  }
+                }}
+                aria-label={`View details for ${member.name}`}
+              >
+                <h3 className="text-xl font-bold text-[#010107] mb-3 font-nunito-sans leading-[140%] tracking-normal">
+                  {member.name}
+                </h3>
               <p className="text-base text-[#3C62ED] mb-[2px] font-work-sans font-normal leading-[150%] tracking-normal">
                 {member.role}
               </p>
               <p className="text-base text-[#3C62ED] font-work-sans font-normal leading-[150%] tracking-normal">
                 {member.location}
               </p>
+              </div>
             </div>
           ))}
         </div>

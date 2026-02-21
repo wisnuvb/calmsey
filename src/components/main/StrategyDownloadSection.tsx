@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Download, X } from "lucide-react";
-import { H5 } from "../ui/typography";
+import { P } from "../ui/typography";
 import { useLanguage } from "../public/LanguageProvider";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
@@ -98,7 +98,7 @@ export function StrategyDownloadSection({
   const learnMoreButtonText = getValue(
     "strategy.learnMoreButtonText",
     propLearnMoreButtonText,
-    "Learn Our Funds"
+    "Our Funds"
   );
 
   const learnMoreButtonUrl = getValue(
@@ -142,12 +142,12 @@ export function StrategyDownloadSection({
         {withBorderTop && <div className="border border-[#FFFFFF80]" />}
         <div className="py-8 sm:py-11 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
           {/* Left - Text Content */}
-          <H5
+          <P
             style="h5regular"
             className="text-white text-lg sm:text-2xl leading-[140%] tracking-normal max-w-[466px]"
           >
             {description}
-          </H5>
+          </P>
 
           {/* Right - CTA Buttons */}
           <div className="flex flex-col items-center justify-center shrink-0 font-normal font-nunito-sans text-base gap-3">
@@ -159,7 +159,7 @@ export function StrategyDownloadSection({
               {downloadButtonText}
             </button>
             <a
-              href={learnMoreButtonUrl}
+              href={learnMoreButtonUrl.startsWith("/") ? `/${currentLanguage}${learnMoreButtonUrl}` : learnMoreButtonUrl}
               className="py-5 px-8 border border-white rounded w-full sm:w-[310px] text-white hover:bg-white/10 transition-colors text-center"
               aria-label={`Learn more about ${learnMoreButtonText}`}
             >

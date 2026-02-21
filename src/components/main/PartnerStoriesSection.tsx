@@ -269,8 +269,9 @@ export function PartnerStoriesSection({
                     buttonBg,
                     buttonTextColor
                   )}
+                  aria-label={buttonText || "View all partner stories"}
                 >
-                  {buttonText}
+                  {buttonText || "Partner Stories"}
                 </Link>
               </div>
             )}

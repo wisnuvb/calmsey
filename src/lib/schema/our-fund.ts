@@ -2,7 +2,14 @@ import { PageContentSchema } from "../page-content-schema";
 
 export const OUR_FUND_SCHEMA: PageContentSchema = {
   pageType: "OUR_FUND",
-  sections: ["Hero", "Grantmaking", "Our Four Funds", "Our Partners", "Fund Details", "Feedback Callout"],
+  sections: [
+    "Hero",
+    "Grantmaking",
+    "Our Four Funds",
+    "Our Partners",
+    "Fund Details",
+    "Feedback Callout",
+  ],
   fields: [
     // Hero Section
     {
@@ -98,8 +105,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           type: "multiple",
           required: false,
           itemLabel: "Practice",
-          helpText:
-            "Optional practices list. Add practices with check icon.",
+          helpText: "Optional practices list. Add practices with check icon.",
           itemSchema: [
             {
               key: "id",
@@ -232,8 +238,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           type: "text",
           required: false,
           placeholder: "Read the full-version of our Grantmaking Framework",
-          helpText:
-            "Optional label text displayed before the download button",
+          helpText: "Optional label text displayed before the download button",
         },
         {
           key: "downloadButtonText",
@@ -297,7 +302,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
               {
                 id: "2",
                 icon: "flag",
-                text: "We use a broad definition to accommodate the multiple ways that tenure can be viewed and experienced. We consider tenure as: \"The ways in which societies define and govern (including through cultures and laws) people's relationships with land, coasts, shores, waterbodies, and associated natural resources.\"",
+                text: 'We use a broad definition to accommodate the multiple ways that tenure can be viewed and experienced. We consider tenure as: "The ways in which societies define and govern (including through cultures and laws) people\'s relationships with land, coasts, shores, waterbodies, and associated natural resources."',
               },
             ],
             numberedListTitle: "We consider tenure to encompass",
@@ -337,7 +342,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           },
         ],
         null,
-        2
+        2,
       ),
     },
 
@@ -388,7 +393,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
         {
           key: "description",
           label: "Fund Description",
-          type: "textarea",
+          type: "html",
           required: true,
           placeholder: "Description of what this fund supports...",
           helpText: "Detailed description of the fund's purpose and focus",
@@ -421,7 +426,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
         {
           key: "learnMoreLink",
           label: "Learn More Link",
-          type: "url",
+          type: "text",
           required: true,
           placeholder: "/our-fund/grassroot",
           helpText: "URL to the detailed fund page",
@@ -487,7 +492,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           },
         ],
         null,
-        2
+        2,
       ),
     },
 
@@ -655,7 +660,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           },
         ],
         null,
-        2
+        2,
       ),
     },
     {
@@ -792,8 +797,10 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           label: "Header Subtitle",
           type: "textarea",
           required: false,
-          placeholder: "Supporting actions at regional, national, and local levels",
-          helpText: "Optional subtitle displayed below the main title. Leave empty if not needed.",
+          placeholder:
+            "Supporting actions at regional, national, and local levels",
+          helpText:
+            "Optional subtitle displayed below the main title. Leave empty if not needed.",
         },
         {
           key: "headerHeroImageSrc",
@@ -850,8 +857,10 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           label: "Supported Section Title",
           type: "text",
           required: false,
-          placeholder: "The fund will support work in the following categories:",
-          helpText: "Title for the supported section (supported-unsupported type only)",
+          placeholder:
+            "The fund will support work in the following categories:",
+          helpText:
+            "Title for the supported section (supported-unsupported type only)",
         },
         {
           key: "supportedItems",
@@ -900,7 +909,8 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           type: "text",
           required: false,
           placeholder: "What the fund typically does NOT cover:",
-          helpText: "Title for the unsupported section (supported-unsupported type only)",
+          helpText:
+            "Title for the unsupported section (supported-unsupported type only)",
         },
         {
           key: "unsupportedItems",
@@ -908,7 +918,8 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           type: "multiple",
           required: false,
           itemLabel: "Unsupported Item",
-          helpText: "List of unsupported items (supported-unsupported type only)",
+          helpText:
+            "List of unsupported items (supported-unsupported type only)",
           itemSchema: [
             {
               key: "id",
@@ -941,7 +952,8 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           type: "text",
           required: false,
           placeholder: "Partners supported by this fund will:",
-          helpText: "Title for the partners will section (partners-will type only)",
+          helpText:
+            "Title for the partners will section (partners-will type only)",
         },
         {
           key: "partnersWillItems",
@@ -1107,6 +1119,307 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           helpText: 'Button style: "primary", "secondary", or "outline"',
         },
       ],
+      defaultValue: JSON.stringify(
+        [
+          {
+            slug: "rapid-response",
+            id: "rapid-response-fund",
+            headerSmallHeading: "OUR FOUR GRANTMAKING FUNDS",
+            headerTitle: "Rapid Response Fund",
+            headerSubtitle:
+              "Rapid support for partners facing legal, physical, or political threats to their safety and operations",
+            headerHeroImageSrc:
+              "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
+            headerHeroImageAlt: "Traditional boats on calm water",
+            contentType: "supported-unsupported",
+            intro:
+              "Funding from the Rapid Response Fund will be available to existing partners as well as groups and individuals working directly with them. We will prioritize recipients operating in restricted, high-risk, or rapidly shifting political contexts. In all cases, recipients must demonstrate a commitment to values in line with Turning Tides' commitment to the rights of Indigenous Peoples, local communities, small-scale fishers and fish workers and be actively working for the protection of rights and tenure across oceans, rivers, lakes, coasts, and shorelines.",
+            supportedSectionTitle:
+              "The Rapid Response Fund will support work in the following categories:",
+            supportedItems: JSON.stringify(
+              [
+                {
+                  id: "security-costs",
+                  icon: "check",
+                  title: "Security-related costs",
+                  description:
+                    "Emergency legal aid, secure communication tools, preparing for digital and physical protection.",
+                },
+                {
+                  id: "reputation-defense",
+                  icon: "check",
+                  title: "Reputation defense",
+                  description:
+                    "Crisis communications, media strategy, counter-disinformation efforts.",
+                },
+                {
+                  id: "operations",
+                  icon: "check",
+                  title: "Operations",
+                  description:
+                    "Bridge funding due to sudden funding cuts, office repairs after raids, equipment replacement.",
+                },
+                {
+                  id: "wellbeing-support",
+                  icon: "check",
+                  title: "Wellbeing support",
+                  description:
+                    "Psychosocial care, burnout recovery, or protective rest for rights holders.",
+                },
+                {
+                  id: "geographic-focus",
+                  icon: "check",
+                  title: "Geographic focus",
+                  description:
+                    "During the first year of grantmaking, the fund will operate exclusively in the regions and countries in which Turning Tides is working. Following this initial phase, we will consider opening to applicants outside our active regions of focus on a case-by-case basis.",
+                },
+              ],
+              null,
+              2,
+            ),
+            unsupportedSectionTitle: "What the fund typically does NOT cover:",
+            unsupportedItems: JSON.stringify(
+              [
+                {
+                  id: "long-term-operations",
+                  icon: "x",
+                  description:
+                    "Long-term salaries, programmatic expansion, infrastructure development, ongoing operations, armed protection and weapons.",
+                },
+                {
+                  id: "relocation-emergency",
+                  icon: "x",
+                  description:
+                    "The fund will also not be used to relocate individuals/groups under threat nor provide direct emergency response. Turning Tides, and the fund, is not designed to respond quickly enough to meet emergency response needs, nor are we skilled in emergency response and protection, potentially opening our partners up to increased risk. We plan, instead, to provide funds to a third party with expertise in emergency response and extraction to be an on-call support mechanism for our partners.",
+                },
+              ],
+              null,
+              2,
+            ),
+            ctaType: "button",
+            ctaText: "Request Support",
+            ctaLink: "/our-fund/rapid-response/request",
+            ctaStyle: "primary",
+          },
+          {
+            slug: "knowledge-action",
+            id: "knowledge-action-fund",
+            headerSmallHeading: "OUR FOUR GRANTMAKING FUNDS",
+            headerTitle: "Knowledge Action Fund",
+            headerSubtitle: "",
+            headerHeroImageSrc:
+              "/assets/demo/61d49ae554575244d2db7ab0551faf2183798c04.png",
+            headerHeroImageAlt: "Knowledge Action Fund",
+            contentType: "partners-will",
+            intro:
+              "The recognition of tenure and surrounding human rights (i.e., the rights to a healthy environment, to food, to self-determination) affects who is involved, holds power and can have impact in the governance, management and development of oceans, coasts, rivers, lakes and their shores. The same spaces that support tenure systems are now objects of intensifying conservation, food production, energy, commercial investments and climate responses. The risk that these ignore and overrule existing tenure regimes and rights is real. However, there is also opportunity to ensure processes of planning, development, climate response, conservation and funding commitments are sensitive to tenure and the agency of rights holders.\n\nThis fund is designed to support a shift toward more enabling conditions by increasing the depth and diversity of knowledge, perspectives, and voices that hold prominence and experience power in pathways toward favourable change.",
+            partnersWillSectionTitle: "Partners supported by this fund will:",
+            partnersWillItems: JSON.stringify(
+              [
+                {
+                  id: "generate-knowledge",
+                  icon: "check",
+                  description:
+                    "Generate Strategic Knowledge, Perspectives and Commentaries for Advocacy",
+                },
+                {
+                  id: "uplift-evidence",
+                  icon: "check",
+                  description: "Uplift Evidence and Experience from Partners",
+                },
+                {
+                  id: "advocate-tenure",
+                  icon: "check",
+                  description:
+                    "Advocate for Tenure Sensitivity in Funding, Policy and Practices",
+                },
+                {
+                  id: "seize-windows",
+                  icon: "check",
+                  description: "Seize time-sensitive advocacy windows",
+                },
+              ],
+              null,
+              2,
+            ),
+            concluding:
+              "By elevating diverse knowledge and strengthening advocacy capacity, the fund aims to increase the influence that local communities, fisher peoples and Indigenous Peoples have over distant policy decisions that affect their tenure and rights - decisions typically made at global, regional and national levels beyond their usual reach.\n\nPartners to this fund are nominated by our trusted partners and advisors.",
+            ctaType: "pdf-download",
+            ctaText: "Knowledge Action Fund Action Plan",
+            ctaFile: "/assets/funds/knowledge-action-fund-action-plan.pdf",
+            ctaIcon: "file-pdf",
+            ctaStyle: "primary",
+          },
+          {
+            slug: "grassroot",
+            id: "grassroot-fund",
+            headerSmallHeading: "OUR FOUR GRANTMAKING FUNDS",
+            headerTitle: "Grassroot Fund",
+            headerSubtitle:
+              "Supporting actions at regional, national, and local levels",
+            headerHeroImageSrc:
+              "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
+            headerHeroImageAlt: "People drying fish on racks",
+            contentType: "custom",
+            customSections: JSON.stringify(
+              [
+                {
+                  id: "intro",
+                  content:
+                    "Turning Tides deploys the majority of its resources through the Grassroots Fund supporting actions at regional, national, and local levels. This fund is designed to empower communities, small-scale fishers, fish workers, and Indigenous Peoples in their efforts to secure and strengthen tenure rights.",
+                },
+                {
+                  id: "focus-areas",
+                  title: "The Grassroot Fund focuses on:",
+                  items: JSON.stringify(
+                    [
+                      {
+                        id: "community-led",
+                        icon: "check",
+                        title: "Community-led initiatives",
+                        description:
+                          "Supporting grassroots organizations and community groups working directly with rights holders to advance tenure security.",
+                      },
+                      {
+                        id: "capacity-building",
+                        icon: "check",
+                        title: "Capacity building",
+                        description:
+                          "Strengthening organizational capacity, leadership development, and community organizing skills.",
+                      },
+                      {
+                        id: "advocacy",
+                        icon: "check",
+                        title: "Local and national advocacy",
+                        description:
+                          "Supporting advocacy efforts at regional, national, and local levels to influence policy and practice.",
+                      },
+                      {
+                        id: "documentation",
+                        icon: "check",
+                        title: "Tenure documentation",
+                        description:
+                          "Supporting efforts to document, map, and secure recognition of traditional tenure systems.",
+                      },
+                    ],
+                    null,
+                    2,
+                  ),
+                },
+                {
+                  id: "approach",
+                  title: "Our Approach",
+                  content:
+                    "The Grassroot Fund operates through flexible, multi-year grants that respond to partners' expressed needs and priorities. We work in close collaboration with partners to ensure funding supports their self-determined goals and strategies for achieving tenure security and rights recognition.",
+                },
+              ],
+              null,
+              2,
+            ),
+            ctaType: "button",
+            ctaText: "Learn More",
+            ctaLink: "/our-fund/grassroot",
+            ctaStyle: "primary",
+          },
+          {
+            slug: "civic-space",
+            id: "civic-space-capacity-fund",
+            headerSmallHeading: "OUR FOUR GRANTMAKING FUNDS",
+            headerTitle: "Civic Space and Capacity Fund",
+            headerSubtitle:
+              "Protecting civic space and strengthening partner capacity",
+            headerHeroImageSrc:
+              "/assets/demo/61d49ae554575244d2db7ab0551faf2183798c04.png",
+            headerHeroImageAlt: "Aerial view of coastal community",
+            contentType: "custom",
+            customSections: JSON.stringify(
+              [
+                {
+                  id: "intro",
+                  content:
+                    "We deploy funding to support the self-identified capacity needs of our partners and to, more broadly, protect civic space. Our team will work in close collaboration with partners to identify needs and craft appropriate responses.",
+                },
+                {
+                  id: "capacity-support",
+                  title: "Capacity Support",
+                  items: JSON.stringify(
+                    [
+                      {
+                        id: "organizational-development",
+                        icon: "check",
+                        title: "Organizational development",
+                        description:
+                          "Supporting organizational strengthening, strategic planning, and institutional capacity building.",
+                      },
+                      {
+                        id: "leadership-development",
+                        icon: "check",
+                        title: "Leadership development",
+                        description:
+                          "Investing in leadership training, mentorship, and skills development for rights holders and their organizations.",
+                      },
+                      {
+                        id: "technical-capacity",
+                        icon: "check",
+                        title: "Technical capacity",
+                        description:
+                          "Building technical skills in areas such as legal advocacy, community organizing, financial management, and communications.",
+                      },
+                    ],
+                    null,
+                    2,
+                  ),
+                },
+                {
+                  id: "civic-space-protection",
+                  title: "Civic Space Protection",
+                  items: JSON.stringify(
+                    [
+                      {
+                        id: "advocacy-support",
+                        icon: "check",
+                        title: "Advocacy support",
+                        description:
+                          "Supporting partners' ability to advocate for their rights and interests in increasingly restrictive environments.",
+                      },
+                      {
+                        id: "legal-protection",
+                        icon: "check",
+                        title: "Legal protection",
+                        description:
+                          "Providing resources for legal defense, policy advocacy, and protection of civic space.",
+                      },
+                      {
+                        id: "network-building",
+                        icon: "check",
+                        title: "Network building",
+                        description:
+                          "Supporting coalition building and network strengthening to amplify voices and increase collective power.",
+                      },
+                    ],
+                    null,
+                    2,
+                  ),
+                },
+                {
+                  id: "approach",
+                  title: "Our Approach",
+                  content:
+                    "The Civic Space and Capacity Fund responds directly to partners' self-identified needs. We work collaboratively to understand capacity gaps and develop tailored support that strengthens partners' ability to achieve their goals while protecting the space in which they operate.",
+                },
+              ],
+              null,
+              2,
+            ),
+            ctaType: "button",
+            ctaText: "Learn More",
+            ctaLink: "/our-fund/civic-space",
+            ctaStyle: "primary",
+          },
+        ],
+        null,
+        2,
+      ),
     },
 
     // Feedback Callout Section
@@ -1158,7 +1471,8 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
       type: "text",
       section: "Feedback Callout",
       defaultValue: "/feedback",
-      helpText: "URL for the feedback button (can be relative path like /feedback or full URL)",
+      helpText:
+        "URL for the feedback button (can be relative path like /feedback or full URL)",
     },
     {
       key: "feedbackCallout.learnMoreButtonText",
@@ -1174,7 +1488,8 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
       type: "text",
       section: "Feedback Callout",
       defaultValue: "/governance",
-      helpText: "URL for the learn more button (can be relative path like /governance or full URL)",
+      helpText:
+        "URL for the learn more button (can be relative path like /governance or full URL)",
     },
     {
       key: "feedbackCallout.backgroundColor",
@@ -1182,7 +1497,8 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
       type: "text",
       section: "Feedback Callout",
       defaultValue: "bg-[#3C62ED]",
-      helpText: "Background color class for the section (e.g., bg-[#3C62ED], bg-blue-500)",
+      helpText:
+        "Background color class for the section (e.g., bg-[#3C62ED], bg-blue-500)",
     },
   ],
 };

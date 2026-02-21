@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { H5, P } from "../ui/typography";
+import { H2, P } from "../ui/typography";
 import { getImageUrl } from "@/lib/utils";
 import { ArrowUpRightIcon } from "lucide-react";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
@@ -74,12 +74,12 @@ export function WhyTurningTidesSection({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 mb-16">
           {/* Left Column - Mission Statement */}
           <div className="space-y-6">
-            <H5
+            <H2
               style="h5regular"
               className="text-[#010107] tracking-tight text-2xl"
             >
               {missionTitle}
-            </H5>
+            </H2>
 
             <P style="p1reg" className="text-[#060726CC] text-base">
               {missionDescription}

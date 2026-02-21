@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef } from "react";
+import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { H1, P } from "../ui/typography";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
@@ -47,6 +48,14 @@ export function VideoHeroSection({
     propPosterImage ||
     getContentValue("hero.posterImage", "/assets/demo/bg-video.png");
 
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handlePlayVideo = () => {
+    setIsPlaying(true);
+    videoRef.current?.play();
+  };
+
   return (
     <section
       className={cn(
@@ -55,17 +64,30 @@ export function VideoHeroSection({
       )}
       style={{ top: "80px" }}
     >
-      {/* Video Background */}
+      {/* Video Background - no autoplay for WCAG; user clicks play button to start */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-blue-900/60 z-10 mix-blend-multiply" />
         <div className="absolute inset-0 bg-black/20 z-10" />
+        {!isPlaying && (
+          <button
+            type="button"
+            onClick={handlePlayVideo}
+            className="absolute inset-0 z-20 flex items-center justify-center w-full h-full"
+            aria-label="Play video"
+          >
+            <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg">
+              <Play className="w-8 h-8 text-[#010107] ml-1 fill-current" />
+            </div>
+          </button>
+        )}
         <video
-          autoPlay
+          ref={videoRef}
           muted
           loop
           playsInline
           className="w-full h-full object-cover"
           poster={posterImage}
+          preload="metadata"
         >
           <source src={videoUrl} type="video/mp4" />
           Your browser does not support the video tag.

@@ -96,6 +96,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
       className={`w-full ${backgroundColor} pt-16 md:pt-24`}
       data-section="get-involved"
     >
+      <h1 className="sr-only">Get Involved</h1>
       <div className="">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[600px]">
           {/* Left Column - Background Image with Overlay */}
@@ -140,7 +141,11 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                 {/* Full Name and Email Row */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
+                    <label htmlFor="fullName" className="sr-only">
+                      Full name
+                    </label>
                     <input
+                      id="fullName"
                       type="text"
                       name="fullName"
                       placeholder="Full name"
@@ -148,10 +153,15 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
                       required
+                      aria-label="Full name"
                     />
                   </div>
                   <div>
+                    <label htmlFor="email" className="sr-only">
+                      Email
+                    </label>
                     <input
+                      id="email"
                       type="email"
                       name="email"
                       placeholder="Email"
@@ -159,18 +169,24 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
                       required
+                      aria-label="Email"
                     />
                   </div>
                 </div>
 
                 {/* Organization */}
                 <div className="relative">
+                  <label htmlFor="organization" className="sr-only">
+                    Company / Institute / Organization / Individual
+                  </label>
                   <select
+                    id="organization"
                     name="organization"
                     value={formData.organization}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
                     required
+                    aria-label="Company / Institute / Organization / Individual"
                   >
                     <option value="">
                       Company / Institute / Organization / Individual
@@ -185,12 +201,17 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
 
                 {/* Country */}
                 <div className="relative">
+                  <label htmlFor="country" className="sr-only">
+                    Country
+                  </label>
                   <select
+                    id="country"
                     name="country"
                     value={formData.country}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
                     required
+                    aria-label="Country"
                   >
                     <option value="">Select Country</option>
                     <option value="indonesia">Indonesia</option>
@@ -204,12 +225,17 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
 
                 {/* Partnership Type */}
                 <div className="relative">
+                  <label htmlFor="partnershipType" className="sr-only">
+                    Partnership type
+                  </label>
                   <select
+                    id="partnershipType"
                     name="partnershipType"
                     value={formData.partnershipType}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
                     required
+                    aria-label="Partnership type"
                   >
                     <option value="">I want to become partner</option>
                     <option value="Funding Partner">Funding Partner</option>
@@ -222,7 +248,11 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
 
                 {/* Message */}
                 <div>
+                  <label htmlFor="message" className="sr-only">
+                    Message
+                  </label>
                   <textarea
+                    id="message"
                     name="message"
                     placeholder="Tell us what you want..."
                     value={formData.message}
@@ -231,6 +261,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                     maxLength={maxChars}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-sm"
                     required
+                    aria-label="Tell us what you want"
                   />
                   <div className="text-right text-xs text-gray-500 mt-2">
                     {charCount} / {maxChars.toLocaleString()}
@@ -277,7 +308,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
           Supporting rights and tenure of local communities, small scale
           fishers, fish workers, and Indigenous Peoples.
         </p>
-        <p className="text-base text-white/50 font-normal font-work-sans max-w-[697px]">
+        <p className="text-base text-white/80 font-normal font-work-sans max-w-[697px]">
           If you are a group, organization, or collective that represents or
           directly serves local communities, small-scale fishers or fish
           workers, or Indigenous Peoples,{" "}

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { H5, P } from "../ui/typography";
+import { H2, P } from "../ui/typography";
 import { getImageUrl } from "@/lib/utils";
 
 interface CommunityStoriesSectionProps {
@@ -61,12 +61,12 @@ export const CommunityStoriesSection: React.FC<
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Left Column */}
 
-          <H5
+          <H2
             style="h5regular"
             className="text-[#060726CC] leading-[1.4] col-span-1 sm:col-span-4 text-2xl"
           >
             {leftText}
-          </H5>
+          </H2>
 
           {/* Right Column */}
           <P
