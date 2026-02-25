@@ -999,7 +999,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
         {
           key: "howToApplyCtaLink",
           label: "How to Apply CTA Link",
-          type: "url",
+          type: "text",
           required: false,
           placeholder: "/our-fund/rapid-response/request",
           helpText: "URL for how to apply CTA button",
