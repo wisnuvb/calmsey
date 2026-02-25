@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FaLinkedin } from "react-icons/fa";
 import { cn, getImageUrl } from "@/lib/utils";
+import { useImageDominantColor } from "@/hooks/useImageDominantColor";
 import { MemberDetailModal } from "@/components/ui/MemberDetailModal";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
@@ -22,6 +23,89 @@ interface TeamSectionProps {
   title?: string;
   description?: string;
   members?: TeamMember[];
+}
+
+function TeamMemberCard({
+  member,
+  onSelect,
+}: {
+  member: TeamMember;
+  onSelect: () => void;
+}) {
+  const imageUrl = getImageUrl(member.image);
+  const { color: bgColor } = useImageDominantColor(imageUrl);
+
+  return (
+    <div className="text-left">
+      {/* Photo with LinkedIn Icon */}
+      <div className="relative inline-block mb-4 w-full max-w-[250px] mx-auto cursor-pointer">
+        <div
+          className="relative aspect-square rounded-lg overflow-hidden transition-colors duration-500"
+          style={{ backgroundColor: bgColor }}
+          role="button"
+          tabIndex={0}
+          onClick={onSelect}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onSelect();
+            }
+          }}
+          aria-label={`View details for ${member.name}`}
+        >
+          <Image
+            src={getImageUrl(member.image)}
+            alt={member.name}
+            fill
+            className="object-contain"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                member.name,
+              )}&size=250&background=random`;
+            }}
+          />
+        </div>
+        {member.linkedinUrl && (
+          <a
+            href={member.linkedinUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute bottom-2 left-2 w-8 h-8 bg-[#0077B5] rounded flex items-center justify-center hover:bg-[#005885] transition-colors shadow-md z-10"
+            aria-label={`View LinkedIn profile of ${member.name} (opens in a new tab)`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <FaLinkedin className="w-4 h-4 text-white" />
+          </a>
+        )}
+      </div>
+
+      {/* Member Info */}
+      <div
+        className="cursor-pointer"
+        role="button"
+        tabIndex={0}
+        onClick={onSelect}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onSelect();
+          }
+        }}
+        aria-label={`View details for ${member.name}`}
+      >
+        <h3 className="text-xl font-bold text-[#010107] mb-3 font-nunito-sans leading-[140%] tracking-normal">
+          {member.name}
+        </h3>
+        <p className="text-base text-[#3C62ED] mb-[2px] font-work-sans font-normal leading-[150%] tracking-normal">
+          {member.role}
+        </p>
+        <p className="text-base text-[#3C62ED] font-work-sans font-normal leading-[150%] tracking-normal">
+          {member.location}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 const defaultMembers: TeamMember[] = [
@@ -79,18 +163,18 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
   description: propDescription,
   members: propMembers,
 }) => {
-  const { getValue, getContentJSON } = usePageContentHelpers()
+  const { getValue, getContentJSON } = usePageContentHelpers();
 
   // Get all values with priority: context > props > default
   const title = getValue("team.title", propTitle, "The Turning Tides' Team");
   const description = getValue(
     "team.description",
     propDescription,
-    "Meet the Turning Tides' team - people from across the globe with combined experiences in progressive philanthropy, human rights, gender equity, community organizing, Indigenous affairs, equity law, and environmental justice."
+    "Meet the Turning Tides' team - people from across the globe with combined experiences in progressive philanthropy, human rights, gender equity, community organizing, Indigenous affairs, equity law, and environmental justice.",
   );
   const members = getContentJSON<TeamMember[]>(
     "team.members",
-    propMembers || defaultMembers
+    propMembers || defaultMembers,
   );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
@@ -99,18 +183,18 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
 
   const currentMembers = members.slice(
     currentIndex,
-    currentIndex + itemsPerPage
+    currentIndex + itemsPerPage,
   );
 
   const goToPrevious = () => {
     setCurrentIndex((prev) =>
-      prev === 0 ? (totalPages - 1) * itemsPerPage : prev - itemsPerPage
+      prev === 0 ? (totalPages - 1) * itemsPerPage : prev - itemsPerPage,
     );
   };
 
   const goToNext = () => {
     setCurrentIndex((prev) =>
-      prev >= (totalPages - 1) * itemsPerPage ? 0 : prev + itemsPerPage
+      prev >= (totalPages - 1) * itemsPerPage ? 0 : prev + itemsPerPage,
     );
   };
 
@@ -130,74 +214,11 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
         {/* Team Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {currentMembers.map((member) => (
-            <div key={member.id} className="text-left">
-              {/* Photo with LinkedIn Icon - LinkedIn link is sibling to avoid nested interactive elements */}
-              <div className="relative inline-block mb-4 w-full max-w-[250px] mx-auto cursor-pointer">
-                <div
-                  className="relative aspect-square rounded-lg overflow-hidden bg-gray-200"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setSelectedMember(member)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setSelectedMember(member);
-                    }
-                  }}
-                  aria-label={`View details for ${member.name}`}
-                >
-                  <Image
-                    src={getImageUrl(member.image)}
-                    alt={member.name}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        member.name
-                      )}&size=250&background=random`;
-                    }}
-                  />
-                </div>
-                {member.linkedinUrl && (
-                  <a
-                    href={member.linkedinUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="absolute bottom-2 left-2 w-8 h-8 bg-[#0077B5] rounded flex items-center justify-center hover:bg-[#005885] transition-colors shadow-md z-10"
-                    aria-label={`View LinkedIn profile of ${member.name} (opens in a new tab)`}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <FaLinkedin className="w-4 h-4 text-white" />
-                  </a>
-                )}
-              </div>
-
-              {/* Member Info - clickable to open modal */}
-              <div
-                className="cursor-pointer"
-                role="button"
-                tabIndex={0}
-                onClick={() => setSelectedMember(member)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setSelectedMember(member);
-                  }
-                }}
-                aria-label={`View details for ${member.name}`}
-              >
-                <h3 className="text-xl font-bold text-[#010107] mb-3 font-nunito-sans leading-[140%] tracking-normal">
-                  {member.name}
-                </h3>
-              <p className="text-base text-[#3C62ED] mb-[2px] font-work-sans font-normal leading-[150%] tracking-normal">
-                {member.role}
-              </p>
-              <p className="text-base text-[#3C62ED] font-work-sans font-normal leading-[150%] tracking-normal">
-                {member.location}
-              </p>
-              </div>
-            </div>
+            <TeamMemberCard
+              key={member.id}
+              member={member}
+              onSelect={() => setSelectedMember(member)}
+            />
           ))}
         </div>
 
@@ -208,7 +229,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
               onClick={goToPrevious}
               className={cn(
                 "w-10 h-10 rounded-full border flex items-center justify-center transition-all",
-                "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200"
+                "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200",
               )}
               aria-label="Previous team members"
             >
@@ -218,7 +239,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
               onClick={goToNext}
               className={cn(
                 "w-10 h-10 rounded-full border flex items-center justify-center transition-all",
-                "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200"
+                "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200",
               )}
               aria-label="Next team members"
             >

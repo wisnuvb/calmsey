@@ -149,7 +149,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
           </P>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:gap-36">
+        <div className="grid grid-cols-1 gap-8 lg:gap-16">
           {funds.map((fund) => (
             <div
               key={fund.id}

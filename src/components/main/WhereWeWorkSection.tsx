@@ -94,7 +94,7 @@ export function WhereWeWorkSection({
   );
 
   return (
-    <section className="bg-white py-16 lg:py-24">
+    <section className="bg-white pb-8 lg:pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
         <div className="text-center mb-12 lg:mb-16">
@@ -104,7 +104,7 @@ export function WhereWeWorkSection({
         </div>
 
         {/* Legend Blocks */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12 lg:mb-16 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-4 lg:mb-8 max-w-6xl mx-auto">
           {/* Block 1 - Action Plans */}
           <div className="flex items-start gap-4">
             <div className="w-4 h-4 bg-[#3C62ED] flex-shrink-0 mt-1" />

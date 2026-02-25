@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { H1, P } from "../ui/typography";
@@ -51,9 +51,15 @@ export function VideoHeroSection({
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  useEffect(() => {
+    videoRef.current?.play().catch(() => {
+      setIsPlaying(false);
+    });
+  }, []);
+
   const handlePlayVideo = () => {
-    setIsPlaying(true);
     videoRef.current?.play();
+    setIsPlaying(true);
   };
 
   return (
@@ -64,7 +70,7 @@ export function VideoHeroSection({
       )}
       style={{ top: "80px" }}
     >
-      {/* Video Background - no autoplay for WCAG; user clicks play button to start */}
+      {/* Video Background - autoplay muted (WCAG compliant); play button shown when paused */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-blue-900/60 z-10 mix-blend-multiply" />
         <div className="absolute inset-0 bg-black/20 z-10" />
@@ -75,19 +81,22 @@ export function VideoHeroSection({
             className="absolute inset-0 z-20 flex items-center justify-center w-full h-full"
             aria-label="Play video"
           >
-            <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg">
+            <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg hidden">
               <Play className="w-8 h-8 text-[#010107] ml-1 fill-current" />
             </div>
           </button>
         )}
         <video
           ref={videoRef}
+          autoPlay
           muted
           loop
           playsInline
           className="w-full h-full object-cover"
           poster={posterImage}
-          preload="metadata"
+          preload="auto"
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
         >
           <source src={videoUrl} type="video/mp4" />
           Your browser does not support the video tag.

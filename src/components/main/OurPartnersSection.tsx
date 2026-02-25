@@ -171,7 +171,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
       : propPartners || defaultPartners;
   return (
     <section
-      className={`w-full ${backgroundColor || "bg-white"} py-16 md:py-24`}
+      className={`w-full ${backgroundColor || "bg-white"} pb-16 md:pb-24`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Header Section */}
