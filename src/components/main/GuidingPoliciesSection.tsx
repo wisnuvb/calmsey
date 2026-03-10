@@ -152,20 +152,20 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
             </div>
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
+          <h2 className="text-3xl md:text-[38px] font-bold text-[#010107] mb-8 sm:mb-16 font-nunito-sans">
             {title}
           </h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <div className="text-left">
-              <p className="text-gray-600 text-sm font-medium mb-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 sm:px-28">
+            <div className="text-left sm:col-span-4 text-[#010107] font-normal font-nunito-sans text-2xl space-y-2">
+              <p className="">
                 Last Update
               </p>
-              <p className="text-gray-900 font-semibold">{lastUpdate}</p>
+              <p className="">{lastUpdate}</p>
             </div>
 
-            <div className="text-left">
-              <p className="text-gray-700 leading-relaxed">{description}</p>
+            <div className="text-left sm:col-span-8">
+              <p className="text-[#010107] text-lg tracking-normal font-nunito-sans leading-relaxed">{description}</p>
             </div>
           </div>
         </div>
@@ -175,17 +175,17 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
           {policies.map((policy) => (
             <div
               key={policy.id}
-              className="border border-gray-200 rounded-lg overflow-hidden"
+              className="overflow-hidden"
             >
               <button
                 onClick={() => togglePolicy(policy.id)}
                 className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors duration-200 ${expandedPolicy === policy.id
-                  ? "bg-blue-50 text-blue-900"
+                  ? "bg-[#F7FAFC] text-blue-900"
                   : "bg-gray-50 text-gray-900 hover:bg-gray-100"
                   }`}
               >
                 <div className="flex items-center gap-4">
-                  <span className="text-lg font-semibold">{policy.title}</span>
+                  <span className="text-lg font-bold text-[#010107] font-nunito-sans">{policy.title}</span>
                 </div>
 
                 {expandedPolicy === policy.id ? (
@@ -196,9 +196,9 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
               </button>
 
               {expandedPolicy === policy.id && (
-                <div className="px-6 py-4 bg-blue-50 border-t border-blue-100">
+                <div className="px-8 py-6 bg-[#EAF1F7] border-t border-[#EAF1F7]">
                   <div
-                    className="text-gray-700 leading-relaxed prose prose-sm max-w-none prose-a:text-[#3C62ED] prose-a:font-medium prose-a:no-underline hover:prose-a:underline"
+                    className="text-[#060726CC] font-normal font-work-sans text-base leading-relaxed prose prose-sm max-w-none prose-a:text-[#3C62ED] prose-a:font-medium prose-a:no-underline hover:prose-a:underline"
                     dangerouslySetInnerHTML={{ __html: policy.content }}
                   />
                 </div>

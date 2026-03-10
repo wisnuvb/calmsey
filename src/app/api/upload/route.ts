@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     // Upload dan compress
     const uploadResult = await ImageUploadService.compressAndUpload(file, {
-      quality: 85,
+      quality: 95,
       maxWidth: 1920,
       maxHeight: 1080,
       folder: "cms-uploads",

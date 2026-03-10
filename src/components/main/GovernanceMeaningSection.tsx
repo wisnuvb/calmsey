@@ -67,7 +67,7 @@ export function GovernanceMeaningSection({
     <section className="bg-white py-16 lg:py-20">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-16 items-start">
-          <div className="space-y-6">
+          <div className="space-y-6 sticky top-28">
             <H2
               style="h1bold"
               className="text-[#010107] font-nunito-sans text-2xl sm:text-[38px] leading-[120%] tracking-normal"

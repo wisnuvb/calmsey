@@ -69,11 +69,11 @@ export function WhereWeWorkSection({
   const mapImage = getValue(
     "whereWeWork.mapImage",
     propMapImage,
-    "/assets/world-map.png"
+    "/assets/world-map.jpg"
   );
 
   // Use getImageUrl with validation built-in
-  const imageUrl = getImageUrl(mapImage, "/assets/world-map.png");
+  const imageUrl = getImageUrl(mapImage, "/assets/world-map.jpg");
 
   const partnersText = getValue(
     "whereWeWork.partnersText",

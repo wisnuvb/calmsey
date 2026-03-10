@@ -155,7 +155,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
               key={fund.id}
               className={cn(
                 "flex flex-col items-start gap-6 sm:gap-16",
-                fund.imagePosition === "left"
+                fund.imagePosition === "right"
                   ? "lg:flex-row"
                   : "lg:flex-row-reverse",
               )}

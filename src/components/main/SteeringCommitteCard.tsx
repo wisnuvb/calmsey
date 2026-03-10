@@ -55,7 +55,7 @@ export const SteeringCommitteCard = ({
             href={member.linkedinUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute bottom-3 left-3 w-9 h-9 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center hover:shadow-lg transition-shadow duration-200 z-10"
+            className="absolute bottom-3 left-3 w-9 h-9 rounded-xl bg-white shadow-md border border-gray-100 flex items-center justify-center hover:shadow-lg transition-shadow duration-200 z-10"
             aria-label={`${member.name}'s LinkedIn profile (opens in a new tab)`}
             onClick={(e) => e.stopPropagation()}
           >

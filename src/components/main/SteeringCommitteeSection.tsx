@@ -137,20 +137,20 @@ export const SteeringCommitteeSection: React.FC<
         <div className="mb-12 lg:mb-16 space-y-10">
           <H2
             style="h2bold"
-            className="text-[#010107] text-3xl sm:text-[38px] leading-[120%] tracking-normal"
+            className="text-[#010107] text-3xl sm:text-[38px] leading-[120%] tracking-normal text-center font-nunito-sans"
           >
             {title}
           </H2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
             <P
               style="p1reg"
-              className="text-[#060726CC] text-2xl font-normal leading-[140%]"
+              className="text-[#060726CC] text-2xl font-normal leading-[140%] font-nunito-sans"
             >
               {description}
             </P>
             <P
               style="p1reg"
-              className="text-[#06072680] text-base leading-[150%]"
+              className="text-[#06072680] text-base leading-[150%] font-work-sans"
             >
               {additionalDescription}
             </P>

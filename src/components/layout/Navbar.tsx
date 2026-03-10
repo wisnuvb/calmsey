@@ -20,8 +20,8 @@ const navLinks: NavLink[] = [
   // { label: "Our Work", href: "/our-work" },
   { label: "Our Approach", href: "/our-approach" },
   { label: "Our Funds", href: "/our-fund" },
-  { label: "Governance", href: "/governance" },
   { label: "Partner Stories", href: "/stories" },
+  { label: "Governance", href: "/governance" },
   // { label: "Articles", href: "/articles" },
 ];
 
