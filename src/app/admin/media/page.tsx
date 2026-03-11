@@ -31,6 +31,8 @@ import { getImageUrl } from "@/lib/utils";
 import { Pagination } from "@/components/common/Pagination";
 
 export default function MediaPage() {
+  const [previewFile, setPreviewFile] = useState<MediaFile | null>(null);
+
   const {
     // Data
     filteredFiles,
@@ -281,6 +283,7 @@ export default function MediaPage() {
                     bulkMode={bulkActionMode}
                     onSelect={() => toggleFileSelection(file.id)}
                     onDelete={() => deleteFile(file.id, file.originalName)}
+                    onPreview={setPreviewFile}
                   />
                 ))}
               </div>
@@ -328,6 +331,7 @@ export default function MediaPage() {
                         bulkMode={bulkActionMode}
                         onSelect={() => toggleFileSelection(file.id)}
                         onDelete={() => deleteFile(file.id, file.originalName)}
+                        onPreview={setPreviewFile}
                       />
                     ))}
                   </tbody>
@@ -385,6 +389,14 @@ export default function MediaPage() {
         )}
       </div>
 
+      {/* Image Preview Modal */}
+      {previewFile && (
+        <ImagePreviewModal
+          file={previewFile}
+          onClose={() => setPreviewFile(null)}
+        />
+      )}
+
       {/* Upload Modal */}
       {showUploadModal && (
         <UploadModal
@@ -414,6 +426,43 @@ export default function MediaPage() {
   );
 }
 
+// Image Preview Modal - tanpa padding, gambar tampil full
+function ImagePreviewModal({
+  file,
+  onClose,
+}: {
+  file: MediaFile;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-0"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+        aria-label="Close"
+      >
+        <XMarkIcon className="h-6 w-6" />
+      </button>
+      <div
+        className="relative w-full h-full flex items-center justify-center p-0 overflow-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Image
+          src={getImageUrl(file.url)}
+          alt={file.alt || file.originalName}
+          width={1920}
+          height={1080}
+          className="max-w-full max-h-full w-auto h-auto object-contain"
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
+    </div>
+  );
+}
+
 // Media Card Component for Grid View
 function MediaCard({
   file,
@@ -421,12 +470,14 @@ function MediaCard({
   bulkMode,
   onSelect,
   onDelete,
+  onPreview,
 }: {
   file: MediaFile;
   selected: boolean;
   bulkMode: boolean;
   onSelect: () => void;
   onDelete: () => void;
+  onPreview?: (file: MediaFile) => void;
 }) {
   const FileIcon = getFileIcon(file.mimeType);
   const isImage = file.mimeType.startsWith("image/");
@@ -478,16 +529,19 @@ function MediaCard({
         {!bulkMode && (
           <div className="flex items-center justify-between pt-2">
             <div className="flex items-center space-x-1">
-              <a
-                href={file.url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() =>
+                  isImage && onPreview
+                    ? onPreview(file)
+                    : window.open(file.url, "_blank")
+                }
                 className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                 title="View file"
                 aria-label="View file"
               >
                 <EyeIcon className="h-4 w-4" />
-              </a>
+              </button>
               <a
                 href={file.url}
                 download={file.originalName}
@@ -519,12 +573,14 @@ function MediaRow({
   bulkMode,
   onSelect,
   onDelete,
+  onPreview,
 }: {
   file: MediaFile;
   selected: boolean;
   bulkMode: boolean;
   onSelect: () => void;
   onDelete: () => void;
+  onPreview?: (file: MediaFile) => void;
 }) {
   const FileIcon = getFileIcon(file.mimeType);
   const isImage = file.mimeType.startsWith("image/");
@@ -583,16 +639,19 @@ function MediaRow({
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         {!bulkMode && (
           <div className="flex items-center space-x-2">
-            <a
-              href={file.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-900"
+            <button
+              type="button"
+              onClick={() =>
+                isImage && onPreview
+                  ? onPreview(file)
+                  : window.open(file.url, "_blank")
+              }
+              className="p-1 rounded text-blue-600 hover:text-blue-900 hover:bg-blue-50"
               title="View file"
               aria-label="View file"
             >
               <EyeIcon className="h-4 w-4" />
-            </a>
+            </button>
             <a
               href={file.url}
               download={file.originalName}
@@ -623,10 +682,14 @@ function UploadModal({
   uploading,
 }: {
   onClose: () => void;
-  onUpload: (files: FileList) => void;
+  onUpload: (
+    files: FileList,
+    options?: { enableImageCompression?: boolean }
+  ) => void;
   uploading: boolean;
 }) {
   const [dragOver, setDragOver] = useState(false);
+  const [enableImageCompression, setEnableImageCompression] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = (e: React.DragEvent) => {
@@ -634,14 +697,14 @@ function UploadModal({
     setDragOver(false);
     const files = e.dataTransfer.files;
     if (files.length) {
-      onUpload(files);
+      onUpload(files, { enableImageCompression });
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files?.length) {
-      onUpload(files);
+      onUpload(files, { enableImageCompression });
     }
   };
 
@@ -716,6 +779,23 @@ function UploadModal({
               className="hidden"
               accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
             />
+          </div>
+
+          {/* Compress Images Option */}
+          <div className="mt-6">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={enableImageCompression}
+                onChange={(e) =>
+                  setEnableImageCompression(e.target.checked)
+                }
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <span className="text-sm text-gray-700">
+                Compress images on upload (smaller file size, recommended)
+              </span>
+            </label>
           </div>
 
           {/* Supported Formats */}

@@ -258,6 +258,7 @@ function DefaultTranslationForm({
   const handleImageUpload = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("files", file);
+    formData.append("enableImageCompression", "true");
 
     try {
       const response = await fetch("/api/admin/media", {

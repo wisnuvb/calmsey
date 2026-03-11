@@ -29,6 +29,7 @@ export class ImageUploadService {
       maxWidth?: number;
       maxHeight?: number;
       folder?: string;
+      compress?: boolean;
     } = {}
   ): Promise<UploadResult> {
     const {
@@ -36,6 +37,7 @@ export class ImageUploadService {
       maxWidth = 1920,
       maxHeight = 1080,
       folder = "uploads",
+      compress = true,
     } = options;
 
     try {
@@ -49,11 +51,15 @@ export class ImageUploadService {
       const key = `${folder}/${new Date().getFullYear()}/${new Date().getMonth() + 1
         }/${uniqueFilename}`;
 
-      // Compress image with Sharp
+      // Compress image with Sharp (or upload as-is when compress=false)
       let processedBuffer: Buffer;
       let finalMimeType: string;
 
-      if (file.type.startsWith("image/")) {
+      if (!compress || !file.type.startsWith("image/")) {
+        // Upload as-is (no compression)
+        processedBuffer = buffer;
+        finalMimeType = file.type;
+      } else {
         const sharpImage = sharp(buffer).resize(maxWidth, maxHeight, {
           fit: "inside",
           withoutEnlargement: true,
@@ -79,9 +85,6 @@ export class ImageUploadService {
             .toBuffer();
           finalMimeType = "image/jpeg";
         }
-      } else {
-        processedBuffer = buffer;
-        finalMimeType = file.type;
       }
 
       // Upload to DigitalOcean Spaces

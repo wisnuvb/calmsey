@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import {
@@ -106,6 +107,11 @@ export async function POST(
       );
     }
 
+    // Revalidate cached pages so UI reflects changes immediately
+    if (pageType === "OUR_FUND") {
+      revalidatePath(`/${language}/our-fund`, "layout");
+    }
+
     return NextResponse.json({
       success: true,
       message: "Page content saved successfully",
@@ -159,6 +165,11 @@ export async function DELETE(
         { error: result.error || "Failed to delete content" },
         { status: 500 }
       );
+    }
+
+    // Revalidate cached pages
+    if (pageType === "OUR_FUND") {
+      revalidatePath(`/${language}/our-fund`, "layout");
     }
 
     return NextResponse.json({

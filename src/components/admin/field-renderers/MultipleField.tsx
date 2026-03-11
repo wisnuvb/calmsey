@@ -29,6 +29,7 @@ interface MultipleFieldProps {
     nestedFieldKey?: string
   ) => void;
   error?: string;
+  enableImageCompression?: boolean;
 }
 
 export function MultipleField({
@@ -37,6 +38,7 @@ export function MultipleField({
   onChange,
   onOpenMediaPicker,
   error,
+  enableImageCompression = true,
 }: MultipleFieldProps) {
   if (!field.itemSchema || field.itemSchema.length === 0) {
     return (
@@ -225,6 +227,10 @@ export function MultipleField({
             onImageUpload={async (file: File): Promise<string> => {
               const formData = new FormData();
               formData.append("file", file);
+              formData.append(
+                "enableImageCompression",
+                String(enableImageCompression)
+              );
 
               try {
                 const response = await fetch("/api/admin/media/upload", {

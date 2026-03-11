@@ -13,6 +13,8 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
+    const enableCompression = formData.get("enableImageCompression");
+    const compress = enableCompression !== "false";
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -25,12 +27,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Upload dan compress
+    // Upload (with optional compression)
     const uploadResult = await ImageUploadService.compressAndUpload(file, {
       quality: 95,
       maxWidth: 1920,
       maxHeight: 1080,
       folder: "cms-uploads",
+      compress,
     });
 
     // Save ke database

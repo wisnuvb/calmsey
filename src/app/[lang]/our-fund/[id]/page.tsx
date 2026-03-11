@@ -36,6 +36,9 @@ export async function generateMetadata({
   };
 }
 
+// Revalidate every 60 seconds (ISR) - ensures updates show even if revalidatePath misses
+export const revalidate = 60;
+
 // Enable dynamic rendering for routes not in generateStaticParams
 export const dynamicParams = true;
 
@@ -45,7 +48,6 @@ export async function generateStaticParams() {
     // Get all fund slugs for default language (en)
     // In production, you might want to generate for all languages
     const slugs = await getAllFundSlugs("en");
-    console.log("Generated static params for funds:", slugs);
     return slugs.map((slug) => ({
       id: slug,
     }));
@@ -59,12 +61,9 @@ export async function generateStaticParams() {
 export default async function DetailOurFundPage({ params }: PageProps) {
   const { lang, id } = await params;
 
-  console.log(`Fetching fund detail for slug: ${id}, language: ${lang}`);
-
   const fund = await getFundDetailBySlug(id, lang);
 
   if (!fund) {
-    console.warn(`Fund not found: slug=${id}, lang=${lang}`);
     notFound();
   }
 

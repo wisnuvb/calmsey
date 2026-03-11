@@ -152,6 +152,7 @@ export function MediaPickerModal({
 
   // Upload modal handlers
   const [dragOver, setDragOver] = useState(false);
+  const [enableImageCompression, setEnableImageCompression] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = (e: React.DragEvent) => {
@@ -159,14 +160,14 @@ export function MediaPickerModal({
     setDragOver(false);
     const files = e.dataTransfer.files;
     if (files.length) {
-      uploadFiles(files);
+      uploadFiles(files, { enableImageCompression });
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files?.length) {
-      uploadFiles(files);
+      uploadFiles(files, { enableImageCompression });
     }
   };
 
@@ -457,6 +458,23 @@ export function MediaPickerModal({
                   className="hidden"
                   accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
                 />
+              </div>
+
+              {/* Compress Images Option */}
+              <div className="mt-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={enableImageCompression}
+                    onChange={(e) =>
+                      setEnableImageCompression(e.target.checked)
+                    }
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="text-sm text-gray-700">
+                    Compress images on upload (smaller file size, recommended)
+                  </span>
+                </label>
               </div>
 
               {/* Supported Formats */}

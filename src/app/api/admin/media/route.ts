@@ -164,6 +164,8 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
+    const enableCompression = formData.get("enableImageCompression");
+    const compress = enableCompression !== "false";
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: "No files provided" }, { status: 400 });
@@ -227,6 +229,7 @@ export async function POST(request: NextRequest) {
         const uploadResult = await MediaUploadService.uploadFile(file, {
           userId: user.id,
           folder: "media",
+          compress,
         });
 
         // Save to database

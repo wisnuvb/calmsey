@@ -18,6 +18,7 @@ interface UploadOptions {
   maxWidth?: number;
   maxHeight?: number;
   generateThumbnail?: boolean;
+  compress?: boolean;
 }
 
 interface UploadResult {
@@ -45,6 +46,7 @@ export class MediaUploadService {
       maxWidth = 1920,
       maxHeight = 1080,
       generateThumbnail = true,
+      compress = true,
     } = options;
 
     // Generate unique filename
@@ -57,11 +59,12 @@ export class MediaUploadService {
     let buffer = Buffer.from(arrayBuffer);
     let processedSize = buffer.length;
     let thumbnailUrl: string | undefined;
+    let contentType = file.type;
 
     const isImage = file.type.startsWith("image/");
 
-    // Process image files
-    if (isImage && file.type !== "image/svg+xml") {
+    // Process image files (only when compress=true)
+    if (compress && isImage && file.type !== "image/svg+xml") {
       try {
         // Compress and resize main image
         const processedBuffer = await sharp(buffer)
@@ -74,6 +77,7 @@ export class MediaUploadService {
 
         buffer = Buffer.from(processedBuffer);
         processedSize = buffer.length;
+        contentType = "image/jpeg";
 
         // Generate thumbnail for images
         if (generateThumbnail) {
@@ -105,12 +109,12 @@ export class MediaUploadService {
     }
 
     // Upload main file to Spaces
-    await this.uploadToSpaces(buffer, filePath, file.type);
+    await this.uploadToSpaces(buffer, filePath, contentType);
 
     return {
       filename: uniqueFilename,
       originalName: file.name,
-      mimeType: file.type,
+      mimeType: contentType,
       size: processedSize,
       url: this.generatePublicUrl(filePath),
       thumbnailUrl,

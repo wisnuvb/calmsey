@@ -32,6 +32,7 @@ interface PageContentEditorProps {
   language?: string;
   initialContent?: Record<string, string>;
   onSave?: (content: Record<string, string>) => void;
+  enableImageCompression?: boolean;
 }
 
 export function PageContentEditor({
@@ -39,6 +40,7 @@ export function PageContentEditor({
   language = "en",
   initialContent = {},
   onSave,
+  enableImageCompression = true,
 }: PageContentEditorProps) {
   const router = useRouter();
   const [content, setContent] =
@@ -207,6 +209,7 @@ export function PageContentEditor({
   const handleImageUpload = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("enableImageCompression", String(enableImageCompression));
 
     try {
       const response = await fetch("/api/admin/media/upload", {
@@ -399,6 +402,7 @@ export function PageContentEditor({
             onChange={handleFieldChange}
             onOpenMediaPicker={handleMultipleFieldOpen}
             error={error}
+            enableImageCompression={enableImageCompression}
           />
         );
 

@@ -3,18 +3,25 @@ import { useState, useCallback } from "react";
 interface UseMediaUploadOptions {
   onSuccess?: () => void;
   onError?: (error: string) => void;
+  enableImageCompression?: boolean;
 }
 
 export function useMediaUpload(options: UseMediaUploadOptions = {}) {
-  const { onSuccess, onError } = options;
+  const { onSuccess, onError, enableImageCompression = true } = options;
   const [uploading, setUploading] = useState(false);
 
   const uploadFiles = useCallback(
-    async (files: FileList) => {
+    async (
+      files: FileList,
+      overrides?: { enableImageCompression?: boolean }
+    ) => {
       if (!files.length) return;
 
       setUploading(true);
       const formData = new FormData();
+      const compress =
+        overrides?.enableImageCompression ?? enableImageCompression;
+      formData.append("enableImageCompression", String(compress));
 
       Array.from(files).forEach((file) => {
         formData.append("files", file);
@@ -43,7 +50,7 @@ export function useMediaUpload(options: UseMediaUploadOptions = {}) {
         setUploading(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError, enableImageCompression]
   );
 
   return {

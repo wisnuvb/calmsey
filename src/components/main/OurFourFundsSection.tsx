@@ -130,6 +130,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
     // Use default funds (convert FundData to Fund)
     funds = defaultFundsData.map(convertFundDataToFund);
   }
+
   return (
     <section className={cn("bg-white py-16 lg:py-24", className)}>
       <div className="container mx-auto px-4">
@@ -155,7 +156,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
               key={fund.id}
               className={cn(
                 "flex flex-col items-start gap-6 sm:gap-16",
-                fund.imagePosition === "right"
+                fund.imagePosition === "left"
                   ? "lg:flex-row"
                   : "lg:flex-row-reverse",
               )}
