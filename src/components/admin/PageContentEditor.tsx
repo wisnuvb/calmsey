@@ -46,6 +46,7 @@ export function PageContentEditor({
   const [content, setContent] =
     useState<Record<string, string>>(initialContent);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
@@ -76,6 +77,7 @@ export function PageContentEditor({
   }, [pageType, language]);
 
   const fetchContent = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         `/api/admin/page-content/${pageType}?language=${language}`
@@ -84,18 +86,26 @@ export function PageContentEditor({
         const data = await response.json();
         let contentData = data.content || {};
 
-        // Hydrate empty multiple fields with schema defaults (e.g. "[]" -> defaultValue)
         if (schema) {
           schema.fields.forEach((field) => {
+            const hasKey = field.key in contentData;
+            const value = contentData[field.key] ?? "";
+
             if (field.type === "multiple" && field.defaultValue) {
-              const value = contentData[field.key] ?? "";
-              const trimmed = (value || "").trim();
-              if (!trimmed || trimmed === "[]") {
+              // Prioritas 1: Use defaultValue ONLY when key is truly missing
+              // NEVER replace "[]" - it's a valid value (user intentionally empty list)
+              if (!hasKey || (hasKey && !value.trim())) {
                 contentData = {
                   ...contentData,
                   [field.key]: field.defaultValue,
                 };
               }
+            } else if (!hasKey && field.defaultValue) {
+              // Prioritas 2: Initialize new field from schema to state
+              contentData = {
+                ...contentData,
+                [field.key]: field.defaultValue,
+              };
             }
           });
         }
@@ -104,6 +114,8 @@ export function PageContentEditor({
       }
     } catch (error) {
       console.error("Error fetching content:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -139,6 +151,25 @@ export function PageContentEditor({
   };
 
   const handleSave = async () => {
+    // Prioritas 1: Prevent save when content is empty (data loss)
+    if (isLoading) {
+      addToast({
+        type: "error",
+        title: "Please wait",
+        description: "Content is still loading. Please wait before saving.",
+        duration: 4000,
+      });
+      return;
+    }
+    if (Object.keys(content).length === 0) {
+      addToast({
+        type: "error",
+        title: "Cannot Save",
+        description: "Content has not loaded yet or is empty. Please refresh the page.",
+        duration: 5000,
+      });
+      return;
+    }
     if (!validateForm()) {
       // Find first tab with error
       if (schema) {
@@ -231,14 +262,15 @@ export function PageContentEditor({
 
   const renderField = (field: FieldDefinition) => {
     let value = content[field.key] ?? "";
-    // For multiple fields: use defaultValue when stored value is empty array "[]"
+    // Priority 1: "[]" is a valid value (user intentionally empty) - DO NOT replace with defaultValue
+    // Only use defaultValue when key is missing or value is truly empty ("")
     if (field.type === "multiple" && field.defaultValue) {
       const trimmed = (value || "").trim();
-      if (!trimmed || trimmed === "[]") {
+      if (!trimmed) {
         value = field.defaultValue;
       }
-    }
-    if (!value && field.defaultValue) {
+      // trimmed === "[]" is not replaced - respect user intent
+    } else if (!value && field.defaultValue) {
       value = field.defaultValue;
     }
     value = value || "";
@@ -614,10 +646,10 @@ export function PageContentEditor({
 
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || isLoading}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
           >
-            {saving ? "Saving..." : "Save Changes"}
+            {isLoading ? "Loading..." : saving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>

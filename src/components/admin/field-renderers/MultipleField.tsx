@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from "react";
 import Image from "next/image";
 import {
   Plus,
@@ -7,6 +8,7 @@ import {
   Image as ImageIcon,
   File,
   Download,
+  AlertCircle,
 } from "lucide-react";
 import { FieldDefinition, MultipleItemField } from "@/lib/page-content-schema";
 import { TextField } from "./TextField";
@@ -101,7 +103,9 @@ export function MultipleField({
   };
 
   // Parse current value as JSON array
+  // Prioritas 3: Track parse error for user feedback + "Reset to default" option
   let items: Record<string, any>[] = [];
+  let parseError = false;
   try {
     if (value && value.trim()) {
       const parsed = JSON.parse(value);
@@ -126,7 +130,7 @@ export function MultipleField({
       }
     }
   } catch {
-    // If parsing fails, reset to empty array
+    parseError = true;
     items = [];
   }
 
@@ -770,6 +774,40 @@ export function MultipleField({
 
   return (
     <div>
+      {parseError && value && value.trim() && (
+        <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-amber-800">
+                Invalid data format. The stored value could not be parsed as a
+                valid list.
+              </p>
+              <p className="text-sm text-amber-700 mt-1">
+                You can reset to default or add new items to fix this.
+              </p>
+              <div className="flex gap-2 mt-3">
+                {field.defaultValue && (
+                  <button
+                    type="button"
+                    onClick={() => onChange(field.defaultValue!)}
+                    className="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 text-sm font-medium"
+                  >
+                    Reset to Default
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => onChange("[]")}
+                  className="px-4 py-2 border border-amber-300 text-amber-800 rounded-md hover:bg-amber-100 text-sm font-medium"
+                >
+                  Start with Empty List
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-gray-600">
           {field.helpText || "Manage multiple items"}
