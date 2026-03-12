@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
-import { Linkedin, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { H2, P } from "@/components/ui/typography";
-import { cn, getImageUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { MemberDetailModal } from "@/components/ui/MemberDetailModal";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { SteeringCommitteCard } from "./SteeringCommitteCard";

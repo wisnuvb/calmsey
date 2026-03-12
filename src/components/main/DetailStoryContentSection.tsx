@@ -14,7 +14,7 @@ import {
   Linkedin,
   MessageCircle,
 } from "lucide-react";
-import { H2, H3, H4, P } from "../ui/typography";
+import { H2, H3, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 

@@ -10,13 +10,14 @@ import { usePageContent } from "@/contexts/PageContentContext";
  * - getValue: Priority: context > propValue > defaultValue
  */
 export function usePageContentHelpers() {
-  // Try to get content from context, fallback to empty object if not available
   let pageContent: Record<string, string> = {};
+  let language = "en";
   try {
     const context = usePageContent();
     pageContent = context.content;
+    language = context.language;
   } catch {
-    // Not in PageContentProvider, use props only
+    // Not in PageContentProvider, use defaults
   }
 
   /**
@@ -59,6 +60,7 @@ export function usePageContentHelpers() {
 
   return {
     pageContent,
+    language,
     getContentValue,
     getContentJSON,
     getValue,

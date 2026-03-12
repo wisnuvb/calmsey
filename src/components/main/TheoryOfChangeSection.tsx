@@ -57,6 +57,7 @@ We support ongoing efforts to build accountability, respect and awareness amongs
     <section
       className={cn("bg-white py-16 lg:py-24", className)}
       data-section="theory-of-change"
+      id="theory-of-change"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title Section */}

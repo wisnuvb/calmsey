@@ -157,6 +157,12 @@ export function MultipleField({
   error,
   enableImageCompression = true,
 }: MultipleFieldProps) {
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
   if (!field.itemSchema || field.itemSchema.length === 0) {
     return (
       <div className="p-4 bg-yellow-50 border border-yellow-200 rounded">
@@ -248,13 +254,6 @@ export function MultipleField({
     parseError = true;
     items = [];
   }
-
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

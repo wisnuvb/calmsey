@@ -533,7 +533,7 @@ export function GrantmakingSection({
   };
 
   return (
-    <>
+    <div id="our-approach-to-grantmaking">
       <hr className="border-[#C3D7E8] container mx-auto px-4" />
       <section className={cn("bg-white py-16 lg:py-24", className)}>
         <div className="container mx-auto px-4">
@@ -868,6 +868,6 @@ export function GrantmakingSection({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

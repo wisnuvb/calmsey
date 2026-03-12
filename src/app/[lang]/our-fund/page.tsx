@@ -2,7 +2,6 @@ import {
   FeedbackCalloutSection,
   HeroSection,
   OurFourFundsSection,
-  OurPartnersSection,
 } from "@/components/main";
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";

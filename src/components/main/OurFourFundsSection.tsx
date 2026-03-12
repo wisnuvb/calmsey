@@ -7,7 +7,6 @@ import { ArrowRight, Waves, Globe, Zap, Lightbulb } from "lucide-react";
 import { H2, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
-import { usePageContent } from "@/contexts/PageContentContext";
 
 /** Raw item from fundDetails.funds (admin Fund Details) - used so listing order matches admin */
 interface FundDetailsFundItem {
@@ -142,13 +141,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
   funds: propFunds,
   className,
 }) => {
-  const { getValue, getContentJSON } = usePageContentHelpers();
-  let language = "en";
-  try {
-    language = usePageContent().language;
-  } catch {
-    // not inside PageContentProvider
-  }
+  const { getValue, getContentJSON, language } = usePageContentHelpers();
 
   // Get all values with priority: context > props > default
   const title = getValue("fourFunds.title", propTitle, "Our Four Funds");
