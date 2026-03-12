@@ -197,8 +197,7 @@ function handleLanguageRouting(
       // Preserve search params and construct new URL using correct origin
       const newUrl = new URL(`/${defaultLanguage}${pathname}`, origin);
       newUrl.search = searchParams;
-      // Use HTML response with client-side redirect to preserve hash fragment
-      return createRedirectResponse(newUrl.toString());
+      return NextResponse.redirect(newUrl, 307);
     }
 
     // If no language specified and not root, add default language
@@ -206,74 +205,11 @@ function handleLanguageRouting(
       // Preserve search params and construct new URL using correct origin
       const newUrl = new URL(`/${defaultLanguage}${pathname}`, origin);
       newUrl.search = searchParams;
-      // Use HTML response with client-side redirect to preserve hash fragment
-      return createRedirectResponse(newUrl.toString());
+      return NextResponse.redirect(newUrl, 307);
     }
   }
 
   return NextResponse.next();
-}
-
-/**
- * Create a response that redirects client-side to preserve hash fragments
- * Hash fragments are not available in server-side middleware, so we use
- * client-side JavaScript to perform the redirect while preserving the hash
- */
-function createRedirectResponse(targetUrl: string): NextResponse {
-  // Ensure targetUrl is absolute and doesn't contain localhost in production
-  if (process.env.NODE_ENV === "production" && targetUrl.includes("localhost")) {
-    console.error("Error: Redirect URL contains localhost in production:", targetUrl);
-    // This should not happen, but if it does, we should log it
-  }
-
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Redirecting...</title>
-  <script>
-    // Preserve hash fragment from current URL
-    const currentHash = window.location.hash;
-    const targetUrl = ${JSON.stringify(targetUrl)};
-    
-    // Ensure we're using the correct protocol and domain
-    // If targetUrl is relative or has wrong domain, use current origin
-    let finalUrl = targetUrl;
-    if (currentHash) {
-      // Only add hash if targetUrl doesn't already have one
-      finalUrl = targetUrl.includes('#') ? targetUrl : targetUrl + currentHash;
-    }
-    
-    // Double check: if finalUrl contains localhost but we're not on localhost, fix it
-    if (finalUrl.includes('localhost') && !window.location.hostname.includes('localhost')) {
-      const currentOrigin = window.location.origin;
-      try {
-        const urlObj = new URL(finalUrl, window.location.href);
-        const urlPath = urlObj.pathname + urlObj.search;
-        finalUrl = currentOrigin + urlPath + (currentHash || '');
-      } catch (e) {
-        // If URL parsing fails, use current origin + path from targetUrl
-        const pathMatch = finalUrl.match(/\\/[^\\s]*/);
-        const path = pathMatch ? pathMatch[0] : '';
-        finalUrl = currentOrigin + path + (currentHash || '');
-      }
-    }
-    
-    window.location.replace(finalUrl);
-  </script>
-  <meta http-equiv="refresh" content="0;url=${targetUrl}">
-</head>
-<body>
-  <p>Redirecting... <a href="${targetUrl}" aria-label="Redirect to ${targetUrl}">Click here if you are not redirected.</a></p>
-</body>
-</html>`;
-
-  return new NextResponse(html, {
-    status: 200,
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-    },
-  });
 }
 
 export const config = {

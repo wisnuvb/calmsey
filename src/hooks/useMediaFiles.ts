@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+
+const SEARCH_DEBOUNCE_MS = 300;
 
 interface MediaFile {
   id: string;
@@ -55,8 +57,10 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(autoFetch);
   const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
   const [filter, setFilter] = useState<FileFilter>(initialFilter);
   const [currentPage, setCurrentPage] = useState(1);
+  const hasLoadedOnce = useRef(false);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: itemsPerPage,
@@ -76,9 +80,12 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
 
   const fetchMediaFiles = useCallback(async () => {
     try {
-      setLoading(true);
+      // Only show full-page loading on initial load so search input doesn't unmount on refetch
+      if (!hasLoadedOnce.current) {
+        setLoading(true);
+      }
       const params = new URLSearchParams({
-        search,
+        search: debouncedSearch,
         filter: filter === "all" ? "" : filter,
         page: currentPage.toString(),
         limit: itemsPerPage.toString(),
@@ -88,6 +95,7 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
       const data = await response.json();
 
       if (data.success) {
+        hasLoadedOnce.current = true;
         setMediaFiles(data.data || []);
         setStats(
           data.stats || {
@@ -99,7 +107,6 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
             totalSize: 0,
           }
         );
-        // Set pagination info dari response
         if (data.pagination) {
           setPagination(data.pagination);
         }
@@ -111,7 +118,15 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
     } finally {
       setLoading(false);
     }
-  }, [search, filter, currentPage, itemsPerPage]);
+  }, [debouncedSearch, filter, currentPage, itemsPerPage]);
+
+  // Debounce search so API isn't called on every keystroke
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [search]);
 
   // Handler untuk page change
   const handlePageChange = useCallback((page: number) => {
@@ -120,7 +135,7 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // Reset ke page 1 saat search atau filter berubah
+  // Reset to page 1 when user changes search (input) or filter
   useEffect(() => {
     setCurrentPage(1);
   }, [search, filter]);
@@ -129,7 +144,7 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
     if (autoFetch) {
       fetchMediaFiles();
     }
-  }, [search, filter, currentPage, autoFetch, fetchMediaFiles]);
+  }, [debouncedSearch, filter, currentPage, autoFetch, fetchMediaFiles]);
 
   return {
     // Data

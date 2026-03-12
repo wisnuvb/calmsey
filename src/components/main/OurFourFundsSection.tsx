@@ -7,6 +7,18 @@ import { ArrowRight, Waves, Globe, Zap, Lightbulb } from "lucide-react";
 import { H2, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
+import { usePageContent } from "@/contexts/PageContentContext";
+
+/** Raw item from fundDetails.funds (admin Fund Details) - used so listing order matches admin */
+interface FundDetailsFundItem {
+  slug?: string;
+  id?: string;
+  headerTitle?: string;
+  headerSubtitle?: string;
+  headerHeroImageSrc?: string;
+  headerHeroImageAlt?: string;
+  intro?: string;
+}
 
 interface FundData {
   id: string;
@@ -100,6 +112,30 @@ const convertFundDataToFund = (fundData: FundData): Fund => ({
   icon: getIconComponent(fundData.icon),
 });
 
+const ICON_ORDER = ["Waves", "Globe", "Zap", "Lightbulb"] as const;
+
+/** Map fundDetails.funds item (admin order) to FundData for listing */
+function mapFundDetailsToFundData(
+  item: FundDetailsFundItem,
+  index: number,
+  language: string
+): FundData {
+  const slug = item.slug || "";
+  const firstParagraph = item.intro
+    ? item.intro.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)[0] || ""
+    : "";
+  return {
+    id: item.id || slug || `fund-${index}`,
+    title: item.headerTitle || "",
+    description: item.headerSubtitle || firstParagraph,
+    imageSrc: item.headerHeroImageSrc || "",
+    imageAlt: item.headerHeroImageAlt || "",
+    icon: ICON_ORDER[index % ICON_ORDER.length],
+    learnMoreLink: `/${language}/our-fund/${slug}`,
+    imagePosition: index % 2 === 0 ? "left" : "right",
+  };
+}
+
 export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
   title: propTitle,
   description: propDescription,
@@ -107,6 +143,12 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
   className,
 }) => {
   const { getValue, getContentJSON } = usePageContentHelpers();
+  let language = "en";
+  try {
+    language = usePageContent().language;
+  } catch {
+    // not inside PageContentProvider
+  }
 
   // Get all values with priority: context > props > default
   const title = getValue("fourFunds.title", propTitle, "Our Four Funds");
@@ -116,18 +158,26 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
     "Turning Tides supports partners through four interacting funds, each of which supports different pathways toward change. Each fund is governed separately to increase responsiveness to partners' expressed needs and opportunities to create change.",
   );
 
-  // Get funds with priority: context > props > default
-  const contextFundsData = getContentJSON<FundData[]>("fourFunds.funds", []);
+  // Prefer fundDetails.funds (same as admin Fund Details) so order and list match the admin
+  const fundDetailsList = getContentJSON<FundDetailsFundItem[]>("fundDetails.funds", []);
+  const fourFundsList = getContentJSON<FundData[]>("fourFunds.funds", []);
 
   let funds: Fund[];
-  if (contextFundsData.length > 0) {
-    // Convert FundData from context to Fund
-    funds = contextFundsData.map(convertFundDataToFund);
+  const fromFundDetails =
+    Array.isArray(fundDetailsList) &&
+    fundDetailsList.length > 0 &&
+    fundDetailsList.some((f) => f?.headerTitle && f?.slug);
+  if (fromFundDetails) {
+    const mapped = fundDetailsList
+      .filter((f) => f?.slug)
+      .map((f, i) => mapFundDetailsToFundData(f, i, language))
+      .filter((f) => f.title && f.imageSrc);
+    funds = mapped.length > 0 ? mapped.map(convertFundDataToFund) : fourFundsList.length > 0 ? fourFundsList.map(convertFundDataToFund) : defaultFundsData.map(convertFundDataToFund);
+  } else if (fourFundsList.length > 0) {
+    funds = fourFundsList.map(convertFundDataToFund);
   } else if (propFunds && propFunds.length > 0) {
-    // Use props directly (already have React icon components)
     funds = propFunds;
   } else {
-    // Use default funds (convert FundData to Fund)
     funds = defaultFundsData.map(convertFundDataToFund);
   }
 

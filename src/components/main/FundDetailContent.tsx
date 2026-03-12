@@ -35,19 +35,22 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
       "inline-flex items-center gap-2 px-8 py-4 rounded-md font-medium transition-colors duration-300";
 
     if (cta.type === "pdf-download") {
+      const isExternal = cta.file?.startsWith("http") ?? false;
       return (
         <a
           href={cta.file}
-          download
+          download={!isExternal && cta.text ? `${cta.text.replace(/\s+/g, "-")}.pdf` : undefined}
+          target={isExternal ? "_blank" : undefined}
+          rel={isExternal ? "noopener noreferrer" : undefined}
           className={cn(
             baseButtonClasses,
-            "bg-[#3C62ED] text-white hover:bg-[#2d4fd6]"
+            "gap-3 rounded-lg bg-[#3C62ED] text-white hover:bg-[#2d4fd6]"
           )}
           aria-label={`Download ${cta.text}`}
         >
-          <FileText className="w-5 h-5" />
+          <FileText className="w-5 h-5 flex-shrink-0" aria-hidden />
           <span>{cta.text}</span>
-          <Download className="w-4 h-4" />
+          <Download className="w-5 h-5 flex-shrink-0" aria-hidden />
         </a>
       );
     }

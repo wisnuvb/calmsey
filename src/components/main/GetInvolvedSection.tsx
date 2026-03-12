@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { ChevronDown, Send } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
 
@@ -24,14 +25,24 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   overlayDescription = "Join Turning Tides in supporting Indigenous Peoples, small-scale fishers, and coastal communities to secure and control their territories—work that is inseparable from environmental and social justice",
   backgroundColor = "bg-white",
 }) => {
+  const searchParams = useSearchParams();
+  const becomeParam = searchParams.get("become");
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     organization: "",
     country: "",
-    partnershipType: "",
+    partnershipType: becomeParam === "funder" ? "Funding Partner" : "",
     message: "",
   });
+
+  // Sync partnershipType when URL has ?become=funder (e.g. after client-side nav)
+  useEffect(() => {
+    if (becomeParam === "funder") {
+      setFormData((prev) => ({ ...prev, partnershipType: "Funding Partner" }));
+    }
+  }, [becomeParam]);
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);

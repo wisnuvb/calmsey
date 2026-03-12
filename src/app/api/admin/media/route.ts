@@ -20,21 +20,11 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: any = {};
 
-    // Search filter
+    // Search filter (MySQL does not support mode: "insensitive"; use contains only; collation may still be case-insensitive)
     if (search) {
       where.OR = [
-        {
-          originalName: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
-        {
-          filename: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
+        { originalName: { contains: search } },
+        { filename: { contains: search } },
       ];
     }
 

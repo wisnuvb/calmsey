@@ -813,7 +813,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
         {
           key: "headerHeroImageAlt",
           label: "Header Hero Image Alt Text",
-          type: "text",
+          type: "image",
           required: true,
           placeholder: "Description of the image",
           helpText: "Alternative text for the hero image (for accessibility)",

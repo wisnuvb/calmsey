@@ -9,10 +9,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Forward,
+  Facebook,
+  Twitter,
+  Linkedin,
+  MessageCircle,
 } from "lucide-react";
 import { H2, H3, H4, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
-import { shareContent } from "@/lib/share-utils";
 import Image from "next/image";
 
 interface PartnerOrganization {
@@ -54,34 +57,35 @@ export function DetailStoryContentSection({
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [showCopyNotification, setShowCopyNotification] = useState(false);
+  const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
 
   // Default values
   const photosList = photos || [];
   const relatedArticlesList = relatedArticles || [];
 
-  // Share handler
-  const handleShare = async () => {
-    const success = await shareContent(
-      {
-        title: document.title,
-        text: description.substring(0, 200) + "...",
-        url: window.location.href,
-      },
-      {
-        onSuccess: () => {
-          setShowCopyNotification(true);
-          setTimeout(() => setShowCopyNotification(false), 2000);
-        },
-        onError: (error) => {
-          console.error("Share failed:", error);
-        },
-      },
-    );
+  const toggleShareMenu = () => {
+    setIsShareMenuOpen(!isShareMenuOpen);
+  };
 
-    // Show notification even if share was successful via native share
-    if (success) {
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+  const shareText = encodeURIComponent(description.substring(0, 100) + "...");
+  const encodedUrl = encodeURIComponent(currentUrl);
+
+  const shareLinks = {
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+    twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${shareText}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+    whatsapp: `https://api.whatsapp.com/send?text=${shareText}%20${encodedUrl}`,
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(currentUrl);
       setShowCopyNotification(true);
+      setIsShareMenuOpen(false);
       setTimeout(() => setShowCopyNotification(false), 2000);
+    } catch (error) {
+      console.error("Copy failed", error);
     }
   };
 
@@ -214,20 +218,76 @@ export function DetailStoryContentSection({
                       </span>
                     </button>
                   )} */}
-                  <button
-                    onClick={handleShare}
-                    className="w-full flex items-center justify-center space-x-2 px-4 py-5 bg-[#3C62ED] text-white rounded-lg hover:bg-gray-800 transition-colors relative"
-                  >
-                    <span className="font-work-sans font-medium">
-                      Share on Social Media
-                    </span>
-                    <Forward className="w-4 h-4" />
+                  <div className="relative w-full">
+                    <button
+                      onClick={toggleShareMenu}
+                      className="w-full flex items-center justify-center space-x-2 px-4 py-5 bg-[#3C62ED] text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    >
+                      <span className="font-work-sans font-medium">
+                        Share on Social Media
+                      </span>
+                      <Forward className="w-4 h-4" />
+                    </button>
+
+                    {isShareMenuOpen && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setIsShareMenuOpen(false)}
+                        />
+                        <div className="absolute right-0 bottom-full mb-2 w-full bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden text-sm font-work-sans p-1">
+                          <a
+                            href={shareLinks.facebook}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-[#1877F2] transition-colors rounded-md"
+                          >
+                            <Facebook className="w-5 h-5" />
+                            <span>Facebook</span>
+                          </a>
+                          <a
+                            href={shareLinks.twitter}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-black transition-colors rounded-md"
+                          >
+                            <Twitter className="w-5 h-5" />
+                            <span>X (Twitter)</span>
+                          </a>
+                          <a
+                            href={shareLinks.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-[#0A66C2] transition-colors rounded-md"
+                          >
+                            <Linkedin className="w-5 h-5" />
+                            <span>LinkedIn</span>
+                          </a>
+                          <a
+                            href={shareLinks.whatsapp}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-[#25D366] transition-colors rounded-md"
+                          >
+                            <MessageCircle className="w-5 h-5" />
+                            <span>WhatsApp</span>
+                          </a>
+                          <button
+                            onClick={handleCopyLink}
+                            className="flex items-center space-x-3 w-full px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors rounded-md"
+                          >
+                            <LinkIcon className="w-5 h-5" />
+                            <span>Copy Link</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
                     {showCopyNotification && (
-                      <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white text-xs px-3 py-1 rounded whitespace-nowrap">
+                      <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white text-xs px-3 py-1 rounded whitespace-nowrap z-50">
                         Link copied!
                       </span>
                     )}
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>

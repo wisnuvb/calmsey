@@ -149,8 +149,7 @@ export function Footer() {
                 className="w-auto h-11 object-contain"
               />
               <p className="font-work-sans font-normal text-base text-white/80 leading-[150%] tracking-[0%]">
-                Turning Tides is legally and fiscally hosted by{" "}
-                <strong>the Tenure Facility Fund</strong>
+              Turning Tides is a fiscally sponsored project of the Tenure Facility Fund, a U.S. 501c3.
               </p>
             </div>
           </div>

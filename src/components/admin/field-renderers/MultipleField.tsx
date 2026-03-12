@@ -1,15 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import { useState } from "react";
 import Image from "next/image";
 import {
   Plus,
   Trash2,
   GripVertical,
+  ChevronDown,
+  ChevronRight,
   Image as ImageIcon,
   File,
   Download,
   AlertCircle,
 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { FieldDefinition, MultipleItemField } from "@/lib/page-content-schema";
 import { TextField } from "./TextField";
 import { TextareaField } from "./TextareaField";
@@ -32,6 +53,100 @@ interface MultipleFieldProps {
   ) => void;
   error?: string;
   enableImageCompression?: boolean;
+}
+
+/** Build a short label for accordion header from item data or "Item N" */
+function getItemSummary(item: Record<string, any>, index: number, itemSchema?: MultipleItemField[]): string {
+  const keys = ["slug", "headerTitle", "title", "headerSmallHeading", "id", "label"];
+  for (const k of keys) {
+    const v = item[k];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  if (itemSchema?.length) {
+    const first = itemSchema[0];
+    const v = item[first.key];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return `Item ${index + 1}`;
+}
+
+/** Sortable accordion item wrapper: drag handle + header + collapsible body */
+function SortableMultipleItem({
+  id,
+  isExpanded,
+  onToggle,
+  summary,
+  onRemove,
+  itemLabel,
+  children,
+}: {
+  id: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+  summary: string;
+  onRemove: () => void;
+  itemLabel?: string;
+  children: React.ReactNode;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`border border-gray-200 rounded-lg bg-gray-50 overflow-hidden ${
+        isDragging ? "shadow-lg opacity-70 z-10" : ""
+      }`}
+    >
+      <div className="flex items-center gap-2 p-3 pr-2">
+        <button
+          type="button"
+          className="p-1.5 rounded hover:bg-gray-200 text-gray-500 touch-none cursor-grab active:cursor-grabbing"
+          aria-label="Drag to reorder"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="w-5 h-5" />
+        </button>
+        <button
+          type="button"
+          onClick={onToggle}
+          className="flex items-center gap-2 flex-1 min-w-0 text-left py-1.5 px-2 rounded hover:bg-gray-200 transition-colors"
+          aria-expanded={isExpanded}
+        >
+          {isExpanded ? (
+            <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+          ) : (
+            <ChevronRight className="w-5 h-5 text-gray-500 flex-shrink-0" />
+          )}
+          <span className="text-sm font-medium text-gray-700 truncate">
+            {summary || itemLabel || "Item"}
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors flex-shrink-0"
+          title="Remove item"
+        >
+          <Trash2 className="w-5 h-5" />
+        </button>
+      </div>
+      {isExpanded && <div className="px-4 pb-4 pt-0 space-y-4 border-t border-gray-200">{children}</div>}
+    </div>
+  );
 }
 
 export function MultipleField({
@@ -134,6 +249,24 @@ export function MultipleField({
     items = [];
   }
 
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = Number(active.id);
+    const newIndex = Number(over.id);
+    if (Number.isNaN(oldIndex) || Number.isNaN(newIndex)) return;
+    const reordered = arrayMove(items, oldIndex, newIndex);
+    onChange(JSON.stringify(reordered, null, 2));
+    setExpandedIndex(newIndex);
+  };
+
   const handleMultipleAdd = () => {
     const newItem: Record<string, any> = {};
     field.itemSchema?.forEach((itemField) => {
@@ -141,11 +274,17 @@ export function MultipleField({
     });
     const newItems = [...items, newItem];
     onChange(JSON.stringify(newItems, null, 2));
+    setExpandedIndex(newItems.length - 1);
   };
 
   const handleMultipleRemove = (index: number) => {
     const newItems = items.filter((_, i) => i !== index);
     onChange(JSON.stringify(newItems, null, 2));
+    if (expandedIndex === index) {
+      setExpandedIndex(newItems.length > 0 ? Math.min(index, newItems.length - 1) : null);
+    } else if (expandedIndex !== null && expandedIndex > index) {
+      setExpandedIndex(expandedIndex - 1);
+    }
   };
 
   const handleMultipleItemChange = (
@@ -810,16 +949,8 @@ export function MultipleField({
       )}
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-gray-600">
-          {field.helpText || "Manage multiple items"}
+          {field.helpText || "Manage multiple items. Drag to reorder; click row to expand or collapse."}
         </p>
-        <button
-          type="button"
-          onClick={handleMultipleAdd}
-          className="items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium hidden"
-        >
-          <Plus className="w-4 h-4" />
-          Add {field.itemLabel || "Item"}
-        </button>
       </div>
 
       {items.length === 0 ? (
@@ -830,52 +961,51 @@ export function MultipleField({
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {items.map((item, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 rounded-lg p-6 bg-gray-50"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <GripVertical className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700">
-                    {field.itemLabel || "Item"} {index + 1}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleMultipleRemove(index)}
-                  className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
-                  title="Remove item"
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={items.map((_, i) => String(i))}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-3">
+              {items.map((item, index) => (
+                <SortableMultipleItem
+                  key={index}
+                  id={String(index)}
+                  isExpanded={expandedIndex === index}
+                  onToggle={() =>
+                    setExpandedIndex(expandedIndex === index ? null : index)
+                  }
+                  summary={getItemSummary(item, index, field.itemSchema)}
+                  onRemove={() => handleMultipleRemove(index)}
+                  itemLabel={field.itemLabel}
                 >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {field.itemSchema?.map((itemField) => (
-                  <div key={itemField.key}>
-                    <label className="block mb-2">
-                      <span className="text-sm font-medium text-gray-700">
-                        {itemField.label}
-                        {itemField.required && (
-                          <span className="text-red-500 ml-1">*</span>
-                        )}
-                      </span>
-                    </label>
-                    {renderMultipleItemField(itemField, item, index)}
-                    {itemField.helpText && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        {itemField.helpText}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  {field.itemSchema?.map((itemField) => (
+                    <div key={itemField.key}>
+                      <label className="block mb-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          {itemField.label}
+                          {itemField.required && (
+                            <span className="text-red-500 ml-1">*</span>
+                          )}
+                        </span>
+                      </label>
+                      {renderMultipleItemField(itemField, item, index)}
+                      {itemField.helpText && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {itemField.helpText}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </SortableMultipleItem>
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+        </DndContext>
       )}
       <button
         type="button"

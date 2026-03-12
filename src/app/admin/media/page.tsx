@@ -18,6 +18,7 @@ import {
   XMarkIcon,
   CheckIcon,
   ExclamationTriangleIcon,
+  ClipboardIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import {
@@ -29,6 +30,7 @@ import {
 import { useMedia } from "@/hooks/useMedia";
 import { getImageUrl } from "@/lib/utils";
 import { Pagination } from "@/components/common/Pagination";
+import { useToast } from "@/components/ui/toast";
 
 export default function MediaPage() {
   const [previewFile, setPreviewFile] = useState<MediaFile | null>(null);
@@ -72,7 +74,8 @@ export default function MediaPage() {
     selectAllFiles(filteredFiles.map((file) => file.id));
   }, [selectAllFiles, filteredFiles]);
 
-  if (loading) {
+  // Only show full-page skeleton on initial load so search/filter refetch doesn't unmount the form (losing focus)
+  if (loading && filteredFiles.length === 0) {
     return (
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="animate-pulse">
@@ -182,16 +185,22 @@ export default function MediaPage() {
       <div className="mt-6 bg-white shadow rounded-lg p-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            {/* Search */}
-            <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            {/* Search - value controlled by hook; refetch is debounced so input keeps focus */}
+            <div className="relative min-w-[200px] sm:w-64">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search files..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Search files"
               />
+              {loading && filteredFiles.length > 0 && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+                  Searching...
+                </span>
+              )}
             </div>
 
             {/* Filter */}
@@ -208,10 +217,11 @@ export default function MediaPage() {
                 <button
                   key={filterOption.key}
                   onClick={() => setFilter(filterOption.key)}
-                  className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap ${filter === filterOption.key
-                    ? "bg-blue-100 text-blue-700 border border-blue-300"
-                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                    }`}
+                  className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap ${
+                    filter === filterOption.key
+                      ? "bg-blue-100 text-blue-700 border border-blue-300"
+                      : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                  }`}
                 >
                   <filterOption.icon className="h-4 w-4 mr-1" />
                   {filterOption.label}
@@ -224,19 +234,21 @@ export default function MediaPage() {
           <div className="flex justify-end space-x-1">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-md ${viewMode === "grid"
-                ? "bg-blue-100 text-blue-700"
-                : "text-gray-400 hover:text-gray-600"
-                }`}
+              className={`p-2 rounded-md ${
+                viewMode === "grid"
+                  ? "bg-blue-100 text-blue-700"
+                  : "text-gray-400 hover:text-gray-600"
+              }`}
             >
               <Squares2X2Icon className="h-5 w-5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2 rounded-md ${viewMode === "list"
-                ? "bg-blue-100 text-blue-700"
-                : "text-gray-400 hover:text-gray-600"
-                }`}
+              className={`p-2 rounded-md ${
+                viewMode === "list"
+                  ? "bg-blue-100 text-blue-700"
+                  : "text-gray-400 hover:text-gray-600"
+              }`}
             >
               <ListBulletIcon className="h-5 w-5" />
             </button>
@@ -351,10 +363,11 @@ export default function MediaPage() {
                   <span className="font-medium">
                     {Math.min(
                       pagination.page * pagination.limit,
-                      pagination.totalCount
+                      pagination.totalCount,
                     )}
                   </span>{" "}
-                  of <span className="font-medium">{pagination.totalCount}</span>{" "}
+                  of{" "}
+                  <span className="font-medium">{pagination.totalCount}</span>{" "}
                   results
                 </div>
                 <Pagination
@@ -481,11 +494,13 @@ function MediaCard({
 }) {
   const FileIcon = getFileIcon(file.mimeType);
   const isImage = file.mimeType.startsWith("image/");
+  const { addToast } = useToast();
 
   return (
     <div
-      className={`bg-white border rounded-lg p-4 hover:shadow-md transition-shadow ${selected ? "ring-2 ring-blue-500 border-blue-300" : "border-gray-200"
-        }`}
+      className={`bg-white border rounded-lg p-4 hover:shadow-md transition-shadow ${
+        selected ? "ring-2 ring-blue-500 border-blue-300" : "border-gray-200"
+      }`}
     >
       {bulkMode && (
         <div className="mb-3">
@@ -551,6 +566,20 @@ function MediaCard({
               >
                 <DocumentArrowDownIcon className="h-4 w-4" />
               </a>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(file.url);
+                  addToast({
+                    title: "File URL copied to clipboard",
+                    type: "success",
+                  });
+                }}
+                className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                title="Copy file URL"
+                aria-label="Copy file URL"
+              >
+                <ClipboardIcon className="h-4 w-4" />
+              </button>
             </div>
             <button
               onClick={onDelete}
@@ -684,7 +713,7 @@ function UploadModal({
   onClose: () => void;
   onUpload: (
     files: FileList,
-    options?: { enableImageCompression?: boolean }
+    options?: { enableImageCompression?: boolean },
   ) => void;
   uploading: boolean;
 }) {
@@ -733,10 +762,11 @@ function UploadModal({
         <div className="p-6">
           {/* Drag and Drop Area */}
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragOver
-              ? "border-blue-400 bg-blue-50"
-              : "border-gray-300 hover:border-gray-400"
-              }`}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              dragOver
+                ? "border-blue-400 bg-blue-50"
+                : "border-gray-300 hover:border-gray-400"
+            }`}
             onDrop={handleDrop}
             onDragOver={(e) => {
               e.preventDefault();
@@ -787,9 +817,7 @@ function UploadModal({
               <input
                 type="checkbox"
                 checked={enableImageCompression}
-                onChange={(e) =>
-                  setEnableImageCompression(e.target.checked)
-                }
+                onChange={(e) => setEnableImageCompression(e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <span className="text-sm text-gray-700">

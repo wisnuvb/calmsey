@@ -199,7 +199,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
   };
 
   return (
-    <section className="bg-white">
+    <section className="bg-white" id="ourteam">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12 lg:mb-16">
