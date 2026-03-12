@@ -811,8 +811,6 @@ export function MultipleField({
                                     type="button"
                                     onClick={() => {
                                       // For nested multiple field, pass nestedIndex and nestedFieldKey
-                                      // The handler will need to be updated to accept these parameters
-                                      // For now, we'll use a workaround by passing them in the fieldKey
                                       onOpenMediaPicker(
                                         field.key,
                                         itemIndex,
@@ -855,6 +853,38 @@ export function MultipleField({
                                   </div>
                                 )}
                               </div>
+                            ) : nestedField.type === "html" ? (
+                              <HtmlField
+                                field={nestedField as FieldDefinition}
+                                value={nestedFieldValue}
+                                onChange={(val) =>
+                                  handleNestedItemChange(
+                                    nestedIndex,
+                                    nestedField.key,
+                                    val
+                                  )
+                                }
+                                onImageUpload={async (file: File): Promise<string> => {
+                                  const formData = new FormData();
+                                  formData.append("file", file);
+                                  formData.append(
+                                    "enableImageCompression",
+                                    String(enableImageCompression)
+                                  );
+                                  try {
+                                    const response = await fetch(
+                                      "/api/admin/media/upload",
+                                      { method: "POST", body: formData }
+                                    );
+                                    if (!response.ok) throw new Error("Upload failed");
+                                    const data = await response.json();
+                                    return data.url;
+                                  } catch (err) {
+                                    console.error("Image upload error:", err);
+                                    throw err;
+                                  }
+                                }}
+                              />
                             ) : (
                               <input
                                 type="text"

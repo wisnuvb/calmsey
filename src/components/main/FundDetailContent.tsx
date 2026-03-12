@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CheckCircle2, X, FileText, Download, ArrowUpRight } from "lucide-react";
 import { H3, P } from "../ui/typography";
+import { RichText } from "../ui/RichText";
 import type { FundContent } from "@/types/fund-detail";
 import { cn } from "@/lib/utils";
 
@@ -95,10 +96,10 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
   };
 
   const renderParagraphWithHtml = (text: string, key?: string) => (
-    <div
+    <RichText
       key={key}
+      content={text}
       className="text-[#060726CC] text-lg leading-relaxed font-work-sans [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
-      dangerouslySetInnerHTML={{ __html: text }}
     />
   );
 

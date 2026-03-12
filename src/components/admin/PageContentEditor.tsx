@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PageType } from "@prisma/client";
 import {
@@ -62,6 +62,9 @@ export function PageContentEditor({
     nestedFieldKey?: string; // For nested multiple field
   } | null>(null);
 
+  /** Baseline for delta save: only changed keys are sent to avoid overwriting other editors' work */
+  const baselineRef = useRef<Record<string, string>>({});
+
   const { addToast } = useToast();
 
   // Tab state
@@ -111,6 +114,7 @@ export function PageContentEditor({
         }
 
         setContent(contentData);
+        baselineRef.current = { ...contentData };
       }
     } catch (error) {
       console.error("Error fetching content:", error);
@@ -196,13 +200,34 @@ export function PageContentEditor({
     setSaving(true);
     setSaveSuccess(false);
 
+    const baseline = baselineRef.current;
+    const changedContent: Record<string, string> = {};
+    for (const key of Object.keys(content)) {
+      const current = content[key] ?? "";
+      const base = baseline[key] ?? "";
+      if (current !== base) {
+        changedContent[key] = current;
+      }
+    }
+
+    if (Object.keys(changedContent).length === 0) {
+      setSaving(false);
+      addToast({
+        type: "info",
+        title: "No changes",
+        description: "There are no changes to save.",
+        duration: 3000,
+      });
+      return;
+    }
+
     try {
       const response = await fetch(`/api/admin/page-content/${pageType}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           language,
-          content,
+          content: changedContent,
         }),
       });
 
@@ -211,6 +236,7 @@ export function PageContentEditor({
       }
 
       setSaveSuccess(true);
+      baselineRef.current = { ...content };
 
       addToast({
         type: "success",

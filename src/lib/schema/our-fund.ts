@@ -1091,11 +1091,14 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
             {
               key: "content",
               label: "Section Content",
-              type: "textarea",
+              type: "html",
               required: false,
               placeholder: "Content paragraph.\n\nAnother paragraph.",
               helpText:
                 "Content paragraphs (separated by double newline). Supports HTML for links.",
+              editorOptions: {
+                height: 300,
+              },
             },
             {
               key: "items",
@@ -1141,7 +1144,8 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
               label: "Action Plan Items",
               type: "textarea",
               required: false,
-              placeholder: 'JSON array: [{"number":"01","title":"...","status":"link","link":"..."}]',
+              placeholder:
+                'JSON array: [{"number":"01","title":"...","status":"link","link":"..."}]',
               helpText:
                 'For sectionType "action-plans": JSON array of {number, title, status: "link"|"in-development", link?}',
             },

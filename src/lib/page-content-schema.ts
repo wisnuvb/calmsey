@@ -14,6 +14,15 @@ import {
   PARTNER_STORIES_SCHEMA,
 } from "./schema";
 
+/** Optional config for html-type fields (TinyMCE editor) */
+export interface HtmlEditorOptions {
+  height?: number;
+  minHeight?: number;
+  menubar?: boolean;
+  resize?: boolean;
+  toolbar?: string;
+}
+
 export type ContentFieldType =
   | "text"
   | "file"
@@ -53,6 +62,8 @@ export interface MultipleItemField {
   options?: Array<{ value: string; label: string }>; // For select type
   itemSchema?: MultipleItemField[]; // For nested multiple fields
   itemLabel?: string; // Label for nested multiple items
+  /** Optional for type "html": editor height, menubar, toolbar, etc. */
+  editorOptions?: HtmlEditorOptions;
 }
 
 export interface FieldDefinition {
@@ -73,6 +84,8 @@ export interface FieldDefinition {
   // For multiple type fields
   itemSchema?: MultipleItemField[]; // Schema for each item in the array
   itemLabel?: string; // Label for each item (e.g., "Image", "Story", "Partner")
+  /** Optional for type "html": editor height, menubar, toolbar, etc. */
+  editorOptions?: HtmlEditorOptions;
 }
 
 export type PageContentSchema = {

@@ -1,4 +1,7 @@
-import { FieldDefinition } from "@/lib/page-content-schema";
+import {
+  FieldDefinition,
+  type HtmlEditorOptions,
+} from "@/lib/page-content-schema";
 import { TinyMCEEditor } from "@/components/admin/TinyMCEEditor";
 
 interface HtmlFieldProps {
@@ -6,6 +9,8 @@ interface HtmlFieldProps {
   value: string;
   onChange: (value: string) => void;
   onImageUpload: (file: File) => Promise<string>;
+  /** Override editor options (e.g. when used inside multiple field with item editorOptions) */
+  editorOptions?: HtmlEditorOptions;
 }
 
 export function HtmlField({
@@ -13,14 +18,20 @@ export function HtmlField({
   value,
   onChange,
   onImageUpload,
+  editorOptions: editorOptionsOverride,
 }: HtmlFieldProps) {
+  const opts = editorOptionsOverride ?? field.editorOptions;
   return (
     <div>
       <TinyMCEEditor
         value={value}
         onChange={onChange}
         placeholder={field.placeholder}
-        height={500}
+        height={opts?.height ?? 500}
+        minHeight={opts?.minHeight}
+        menubar={opts?.menubar}
+        resize={opts?.resize}
+        toolbar={opts?.toolbar}
         onImageUpload={onImageUpload}
       />
       {field.helpText && (

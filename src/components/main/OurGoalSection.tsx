@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Download, X } from "lucide-react";
 import Image from "next/image";
 import { H2, H3, P } from "../ui/typography";
+import { RichText } from "../ui/RichText";
 import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { useLanguage } from "../public/LanguageProvider";
@@ -193,13 +194,13 @@ export function OurGoalSection({
 
             {/* Goal Description */}
             <div className="space-y-6">
-              <div
-                className="text-[#060726CC] text-base font-normal font-work-sans leading-[150%]"
-                dangerouslySetInnerHTML={{ __html: description1 }}
+              <RichText
+                content={description1}
+                className="text-[#060726CC] text-base font-normal font-work-sans leading-[150%] [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
               />
-              <div
-                className="text-[#060726CC] text-base font-normal font-work-sans leading-[150%]"
-                dangerouslySetInnerHTML={{ __html: description2 }}
+              <RichText
+                content={description2}
+                className="text-[#060726CC] text-base font-normal font-work-sans leading-[150%] [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
               />
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { CheckCircle2, Shield, Flag, Info, FileDown, X } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
+import { RichText } from "../ui/RichText";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { useLanguage } from "../public/LanguageProvider";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
@@ -596,20 +597,15 @@ export function GrantmakingSection({
                       activeContent.paragraphs.length > 0 && (
                         <div className="space-y-6 mb-8">
                           {activeContent.paragraphs.map((paragraph, index) => (
-                            <p
+                            <RichText
                               key={index}
                               className={cn(
-                                "text-lg leading-relaxed text-gray-700"
-                                // activeContent.imageSrc
-                                //   ? "text-white/90"
-                                //   : "text-gray-700"
+                                "text-lg leading-relaxed text-gray-700 font-work-sans"
                               )}
-                              dangerouslySetInnerHTML={{
-                                __html: paragraph.replace(
-                                  /\*\*(.*?)\*\*/g,
-                                  "<strong>$1</strong>"
-                                ),
-                              }}
+                              content={paragraph.replace(
+                                /\*\*(.*?)\*\*/g,
+                                "<strong>$1</strong>"
+                              )}
                             />
                           ))}
                         </div>
@@ -677,16 +673,14 @@ export function GrantmakingSection({
                                   </div>
                                 </div>
                                 <div className="flex-1">
-                                  <p
-                                    className="text-gray-700 text-base leading-relaxed"
-                                    dangerouslySetInnerHTML={{
-                                      __html: block.text
-                                        .replace(
-                                          /\*\*(.*?)\*\*/g,
-                                          "<strong>$1</strong>"
-                                        )
-                                        .replace(/\\"/g, '"'),
-                                    }}
+                                  <RichText
+                                    className="text-gray-700 text-base leading-relaxed font-work-sans"
+                                    content={block.text
+                                      .replace(
+                                        /\*\*(.*?)\*\*/g,
+                                        "<strong>$1</strong>"
+                                      )
+                                      .replace(/\\"/g, '"')}
                                   />
                                 </div>
                               </div>
@@ -739,19 +733,17 @@ export function GrantmakingSection({
                             ))}
                           </ul>
                           {activeContent.numberedListFooter && (
-                            <p
+                            <RichText
                               className={cn(
-                                "mt-6 text-lg leading-relaxed",
+                                "mt-6 text-lg leading-relaxed font-work-sans",
                                 activeContent.imageSrc
                                   ? "text-white/90"
                                   : "text-gray-700"
                               )}
-                              dangerouslySetInnerHTML={{
-                                __html: activeContent.numberedListFooter.replace(
-                                  /\*\*(.*?)\*\*/g,
-                                  "<strong>$1</strong>"
-                                ),
-                              }}
+                              content={activeContent.numberedListFooter.replace(
+                                /\*\*(.*?)\*\*/g,
+                                "<strong>$1</strong>"
+                              )}
                             />
                           )}
                         </div>
@@ -766,14 +758,12 @@ export function GrantmakingSection({
                           </div>
                         </div>
                         <div className="flex-1">
-                          <p
-                            className="text-white text-base leading-relaxed"
-                            dangerouslySetInnerHTML={{
-                              __html: activeContent.infoBlockFooter.text.replace(
+                          <RichText
+                            className="text-white text-base leading-relaxed font-work-sans"
+                            content={activeContent.infoBlockFooter.text.replace(
                                 /\*\*(.*?)\*\*/g,
                                 "<strong>$1</strong>"
-                              ),
-                            }}
+                              )}
                           />
                         </div>
                       </div>

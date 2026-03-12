@@ -93,6 +93,8 @@ export async function POST(
       );
     }
 
+    // content can be partial (only changed keys). savePageContent merges by key
+    // so other keys are not overwritten (safe for concurrent editors).
     const result = await savePageContent(
       pageType,
       language,

@@ -131,6 +131,7 @@ export async function savePageContent(
     });
 
     // Find or create translation
+    const heroTitle = content["hero.title"];
     const translation = await prisma.pageTranslation.upsert({
       where: {
         pageId_languageId: {
@@ -141,36 +142,75 @@ export async function savePageContent(
       create: {
         pageId: page.id,
         languageId,
-        title: content["hero.title"] || pageType,
-        seoTitle: content["hero.title"] || pageType,
+        title: heroTitle || pageType,
+        seoTitle: heroTitle || pageType,
       },
       update: {
-        title: content["hero.title"] || pageType,
-        seoTitle: content["hero.title"] || pageType,
+        // Only update title/seoTitle when hero.title is in payload (partial save must not overwrite)
+        ...(heroTitle !== undefined && heroTitle !== null
+          ? {
+              title: heroTitle || pageType,
+              seoTitle: heroTitle || pageType,
+            }
+          : {}),
         updatedAt: new Date(),
       },
     });
 
-    // Delete existing page content for this translation
-    await prisma.pageContent.deleteMany({
-      where: { pageTranslationId: translation.id },
-    });
-
-    // Create new page content entries
-    const contentEntries = Object.entries(content)
-      .filter(([_, value]) => value !== null && value !== undefined)
-      .map(([key, value]) => ({
-        pageTranslationId: translation.id,
-        key,
-        value: String(value),
-        type: inferContentType(key, value),
-      }));
-
-    if (contentEntries.length > 0) {
-      await prisma.pageContent.createMany({
-        data: contentEntries,
-      });
+    // Merge: only update or create keys present in content (never delete other keys)
+    // This allows partial save and avoids overwriting other editors' changes.
+    const entries = Object.entries(content).filter(
+      ([_, value]) => value !== null && value !== undefined
+    );
+    if (entries.length === 0) {
+      return { success: true };
     }
+
+    const existing = await prisma.pageContent.findMany({
+      where: { pageTranslationId: translation.id },
+      select: { id: true, key: true },
+    });
+    const existingByKey = new Map(existing.map((e) => [e.key, e]));
+
+    const toUpdate: { id: string; value: string; type: ContentType }[] = [];
+    const toCreate: {
+      pageTranslationId: string;
+      key: string;
+      value: string;
+      type: ContentType;
+    }[] = [];
+
+    for (const [key, value] of entries) {
+      const strValue = String(value);
+      const type = inferContentType(key, value);
+      const existingRow = existingByKey.get(key);
+      if (existingRow) {
+        toUpdate.push({ id: existingRow.id, value: strValue, type });
+      } else {
+        toCreate.push({
+          pageTranslationId: translation.id,
+          key,
+          value: strValue,
+          type,
+        });
+      }
+    }
+
+    await prisma.$transaction([
+      ...toUpdate.map(({ id, value, type }) =>
+        prisma.pageContent.update({
+          where: { id },
+          data: { value, type, updatedAt: new Date() },
+        })
+      ),
+      ...(toCreate.length > 0
+        ? [
+            prisma.pageContent.createMany({
+              data: toCreate,
+            }),
+          ]
+        : []),
+    ]);
 
     return { success: true };
   } catch (error) {

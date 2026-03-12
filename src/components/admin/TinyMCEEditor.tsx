@@ -4,19 +4,44 @@ import { useEffect, useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import type { Editor as TinyMCEEditorType } from "tinymce";
 
+export interface TinyMCEEditorOptions {
+  height?: number;
+  minHeight?: number;
+  menubar?: boolean;
+  resize?: boolean;
+  toolbar?: string;
+}
+
 interface TinyMCEEditorProps {
   value?: string;
   onChange: (content: string) => void;
   placeholder?: string;
   height?: number;
+  minHeight?: number;
+  menubar?: boolean;
+  resize?: boolean;
+  toolbar?: string;
   onImageUpload?: (file: File) => Promise<string>;
 }
+
+const DEFAULT_TOOLBAR =
+  "undo redo | formatselect fontsizeselect | " +
+  "bold italic underline strikethrough | forecolor backcolor | " +
+  "alignleft aligncenter alignright alignjustify | " +
+  "bullist numlist outdent indent | " +
+  "link image media table | " +
+  "code fullscreen preview | " +
+  "removeformat help";
 
 export function TinyMCEEditor({
   value,
   onChange,
   placeholder,
   height = 500,
+  minHeight,
+  menubar = true,
+  resize = true,
+  toolbar = DEFAULT_TOOLBAR,
   onImageUpload,
 }: TinyMCEEditorProps) {
   const editorRef = useRef<TinyMCEEditorType | null>(null);
@@ -59,8 +84,11 @@ export function TinyMCEEditor({
       value={value}
       init={{
         height,
-        menubar: true,
+        min_height: minHeight,
+        menubar,
+        resize,
         placeholder,
+        toolbar,
         plugins: [
           "advlist",
           "autolink",
@@ -80,14 +108,6 @@ export function TinyMCEEditor({
           "help",
           "wordcount",
         ],
-        toolbar:
-          "undo redo | formatselect fontsizeselect | " +
-          "bold italic underline strikethrough | forecolor backcolor | " +
-          "alignleft aligncenter alignright alignjustify | " +
-          "bullist numlist outdent indent | " +
-          "link image media table | " +
-          "code fullscreen preview | " +
-          "removeformat help",
         toolbar_mode: "sliding",
         content_style:
           "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
@@ -151,7 +171,6 @@ export function TinyMCEEditor({
         promotion: false,
         statusbar: true,
         elementpath: true,
-        resize: true,
       }}
       onEditorChange={(content) => onChange(content)}
     />
