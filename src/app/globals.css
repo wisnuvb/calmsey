@@ -5,6 +5,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Offset for fixed navbar when scrolling to hash anchors (e.g. #ourteam, #vision) */
+@layer base {
+  [id] {
+    scroll-margin-top: 5rem; /* h-20 navbar */
+  }
+}
+
 .prose {
   @apply text-gray-900;
 }

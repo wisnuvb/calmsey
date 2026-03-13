@@ -9,6 +9,7 @@ import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
 import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import React from "react";
 import { Metadata } from "next";
@@ -62,9 +63,26 @@ export async function generateMetadata({
   };
 }
 
+async function getShareUrl(lang: string, id: string): Promise<string> {
+  try {
+    const headersList = await headers();
+    const host =
+      headersList.get("x-forwarded-host") ||
+      headersList.get("host") ||
+      "localhost:3000";
+    const proto = headersList.get("x-forwarded-proto") || "https";
+    const base = `${proto}://${host}`;
+    const path = `/${lang}/stories/${id}`.replace(/\/+/g, "/");
+    return `${base}${path}`;
+  } catch {
+    return "";
+  }
+}
+
 const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
   const { lang, id } = await params;
   const language = lang || "en";
+  const shareUrl = await getShareUrl(lang, id);
 
   // Use STORIES page type or pass empty content if not needed
   const content = await getPageContentServer("STORIES", language).catch(
@@ -256,6 +274,7 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
         photos={storyData.photos}
         relatedArticles={storyData.relatedArticles}
         videoUrl={storyData.videoUrl}
+        shareUrl={shareUrl}
       />
       <LatestStoriesSection language={language} />
       <FeedbackCalloutSection

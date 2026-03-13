@@ -17,6 +17,7 @@ import {
 import { H2, H3, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import Image from "next/image";
+import { useToast } from "../ui/toast";
 
 interface PartnerOrganization {
   name: string;
@@ -44,6 +45,8 @@ interface DetailStoryContentSectionProps {
   relatedArticles?: RelatedArticle[];
   className?: string;
   videoUrl?: string;
+  /** URL untuk share - dari server agar valid saat SSR/deploy */
+  shareUrl?: string;
 }
 
 export function DetailStoryContentSection({
@@ -53,11 +56,17 @@ export function DetailStoryContentSection({
   photos,
   relatedArticles,
   className,
+  shareUrl: shareUrlProp,
 }: DetailStoryContentSectionProps) {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
-  const [showCopyNotification, setShowCopyNotification] = useState(false);
   const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
+  const [clientUrl, setClientUrl] = useState("");
+  const { addToast } = useToast();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") setClientUrl(window.location.href);
+  }, []);
 
   // Default values
   const photosList = photos || [];
@@ -67,7 +76,8 @@ export function DetailStoryContentSection({
     setIsShareMenuOpen(!isShareMenuOpen);
   };
 
-  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+  // Prioritas: URL dari client (setelah hydration) > URL dari server (SSR/deploy)
+  const currentUrl = clientUrl || shareUrlProp || "";
   const shareText = encodeURIComponent(description.substring(0, 100) + "...");
   const encodedUrl = encodeURIComponent(currentUrl);
 
@@ -81,11 +91,21 @@ export function DetailStoryContentSection({
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(currentUrl);
-      setShowCopyNotification(true);
       setIsShareMenuOpen(false);
-      setTimeout(() => setShowCopyNotification(false), 2000);
+      addToast({
+        type: "success",
+        title: "Link Copied",
+        description: "Link has been copied to clipboard.",
+        duration: 2000,
+      });
     } catch (error) {
       console.error("Copy failed", error);
+      addToast({
+        type: "error",
+        title: "Copy Failed",
+        description: "Failed to copy link to clipboard. Please try again.",
+        duration: 4000,
+      });
     }
   };
 
@@ -235,7 +255,7 @@ export function DetailStoryContentSection({
                           className="fixed inset-0 z-40"
                           onClick={() => setIsShareMenuOpen(false)}
                         />
-                        <div className="absolute right-0 bottom-full mb-2 w-full bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden text-sm font-work-sans p-1">
+                        <div className="absolute right-0 left-0 top-full mt-2 w-full bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden text-sm font-work-sans p-1">
                           <a
                             href={shareLinks.facebook}
                             target="_blank"
@@ -281,11 +301,6 @@ export function DetailStoryContentSection({
                           </button>
                         </div>
                       </>
-                    )}
-                    {showCopyNotification && (
-                      <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white text-xs px-3 py-1 rounded whitespace-nowrap z-50">
-                        Link copied!
-                      </span>
                     )}
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import { Footer, Navbar } from "@/components/layout";
 import SessionProvider from "@/components/providers/SessionProvider";
 import { LanguageProvider } from "@/components/public/LanguageProvider";
+import { ScrollToHash } from "@/components/public/ScrollToHash";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -110,6 +111,7 @@ const FrontendLayout = async ({ children, params }: LanguageLayoutProps) => {
           Skip to main content
         </a>
 
+        <ScrollToHash />
         <Navbar />
         <main id="main-content">{children}</main>
         <Footer />

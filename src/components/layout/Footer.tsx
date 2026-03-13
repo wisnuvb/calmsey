@@ -3,6 +3,42 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useLanguage } from "../public/LanguageProvider";
+
+/**
+ * Resolves internal footer link href to include current language prefix and preserve hash.
+ * Internal: relative path (starts with /, not //) and target !== BLANK.
+ * External: target BLANK or full URL -> return as-is.
+ */
+function resolveFooterLinkHref(
+  href: string,
+  language: string,
+  target: "SELF" | "BLANK"
+): string {
+  if (
+    target === "BLANK" ||
+    href.startsWith("http://") ||
+    href.startsWith("https://")
+  ) {
+    return href;
+  }
+  if (!href.startsWith("/") || href.startsWith("//")) {
+    return href;
+  }
+
+  const hashIndex = href.indexOf("#");
+  const pathname = hashIndex >= 0 ? href.slice(0, hashIndex) : href;
+  const hash = hashIndex >= 0 ? href.slice(hashIndex) : "";
+
+  const langPrefixMatch = pathname.match(/^\/[a-z]{2,3}(\/|$)/);
+  const resolvedPath = langPrefixMatch
+    ? `/${language}${pathname.slice(3)}`
+    : pathname === "/"
+      ? `/${language}`
+      : `/${language}${pathname}`;
+
+  return resolvedPath + hash;
+}
 
 interface FooterLink {
   id: string;
@@ -18,6 +54,7 @@ interface FooterSection {
 }
 
 export function Footer() {
+  const { language } = useLanguage();
   const [footerSections, setFooterSections] = useState<FooterSection[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -166,7 +203,11 @@ export function Footer() {
                     {section.links.map((link) => (
                       <li key={link.id}>
                         <Link
-                          href={link.href}
+                          href={resolveFooterLinkHref(
+                            link.href,
+                            language,
+                            link.target
+                          )}
                           target={link.target === "BLANK" ? "_blank" : "_self"}
                           rel={
                             link.target === "BLANK"
