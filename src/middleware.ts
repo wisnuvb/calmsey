@@ -188,24 +188,31 @@ function handleLanguageRouting(
     const segments = pathname.split("/");
     const possibleLang = segments[1];
 
-    // If it's an invalid language, redirect to default language
+    // If it's an invalid language, redirect to default language (correct the URL)
     if (
       possibleLang &&
       possibleLang.length === 2 &&
       !supportedLanguages.includes(possibleLang)
     ) {
-      // Preserve search params and construct new URL using correct origin
       const newUrl = new URL(`/${defaultLanguage}${pathname}`, origin);
       newUrl.search = searchParams;
       return NextResponse.redirect(newUrl, 307);
     }
 
-    // If no language specified and not root, add default language
+    // Path without lang: REWRITE (not redirect) so browser URL and hash are preserved
     if (pathname !== "/") {
-      // Preserve search params and construct new URL using correct origin
-      const newUrl = new URL(`/${defaultLanguage}${pathname}`, origin);
+      const newUrl = new URL(
+        `/${defaultLanguage}${pathname}`,
+        origin
+      );
       newUrl.search = searchParams;
-      return NextResponse.redirect(newUrl, 307);
+      return NextResponse.rewrite(newUrl);
+    }
+
+    // Root: REWRITE to /en so user sees / without redirect
+    if (pathname === "/") {
+      const newUrl = new URL(`/${defaultLanguage}`, origin);
+      return NextResponse.rewrite(newUrl);
     }
   }
 

@@ -19,6 +19,30 @@ import { cn, getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import { useToast } from "../ui/toast";
 
+/**
+ * Fallback copy ke clipboard via execCommand.
+ * Now use navigator.clipboard not available (HTTP, old Safari, iframe).
+ */
+function fallbackCopyToClipboard(text: string): boolean {
+  if (typeof document === "undefined") return false;
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  try {
+    const success = document.execCommand("copy");
+    document.body.removeChild(textarea);
+    return success;
+  } catch {
+    document.body.removeChild(textarea);
+    return false;
+  }
+}
+
 interface PartnerOrganization {
   name: string;
   logo: string;
@@ -89,8 +113,28 @@ export function DetailStoryContentSection({
   };
 
   const handleCopyLink = async () => {
+    // Read URL directly when clicked to always be valid (not dependent on state/SSR)
+    const urlToCopy =
+      typeof window !== "undefined" ? window.location.href : currentUrl;
+    if (!urlToCopy) {
+      addToast({
+        type: "error",
+        title: "Copy Failed",
+        description: "No URL available to copy.",
+        duration: 4000,
+      });
+      return;
+    }
+
     try {
-      await navigator.clipboard.writeText(currentUrl);
+      // Main: Clipboard API (HTTPS, modern browser)
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(urlToCopy);
+      } else {
+        // Fallback: execCommand for old browser / non-secure context (HTTP)
+        const success = fallbackCopyToClipboard(urlToCopy);
+        if (!success) throw new Error("execCommand fallback failed");
+      }
       setIsShareMenuOpen(false);
       addToast({
         type: "success",
@@ -103,7 +147,8 @@ export function DetailStoryContentSection({
       addToast({
         type: "error",
         title: "Copy Failed",
-        description: "Failed to copy link to clipboard. Please try again.",
+        description:
+          "Failed to copy link. Try selecting and copying the URL manually.",
         duration: 4000,
       });
     }
