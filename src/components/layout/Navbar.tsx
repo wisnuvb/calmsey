@@ -91,7 +91,8 @@ export function Navbar() {
   const isGetInvolvedPage =
     pathname === `/${language}/get-involved` ||
     pathname === "/en/get-involved" ||
-    pathname === "/id/get-involved";
+    pathname === "/id/get-involved" ||
+    pathname === "/get-involved";
 
   // Pages that should have dynamic background detection
   const hasDynamicBackground = isGetInvolvedPage;
@@ -227,8 +228,8 @@ export function Navbar() {
         isHomePage
           ? "bg-white !text-[#010107]"
           : isScrolled
-          ? "bg-[#3C62ED]/95 backdrop-blur-md shadow-lg"
-          : "bg-transparent"
+            ? "bg-[#3C62ED]/95 backdrop-blur-md shadow-lg"
+            : "bg-transparent",
       )}
     >
       <div className="container mx-auto px-4">
@@ -257,10 +258,10 @@ export function Navbar() {
                   isHomePage
                     ? "text-[#010107]"
                     : !hasDynamicBackground ||
-                      isScrolled ||
-                      !currentBackgroundAnalysis?.isLight
-                    ? "text-white hover:text-blue-300"
-                    : "text-gray-700 hover:text-[#3C62ED]"
+                        isScrolled ||
+                        !currentBackgroundAnalysis?.isLight
+                      ? "text-white hover:text-blue-300"
+                      : "text-gray-700 hover:text-[#3C62ED]",
                 )}
               >
                 {link.label}
@@ -299,10 +300,10 @@ export function Navbar() {
                 isHomePage
                   ? "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white"
                   : !hasDynamicBackground ||
-                    (isScrolled && !isHomePage) ||
-                    !currentBackgroundAnalysis?.isLight
-                  ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
-                  : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white"
+                      (isScrolled && !isHomePage) ||
+                      !currentBackgroundAnalysis?.isLight
+                    ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
+                    : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white",
               )}
             >
               Get Involved
@@ -317,10 +318,10 @@ export function Navbar() {
               isHomePage
                 ? "text-[#010107]"
                 : !hasDynamicBackground ||
-                  (isScrolled && !isHomePage) ||
-                  !currentBackgroundAnalysis?.isLight
-                ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
-                : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-100"
+                    (isScrolled && !isHomePage) ||
+                    !currentBackgroundAnalysis?.isLight
+                  ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
+                  : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-100",
             )}
             aria-label="Toggle menu"
           >
@@ -337,10 +338,10 @@ export function Navbar() {
             isHomePage
               ? "bg-white !text-[#010107]"
               : !hasDynamicBackground ||
-                (isScrolled && !isHomePage) ||
-                !currentBackgroundAnalysis?.isLight
-              ? "bg-[#3C62ED]/95 backdrop-blur-md border-blue-500/30"
-              : "bg-white border-gray-200"
+                  (isScrolled && !isHomePage) ||
+                  !currentBackgroundAnalysis?.isLight
+                ? "bg-[#3C62ED]/95 backdrop-blur-md border-blue-500/30"
+                : "bg-white border-gray-200",
           )}
         >
           <div className="px-4 pt-2 pb-4 space-y-1">
@@ -353,10 +354,10 @@ export function Navbar() {
                   isHomePage
                     ? "text-[#010107]"
                     : !hasDynamicBackground ||
-                      (isScrolled && !isHomePage) ||
-                      !currentBackgroundAnalysis?.isLight
-                    ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
-                    : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-50"
+                        (isScrolled && !isHomePage) ||
+                        !currentBackgroundAnalysis?.isLight
+                      ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
+                      : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-50",
                 )}
                 onClick={() => setIsOpen(false)}
               >
@@ -370,10 +371,10 @@ export function Navbar() {
                   isHomePage
                     ? "text-[#010107]"
                     : !hasDynamicBackground ||
-                      (isScrolled && !isHomePage) ||
-                      !currentBackgroundAnalysis?.isLight
-                    ? "text-white hover:text-blue-300"
-                    : "text-gray-700 hover:text-[#3C62ED]"
+                        (isScrolled && !isHomePage) ||
+                        !currentBackgroundAnalysis?.isLight
+                      ? "text-white hover:text-blue-300"
+                      : "text-gray-700 hover:text-[#3C62ED]",
                 )}
               >
                 <span>{language}</span>
@@ -386,10 +387,10 @@ export function Navbar() {
                   isHomePage
                     ? "border-[#3C62ED] text-[#3C62ED]"
                     : !hasDynamicBackground ||
-                      (isScrolled && !isHomePage) ||
-                      !currentBackgroundAnalysis?.isLight
-                    ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
-                    : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white"
+                        (isScrolled && !isHomePage) ||
+                        !currentBackgroundAnalysis?.isLight
+                      ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
+                      : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white",
                 )}
                 onClick={() => setIsOpen(false)}
               >
