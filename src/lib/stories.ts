@@ -117,11 +117,15 @@ export async function getStories(
       const title = translation?.title || article.title;
       const excerpt = translation?.excerpt || article.excerpt || "";
 
-      // Get primary category for display
+      // Get primary category (fallback label when article.location is empty)
       const primaryCategory = article.categories?.[0]?.category;
       const categoryTranslation = primaryCategory?.translations?.[0];
+      const locationFromCategory =
+        categoryTranslation?.name || primaryCategory?.slug || "";
       const location =
-        categoryTranslation?.name || primaryCategory?.slug || "Global";
+        (article.location && article.location.trim()) ||
+        locationFromCategory ||
+        "Global";
 
       // Format date
       const date = article.publishedAt

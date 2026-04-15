@@ -11,6 +11,7 @@ module.exports = {
       fontFamily: {
         "work-sans": ["Work Sans", "sans-serif"],
         "nunito-sans": ["Nunito Sans", "sans-serif"],
+        nunito: ["Nunito", "sans-serif"],
         sans: ["Work Sans", "sans-serif"],
       },
       borderRadius: {

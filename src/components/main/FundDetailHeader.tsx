@@ -27,7 +27,7 @@ export function FundDetailHeader({ header }: FundDetailHeaderProps) {
         <div className="text-center mb-8">
           <H2
             style="h2bold"
-            className="text-[#010107] text-3xl sm:text-4xl lg:text-5xl font-bold font-nunito-sans leading-tight"
+            className="text-[#010107] text-3xl sm:text-4xl lg:text-5xl font-bold font-nunito leading-tight"
           >
             {header.title}
           </H2>

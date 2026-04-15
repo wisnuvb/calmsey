@@ -181,7 +181,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
         <div className="max-w-4xl mx-auto text-center mb-14 space-y-8 hidden">
           <H2
             style="h2bold"
-            className="text-[#010107] text-2xl sm:text-[38px] leading-[120%] tracking-normal font-bold font-nunito-sans"
+            className="text-[#010107] text-2xl sm:text-[38px] leading-[120%] tracking-normal font-bold font-nunito"
           >
             {title}
           </H2>
@@ -223,7 +223,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
               {/* Content */}
               <div className="lg:w-3/5 flex flex-col justify-center space-y-8 sm:space-y-14">
                 <div className="space-y-4">
-                  <h3 className="text-2xl sm:text-[32px] leading-[120%] tracking-normal font-bold font-nunito-sans text-[#3C62ED]">
+                  <h3 className="text-2xl sm:text-[32px] leading-[120%] tracking-normal font-bold font-nunito text-[#3C62ED]">
                     {fund.title}
                   </h3>
                   <p

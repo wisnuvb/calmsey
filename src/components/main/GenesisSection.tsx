@@ -10,7 +10,8 @@ interface GenesisSectionProps {
   introParagraph?: string;
   mainParagraph?: string;
   closingParagraph?: string;
-  logoSrc?: string;
+  heroImageSrc?: string;
+  heroImageAlt?: string;
   className?: string;
 }
 
@@ -19,7 +20,8 @@ export function GenesisSection({
   introParagraph: propIntroParagraph,
   mainParagraph: propMainParagraph,
   closingParagraph: propClosingParagraph,
-  logoSrc: propLogoSrc,
+  heroImageSrc: propHeroImageSrc,
+  heroImageAlt: propHeroImageAlt,
   className,
 }: GenesisSectionProps = {}) {
   const { getValue } = usePageContentHelpers()
@@ -45,7 +47,17 @@ export function GenesisSection({
     propClosingParagraph,
     "With **$33 million** committed from six aligned funders, **Turning Tides** launched in June 2024 as an institution purpose-built to support the recognition of rights and tenure security that unlocks community agency for more effective and self-determined climate action, environmental stewardship, and development."
   );
-  const logoSrc = getValue("genesis.logoSrc", propLogoSrc, "/assets/Logo.png");
+  const heroImageSrc = getValue(
+    "genesis.heroImageSrc",
+    propHeroImageSrc,
+    ""
+  ).trim();
+  const heroImageAlt = getValue(
+    "genesis.heroImageAlt",
+    propHeroImageAlt,
+    "Genesis — Turning Tides"
+  );
+  const hasHeroImage = Boolean(heroImageSrc);
   return (
     <section
       className={cn("bg-[#ECEFFD] py-16 lg:py-[100px]", className)}
@@ -53,32 +65,37 @@ export function GenesisSection({
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
-        <h2 className="text-center text-3xl sm:text-4xl lg:text-[38px] font-bold text-[#3C62ED] font-nunito-sans mb-8">
+        <h2 className="text-center text-3xl sm:text-4xl lg:text-[38px] font-bold text-[#3C62ED] font-nunito mb-8">
           {title}
         </h2>
 
         {/* Intro Paragraph */}
-        <div className="max-w-4xl mx-auto mb-12 lg:mb-16">
+        <div className="max-w-4xl mx-auto mb-8 sm:mb-12 lg:mb-16 px-1">
           <P
             style="p1reg"
-            className="text-[#060726CC] text-center leading-relaxed font-work-sans"
+            className="text-[#060726CC] text-center font-work-sans"
           >
             {introParagraph}
           </P>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
+        {/* Text + optional image from CMS */}
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-6 sm:gap-8 lg:gap-12 mb-12",
+            hasHeroImage && "lg:grid-cols-2"
+          )}
+        >
           {/* Left Column - Main Text */}
-          <div className="space-y-6">
+          <div className="space-y-5 sm:space-y-6 px-1 lg:px-0">
             <P
               style="p1reg"
-              className="text-[#060726CC] leading-relaxed font-work-sans"
+              className="text-[#060726CC] font-work-sans"
             >
               {mainParagraph}
             </P>
             <div
-              className="text-[#060726CC] leading-relaxed font-work-sans text-base font-normal"
+              className="text-[#060726CC] font-work-sans text-base font-normal leading-[27px]"
               dangerouslySetInnerHTML={{
                 __html: closingParagraph.replace(
                   /\*\*(.*?)\*\*/g,
@@ -88,44 +105,21 @@ export function GenesisSection({
             />
           </div>
 
-          {/* Right Column - Blue Block with Logo */}
-          <div className="flex items-center justify-center">
-            <div className="w-full bg-[#3C62ED] rounded-lg p-12 lg:p-16 flex flex-col items-center justify-center min-h-[368px]">
-              {/* Logo */}
-              <div className="relative w-32 h-32 mb-6">
+          {hasHeroImage ? (
+            <div className="flex items-center justify-center px-1 lg:px-0">
+              <div className="relative w-full aspect-[4/3] max-h-[min(100%,420px)] rounded-lg overflow-hidden shadow-sm">
                 <Image
-                  src={getImageUrl(logoSrc)}
-                  alt="Turning Tides Logo"
+                  src={getImageUrl(heroImageSrc)}
+                  alt={heroImageAlt}
                   fill
-                  className="object-contain"
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
                 />
               </div>
-              {/* Logo Text */}
-              <h2 className="text-white text-2xl lg:text-3xl font-bold uppercase tracking-wider font-nunito-sans">
-                TURNING TIDES
-              </h2>
             </div>
-          </div>
+          ) : null}
         </div>
-
-        {/* Closing Paragraph */}
-        {/* <div className="max-w-4xl">
-          <P
-            style="p1reg"
-            className="text-[#060726CC] leading-relaxed font-work-sans"
-          >
-            {closingParagraph.split("**").map((part, index) =>
-              index % 2 === 1 ? (
-                <strong key={index} className="font-bold">
-                  {part}
-                </strong>
-              ) : (
-                part
-              )
-            )}
-          </P>
-        </div> */}
       </div>
     </section>
   );

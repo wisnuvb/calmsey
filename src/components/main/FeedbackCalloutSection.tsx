@@ -68,7 +68,7 @@ export function FeedbackCalloutSection({
           <div className="space-y-6">
             <H2
               style="h2bold"
-              className="text-white text-2xl sm:text-[32px] leading-[120%] tracking-normal font-bold font-nunito-sans"
+              className="text-white text-2xl sm:text-[32px] leading-[120%] tracking-normal font-bold font-nunito"
             >
               {title}
             </H2>

@@ -87,7 +87,7 @@ export function OurWorkSection({
             </div>
 
             {/* Title */}
-            <h2 className="text-3xl sm:text-[38px] font-nunito-sans font-bold text-[#010107] leading-tight">
+            <h2 className="text-3xl sm:text-[38px] font-nunito font-bold text-[#010107] leading-tight">
               {title}
             </h2>
 

@@ -118,7 +118,7 @@ export function FundersSection({
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-11">
         {/* Title */}
-        <h2 className="text-xl sm:text-[38px] text-[#010107] text-center tracking-wider font-nunito-sans font-bold">
+        <h2 className="text-xl sm:text-[38px] text-[#010107] text-center tracking-wider font-nunito font-bold">
           {title}
         </h2>
 

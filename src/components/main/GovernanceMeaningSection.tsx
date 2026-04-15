@@ -70,7 +70,7 @@ export function GovernanceMeaningSection({
           <div className="space-y-6 sticky top-28">
             <H2
               style="h1bold"
-              className="text-[#010107] font-nunito-sans text-2xl sm:text-[38px] leading-[120%] tracking-normal"
+              className="text-[#010107] font-nunito text-2xl sm:text-[38px] leading-[120%] tracking-normal"
             >
               {title}
             </H2>

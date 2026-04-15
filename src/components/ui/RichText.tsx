@@ -61,7 +61,7 @@ export function RichText({ content, className }: RichTextProps) {
     return () => {
       container.removeEventListener("click", handleLinkClick);
     };
-  }, [router]);
+  }, [router, language]);
 
   return (
     <div

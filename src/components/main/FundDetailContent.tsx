@@ -125,14 +125,14 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
               {content.supportedMainHeading && (
                 <H3
                   style="h3bold"
-                  className="text-[#010107] text-2xl font-bold font-nunito-sans mb-2"
+                  className="text-[#010107] text-2xl font-bold font-nunito mb-2"
                 >
                   {content.supportedMainHeading}
                 </H3>
               )}
               <H3
                 style="h3bold"
-                className="text-[#010107] text-xl font-bold font-nunito-sans mb-6"
+                className="text-[#010107] text-xl font-bold font-nunito mb-6"
               >
                 {content.supportedSection.title}
               </H3>
@@ -142,7 +142,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                     {renderIcon(item.icon)}
                     <div className="flex-1">
                       {item.title && (
-                        <h4 className="font-semibold text-[#010107] mb-1 font-nunito-sans">
+                        <h4 className="font-semibold text-[#010107] mb-1 font-nunito">
                           {item.title}:
                         </h4>
                       )}
@@ -162,7 +162,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
             <div className="space-y-6">
               <H3
                 style="h3bold"
-                className="text-[#010107] text-2xl font-bold font-nunito-sans mb-6"
+                className="text-[#010107] text-2xl font-bold font-nunito mb-6"
               >
                 {content.unsupportedSection.title}
               </H3>
@@ -195,7 +195,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
               <div className="space-y-6">
                 <H3
                   style="h3bold"
-                  className="text-[#010107] text-2xl font-bold font-nunito-sans mb-6"
+                  className="text-[#010107] text-2xl font-bold font-nunito mb-6"
                 >
                   {content.howToApplySection.heading}
                 </H3>
@@ -244,7 +244,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
             <div className="space-y-6">
               <H3
                 style="h3bold"
-                className="text-[#010107] text-2xl font-bold font-nunito-sans mb-6"
+                className="text-[#010107] text-2xl font-bold font-nunito mb-6"
               >
                 {content.partnersWillSection.title}
               </H3>
@@ -296,7 +296,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                 {section.title && (
                   <H3
                     style="h3bold"
-                    className="text-[#010107] text-2xl font-bold font-nunito-sans"
+                    className="text-[#010107] text-2xl font-bold font-nunito"
                   >
                     {section.title}
                   </H3>
@@ -338,7 +338,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                         key={item.number}
                         className="flex items-center justify-between gap-4 flex-wrap"
                       >
-                        <span className="font-nunito-sans font-semibold text-[#010107]">
+                        <span className="font-nunito font-semibold text-[#010107]">
                           {item.number} {item.title}:
                         </span>
                         {item.status === "link" && item.link ? (
@@ -367,7 +367,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                         {item.icon && renderIcon(item.icon)}
                         <div className="flex-1">
                           {item.title && (
-                            <h4 className="font-semibold text-[#010107] mb-1 font-nunito-sans">
+                            <h4 className="font-semibold text-[#010107] mb-1 font-nunito">
                               {item.title}
                             </h4>
                           )}

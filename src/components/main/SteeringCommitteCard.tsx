@@ -78,7 +78,7 @@ export const SteeringCommitteCard = ({
         }}
         aria-label={`View details for ${member.name}`}
       >
-        <h3 className="text-xl font-bold text-[#010107] font-nunito-sans">
+        <h3 className="text-xl font-bold text-[#010107] font-nunito">
           {member.name}
         </h3>
         <p className="text-base text-[#3C62ED] font-work-sans">

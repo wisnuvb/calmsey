@@ -145,7 +145,7 @@ export function WhereWeWorkSection({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
         <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-3xl sm:text-[38px] font-nunito-sans font-bold text-[#010107]">
+          <h2 className="text-3xl sm:text-[38px] font-nunito font-bold text-[#010107]">
             {title}
           </h2>
         </div>

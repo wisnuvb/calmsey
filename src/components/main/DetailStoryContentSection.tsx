@@ -366,7 +366,7 @@ export function DetailStoryContentSection({
             <div>
               <H2
                 style="h5bold"
-                className="text-[#010107] font-nunito-sans mb-6"
+                className="text-[#010107] font-nunito mb-6"
               >
                 Description
               </H2>

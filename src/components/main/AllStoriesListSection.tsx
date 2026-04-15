@@ -203,7 +203,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-[#C3D7E8] pb-8">
           <H3
             style="h3bold"
-            className="text-[#010107] font-[var(--font-nunito)] leading-[1.2]"
+            className="text-[#010107] font-nunito leading-[1.2]"
           >
             {title}
           </H3>
@@ -402,7 +402,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
                   {/* Title */}
                   <H3
                     style="h3bold"
-                    className="text-[#010107] font-[var(--font-nunito)] leading-[1.2]"
+                    className="text-[#010107] font-nunito leading-[1.2]"
                   >
                     {story.title}
                   </H3>

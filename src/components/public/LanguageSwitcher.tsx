@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
 import { SupportedLanguage } from "@/lib/public-api";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { cn } from "@/lib/utils";
@@ -8,39 +9,50 @@ import { cn } from "@/lib/utils";
 interface LanguageSwitcherProps {
   currentLanguage: SupportedLanguage;
   isDark: boolean;
+  /** Full-width trigger + menu for mobile drawer */
+  variant?: "navbar" | "drawer";
 }
 
 export function LanguageSwitcher({
   currentLanguage,
   isDark,
+  variant = "navbar",
 }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const { languages, loading, error } = useActiveLanguages();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
 
   // Handle language change with page reload for stability
   const handleLanguageChange = (languageId: string, url: string) => {
-    // Use full page reload to ensure LanguageProvider triggers correctly
-    // This ensures Google Translate is properly initialized with the new language
+    setOpen(false);
     window.location.href = url;
   };
 
   const getLanguageUrl = (languageId: string) => {
-    // Get all active language IDs
     const activeLanguageIds = languages.map((lang) => lang.id);
 
-    // Find the current language in the pathname
     const currentLangInPath = activeLanguageIds.find(
       (langId) =>
         pathname.startsWith(`/${langId}/`) || pathname === `/${langId}`
     );
 
-    // Remove current language from pathname
     let pathWithoutLang = pathname;
     if (currentLangInPath) {
       pathWithoutLang = pathname.replace(`/${currentLangInPath}`, "");
     }
 
-    // Clean up path - handle empty string case
     if (pathWithoutLang === "") {
       pathWithoutLang = "/";
     }
@@ -49,19 +61,16 @@ export function LanguageSwitcher({
       return pathWithoutLang === "/" ? "/" : pathWithoutLang;
     }
 
-    // Handle trailing slash issue
     const cleanPath = pathWithoutLang === "/" ? "" : pathWithoutLang;
     return `/${languageId}${cleanPath}`;
   };
 
-  // Find current language info
   const currentLanguageInfo = languages.find(
     (lang) => lang.id === currentLanguage
   );
 
   const currentLanguageId = currentLanguageInfo?.id || currentLanguage;
 
-  // Show loading state
   if (loading) {
     return (
       <div className="flex items-center space-x-1 text-gray-500 px-3 py-2 text-sm font-medium">
@@ -70,7 +79,6 @@ export function LanguageSwitcher({
     );
   }
 
-  // Show error state
   if (error) {
     return (
       <div className="flex items-center space-x-1 text-red-500 px-3 py-2 text-sm font-medium">
@@ -80,10 +88,18 @@ export function LanguageSwitcher({
   }
 
   return (
-    <div className="relative group">
+    <div
+      ref={rootRef}
+      className={cn("relative group", variant === "drawer" && "w-full")}
+    >
       <button
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        onClick={() => setOpen((o) => !o)}
         className={cn(
-          "flex items-center space-x-1 px-3 py-2 text-sm font-medium",
+          "flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-md",
+          variant === "drawer" && "w-full justify-center",
           isDark
             ? "text-white hover:text-gray-100"
             : "text-gray-700 hover:text-gray-600"
@@ -91,7 +107,7 @@ export function LanguageSwitcher({
       >
         <span className="uppercase">{currentLanguageId}</span>
         <svg
-          className="h-4 w-4"
+          className={cn("h-4 w-4 transition-transform", open && "rotate-180")}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -107,15 +123,23 @@ export function LanguageSwitcher({
 
       <div
         className={cn(
-          "absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10"
+          "absolute mt-2 bg-white rounded-md shadow-lg transition-all duration-200 z-[60]",
+          variant === "navbar" && "right-0 w-48",
+          variant === "drawer" && "left-0 right-0 w-auto",
+          open
+            ? "opacity-100 visible"
+            : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"
         )}
       >
-        <div className="py-1">
+        <div className="py-1" role="listbox">
           {languages.map((language) => {
             const languageUrl = getLanguageUrl(language.id);
             return (
               <button
                 key={language.id}
+                type="button"
+                role="option"
+                aria-selected={language.id === currentLanguage}
                 onClick={() => handleLanguageChange(language.id, languageUrl)}
                 className={`w-full text-left block px-4 py-2 text-sm hover:bg-gray-100 ${
                   language.id === currentLanguage

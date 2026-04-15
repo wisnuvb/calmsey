@@ -68,6 +68,8 @@ export function DetailStoryVideoSection({
   // If no video URL but has poster image, show as regular image
   const isImageOnly = !videoUrl && !!posterImage;
 
+  console.log({videoUrl})
+
   return (
     <section
       className={cn(

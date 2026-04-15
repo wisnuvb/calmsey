@@ -142,7 +142,7 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
   };
 
   return (
-    <section className={`w-full ${backgroundColor} py-16 md:py-24`}>
+    <section className={`w-full ${backgroundColor} py-16 md:py-24`} id="guidingpolicies">
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -152,12 +152,12 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
             </div>
           </div>
 
-          <h2 className="text-3xl md:text-[38px] font-bold text-[#010107] mb-8 sm:mb-16 font-nunito-sans">
+          <h2 className="text-3xl md:text-[38px] font-bold text-[#010107] mb-8 sm:mb-16 font-nunito">
             {title}
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 sm:px-28">
-            <div className="text-left sm:col-span-4 text-[#010107] font-normal font-nunito-sans text-2xl space-y-2">
+            <div className="text-left sm:col-span-4 text-[#010107] font-normal font-nunito text-2xl space-y-2">
               <p className="">
                 Last Update
               </p>
@@ -176,6 +176,7 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
             <div
               key={policy.id}
               className="overflow-hidden"
+              id={policy.id}
             >
               <button
                 onClick={() => togglePolicy(policy.id)}
@@ -185,7 +186,7 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
                   }`}
               >
                 <div className="flex items-center gap-4">
-                  <span className="text-lg font-bold text-[#010107] font-nunito-sans">{policy.title}</span>
+                  <span className="text-lg font-bold text-[#010107] font-nunito">{policy.title}</span>
                 </div>
 
                 {expandedPolicy === policy.id ? (

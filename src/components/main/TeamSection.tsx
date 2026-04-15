@@ -40,7 +40,7 @@ function TeamMemberCard({
       {/* Photo with LinkedIn Icon */}
       <div className="relative inline-block mb-4 w-full max-w-[250px] mx-auto cursor-pointer">
         <div
-          className="relative aspect-square rounded-lg overflow-hidden transition-colors duration-500"
+          className="relative rounded-lg overflow-hidden transition-colors duration-500 aspect-[3/4]"
           style={{ backgroundColor: bgColor }}
           role="button"
           tabIndex={0}
@@ -57,7 +57,7 @@ function TeamMemberCard({
             src={getImageUrl(member.image)}
             alt={member.name}
             fill
-            className="object-contain"
+            className="object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -94,13 +94,13 @@ function TeamMemberCard({
         }}
         aria-label={`View details for ${member.name}`}
       >
-        <h3 className="text-xl font-bold text-[#010107] mb-3 font-nunito-sans leading-[140%] tracking-normal">
+        <h3 className="text-xl font-bold text-[#010107] mb-3 font-nunito leading-[140%] tracking-normal">
           {member.name}
         </h3>
-        <p className="text-base text-[#3C62ED] mb-[2px] font-work-sans font-normal leading-[150%] tracking-normal">
+        <p className="text-base text-[#3C62ED] mb-[2px] font-work-sans font-normal leading-[27px] tracking-normal">
           {member.role}
         </p>
-        <p className="text-base text-[#3C62ED] font-work-sans font-normal leading-[150%] tracking-normal">
+        <p className="text-base text-[#3C62ED] font-work-sans font-normal leading-[27px] tracking-normal">
           {member.location}
         </p>
       </div>
@@ -202,17 +202,34 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
     <section className="bg-white" id="ourteam">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-[38px] font-bold text-[#010107] mb-6 font-nunito-sans">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+          <h2 className="text-2xl sm:text-4xl lg:text-[38px] font-bold text-[#010107] mb-4 sm:mb-6 font-nunito leading-tight px-1">
             {title}
           </h2>
-          <p className="text-base text-[#060726CC] max-w-4xl mx-auto leading-[150%] tracking-normal font-work-sans">
+          <p className="text-base text-[#060726CC] max-w-4xl mx-auto leading-[27px] tracking-normal font-work-sans px-1">
             {description}
           </p>
         </div>
 
-        {/* Team Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        {/* Mobile: horizontal scroll cards */}
+        <div className="sm:hidden mb-10 -mx-1 px-1">
+          <div className="flex gap-0 sm:gap-5 overflow-x-auto snap-x snap-mandatory pb-2 scroll-px-4 px-2 [scrollbar-width:thin]">
+            {members.map((member) => (
+              <div
+                key={member.id}
+                className="snap-center shrink-0 w-[min(280px,82vw)]"
+              >
+                <TeamMemberCard
+                  member={member}
+                  onSelect={() => setSelectedMember(member)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* sm+: paginated grid */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {currentMembers.map((member) => (
             <TeamMemberCard
               key={member.id}
@@ -222,9 +239,9 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
           ))}
         </div>
 
-        {/* Navigation Controls */}
+        {/* Navigation Controls (desktop / tablet grid only) */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-4">
+          <div className="hidden sm:flex justify-center items-center gap-4">
             <button
               onClick={goToPrevious}
               className={cn(

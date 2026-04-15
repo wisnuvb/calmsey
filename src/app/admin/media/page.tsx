@@ -32,6 +32,49 @@ import { getImageUrl } from "@/lib/utils";
 import { Pagination } from "@/components/common/Pagination";
 import { useToast } from "@/components/ui/toast";
 
+type ToastLike = (opts: { title: string; type: "success" | "error" }) => void;
+
+/** URL untuk clipboard: path situs → origin; host CDN (DO Spaces, dll.) tanpa skema → https:// */
+function resolveMediaUrlForClipboard(trimmed: string): string {
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+  // Path relatif ke app admin (mis. /uploads/...)
+  if (trimmed.startsWith("/")) {
+    return `${window.location.origin}${trimmed}`;
+  }
+  // Tanpa skema tapi sudah host absolut, mis. space-xxx.sgp1.cdn.digitaloceanspaces.com/media/...
+  const firstSegment = trimmed.split("/")[0] ?? "";
+  if (firstSegment.includes(".")) {
+    return `https://${trimmed}`;
+  }
+  return `${window.location.origin}/${trimmed}`;
+}
+
+async function copyMediaUrlToClipboard(url: string, addToast: ToastLike) {
+  const trimmed = url.trim();
+  const absolute = resolveMediaUrlForClipboard(trimmed);
+  try {
+    await navigator.clipboard.writeText(absolute);
+    addToast({ title: "File URL copied to clipboard", type: "success" });
+  } catch {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = absolute;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      addToast({ title: "File URL copied to clipboard", type: "success" });
+    } catch {
+      addToast({ title: "Could not copy URL to clipboard", type: "error" });
+    }
+  }
+}
+
 export default function MediaPage() {
   const [previewFile, setPreviewFile] = useState<MediaFile | null>(null);
 
@@ -567,12 +610,9 @@ function MediaCard({
                 <DocumentArrowDownIcon className="h-4 w-4" />
               </a>
               <button
+                type="button"
                 onClick={() => {
-                  navigator.clipboard.writeText(file.url);
-                  addToast({
-                    title: "File URL copied to clipboard",
-                    type: "success",
-                  });
+                  void copyMediaUrlToClipboard(file.url, addToast);
                 }}
                 className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                 title="Copy file URL"

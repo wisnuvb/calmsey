@@ -239,7 +239,7 @@ export function PartnerStoriesSection({
               {title && (
                 <h2
                   className={cn(
-                    "text-3xl sm:text-4xl lg:text-[42px] font-bold leading-tight mb-3 font-nunito-sans",
+                    "text-3xl sm:text-4xl lg:text-[42px] font-bold leading-tight mb-3 font-nunito",
                     textColor
                   )}
                 >
@@ -340,7 +340,7 @@ export function PartnerStoriesSection({
                   <Link href={story.url}>
                     <h3
                       className={cn(
-                        "text-xl sm:text-2xl font-bold leading-tight transition-colors hover:text-white/80 font-nunito-sans",
+                        "text-xl sm:text-2xl font-bold leading-tight transition-colors hover:text-white/80 font-nunito",
                         textColor
                       )}
                     >

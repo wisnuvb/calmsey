@@ -130,13 +130,13 @@ export const SteeringCommitteeSection: React.FC<
   };
 
   return (
-    <section className={cn("w-full pb-16 lg:pb-24", backgroundColor)}>
+    <section className={cn("w-full pb-16 lg:pb-24", backgroundColor)} id="steeringcommittees">
       <div className="container mx-auto px-4">
         {/* Title and Description */}
         <div className="mb-12 lg:mb-16 space-y-10">
           <H2
             style="h2bold"
-            className="text-[#010107] text-3xl sm:text-[38px] leading-[120%] tracking-normal text-center font-nunito-sans"
+            className="text-[#010107] text-3xl sm:text-[38px] leading-[120%] tracking-normal text-center font-nunito"
           >
             {title}
           </H2>

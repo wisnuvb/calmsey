@@ -111,7 +111,7 @@ export function RelationshipsSection({
               <h2
                 key={index}
                 id={index === 0 ? "relationships-heading" : undefined}
-                className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#010107] font-nunito-sans leading-tight"
+                className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#010107] font-nunito leading-tight"
               >
                 {line}
               </h2>

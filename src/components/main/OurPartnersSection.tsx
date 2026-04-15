@@ -176,10 +176,10 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#010107] mb-6">
             {title}
           </h2>
-          <p className="text-gray-700 text-lg md:text-xl">{description}</p>
+          <p className="text-[#060726CC] text-sm md:text-base leading-relaxed font-work-sans font-normal">{description}</p>
         </div>
 
         {/* Partners Grid */}

@@ -646,12 +646,21 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
         "Closing paragraph (supports HTML formatting, use **text** for bold)",
     },
     {
-      key: "genesis.logoSrc",
-      label: "Logo Image",
+      key: "genesis.heroImageSrc",
+      label: "Genesis Section Image",
       type: "image",
       section: "Genesis",
-      defaultValue: "/assets/Logo.png",
-      helpText: "Logo image displayed in the blue block",
+      defaultValue: "",
+      helpText:
+        "Image shown beside the genesis text. Upload via Media Library. Leave empty for text-only (full width).",
+    },
+    {
+      key: "genesis.heroImageAlt",
+      label: "Genesis Image Alt Text",
+      type: "text",
+      section: "Genesis",
+      defaultValue: "Genesis — Turning Tides",
+      helpText: "Short description of the image for screen readers (accessibility).",
     },
 
     // Funders Section

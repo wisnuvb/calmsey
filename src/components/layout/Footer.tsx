@@ -185,8 +185,10 @@ export function Footer() {
                 height={100}
                 className="w-auto h-11 object-contain"
               />
-              <p className="font-work-sans font-normal text-base text-white/80 leading-[150%] tracking-[0%]">
-              Turning Tides is a fiscally sponsored project of the Tenure Facility Fund, a U.S. 501c3.
+              <p className="font-work-sans font-normal text-base text-white/80 leading-[27px] tracking-[0%]">
+                Turning Tides is a fiscally sponsored project of the Tenure
+                Facility Fund, a US 501(c)3, which is a not for profit
+                subsidiary of the International Land and Forest Tenure Facility.
               </p>
             </div>
           </div>

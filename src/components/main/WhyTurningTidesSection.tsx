@@ -51,12 +51,11 @@ export function WhyTurningTidesSection({
 
   const fundersLabel = getValue(
     "whyUs.fundersLabel",
-    propContent,
+    undefined,
     "Together with the Funders Transforming Coastal Right"
   );
 
-  const funders =
-    propContent || getContentJSON<Funder[]>("whyUs.funders", defaultFunders);
+  const funders = getContentJSON<Funder[]>("whyUs.funders", defaultFunders);
 
   const whyContent = getValue(
     "whyUs.whyContent",

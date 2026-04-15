@@ -227,7 +227,7 @@ export const LatestStoriesSection: React.FC<LatestStoriesSectionProps> = ({
                   {/* Title - H4 for WCAG hierarchy (h3 Latest Stories → h4 card titles) */}
                   <H4
                     style="h5bold"
-                    className="text-[#010107] mb-4 font-nunito-sans leading-tight"
+                    className="text-[#010107] mb-4 font-nunito leading-tight"
                   >
                     {story.title}
                   </H4>

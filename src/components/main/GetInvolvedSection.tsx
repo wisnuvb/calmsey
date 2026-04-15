@@ -104,7 +104,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
 
   return (
     <section
-      className={`w-full ${backgroundColor} pt-16 md:pt-24`}
+      className={`w-full ${backgroundColor} pt-20 md:pt-24`}
       data-section="get-involved"
     >
       <h1 className="sr-only">Get Involved</h1>
@@ -125,7 +125,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
 
             {/* Overlay Content */}
             <div className="relative z-10 p-8 md:p-12 flex flex-col justify-center h-full">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight font-nunito-sans">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight font-nunito">
                 {overlayTitle}
               </h2>
               <p className="text-white/95 text-lg leading-[1.8] font-work-sans">
@@ -138,7 +138,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
           <div className="bg-white p-8 md:p-16 flex flex-col justify-center">
             <div className="max-w-md mx-auto w-full">
               <div className="mb-10">
-                <h3 className="text-4xl font-bold text-gray-900 mb-2 font-nunito-sans">
+                <h3 className="text-4xl font-bold text-gray-900 mb-2 font-nunito">
                   {title}
                 </h3>
                 {subtitle && (
@@ -248,7 +248,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                     required
                     aria-label="Partnership type"
                   >
-                    <option value="">I want to become partner</option>
+                    <option value="">Type of partner</option>
                     <option value="Funding Partner">Funding Partner</option>
                     <option value="Technical Partner">Technical Partner</option>
                     <option value="Community Partner">Community Partner</option>

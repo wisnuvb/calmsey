@@ -549,7 +549,7 @@ export function GrantmakingSection({
                       key={item.id}
                       onClick={() => handleNavClick(item.id)}
                       className={cn(
-                        "w-full text-left px-4 py-3 rounded-md transition-colors text-xl font-bold font-nunito-sans p-6",
+                        "w-full text-left px-4 py-3 rounded-md transition-colors text-xl font-bold font-nunito p-6",
                         isActive
                           ? "bg-[#3C62ED] text-white font-medium"
                           : "text-gray-900 hover:bg-gray-50"
@@ -567,7 +567,7 @@ export function GrantmakingSection({
               {activeContent ? (
                 <>
                   {/* Title */}
-                  <h2 className="text-3xl sm:text-[38px] font-bold text-[#010107] font-nunito-sans mb-6">
+                  <h2 className="text-3xl sm:text-[38px] font-bold text-[#010107] font-nunito mb-6">
                     {activeContent.title}
                   </h2>
 

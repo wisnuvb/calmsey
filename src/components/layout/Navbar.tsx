@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -236,7 +236,7 @@ export function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <div className="w-[79px] h-[50px] relative">
+            <div className="w-[100px] h-[65px] relative">
               <Image
                 src={getLogoSrc()}
                 alt="Turning Tides Logo"
@@ -294,7 +294,7 @@ export function Navbar() {
 
             {/* Get Involved Button */}
             <Link
-              href="/get-involved"
+              href={`/${language}/get-involved`}
               className={cn(
                 "px-6 py-2 border-2 rounded transition-all duration-300 text-sm font-medium",
                 isHomePage
@@ -348,7 +348,7 @@ export function Navbar() {
             {navLinks.map((link) => (
               <Link
                 key={link.href}
-                href={link.href}
+                href={`/${language}${link.href}`}
                 className={cn(
                   "block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300",
                   isHomePage
@@ -365,23 +365,18 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-4 space-y-2">
-              <button
-                className={cn(
-                  "w-full flex items-center justify-center space-x-1 px-3 py-2 text-sm transition-colors duration-300",
-                  isHomePage
-                    ? "text-[#010107]"
-                    : !hasDynamicBackground ||
-                        (isScrolled && !isHomePage) ||
-                        !currentBackgroundAnalysis?.isLight
-                      ? "text-white hover:text-blue-300"
-                      : "text-gray-700 hover:text-[#3C62ED]",
-                )}
-              >
-                <span>{language}</span>
-                <ChevronDown className="w-4 h-4" />
-              </button>
+              <LanguageSwitcher
+                variant="drawer"
+                currentLanguage={language}
+                isDark={
+                  !isHomePage &&
+                  (!hasDynamicBackground ||
+                    (isScrolled && !isHomePage) ||
+                    !currentBackgroundAnalysis?.isLight)
+                }
+              />
               <Link
-                href="/get-involved"
+                href={`/${language}/get-involved`}
                 className={cn(
                   "block w-full text-center px-6 py-2 border-2 rounded transition-all duration-300 text-sm font-medium",
                   isHomePage

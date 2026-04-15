@@ -65,7 +65,7 @@ We support ongoing efforts to build accountability, respect and awareness amongs
           <p className="text-xs uppercase tracking-wider text-[#3C62ED] mb-3 font-work-sans font-normal">
             {title}
           </p>
-          <h2 className="text-3xl sm:text-[38px] leading-[120%] font-bold text-[#010107] font-nunito-sans max-w-[382px] mx-auto">
+          <h2 className="text-3xl sm:text-[38px] leading-[120%] font-bold text-[#010107] font-nunito max-w-[382px] mx-auto">
             {subtitle}
           </h2>
         </div>

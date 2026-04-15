@@ -40,7 +40,7 @@ export function QuoteSection({
             </div>
 
             {/* Quote Text */}
-            <blockquote className="text-[#3C62ED] text-2xl sm:text-[26px] font-bold leading-tight font-nunito-sans">
+            <blockquote className="text-[#3C62ED] text-2xl sm:text-[26px] font-bold leading-tight font-nunito">
               {quote}
             </blockquote>
           </div>

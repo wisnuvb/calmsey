@@ -1353,7 +1353,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
                 {
                   id: "intro",
                   content:
-                    'Grassroots Fund Action Plans are influenced by our partners, and are in alignment with Turning Tides\' <a href="/our-approach" class="text-[#3C62ED] underline hover:text-[#2d4fd6]">Theory of Change</a> and <a href="/our-approach" class="text-[#3C62ED] underline hover:text-[#2d4fd6]">grantmaking framework</a>. These funds support on-the-ground efforts and opportunities to move toward tenure security and recognition of rights. Action Plans present a set of priorities and pathways that guide our grantmaking and relationship building over at least five years.',
+                    'Grassroots Fund Action Plans are influenced by our partners, and are in alignment with Turning Tides\' <a href="/our-approach#theory-of-change" class="text-[#3C62ED] underline hover:text-[#2d4fd6]">Theory of Change</a> and <a href="/our-approach#our-approach-to-grantmaking" class="text-[#3C62ED] underline hover:text-[#2d4fd6]">grantmaking framework</a>. These funds support on-the-ground efforts and opportunities to move toward tenure security and recognition of rights. Action Plans present a set of priorities and pathways that guide our grantmaking and relationship building over at least five years.',
                 },
                 {
                   id: "action-plans",

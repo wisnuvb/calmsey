@@ -49,30 +49,27 @@ interface TypographyProps {
   "data-testid"?: string;
 }
 
-// Style mappings dengan font yang benar menggunakan Tailwind classes
+// Style mappings — headings use Nunito; body text uses Work Sans
 const styleClasses: Record<TypographyStyle, string> = {
-  // H2 Bold - menggunakan Nunito Sans
   h2bold:
-    "font-bold text-[38px] leading-[120%] tracking-normal align-middle font-nunito-sans",
+    "font-bold text-[38px] leading-[120%] tracking-normal align-middle font-nunito",
   h2reg:
-    "font-normal text-[38px] leading-[120%] tracking-normal align-middle font-nunito-sans",
+    "font-normal text-[38px] leading-[120%] tracking-normal align-middle font-nunito",
 
-  // P1 Regular - menggunakan Work Sans
-  p1reg: "font-work-sans font-normal text-base leading-[150%] align-middle",
+  p1reg: "font-work-sans font-normal text-base leading-[27px] align-middle",
   p2reg: "font-work-sans font-normal text-sm leading-[150%] align-middle",
 
-  // Variant tambahan untuk kelengkapan
-  h1bold: "font-bold text-3xl sm:text-[48px] font-nunito-sans leading-[120%]",
-  h3semibold: "font-semibold text-2xl font-nunito-sans",
+  h1bold: "font-bold text-3xl sm:text-[48px] font-nunito leading-[120%]",
+  h3semibold: "font-semibold text-2xl font-nunito",
   h3bold:
-    "text-xl sm:text-[32px] leading-[120%] tracking-normal font-bold font-nunito-sans",
-  h3reg: "font-normal text-[32px] leading-[120%] font-nunito-sans",
-  h4reg: "font-normal text-[24px] leading-[140%] font-work-sans",
-  h4medium: "font-medium text-xl leading-snug tracking-tight font-nunito-sans",
-  h5bold: "font-bold text-2xl leading-snug tracking-tight font-nunito-sans",
+    "text-xl sm:text-[32px] leading-[120%] tracking-normal font-bold font-nunito",
+  h3reg: "font-normal text-[32px] leading-[120%] font-nunito",
+  h4reg: "font-normal text-[24px] leading-[140%] font-nunito",
+  h4medium: "font-medium text-xl leading-snug tracking-tight font-nunito",
+  h5bold: "font-bold text-2xl leading-snug tracking-tight font-nunito",
   h5regular:
-    "font-normal text-lg leading-snug tracking-normal font-nunito-sans",
-  h6bold: "font-bold text-xl leading-snug tracking-normal font-nunito-sans",
+    "font-normal text-lg leading-snug tracking-normal font-nunito",
+  h6bold: "font-bold text-xl leading-snug tracking-normal font-nunito",
   p2medium:
     "font-medium text-base leading-relaxed tracking-normal font-work-sans",
   p3regular:

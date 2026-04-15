@@ -74,7 +74,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
           )}
 
           {/* Name */}
-          <h3 className="text-3xl sm:text-4xl font-bold text-[#010107] mb-2 font-nunito-sans">
+          <h3 className="text-3xl sm:text-4xl font-bold text-[#010107] mb-2 font-nunito">
             {member.name}
           </h3>
 
