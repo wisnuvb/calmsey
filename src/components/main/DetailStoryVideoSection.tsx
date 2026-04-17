@@ -4,51 +4,13 @@ import { useState, useMemo } from "react";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { getVideoEmbedInfo } from "@/lib/video-embed";
 
 interface DetailStoryVideoSectionProps {
   videoUrl?: string;
   posterImage?: string;
   title?: string;
   className?: string;
-}
-
-type VideoType = "youtube" | "vimeo" | "direct";
-
-// Helper function to detect video type and extract ID
-function getVideoInfo(url: string): {
-  type: VideoType;
-  embedUrl?: string;
-  videoId?: string;
-} {
-  if (!url) {
-    return { type: "direct" };
-  }
-
-  // YouTube detection
-  const youtubeRegex =
-    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-  const youtubeMatch = url.match(youtubeRegex);
-  if (youtubeMatch && youtubeMatch[1]) {
-    return {
-      type: "youtube",
-      videoId: youtubeMatch[1],
-      embedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1&rel=0`,
-    };
-  }
-
-  // Vimeo detection
-  const vimeoRegex = /(?:vimeo\.com\/)(\d+)/;
-  const vimeoMatch = url.match(vimeoRegex);
-  if (vimeoMatch && vimeoMatch[1]) {
-    return {
-      type: "vimeo",
-      videoId: vimeoMatch[1],
-      embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`,
-    };
-  }
-
-  // Direct video (MP4, WebM, etc.)
-  return { type: "direct" };
 }
 
 export function DetailStoryVideoSection({
@@ -59,7 +21,7 @@ export function DetailStoryVideoSection({
 }: DetailStoryVideoSectionProps) {
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const videoInfo = useMemo(() => getVideoInfo(videoUrl || ""), [videoUrl]);
+  const videoInfo = useMemo(() => getVideoEmbedInfo(videoUrl || ""), [videoUrl]);
 
   const handlePlayVideo = () => {
     setIsPlaying(true);
@@ -67,8 +29,6 @@ export function DetailStoryVideoSection({
 
   // If no video URL but has poster image, show as regular image
   const isImageOnly = !videoUrl && !!posterImage;
-
-  console.log({videoUrl})
 
   return (
     <section

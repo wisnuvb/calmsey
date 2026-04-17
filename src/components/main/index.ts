@@ -1,5 +1,6 @@
 export * from "./HeroSection";
 export * from "./VideoHeroSection";
+export * from "./VideoWeAreSection";
 export * from "./WhyTurningTidesSection";
 export * from "./WhereWeWorkSection";
 export * from "./OngoingProjectsSection";

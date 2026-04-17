@@ -5,6 +5,7 @@ export const HOME_SCHEMA: PageContentSchema = {
   sections: [
     "Hero",
     "Why TurningTides",
+    "We Are Video",
     "Grantmaking",
     "Partner Stories",
     "Where We Work",
@@ -158,6 +159,38 @@ export const HOME_SCHEMA: PageContentSchema = {
       section: "Why TurningTides",
       defaultValue: "/about",
       helpText: "URL for the call-to-action button",
+    },
+
+    // We Are Video (promo / embed)
+    {
+      key: "weAreVideo.videoUrl",
+      label: "Video URL",
+      type: "url",
+      section: "We Are Video",
+      placeholder: "https://www.youtube.com/watch?v=… or https://vimeo.com/…",
+      helpText:
+        "YouTube, Vimeo, or direct video file URL (mp4, webm, etc.).",
+    },
+    {
+      key: "weAreVideo.posterImage",
+      label: "Poster / Thumbnail",
+      type: "image",
+      section: "We Are Video",
+      helpText: "Background image before video is played. Recommended large width (e.g. 1920px).",
+    },
+    {
+      key: "weAreVideo.titleLine1",
+      label: "Title Line 1",
+      type: "text",
+      section: "We Are Video",
+      defaultValue: "",
+    },
+    {
+      key: "weAreVideo.titleLine2",
+      label: "Title Line 2",
+      type: "text",
+      section: "We Are Video",
+      defaultValue: "",
     },
 
     // Grantmaking Section

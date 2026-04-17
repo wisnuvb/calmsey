@@ -2,6 +2,7 @@ import React from "react";
 import {
   VideoHeroSection,
   WhyTurningTidesSection,
+  VideoWeAreSection,
   PartnerStoriesSection,
   StrategyDownloadSection,
   GrantmakingSection,
@@ -56,6 +57,7 @@ const HomePage = async ({ params }: HomePageProps) => {
       {/* <OngoingProjectsSection /> */}
       {/* <LatestArticlesSection /> */}
       {/* <OurWorkSection /> */}
+      <VideoWeAreSection />
       <GrantmakingSection />
       <PartnerStoriesSection
         tag="COMMUNITY ECHOES"
