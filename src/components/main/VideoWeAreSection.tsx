@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import { Play } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { getVideoEmbedInfo } from "@/lib/video-embed";
 
@@ -60,7 +60,7 @@ export function VideoWeAreSection({
   return (
     <section
       className={cn(
-        "container mx-auto px-4 mb-[80px] max-w-[1200px]",
+        "container mx-auto px-4 mb-[80px]",
         className
       )}
     >
@@ -70,11 +70,10 @@ export function VideoWeAreSection({
             {posterImage ? (
               <div className="absolute inset-0 z-0">
                 <Image
-                  src={posterImage}
-                  alt=""
+                  src={getImageUrl(posterImage)}
+                  alt={titleLine2}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 1200px) 100vw, 1200px"
                   priority={false}
                 />
               </div>

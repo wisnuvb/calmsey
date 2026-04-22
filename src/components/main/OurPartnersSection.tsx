@@ -179,7 +179,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
           <h2 className="text-3xl md:text-4xl font-bold text-[#010107] mb-6">
             {title}
           </h2>
-          <p className="text-[#060726CC] text-sm md:text-base leading-relaxed font-work-sans font-normal">{description}</p>
+          <p className="text-[#060726CC] p">{description}</p>
         </div>
 
         {/* Partners Grid */}

@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, X, FileText, Download, ArrowUpRight } from "lucide-react";
+import {
+  CheckCircle2,
+  X,
+  FileText,
+  Download,
+  ArrowUpRight,
+} from "lucide-react";
 import { H3, P } from "../ui/typography";
 import { RichText } from "../ui/RichText";
 import type { FundContent } from "@/types/fund-detail";
@@ -40,12 +46,16 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
       return (
         <a
           href={cta.file}
-          download={!isExternal && cta.text ? `${cta.text.replace(/\s+/g, "-")}.pdf` : undefined}
+          download={
+            !isExternal && cta.text
+              ? `${cta.text.replace(/\s+/g, "-")}.pdf`
+              : undefined
+          }
           target={isExternal ? "_blank" : undefined}
           rel={isExternal ? "noopener noreferrer" : undefined}
           className={cn(
             baseButtonClasses,
-            "gap-3 rounded-lg bg-[#3C62ED] text-white hover:bg-[#2d4fd6]"
+            "gap-3 rounded-lg bg-[#3C62ED] text-white hover:bg-[#2d4fd6]",
           )}
           aria-label={`Download ${cta.text}`}
         >
@@ -58,7 +68,8 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
 
     if (cta.type === "button") {
       const isExternal = cta.link?.startsWith("http") ?? false;
-      const showArrow = cta.icon === "arrow" || cta.icon === "arrow-external" || isExternal;
+      const showArrow =
+        cta.icon === "arrow" || cta.icon === "arrow-external" || isExternal;
       const buttonContent = (
         <>
           {cta.text}
@@ -70,8 +81,8 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
         cta.style === "primary"
           ? "bg-[#3C62ED] text-white hover:bg-[#2d4fd6]"
           : cta.style === "secondary"
-          ? "bg-gray-100 text-gray-900 hover:bg-gray-200"
-          : "bg-white border border-gray-300 text-gray-900 hover:bg-gray-50"
+            ? "bg-gray-100 text-gray-900 hover:bg-gray-200"
+            : "bg-white border border-gray-300 text-gray-900 hover:bg-gray-50",
       );
       if (isExternal && cta.link) {
         return (
@@ -99,7 +110,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
     <RichText
       key={key}
       content={text}
-      className="text-[#060726CC] text-lg leading-relaxed font-work-sans [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
+      className="text-[#060726CC] p [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
     />
   );
 
@@ -111,11 +122,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
           <div className="max-w-4xl mx-auto space-y-12">
             {/* Intro */}
             {content.intro.map((paragraph, index) => (
-              <P
-                key={index}
-                style="p1reg"
-                className="text-[#060726CC] text-lg leading-relaxed font-work-sans"
-              >
+              <P key={index} style="p1reg" className="text-[#060726CC] p">
                 {paragraph}
               </P>
             ))}
@@ -146,10 +153,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                           {item.title}:
                         </h4>
                       )}
-                      <P
-                        style="p1reg"
-                        className="text-[#060726CC] leading-relaxed font-work-sans"
-                      >
+                      <P style="p1reg" className="text-[#060726CC] p">
                         {item.description}
                       </P>
                     </div>
@@ -170,21 +174,14 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                 {content.unsupportedSection.items.map((item) => (
                   <li key={item.id} className="flex items-start gap-4">
                     {renderIcon(item.icon)}
-                    <P
-                      style="p1reg"
-                      className="text-[#060726CC] leading-relaxed font-work-sans flex-1"
-                    >
+                    <P style="p1reg" className="text-[#060726CC] p flex-1">
                       {item.description}
                     </P>
                   </li>
                 ))}
               </ul>
               {content.unsupportedConcluding?.map((paragraph, index) => (
-                <P
-                  key={index}
-                  style="p1reg"
-                  className="text-[#060726CC] leading-relaxed font-work-sans"
-                >
+                <P key={index} style="p1reg" className="text-[#060726CC] p">
                   {paragraph}
                 </P>
               ))}
@@ -200,16 +197,14 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                   {content.howToApplySection.heading}
                 </H3>
                 {content.howToApplySection.content.map((paragraph, index) => (
-                  <P
-                    key={index}
-                    style="p1reg"
-                    className="text-[#060726CC] text-lg leading-relaxed font-work-sans"
-                  >
+                  <P key={index} style="p1reg" className="text-[#060726CC] p">
                     {paragraph}
                   </P>
                 ))}
                 {content.howToApplySection.cta && (
-                  <div className="pt-2">{renderCTA(content.howToApplySection.cta)}</div>
+                  <div className="pt-2">
+                    {renderCTA(content.howToApplySection.cta)}
+                  </div>
                 )}
               </div>
             )}
@@ -231,11 +226,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
           <div className="max-w-4xl mx-auto space-y-12">
             {/* Intro */}
             {content.intro.map((paragraph, index) => (
-              <P
-                key={index}
-                style="p1reg"
-                className="text-[#060726CC] text-lg leading-relaxed font-work-sans"
-              >
+              <P key={index} style="p1reg" className="text-[#060726CC] p">
                 {paragraph}
               </P>
             ))}
@@ -252,10 +243,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                 {content.partnersWillSection.items.map((item) => (
                   <li key={item.id} className="flex items-start gap-4">
                     {renderIcon(item.icon)}
-                    <P
-                      style="p1reg"
-                      className="text-[#060726CC] leading-relaxed font-work-sans flex-1"
-                    >
+                    <P style="p1reg" className="text-[#060726CC] p flex-1">
                       {item.description}
                     </P>
                   </li>
@@ -265,11 +253,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
 
             {/* Concluding */}
             {content.concluding.map((paragraph, index) => (
-              <P
-                key={index}
-                style="p1reg"
-                className="text-[#060726CC] text-lg leading-relaxed font-work-sans"
-              >
+              <P key={index} style="p1reg" className="text-[#060726CC] p">
                 {paragraph}
               </P>
             ))}
@@ -312,53 +296,51 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                           <P
                             key={index}
                             style="p1reg"
-                            className="text-[#060726CC] text-lg leading-relaxed font-work-sans"
+                            className="text-[#060726CC] p"
                           >
                             {para}
                           </P>
-                        )
+                        ),
                       )
                     ) : hasHtml(section.content) ? (
                       renderParagraphWithHtml(section.content)
                     ) : (
-                      <P
-                        style="p1reg"
-                        className="text-[#060726CC] text-lg leading-relaxed font-work-sans"
-                      >
+                      <P style="p1reg" className="text-[#060726CC] p">
                         {section.content}
                       </P>
                     )}
                   </div>
                 )}
 
-                {section.sectionType === "action-plans" && section.actionPlanItems && (
-                  <ol className="space-y-4 list-none">
-                    {section.actionPlanItems.map((item) => (
-                      <li
-                        key={item.number}
-                        className="flex items-center justify-between gap-4 flex-wrap"
-                      >
-                        <span className="font-nunito font-semibold text-[#010107]">
-                          {item.number} {item.title}:
-                        </span>
-                        {item.status === "link" && item.link ? (
-                          <a
-                            href={item.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-4 py-2 rounded-md bg-[#3C62ED] text-white text-sm font-medium hover:bg-[#2d4fd6] transition-colors"
-                          >
-                            Hyperlink to public version
-                          </a>
-                        ) : (
-                          <span className="inline-flex items-center px-4 py-2 rounded-md bg-gray-200 text-gray-700 text-sm font-medium">
-                            In Development via Engagement phase
+                {section.sectionType === "action-plans" &&
+                  section.actionPlanItems && (
+                    <ol className="space-y-4 list-none">
+                      {section.actionPlanItems.map((item) => (
+                        <li
+                          key={item.number}
+                          className="flex items-center justify-between gap-4 flex-wrap"
+                        >
+                          <span className="font-nunito font-semibold text-[#010107]">
+                            {item.number} {item.title}:
                           </span>
-                        )}
-                      </li>
-                    ))}
-                  </ol>
-                )}
+                          {item.status === "link" && item.link ? (
+                            <a
+                              href={item.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center px-4 py-2 rounded-md bg-[#3C62ED] text-white text-sm font-medium hover:bg-[#2d4fd6] transition-colors"
+                            >
+                              Hyperlink to public version
+                            </a>
+                          ) : (
+                            <span className="inline-flex items-center px-4 py-2 rounded-md bg-gray-200 text-gray-700 text-sm font-medium">
+                              In Development via Engagement phase
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ol>
+                  )}
 
                 {section.items && !section.actionPlanItems && (
                   <ul className="space-y-4">
@@ -371,10 +353,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
                               {item.title}
                             </h4>
                           )}
-                          <P
-                            style="p1reg"
-                            className="text-[#060726CC] leading-relaxed font-work-sans"
-                          >
+                          <P style="p1reg" className="text-[#060726CC] p">
                             {item.description}
                           </P>
                         </div>

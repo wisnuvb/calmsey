@@ -80,13 +80,13 @@ export function WhyTurningTidesSection({
               {missionTitle}
             </H2>
 
-            <P style="p1reg" className="text-[#060726CC] text-base">
+            <P style="p1reg" className="text-[#060726CC]">
               {missionDescription}
             </P>
 
             {/* Funders Section */}
             <div className="pt-12 space-y-8">
-              <P style="p1reg" className="text-[#060726CC] text-base">
+              <P style="p1reg" className="text-[#060726CC]">
                 {fundersLabel}
               </P>
 
@@ -119,7 +119,7 @@ export function WhyTurningTidesSection({
               {whyTitle}
             </H5> */}
 
-            <P style="p1reg" className="text-[#060726CC] text-base">
+            <P style="p1reg" className="text-[#060726CC]">
               {whyContent}
             </P>
 

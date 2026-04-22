@@ -117,11 +117,14 @@ const ICON_ORDER = ["Waves", "Globe", "Zap", "Lightbulb"] as const;
 function mapFundDetailsToFundData(
   item: FundDetailsFundItem,
   index: number,
-  language: string
+  language: string,
 ): FundData {
   const slug = item.slug || "";
   const firstParagraph = item.intro
-    ? item.intro.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)[0] || ""
+    ? item.intro
+        .split(/\n\s*\n/)
+        .map((p) => p.trim())
+        .filter(Boolean)[0] || ""
     : "";
   return {
     id: item.id || slug || `fund-${index}`,
@@ -152,7 +155,10 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
   );
 
   // Prefer fundDetails.funds (same as admin Fund Details) so order and list match the admin
-  const fundDetailsList = getContentJSON<FundDetailsFundItem[]>("fundDetails.funds", []);
+  const fundDetailsList = getContentJSON<FundDetailsFundItem[]>(
+    "fundDetails.funds",
+    [],
+  );
   const fourFundsList = getContentJSON<FundData[]>("fourFunds.funds", []);
 
   let funds: Fund[];
@@ -165,7 +171,12 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
       .filter((f) => f?.slug)
       .map((f, i) => mapFundDetailsToFundData(f, i, language))
       .filter((f) => f.title && f.imageSrc);
-    funds = mapped.length > 0 ? mapped.map(convertFundDataToFund) : fourFundsList.length > 0 ? fourFundsList.map(convertFundDataToFund) : defaultFundsData.map(convertFundDataToFund);
+    funds =
+      mapped.length > 0
+        ? mapped.map(convertFundDataToFund)
+        : fourFundsList.length > 0
+          ? fourFundsList.map(convertFundDataToFund)
+          : defaultFundsData.map(convertFundDataToFund);
   } else if (fourFundsList.length > 0) {
     funds = fourFundsList.map(convertFundDataToFund);
   } else if (propFunds && propFunds.length > 0) {
@@ -185,10 +196,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
           >
             {title}
           </H2>
-          <P
-            style="p1reg"
-            className="text-[#060726CC] text-base leading-[150%] tracking-normal font-work-sans"
-          >
+          <P style="p1reg" className="text-[#060726CC] p">
             {description}
           </P>
         </div>
@@ -227,7 +235,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
                     {fund.title}
                   </h3>
                   <p
-                    className="text-[#060726CC] text-base font-normal leading-relaxed"
+                    className="text-[#060726CC] p font-normal leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: fund.description }}
                   />
                 </div>

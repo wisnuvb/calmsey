@@ -165,7 +165,7 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
             </div>
 
             <div className="text-left sm:col-span-8">
-              <p className="text-[#010107] text-lg tracking-normal font-nunito-sans leading-relaxed">{description}</p>
+              <p className="text-[#010107] p">{description}</p>
             </div>
           </div>
         </div>

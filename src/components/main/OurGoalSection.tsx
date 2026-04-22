@@ -196,11 +196,11 @@ export function OurGoalSection({
             <div className="space-y-6">
               <RichText
                 content={description1}
-                className="text-[#060726CC] text-base font-normal font-work-sans leading-[150%] [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
+                className="text-[#060726CC] p font-normal font-work-sans leading-[150%] [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
               />
               <RichText
                 content={description2}
-                className="text-[#060726CC] text-base font-normal font-work-sans leading-[150%] [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
+                className="text-[#060726CC] p font-normal font-work-sans leading-[150%] [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
               />
             </div>
           </div>
@@ -223,7 +223,7 @@ export function OurGoalSection({
                   {strategyTitle}
                 </H3>
 
-                <P style="p1reg" className="text-[#06072680] leading-[150%]">
+                <P style="p1reg" className="text-[#06072680] leading-[150%] p">
                   {strategyDescription}
                 </P>
 

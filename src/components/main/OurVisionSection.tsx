@@ -73,7 +73,7 @@ export function OurVisionSection({
 
             {/* Vision Description */}
             <div
-              className="text-[#060726CC] leading-relaxed text-base font-normal font-nunito-sans"
+              className="text-[#060726CC] leading-relaxed p font-normal font-nunito-sans"
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </div>

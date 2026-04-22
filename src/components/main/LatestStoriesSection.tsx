@@ -126,7 +126,7 @@ export const LatestStoriesSection: React.FC<LatestStoriesSectionProps> = ({
                 videoUrl: article.videoUrl,
                 caption: undefined, // Can be set from photos or other sources if needed
               };
-            }
+            },
           );
 
           setStories(transformedStories);
@@ -235,7 +235,7 @@ export const LatestStoriesSection: React.FC<LatestStoriesSectionProps> = ({
                   {/* Description */}
                   <P
                     style="p1reg"
-                    className="text-[#06072680] mb-4 leading-relaxed line-clamp-3"
+                    className="text-[#06072680] mb-4 p line-clamp-3"
                   >
                     {story.description}
                   </P>

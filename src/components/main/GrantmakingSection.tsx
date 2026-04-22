@@ -600,7 +600,7 @@ export function GrantmakingSection({
                             <RichText
                               key={index}
                               className={cn(
-                                "text-lg leading-relaxed text-gray-700 font-work-sans"
+                                "p text-gray-700 font-work-sans"
                               )}
                               content={paragraph.replace(
                                 /\*\*(.*?)\*\*/g,

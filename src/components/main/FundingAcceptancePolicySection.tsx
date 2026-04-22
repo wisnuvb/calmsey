@@ -20,24 +20,24 @@ export function FundingAcceptancePolicySection({
   buttonLink: propButtonLink,
   backgroundColor = "bg-[#1E0F39]",
 }: FundingAcceptancePolicySectionProps = {}) {
-  const { getValue, getContentJSON } = usePageContentHelpers()
+  const { getValue, getContentJSON } = usePageContentHelpers();
 
   const title = getValue(
     "fundingAcceptancePolicy.title",
     propTitle,
-    "Turning Tides External Funding Acceptance Policy"
+    "Turning Tides External Funding Acceptance Policy",
   );
 
   const buttonText = getValue(
     "fundingAcceptancePolicy.buttonText",
     propButtonText,
-    "Our Funding Acceptance Policy"
+    "Our Funding Acceptance Policy",
   );
 
   const buttonLink = getValue(
     "fundingAcceptancePolicy.buttonLink",
     propButtonLink,
-    "/governance/funding-policy"
+    "/governance/funding-policy",
   );
 
   const defaultParagraphs = [
@@ -48,7 +48,7 @@ export function FundingAcceptancePolicySection({
   // Get paragraphs from content (can be array of strings or array of objects with paragraph property)
   const rawParagraphs = getContentJSON<string[] | { paragraph: string }[]>(
     "fundingAcceptancePolicy.paragraphs",
-    propParagraphs || defaultParagraphs
+    propParagraphs || defaultParagraphs,
   );
 
   // Normalize to array of strings
@@ -73,11 +73,7 @@ export function FundingAcceptancePolicySection({
             {/* Paragraphs */}
             <div className="space-y-6">
               {paragraphs.map((paragraph, index) => (
-                <P
-                  key={index}
-                  style="p1reg"
-                  className="!text-white text-base font-normal font-work-sans leading-[150%] tracking-normal"
-                >
+                <P key={index} style="p1reg" className="!text-white p">
                   {paragraph}
                 </P>
               ))}

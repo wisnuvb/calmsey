@@ -120,7 +120,7 @@ export function DetailStoryVideoSection({
 
       {!isPlaying && !isImageOnly && (
         <div className="text-center mt-4">
-          <p className="text-white font-medium">{title}</p>
+          <p className="text-white font-medium p">{title}</p>
         </div>
       )}
     </section>

@@ -50,13 +50,13 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
   // categories: propCategories = [], // Not used - we filter by year instead
   // defaultCategory: propDefaultCategory, // Not used - we filter by year instead
 }) => {
-  const { getValue, getContentValue } = usePageContentHelpers()
+  const { getValue, getContentValue } = usePageContentHelpers();
 
   // Get all values with priority: context > props > default
   const title = getValue(
     "allStories.title",
     propTitle,
-    "All Stories From Our Partners"
+    "All Stories From Our Partners",
   );
 
   const showLoadMore = (() => {
@@ -109,7 +109,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
   const defaultSortOrder = getValue(
     "allStories.sortOrder",
     undefined,
-    "Latest"
+    "Latest",
   );
   const [sortBy, setSortBy] = useState(defaultSortOrder);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -223,7 +223,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
                 <ChevronDown
                   className={cn(
                     "w-4 h-4 text-gray-500 transition-transform",
-                    showSortDropdown && "rotate-180"
+                    showSortDropdown && "rotate-180",
                   )}
                 />
               </button>
@@ -246,7 +246,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
                           "w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors",
                           sortBy === option
                             ? "bg-blue-50 text-blue-600 font-medium"
-                            : "text-gray-700"
+                            : "text-gray-700",
                         )}
                       >
                         {option}
@@ -267,7 +267,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
                 "flex items-center gap-2 px-4 py-2 bg-white border rounded-md hover:bg-gray-50 transition-colors text-sm font-medium",
                 selectedYear
                   ? "border-blue-500 text-blue-600"
-                  : "border-gray-300 text-gray-700"
+                  : "border-gray-300 text-gray-700",
               )}
             >
               <Filter className="w-4 h-4" />
@@ -319,7 +319,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
                     "w-full text-left px-4 py-3 rounded-lg border-2 transition-colors",
                     !selectedYear
                       ? "border-blue-500 bg-blue-50 text-blue-900"
-                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
+                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700",
                   )}
                 >
                   <span className="font-medium">All Years</span>
@@ -332,7 +332,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
                       "w-full text-left px-4 py-3 rounded-lg border-2 transition-colors",
                       selectedYear === year
                         ? "border-blue-500 bg-blue-50 text-blue-900"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700",
                     )}
                   >
                     <span className="font-medium">{year}</span>
@@ -420,10 +420,7 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
                   </div>
 
                   {/* Description */}
-                  <P
-                    style="p1reg"
-                    className="text-[#06072680] leading-[150%] tracking-[0%] text-base line-clamp-3"
-                  >
+                  <P style="p1reg" className="text-[#06072680] p line-clamp-3">
                     {story.description}
                   </P>
 

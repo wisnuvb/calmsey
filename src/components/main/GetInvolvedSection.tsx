@@ -53,7 +53,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -128,9 +128,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight font-nunito">
                 {overlayTitle}
               </h2>
-              <p className="text-white/95 text-lg leading-[1.8] font-work-sans">
-                {overlayDescription}
-              </p>
+              <p className="text-white/95 p">{overlayDescription}</p>
             </div>
           </div>
 
@@ -315,11 +313,11 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
         </div>
       </div>
       <div className="bg-[#3C62ED] py-[100px] px-[120px] flex items-center justify-between gap-[70px]">
-        <p className="text-base text-white font-normal font-work-sans max-w-[433px]">
+        <p className="text-white p max-w-[433px]">
           Supporting rights and tenure of local communities, small scale
           fishers, fish workers, and Indigenous Peoples.
         </p>
-        <p className="text-base text-white font-normal font-work-sans max-w-[697px]">
+        <p className="text-white p max-w-[697px]">
           If you are a group, organization, or collective that represents or
           directly serves local communities, small-scale fishers or fish
           workers, or Indigenous Peoples,{" "}

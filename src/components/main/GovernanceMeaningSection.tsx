@@ -20,30 +20,30 @@ export function GovernanceMeaningSection({
   imageAlt: propImageAlt,
   paragraphs: propParagraphs,
 }: GovernanceMeaningSectionProps = {}) {
-  const { getValue, getContentJSON } = usePageContentHelpers()
+  const { getValue, getContentJSON } = usePageContentHelpers();
 
   const title = getValue(
     "governanceMeaning.title",
     propTitle,
-    "What governance means to Turning Tides and why it’s foundational"
+    "What governance means to Turning Tides and why it’s foundational",
   );
 
   const subtitle = getValue(
     "governanceMeaning.subtitle",
     propSubtitle,
-    "(power, agency, connection to theory of change)."
+    "(power, agency, connection to theory of change).",
   );
 
   const image = getValue(
     "governanceMeaning.image",
     propImage,
-    "/assets/achieve-1.webp"
+    "/assets/achieve-1.webp",
   );
 
   const imageAlt = getValue(
     "governanceMeaning.imageAlt",
     propImageAlt,
-    "Boats near a riverside community"
+    "Boats near a riverside community",
   );
 
   const defaultParagraphs = [
@@ -55,7 +55,7 @@ export function GovernanceMeaningSection({
   // Get paragraphs from content (can be array of strings or array of objects with paragraph property)
   const rawParagraphs = getContentJSON<string[] | { paragraph: string }[]>(
     "governanceMeaning.paragraphs",
-    propParagraphs || defaultParagraphs
+    propParagraphs || defaultParagraphs,
   );
 
   // Normalize to array of strings
@@ -74,10 +74,7 @@ export function GovernanceMeaningSection({
             >
               {title}
             </H2>
-            <P
-              style="p1reg"
-              className="text-[#060726CC] text-xl font-normal leading-[140%] tracking-normal"
-            >
+            <P style="p1reg" className="text-[#060726CC] p">
               {subtitle}
             </P>
           </div>

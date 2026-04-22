@@ -57,8 +57,8 @@ const HomePage = async ({ params }: HomePageProps) => {
       {/* <OngoingProjectsSection /> */}
       {/* <LatestArticlesSection /> */}
       {/* <OurWorkSection /> */}
-      <VideoWeAreSection />
       <GrantmakingSection />
+      <VideoWeAreSection />
       <PartnerStoriesSection
         tag="COMMUNITY ECHOES"
         title="Stories From Our Partners"

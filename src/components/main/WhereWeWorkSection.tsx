@@ -156,7 +156,7 @@ export function WhereWeWorkSection({
           <div className="flex items-start gap-4">
             <div className="w-4 h-4 bg-[#3C62ED] flex-shrink-0 mt-1" />
             <div className="text-base text-gray-900 font-work-sans leading-relaxed">
-              <p className="mb-2">
+              <p className="mb-2 p">
                 {actionPlansText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
                   // Every odd index is the text inside **
                   if (index % 2 === 1) {
@@ -181,7 +181,7 @@ export function WhereWeWorkSection({
           {/* Block 2 - Exploration Phase */}
           <div className="flex items-start gap-4">
             <div className="w-4 h-4 bg-[#7db5bb] flex-shrink-0 mt-1" />
-            <p className="text-base text-gray-900 font-work-sans leading-relaxed">
+            <p className="text-base text-gray-900 font-work-sans leading-relaxed p">
               {explorationText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
                 // Every odd index is the text inside **
                 if (index % 2 === 1) {
@@ -196,7 +196,7 @@ export function WhereWeWorkSection({
           <div className="flex items-start gap-4">
             <div className="w-4 h-4 bg-[#C4B5FD] flex-shrink-0 mt-1" />
             <div className="text-base text-gray-900 font-work-sans leading-relaxed">
-              <p className="mb-2">
+              <p className="mb-2 p">
                 {partnersText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
                   // Every odd index is the text inside **
                   if (index % 2 === 1) {

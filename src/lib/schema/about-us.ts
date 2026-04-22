@@ -4,6 +4,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
   pageType: "ABOUT_US",
   sections: [
     "Hero",
+    "We Are Video",
     "Our Vision",
     "Our Values",
     "Our Goal",
@@ -37,6 +38,38 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       label: "Hero Background Image",
       type: "image",
       section: "Hero",
+    },
+
+    // We Are Video (sama kunci dengan beranda; konten tersimpan per halaman)
+    {
+      key: "weAreVideo.videoUrl",
+      label: "Video URL",
+      type: "url",
+      section: "We Are Video",
+      placeholder: "https://www.youtube.com/watch?v=… atau https://vimeo.com/…",
+      helpText:
+        "YouTube, Vimeo, atau URL file video langsung (mp4, webm, dll.).",
+    },
+    {
+      key: "weAreVideo.posterImage",
+      label: "Poster / Thumbnail",
+      type: "image",
+      section: "We Are Video",
+      helpText: "Gambar latar sebelum video diputar. Disarankan lebar besar (mis. 1920px).",
+    },
+    {
+      key: "weAreVideo.titleLine1",
+      label: "Baris judul pertama",
+      type: "text",
+      section: "We Are Video",
+      defaultValue: "WE ARE",
+    },
+    {
+      key: "weAreVideo.titleLine2",
+      label: "Baris judul kedua",
+      type: "text",
+      section: "We Are Video",
+      defaultValue: "TURNING TIDES",
     },
 
     // Our Vision Section

@@ -87,7 +87,7 @@ We support ongoing efforts to build accountability, respect and awareness amongs
         <div className="max-w-4xl mx-auto">
           <p
             className={cn(
-              "text-base text-[#060726CC] leading-relaxed font-work-sans",
+              "p text-[#060726CC] leading-relaxed font-work-sans",
               !isExpanded && "line-clamp-4"
             )}
           >

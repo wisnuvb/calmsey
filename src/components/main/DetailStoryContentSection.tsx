@@ -364,13 +364,10 @@ export function DetailStoryContentSection({
           >
             {/* Description */}
             <div>
-              <H2
-                style="h5bold"
-                className="text-[#010107] font-nunito mb-6"
-              >
+              <H2 style="h5bold" className="text-[#010107] font-nunito mb-6">
                 Description
               </H2>
-              <P style="p1reg" className="text-[#060726CC] leading-relaxed">
+              <P style="p1reg" className="text-[#060726CC] p">
                 {description}
               </P>
             </div>
@@ -443,7 +440,7 @@ export function DetailStoryContentSection({
                           <LinkIcon className="w-4 h-4 text-[#3C62ED] group-hover:text-blue-600" />
                           <P
                             style="p1reg"
-                            className="text-[#060726CC] group-hover:text-blue-600"
+                            className="text-[#060726CC] group-hover:text-blue-600 p"
                           >
                             {article.title}
                           </P>

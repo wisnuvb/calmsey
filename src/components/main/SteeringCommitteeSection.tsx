@@ -149,7 +149,7 @@ export const SteeringCommitteeSection: React.FC<
             </P>
             <P
               style="p1reg"
-              className="text-[#06072680] text-base leading-[150%] font-work-sans"
+              className="text-[#06072680] p"
             >
               {additionalDescription}
             </P>

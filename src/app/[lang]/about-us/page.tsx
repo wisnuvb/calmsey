@@ -8,6 +8,7 @@ import {
   OurValuesSection,
   WhereWeWorkSection,
   FeedbackCalloutSection,
+  VideoWeAreSection,
 } from "@/components/main";
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
@@ -62,6 +63,10 @@ const AboutUsPage = async ({ params }: AboutUsPageProps) => {
         className="h-[590px] !min-h-[590px]"
       />
       {/* <QuoteSection /> */}
+
+      <div className="-mb-20 mt-20">
+        <VideoWeAreSection />
+      </div>
 
       <OurVisionSection />
       <OurValuesSection />
