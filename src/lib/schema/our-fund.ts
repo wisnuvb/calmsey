@@ -17,8 +17,17 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
       label: "Page Title",
       type: "text",
       section: "Hero",
-      defaultValue: "How we fund change",
+      defaultValue: "Our Funds",
       helpText: "Main title for the hero section",
+    },
+    {
+      key: "hero.subtitle",
+      label: "Hero description",
+      type: "textarea",
+      section: "Hero",
+      defaultValue:
+        "Turning Tides supports partners through four interacting funds, each of which supports different pathways toward change. Each fund is governed separately to increase responsiveness to partners' expressed needs and opportunities to create change.",
+      helpText: "Text shown under the title on the Our Funds hero",
     },
     {
       key: "hero.backgroundImage",
@@ -27,6 +36,24 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
       section: "Hero",
       defaultValue: "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
       helpText: "Background image for the hero section",
+    },
+    {
+      key: "hero.annualReportLabel",
+      label: "Annual Report button label",
+      type: "text",
+      section: "Hero",
+      defaultValue: "Download our Annual Report",
+      helpText:
+        "Label for the download button. Leave the URL empty to hide the button.",
+    },
+    {
+      key: "hero.annualReportUrl",
+      label: "Annual Report file URL",
+      type: "text",
+      section: "Hero",
+      defaultValue: "/downloads/annual-report.pdf",
+      helpText:
+        "Public URL to the PDF (e.g. /downloads/annual-report.pdf after uploading the file to public/downloads/).",
     },
 
     // Grantmaking Section
@@ -253,8 +280,9 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           label: "Download Button URL",
           type: "text",
           required: false,
-          placeholder: "/documents/framework.pdf",
-          helpText: "URL or path to the downloadable file",
+          placeholder: "/downloads/example.pdf",
+          helpText:
+            "Use a public path (e.g. /downloads/…). Private SharePoint/OneDrive links return access denied for public users.",
         },
       ],
       defaultValue: JSON.stringify(
@@ -328,6 +356,11 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
             infoBlockFooterIcon: "info",
             infoBlockFooterText:
               "Read more about the diverse ways in which we have come to consider tenure, and tenure security and rights recognition, in our Scoping Study and our brief (**forthcoming**).",
+            downloadButtonLabel:
+              "Marine, Coastal and Shoreline Tenure — Scoping Report (2024)",
+            downloadButtonText: "Download",
+            downloadButtonUrl:
+              "/downloads/marine-coastal-tenure-scoping-2024.pdf",
           },
           {
             id: "framework",

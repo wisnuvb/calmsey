@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import type { Editor as TinyMCEEditorType } from "tinymce";
 
 export interface TinyMCEEditorOptions {
   height?: number;
@@ -44,18 +42,6 @@ export function TinyMCEEditor({
   toolbar = DEFAULT_TOOLBAR,
   onImageUpload,
 }: TinyMCEEditorProps) {
-  const editorRef = useRef<TinyMCEEditorType | null>(null);
-
-  // Sync value with editor content when value prop changes
-  useEffect(() => {
-    if (editorRef.current && value !== undefined) {
-      const currentContent = editorRef.current.getContent();
-      if (currentContent !== value) {
-        editorRef.current.setContent(value || "");
-      }
-    }
-  }, [value]);
-
   const handleUploadImage = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     blobInfo: any,
@@ -80,7 +66,6 @@ export function TinyMCEEditor({
     <Editor
       tinymceScriptSrc="/tinymce/tinymce.min.js"
       licenseKey="gpl"
-      onInit={(_evt, editor) => (editorRef.current = editor)}
       value={value}
       init={{
         height,

@@ -247,6 +247,7 @@ export async function POST(request: NextRequest) {
       partnerOrganization,
       photos,
       relatedArticles,
+      publishedAt: publishedAtBody,
     } = body;
 
     // Validation
@@ -292,7 +293,15 @@ export async function POST(request: NextRequest) {
         partnerOrganization: partnerOrganization || null,
         photos: photos || null,
         relatedArticles: relatedArticles || null,
-        publishedAt: status === "PUBLISHED" ? new Date() : null,
+        publishedAt: (() => {
+          if (publishedAtBody && String(publishedAtBody).trim() !== "") {
+            return new Date(publishedAtBody as string);
+          }
+          if (status === "PUBLISHED") {
+            return new Date();
+          }
+          return null;
+        })(),
         authorId: session!.user.id,
 
         // Store English content directly in Article (for browser translation)

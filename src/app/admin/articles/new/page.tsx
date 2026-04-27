@@ -32,6 +32,7 @@ export default function NewArticlePage() {
   const [articleData, setArticleData] = useState({
     slug: "",
     status: "DRAFT",
+    publishedAt: "",
     featuredImage: "",
     location: "",
     categories: [] as string[],
@@ -188,6 +189,10 @@ export default function NewArticlePage() {
         body: JSON.stringify({
           slug: articleData.slug,
           status: publishNow ? "PUBLISHED" : articleData.status,
+          publishedAt:
+            articleData.publishedAt && articleData.publishedAt.trim() !== ""
+              ? new Date(articleData.publishedAt).toISOString()
+              : null,
           featuredImage: articleData.featuredImage || null,
           location: articleData.location || null,
           translations: translations.filter((t) => t.title.trim()), // Only save translations with titles
@@ -295,6 +300,27 @@ export default function NewArticlePage() {
                   <option value="PUBLISHED">Published</option>
                 </select>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Published date & time (optional)
+              </label>
+              <input
+                type="datetime-local"
+                value={articleData.publishedAt}
+                onChange={(e) =>
+                  setArticleData((prev) => ({
+                    ...prev,
+                    publishedAt: e.target.value,
+                  }))
+                }
+                className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                If empty and you publish, the time of the first save as Published
+                is used.
+              </p>
             </div>
 
             <div>

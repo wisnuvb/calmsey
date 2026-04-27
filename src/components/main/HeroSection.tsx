@@ -236,7 +236,10 @@ export function HeroSection({
           >
             {title}
           </H1>
-          <P style="p1reg" className="text-white/90 max-w-4xl mx-auto">
+          <P
+            style="p1reg"
+            className="text-white/90 max-w-4xl mx-auto whitespace-pre-line"
+          >
             {subtitle}
           </P>
         </div>

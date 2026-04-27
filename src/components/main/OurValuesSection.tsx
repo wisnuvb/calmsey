@@ -171,11 +171,11 @@ const ValueCard: React.FC<{ item: ValueItem }> = ({ item }) => {
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
       {/* Content */}
-      {/* <div className="absolute bottom-0 left-0 right-0 p-6">
+      <div className="absolute bottom-0 left-0 right-0 p-6 z-[1]">
         <p className="text-white font-bold text-lg leading-tight">
           {item.title}
         </p>
-      </div> */}
+      </div>
     </div>
   );
 };

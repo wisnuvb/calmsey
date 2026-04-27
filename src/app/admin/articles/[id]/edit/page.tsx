@@ -21,6 +21,7 @@ interface ArticleData {
   id: string;
   slug: string;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  publishedAt?: string | null;
   featuredImage: string;
   location: string;
   categories: string[];
@@ -35,6 +36,7 @@ interface ArticleData {
     fullName: string;
   } | null;
   photos?: Array<{ id: string; src: string; alt: string }> | null;
+  relatedArticles?: Array<{ id: string; title: string; url: string }> | null;
 }
 
 export default function EditArticlePage() {
@@ -123,11 +125,30 @@ export default function EditArticlePage() {
           }
         }
 
+        let relatedArticles: Array<{
+          id: string;
+          title: string;
+          url: string;
+        }> | null = null;
+        if (result.article.relatedArticles) {
+          try {
+            relatedArticles =
+              typeof result.article.relatedArticles === "string"
+                ? JSON.parse(result.article.relatedArticles)
+                : result.article.relatedArticles;
+          } catch (e) {
+            console.error("Error parsing relatedArticles:", e);
+          }
+        }
+
         // Transform the data to match our form structure
         const transformedData: ArticleData = {
           id: result.article.id,
           slug: result.article.slug,
           status: result.article.status,
+          publishedAt: result.article.publishedAt
+            ? new Date(result.article.publishedAt as string | Date).toISOString()
+            : null,
           featuredImage: result.article.featuredImage || "",
           location: result.article.location || "",
           categories: result.article.categories?.map((c: any) => c.id) || [],
@@ -138,6 +159,7 @@ export default function EditArticlePage() {
           posterImage: (result.article as any).posterImage || null,
           partnerOrganization,
           photos,
+          relatedArticles: Array.isArray(relatedArticles) ? relatedArticles : [],
         };
 
         setArticleData(transformedData);
@@ -156,6 +178,7 @@ export default function EditArticlePage() {
   const handleSave = async (data: {
     slug: string;
     status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+    publishedAt: string | null;
     featuredImage: string;
     location: string;
     categories: string[];
@@ -170,6 +193,11 @@ export default function EditArticlePage() {
       fullName: string;
     } | null;
     photos?: Array<{ id: string; src: string; alt: string }> | null;
+    relatedArticles?: Array<{
+      id: string;
+      title: string;
+      url: string;
+    }> | null;
   }) => {
     setSaving(true);
     try {

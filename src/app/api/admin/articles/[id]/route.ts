@@ -112,6 +112,7 @@ export async function PUT(
       partnerOrganization,
       photos,
       relatedArticles,
+      publishedAt: publishedAtBody,
     } = body;
 
     // Check if article exists and user has permission
@@ -156,10 +157,21 @@ export async function PUT(
               : existingArticle.partnerOrganization,
           photos: photos !== undefined ? photos : existingArticle.photos,
           relatedArticles: relatedArticles !== undefined ? relatedArticles : existingArticle.relatedArticles,
-          publishedAt:
-            status === "PUBLISHED" && !existingArticle.publishedAt
-              ? new Date()
-              : existingArticle.publishedAt,
+          publishedAt: (() => {
+            if (Object.prototype.hasOwnProperty.call(body, "publishedAt")) {
+              if (publishedAtBody && String(publishedAtBody).trim() !== "") {
+                return new Date(publishedAtBody as string);
+              }
+              if (status === "PUBLISHED" && !existingArticle.publishedAt) {
+                return new Date();
+              }
+              return null;
+            }
+            if (status === "PUBLISHED" && !existingArticle.publishedAt) {
+              return new Date();
+            }
+            return existingArticle.publishedAt;
+          })(),
 
           // Update English content in Article model (for browser translation)
           ...(englishTranslation && {

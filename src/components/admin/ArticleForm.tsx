@@ -33,9 +33,20 @@ interface RelatedArticle {
   url: string;
 }
 
+function publishedAtToInputValue(
+  value: string | null | undefined,
+): string {
+  if (value == null || value === "") return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 interface ArticleFormData {
   slug: string;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  publishedAt: string;
   featuredImage: string;
   location: string;
   categories: string[];
@@ -71,10 +82,12 @@ interface ArticleFormProps {
     } | null;
     photos?: Array<{ id: string; src: string; alt: string }> | null;
     relatedArticles?: RelatedArticle[] | null;
+    publishedAt?: string | null;
   };
   onSave: (data: {
     slug: string;
     status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+    publishedAt: string | null;
     featuredImage: string;
     location: string;
     categories: string[];
@@ -124,6 +137,7 @@ export default function ArticleForm({
   const [articleData, setArticleData] = useState<ArticleFormData>({
     slug: initialData?.slug || "",
     status: initialData?.status || "DRAFT",
+    publishedAt: publishedAtToInputValue(initialData?.publishedAt),
     featuredImage: initialData?.featuredImage || "",
     location: initialData?.location || "",
     categories: initialData?.categories || [],
@@ -309,6 +323,10 @@ export default function ArticleForm({
     await onSave({
       slug: articleData.slug,
       status: publishNow ? "PUBLISHED" : articleData.status,
+      publishedAt:
+        articleData.publishedAt && articleData.publishedAt.trim() !== ""
+          ? new Date(articleData.publishedAt).toISOString()
+          : null,
       featuredImage: articleData.featuredImage || "",
       location: articleData.location || "",
       categories: articleData.categories,
@@ -411,6 +429,27 @@ export default function ArticleForm({
                 <option value="ARCHIVED">Archived</option>
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Published date & time (optional)
+            </label>
+            <input
+              type="datetime-local"
+              value={articleData.publishedAt}
+              onChange={(e) =>
+                setArticleData((prev) => ({
+                  ...prev,
+                  publishedAt: e.target.value,
+                }))
+              }
+              className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p className="text-sm text-gray-500 mt-1">
+              Shown to readers when the story displays a date. Leave empty to
+              set automatically the first time you publish (edit flow only).
+            </p>
           </div>
 
           <div>
@@ -734,13 +773,17 @@ export default function ArticleForm({
             {/* Related Articles */}
             <div className="border border-gray-200 rounded-lg p-4">
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Related Links About This Story
+                Related links about this story
               </label>
+              <p className="text-sm text-gray-500 mb-3">
+                You can add internal stories from search, or edit a row to use
+                a full URL (e.g. https://…) for an external page.
+              </p>
               <div className="space-y-3">
                 {/* Article Picker */}
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">
-                    Search and Select Articles
+                    Search and select internal articles
                   </label>
                   <input
                     type="text"

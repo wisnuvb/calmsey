@@ -267,8 +267,9 @@ export const OUR_APPROACH_SCHEMA: PageContentSchema = {
           label: "Download Button URL",
           type: "text",
           required: false,
-          placeholder: "/documents/framework.pdf",
-          helpText: "URL or path to the downloadable file",
+          placeholder: "/downloads/example.pdf",
+          helpText:
+            "Use a public URL or path (e.g. /downloads/… in public/). Private SharePoint/OneDrive links will show access denied for visitors.",
         },
       ],
     },

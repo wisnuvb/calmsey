@@ -36,7 +36,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col lg:flex-row shadow-2xl relative"
+        className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] min-h-0 overflow-hidden flex flex-col lg:flex-row shadow-2xl relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -49,12 +49,13 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
         </button>
 
         {/* Left Section - Image */}
-        <div className="w-full lg:w-1/2 relative h-64 lg:h-auto">
+        <div className="w-full lg:w-1/2 relative h-64 flex-shrink-0 lg:min-h-[20rem] lg:h-auto">
           <Image
             src={getImageUrl(member.image)}
             alt={member.name}
             fill
-            className="object-cover"
+            className="object-cover object-top lg:object-center"
+            sizes="(max-width: 1024px) 100vw, 50vw"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -65,7 +66,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
         </div>
 
         {/* Right Section - Content */}
-        <div className="w-full lg:w-1/2 p-6 sm:p-8 flex flex-col">
+        <div className="w-full lg:w-1/2 p-6 sm:p-8 flex flex-col min-h-0 flex-1 overflow-hidden">
           {/* Title/Role */}
           {member.role && (
             <p className="text-xs uppercase tracking-wider text-gray-400 mb-2 font-work-sans">
@@ -87,7 +88,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
 
           {/* Biography - Scrollable */}
           {member.biography ? (
-            <div className="flex-1 mb-6 overflow-y-auto pr-2 min-h-0">
+            <div className="flex-1 mb-6 min-h-0 overflow-y-auto pr-2 overscroll-contain">
               <div
                 className="text-base text-gray-700 leading-relaxed font-work-sans prose prose-sm max-w-none prose-a:text-[#3C62ED] prose-a:font-medium prose-a:no-underline hover:prose-a:underline"
                 dangerouslySetInnerHTML={{
@@ -109,7 +110,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
               href={member.linkedinUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-6 py-3 border-2 border-[#0077B5] bg-white text-[#0077B5] rounded-lg hover:bg-[#0077B5] hover:text-white transition-colors font-semibold font-work-sans mt-auto"
+              className="inline-flex items-center justify-center gap-3 px-6 py-3 border-2 border-[#0077B5] bg-white text-[#0077B5] rounded-lg hover:bg-[#0077B5] hover:text-white transition-colors font-semibold font-work-sans mt-auto w-full sm:w-auto sm:justify-start"
               aria-label={`View LinkedIn profile of ${member.name} (opens in a new tab)`}
             >
               <div className="w-6 h-6 bg-[#0077B5] rounded flex items-center justify-center">

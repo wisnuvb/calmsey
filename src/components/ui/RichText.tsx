@@ -52,6 +52,22 @@ export function RichText({ content, className }: RichTextProps) {
           }
           
           router.push(href);
+          const anchorId = href.includes("#")
+            ? (href.split("#")[1] ?? "").split("?")[0]
+            : "";
+          if (anchorId) {
+            const scrollToHash = (attempts: number) => {
+              const el = document.getElementById(anchorId);
+              if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+                return;
+              }
+              if (attempts < 25) {
+                window.setTimeout(() => scrollToHash(attempts + 1), 40);
+              }
+            };
+            window.setTimeout(() => scrollToHash(0), 80);
+          }
         }
       }
     };

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ExternalLink, Download, X } from "lucide-react";
+import { Download, X } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
 import { useState } from "react";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
@@ -153,9 +153,9 @@ export function WhereWeWorkSection({
         {/* Legend Blocks */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-4 lg:mb-8 max-w-6xl mx-auto">
           {/* Block 1 - Action Plans */}
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-4 max-w-prose mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#3C62ED] flex-shrink-0 mt-1" />
-            <div className="text-base text-gray-900 font-work-sans leading-relaxed">
+            <div className="text-base text-gray-900 font-work-sans leading-relaxed min-w-0">
               <p className="mb-2 p">
                 {actionPlansText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
                   // Every odd index is the text inside **
@@ -173,15 +173,15 @@ export function WhereWeWorkSection({
                 className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
               >
                 <span>{actionPlansLinkText}</span>
-                <ExternalLink className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <Download className="w-4 h-4 ml-1 group-hover:translate-y-0.5 transition-transform" aria-hidden />
               </button>
             </div>
           </div>
 
           {/* Block 2 - Exploration Phase */}
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-4 max-w-prose mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#7db5bb] flex-shrink-0 mt-1" />
-            <p className="text-base text-gray-900 font-work-sans leading-relaxed p">
+            <p className="text-base text-gray-900 font-work-sans leading-relaxed p min-w-0">
               {explorationText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
                 // Every odd index is the text inside **
                 if (index % 2 === 1) {
@@ -193,9 +193,9 @@ export function WhereWeWorkSection({
           </div>
 
           {/* Block 3 - Partners Piloting */}
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-4 max-w-prose mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#C4B5FD] flex-shrink-0 mt-1" />
-            <div className="text-base text-gray-900 font-work-sans leading-relaxed">
+            <div className="text-base text-gray-900 font-work-sans leading-relaxed min-w-0">
               <p className="mb-2 p">
                 {partnersText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
                   // Every odd index is the text inside **
@@ -213,7 +213,7 @@ export function WhereWeWorkSection({
                 className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
               >
                 <span>{partnersLinkText}</span>
-                <ExternalLink className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <Download className="w-4 h-4 ml-1 group-hover:translate-y-0.5 transition-transform" aria-hidden />
               </button>
             </div>
           </div>
