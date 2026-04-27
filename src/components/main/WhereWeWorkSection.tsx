@@ -142,7 +142,7 @@ export function WhereWeWorkSection({
 
   return (
     <section className="bg-white pb-8 lg:pb-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-0">
         {/* Title */}
         <div className="text-center mb-12 lg:mb-16">
           <h2 className="text-3xl sm:text-[38px] font-nunito font-bold text-[#010107]">
@@ -151,14 +151,12 @@ export function WhereWeWorkSection({
         </div>
 
         {/* Legend Blocks */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-4 lg:mb-8 max-w-6xl mx-auto px-3 sm:px-6 lg:px-10">
-          {/* Block 1 - Action Plans */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-4 lg:mb-8 mx-auto px-3 sm:px-6 lg:px-0">
           <div className="flex items-start gap-4 max-w-[22rem] mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#3C62ED] flex-shrink-0 mt-1" />
             <div className="text-base text-gray-900 font-work-sans leading-relaxed min-w-0">
               <p className="mb-2 p">
                 {actionPlansText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
-                  // Every odd index is the text inside **
                   if (index % 2 === 1) {
                     return <strong key={index}>{part}</strong>;
                   }
@@ -178,12 +176,10 @@ export function WhereWeWorkSection({
             </div>
           </div>
 
-          {/* Block 2 - Exploration Phase */}
           <div className="flex items-start gap-4 max-w-[22rem] mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#7db5bb] flex-shrink-0 mt-1" />
             <p className="text-base text-gray-900 font-work-sans leading-relaxed p min-w-0">
               {explorationText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
-                // Every odd index is the text inside **
                 if (index % 2 === 1) {
                   return <strong key={index}>{part}</strong>;
                 }
@@ -192,13 +188,11 @@ export function WhereWeWorkSection({
             </p>
           </div>
 
-          {/* Block 3 - Partners Piloting */}
           <div className="flex items-start gap-4 max-w-[22rem] mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#C4B5FD] flex-shrink-0 mt-1" />
             <div className="text-base text-gray-900 font-work-sans leading-relaxed min-w-0">
               <p className="mb-2 p">
                 {partnersText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
-                  // Every odd index is the text inside **
                   if (index % 2 === 1) {
                     return <strong key={index}>{part}</strong>;
                   }
