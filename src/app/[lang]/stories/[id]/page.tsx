@@ -8,7 +8,6 @@ import {
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
 import { prisma } from "@/lib/prisma";
-import { format } from "date-fns";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -125,9 +124,17 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
   const title = translation?.title || article.title;
   const excerpt = translation?.excerpt || article.excerpt || "";
 
-  // Format date
+  // Format date in WIB so it matches admin input timezone
   const date = article.publishedAt
-    ? format(new Date(article.publishedAt), "MMM dd, yyyy h:mm a")
+    ? new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Jakarta",
+      }).format(new Date(article.publishedAt))
     : "";
 
   // Parse JSON fields

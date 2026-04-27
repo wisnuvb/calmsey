@@ -366,7 +366,12 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
                 className="flex flex-col sm:flex-row gap-6 hover:shadow-lg transition-shadow duration-300 rounded-lg overflow-hidden"
               >
                 {/* Video/Image Thumbnail */}
-                <div className="sm:w-[40%] flex-shrink-0">
+                <Link
+                  href={story.url}
+                  onClick={() => handleStoryClick(story.id)}
+                  className="sm:w-[40%] flex-shrink-0 block rounded-lg overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3C62ED] focus-visible:ring-offset-2"
+                  aria-label={`View story: ${story.title}`}
+                >
                   <div className="relative aspect-video bg-gray-200 overflow-hidden group">
                     <Image
                       src={getImageUrl(story.thumbnail)}
@@ -395,17 +400,23 @@ export const AllStoriesListSection: React.FC<AllStoriesListSectionProps> = ({
                       </div>
                     )}
                   </div>
-                </div>
+                </Link>
 
                 {/* Content */}
                 <div className="flex-1 flex flex-col justify-center space-y-4 py-4">
                   {/* Title */}
-                  <H3
-                    style="h3bold"
-                    className="text-[#010107] font-nunito leading-[1.2]"
+                  <Link
+                    href={story.url}
+                    onClick={() => handleStoryClick(story.id)}
+                    className="block w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3C62ED] focus-visible:ring-offset-2 rounded-sm"
                   >
-                    {story.title}
-                  </H3>
+                    <H3
+                      style="h3bold"
+                      className="text-[#010107] font-nunito leading-[1.2] hover:text-[#3C62ED] transition-colors"
+                    >
+                      {story.title}
+                    </H3>
+                  </Link>
 
                   {/* Metadata */}
                   <div className="flex items-center gap-4 text-sm text-[#010107]">

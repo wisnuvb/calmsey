@@ -166,7 +166,7 @@ export const LatestStoriesSection: React.FC<LatestStoriesSectionProps> = ({
 
         {/* Stories Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-8 gap-4">
             {[...Array(limit)].map((_, index) => (
               <div
                 key={index}
@@ -187,15 +187,15 @@ export const LatestStoriesSection: React.FC<LatestStoriesSectionProps> = ({
             <p className="text-gray-500">No stories available</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-8 gap-4">
             {stories.map((story) => (
               <div
                 key={story.id}
-                className="bg-white rounded overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer group"
+                className="bg-white rounded overflow-hidden transition-shadow duration-300 cursor-pointer group"
                 onClick={() => handleStoryClick(story.slug)}
               >
                 {/* Video Thumbnail */}
-                <div className="relative aspect-[16/10] bg-gray-200 overflow-hidden mb-8">
+                <div className="relative aspect-[16/10] bg-gray-200 overflow-hidden md:mb-4 mb-0">
                   <Image
                     src={getImageUrl(story.thumbnail)}
                     alt={story.thumbnailAlt}
@@ -223,7 +223,7 @@ export const LatestStoriesSection: React.FC<LatestStoriesSectionProps> = ({
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
+                <div className="py-3">
                   {/* Title - H4 for WCAG hierarchy (h3 Latest Stories → h4 card titles) */}
                   <H4
                     style="h5bold"

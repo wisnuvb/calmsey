@@ -203,8 +203,8 @@ export function DetailStoryContentSection({
   };
 
   return (
-    <section className={cn("py-16 bg-white", className)}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className={cn("md:py-16 py-0 bg-white", className)}>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Left Sidebar */}
           {(partnerOrganization || country) && (
@@ -241,7 +241,7 @@ export function DetailStoryContentSection({
 
                       {country && (
                         <>
-                          <div className="border-b border-[#C3D7E8] my-11" />
+                          <div className="border-b border-[#C3D7E8] md:my-11 my-6" />
 
                           <H3
                             style="h5bold"
@@ -288,7 +288,7 @@ export function DetailStoryContentSection({
                       </span>
                     </button>
                   )} */}
-                  <div className="relative w-full">
+                  <div className="relative w-full mt-8 sm:mt-0">
                     <button
                       onClick={toggleShareMenu}
                       className="w-full flex items-center justify-center space-x-2 px-4 py-5 bg-[#3C62ED] text-white rounded-lg hover:bg-gray-800 transition-colors"
