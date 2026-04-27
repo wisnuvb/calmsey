@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Play, Search } from "lucide-react";
+import { Download, Play, Search } from "lucide-react";
 import Image from "next/image";
 import { H1, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
@@ -92,6 +92,12 @@ export function HeroSection({
     "hero.searchPlaceholder",
     propSearchPlaceholder,
     "Discover articles"
+  );
+  const annualReportUrl = getValue("hero.annualReportUrl", "", "");
+  const annualReportLabel = getValue(
+    "hero.annualReportLabel",
+    "",
+    "Download our Annual Report"
   );
 
   const handlePlayVideo = () => {
@@ -242,6 +248,19 @@ export function HeroSection({
           >
             {subtitle}
           </P>
+          {annualReportUrl.trim() !== "" && (
+            <div className="mt-8 flex justify-center">
+              <a
+                href={annualReportUrl}
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#3C62ED] text-white rounded-lg font-work-sans font-medium hover:bg-[#2d4fd6] transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Download className="w-5 h-5 flex-shrink-0" aria-hidden />
+                {annualReportLabel}
+              </a>
+            </div>
+          )}
         </div>
       </section>
     );

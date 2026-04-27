@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Download, Waves, Globe, Zap, Lightbulb } from "lucide-react";
+import { ArrowRight, Waves, Globe, Zap, Lightbulb } from "lucide-react";
 import { H2, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
@@ -153,13 +153,6 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
     propDescription,
     "Turning Tides supports partners through four interacting funds, each of which supports different pathways toward change. Each fund is governed separately to increase responsiveness to partners' expressed needs and opportunities to create change.",
   );
-  const annualReportUrl = getValue("hero.annualReportUrl", "", "");
-  const annualReportLabel = getValue(
-    "hero.annualReportLabel",
-    "",
-    "Download our Annual Report",
-  );
-
   // Prefer fundDetails.funds (same as admin Fund Details) so order and list match the admin
   const fundDetailsList = getContentJSON<FundDetailsFundItem[]>(
     "fundDetails.funds",
@@ -194,19 +187,6 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
   return (
     <section className={cn("bg-white py-16 lg:py-24", className)}>
       <div className="container mx-auto px-4">
-        {annualReportUrl.trim() !== "" && (
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12 sm:mb-14">
-            <a
-              href={annualReportUrl}
-              className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#3C62ED] text-white rounded-lg font-work-sans font-medium hover:bg-[#2d4fd6] transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Download className="w-5 h-5 flex-shrink-0" aria-hidden />
-              {annualReportLabel}
-            </a>
-          </div>
-        )}
         {/* Header Section - Centered */}
         <div className="max-w-4xl mx-auto text-center mb-14 space-y-8 hidden">
           <H2

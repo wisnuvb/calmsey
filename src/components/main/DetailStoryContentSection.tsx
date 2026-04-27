@@ -18,6 +18,7 @@ import { H2, H3, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import { useToast } from "../ui/toast";
+import { RichText } from "../ui/RichText";
 
 /**
  * Fallback copy ke clipboard via execCommand.
@@ -65,6 +66,7 @@ interface DetailStoryContentSectionProps {
   partnerOrganization?: PartnerOrganization | null;
   country?: string;
   description: string;
+  bodyContent?: string;
   photos?: Photo[];
   relatedArticles?: RelatedArticle[];
   className?: string;
@@ -77,6 +79,7 @@ export function DetailStoryContentSection({
   partnerOrganization,
   country,
   description,
+  bodyContent,
   photos,
   relatedArticles,
   className,
@@ -102,7 +105,9 @@ export function DetailStoryContentSection({
 
   // Prioritas: URL dari client (setelah hydration) > URL dari server (SSR/deploy)
   const currentUrl = clientUrl || shareUrlProp || "";
-  const shareText = encodeURIComponent(description.substring(0, 100) + "...");
+  const plainBody = (bodyContent || "").replace(/<[^>]*>/g, " ").trim();
+  const shareSource = description || plainBody;
+  const shareText = encodeURIComponent(shareSource.substring(0, 100) + "...");
   const encodedUrl = encodeURIComponent(currentUrl);
 
   const shareLinks = {
@@ -371,6 +376,18 @@ export function DetailStoryContentSection({
                 {description}
               </P>
             </div>
+
+            {bodyContent?.trim() && (
+              <div>
+                <H2 style="h5bold" className="text-[#010107] font-nunito mb-6">
+                  Full Story
+                </H2>
+                <RichText
+                  content={bodyContent}
+                  className="text-[#060726CC] p space-y-4 [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
+                />
+              </div>
+            )}
 
             {/* Photos */}
             {photosList.length > 0 && (

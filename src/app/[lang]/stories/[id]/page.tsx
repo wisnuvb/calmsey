@@ -248,6 +248,7 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
     },
     country: article.location || "",
     description: excerpt || article.content.substring(0, 500),
+    bodyContent: article.content || "",
     photos,
     relatedArticles,
   };
@@ -271,6 +272,7 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
         partnerOrganization={storyData.partnerOrganization}
         country={storyData.country}
         description={storyData.description}
+        bodyContent={storyData.bodyContent}
         photos={storyData.photos}
         relatedArticles={storyData.relatedArticles}
         videoUrl={storyData.videoUrl}

@@ -837,12 +837,32 @@ export default function ArticleForm({
                     </div>
                   )}
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const ts = Date.now();
+                    setArticleData((prev) => ({
+                      ...prev,
+                      relatedArticles: [
+                        ...prev.relatedArticles,
+                        {
+                          id: `ext-${ts}-${prev.relatedArticles.length}`,
+                          title: "",
+                          url: "",
+                        },
+                      ],
+                    }));
+                  }}
+                  className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  + Add external link
+                </button>
 
                 {/* Selected Related Articles */}
                 {articleData.relatedArticles.length > 0 && (
                   <div className="border-t pt-3">
                     <label className="block text-xs text-gray-600 mb-2 font-medium">
-                      Selected Articles ({articleData.relatedArticles.length})
+                      Selected Links ({articleData.relatedArticles.length})
                     </label>
                     <div className="space-y-2">
                       {articleData.relatedArticles.map((article, index) => (
@@ -851,9 +871,25 @@ export default function ArticleForm({
                           className="flex gap-2 items-start border border-gray-200 rounded p-3 bg-gray-50"
                         >
                           <div className="flex-1 space-y-1">
-                            <div className="text-sm font-medium text-gray-900">
-                              {article.title}
-                            </div>
+                            <input
+                              type="text"
+                              value={article.title}
+                              onChange={(e) => {
+                                const newRelated = [
+                                  ...articleData.relatedArticles,
+                                ];
+                                newRelated[index] = {
+                                  ...article,
+                                  title: e.target.value,
+                                };
+                                setArticleData((prev) => ({
+                                  ...prev,
+                                  relatedArticles: newRelated,
+                                }));
+                              }}
+                              className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
+                              placeholder="Link label/title"
+                            />
                             <input
                               type="text"
                               value={article.url}

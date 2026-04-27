@@ -208,11 +208,11 @@ export function OurGoalSection({
           {/* Right Column - Strategy Card */}
           <div className="space-y-8 relative">
             {/* Strategy Description */}
-            <div className="p-6 border border-[#CADBEA] bg-white w-full rounded items-center justify-between grid grid-cols-2 gap-6">
+            <div className="p-6 border border-[#CADBEA] bg-white w-full rounded items-center justify-between grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Image
                 src={getImageUrl(strategyImage)}
                 alt={strategyImageAlt}
-                className="object-cover object-left-bottom w-full h-[266px]"
+                className="object-cover object-left-bottom w-full h-48 sm:h-60 lg:h-[266px]"
                 width={500}
                 height={313}
                 priority

@@ -148,8 +148,8 @@ export function FundersSection({
         </div>
 
         {/* Call to Action */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 lg:gap-8 max-w-2xl mx-auto w-full">
-          <p className="text-[#060726CC] text-base leading-[150%] tracking-normal font-work-sans text-center max-w-prose sm:text-left sm:max-w-md">
+        <div className="flex flex-col items-center justify-center gap-4 lg:gap-6 max-w-xl mx-auto w-full">
+          <p className="text-[#060726CC] text-base leading-[150%] tracking-normal font-work-sans text-center max-w-md line-clamp-3">
             {ctaText}
           </p>
           <Link

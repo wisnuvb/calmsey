@@ -151,9 +151,9 @@ export function WhereWeWorkSection({
         </div>
 
         {/* Legend Blocks */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-4 lg:mb-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-4 lg:mb-8 max-w-6xl mx-auto px-3 sm:px-6 lg:px-10">
           {/* Block 1 - Action Plans */}
-          <div className="flex items-start gap-4 max-w-prose mx-auto w-full sm:px-1">
+          <div className="flex items-start gap-4 max-w-[22rem] mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#3C62ED] flex-shrink-0 mt-1" />
             <div className="text-base text-gray-900 font-work-sans leading-relaxed min-w-0">
               <p className="mb-2 p">
@@ -179,7 +179,7 @@ export function WhereWeWorkSection({
           </div>
 
           {/* Block 2 - Exploration Phase */}
-          <div className="flex items-start gap-4 max-w-prose mx-auto w-full sm:px-1">
+          <div className="flex items-start gap-4 max-w-[22rem] mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#7db5bb] flex-shrink-0 mt-1" />
             <p className="text-base text-gray-900 font-work-sans leading-relaxed p min-w-0">
               {explorationText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
@@ -193,7 +193,7 @@ export function WhereWeWorkSection({
           </div>
 
           {/* Block 3 - Partners Piloting */}
-          <div className="flex items-start gap-4 max-w-prose mx-auto w-full sm:px-1">
+          <div className="flex items-start gap-4 max-w-[22rem] mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#C4B5FD] flex-shrink-0 mt-1" />
             <div className="text-base text-gray-900 font-work-sans leading-relaxed min-w-0">
               <p className="mb-2 p">

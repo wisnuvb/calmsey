@@ -48,9 +48,13 @@ export function usePageContentHelpers() {
     propValue?: string,
     defaultValue: string = ""
   ): string => {
-    const contentValue = getContentValue(contentKey, "");
-    if (contentValue && contentValue.trim() !== "") {
-      return contentValue;
+    const hasContentKey = Object.prototype.hasOwnProperty.call(
+      pageContent,
+      contentKey
+    );
+    if (hasContentKey) {
+      // Important: empty string can be an intentional value from CMS/admin.
+      return pageContent[contentKey] ?? "";
     }
     if (propValue && propValue.trim() !== "") {
       return propValue;

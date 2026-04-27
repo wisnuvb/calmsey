@@ -287,6 +287,7 @@ export function PageContentEditor({
   };
 
   const renderField = (field: FieldDefinition) => {
+    const hasKey = Object.prototype.hasOwnProperty.call(content, field.key);
     let value = content[field.key] ?? "";
     // Priority 1: "[]" is a valid value (user intentionally empty) - DO NOT replace with defaultValue
     // Only use defaultValue when key is missing or value is truly empty ("")
@@ -296,7 +297,7 @@ export function PageContentEditor({
         value = field.defaultValue;
       }
       // trimmed === "[]" is not replaced - respect user intent
-    } else if (!value && field.defaultValue) {
+    } else if (!hasKey && field.defaultValue) {
       value = field.defaultValue;
     }
     value = value || "";
