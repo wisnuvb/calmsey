@@ -120,7 +120,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
 
   return (
     <section className={`w-full ${backgroundColor} py-16 md:py-24`}>
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="container mx-auto px-6 md:px-12">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-0">

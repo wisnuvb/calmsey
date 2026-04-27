@@ -173,7 +173,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
     <section
       className={`w-full ${backgroundColor || "bg-white"} pb-16 md:pb-24`}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="container mx-auto px-6 md:px-12">
         {/* Header Section */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-[#010107] mb-6">
@@ -182,12 +182,12 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
           <p className="text-[#060726CC] p">{description}</p>
         </div>
 
-        {/* Partners Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 justify-items-center items-center gap-8 mb-12">
+        {/* Partners: flex so baris terakhir tetap rata tengah jika item tidak penuh */}
+        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 mb-12">
           {partners.map((partner) => (
             <div
               key={partner.id}
-              className="flex items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+              className="flex h-auto w-[140px] shrink-0 items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 sm:w-[152px] md:w-[148px]"
             >
               <a
                 href={partner.website}

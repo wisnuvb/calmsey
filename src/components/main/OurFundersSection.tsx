@@ -66,7 +66,7 @@ export const OurFundersSection: React.FC<OurFundersSectionProps> = ({
 }) => {
   return (
     <section className={`w-full bg-white pb-16 md:pb-24`}>
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="container mx-auto px-6 md:px-12">
         {/* Title */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-[#010107] mb-8">

@@ -36,7 +36,7 @@ export function WhatWeWannaAchieveSection({
 
   return (
     <section className="py-16 lg:py-[100px] bg-[#F1FAFA]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Small Heading */}
         <P
           style="p2reg"

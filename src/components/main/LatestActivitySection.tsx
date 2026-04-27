@@ -193,7 +193,7 @@ export function LatestActivitySection({
       className={cn("bg-gray-50 py-16 lg:py-24", className)}
       aria-labelledby="latest-activity-heading"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-12">
           <h2

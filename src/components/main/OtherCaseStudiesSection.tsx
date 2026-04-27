@@ -113,7 +113,7 @@ export const OtherCaseStudiesSection: React.FC<
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="max-w-7xl mx-auto">
+        <div className="container mx-auto">
           {/* Section Title */}
           <h2 className="text-4xl font-bold text-black mb-12">{title}</h2>
 

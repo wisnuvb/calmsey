@@ -27,7 +27,7 @@ export function QuoteSection({
       className={cn("bg-white py-16 lg:py-24", className)}
       data-section="quote"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative flex items-center justify-center">
           {/* Left Decorative Line */}
           <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-[120px] sm:w-[273px] h-[1px] bg-[#CADBEA]" />

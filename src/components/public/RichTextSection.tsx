@@ -23,9 +23,9 @@ export default function RichTextSection({
       case "narrow":
         return "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8";
       case "container":
-        return "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
+        return "container mx-auto px-4 sm:px-6 lg:px-8";
       default:
-        return "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
+        return "container mx-auto px-4 sm:px-6 lg:px-8";
     }
   };
 

@@ -63,7 +63,7 @@ export function GenesisSection({
       className={cn("bg-[#ECEFFD] py-16 lg:py-[100px]", className)}
       data-section="genesis"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
         <h2 className="text-center text-3xl sm:text-4xl lg:text-[38px] font-bold text-[#3C62ED] font-nunito mb-8">
           {title}

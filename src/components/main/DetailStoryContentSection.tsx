@@ -480,7 +480,7 @@ export function DetailStoryContentSection({
           tabIndex={0}
           aria-label="Close gallery modal"
         >
-          <div className="relative max-w-7xl max-h-full w-full">
+          <div className="relative container max-h-full w-full">
             {/* Close button */}
             <button
               onClick={closeGallery}

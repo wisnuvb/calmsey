@@ -59,7 +59,7 @@ We support ongoing efforts to build accountability, respect and awareness amongs
       data-section="theory-of-change"
       id="theory-of-change"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title Section */}
         <div className="text-center mb-12 lg:mb-16">
           <p className="text-xs uppercase tracking-wider text-[#3C62ED] mb-3 font-work-sans font-normal">
@@ -84,7 +84,7 @@ We support ongoing efforts to build accountability, respect and awareness amongs
         </div>
 
         {/* Description Text */}
-        <div className="max-w-4xl mx-auto">
+        <div className="container mx-auto">
           <p
             className={cn(
               "p text-[#060726CC] leading-relaxed font-work-sans",

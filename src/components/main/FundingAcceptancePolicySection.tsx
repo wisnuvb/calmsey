@@ -82,6 +82,8 @@ export function FundingAcceptancePolicySection({
             {/* Button */}
             <a
               href={buttonLink}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-3 px-8 py-5 bg-white text-[#010107] rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
               aria-label={`Read more about ${buttonText}`}
             >

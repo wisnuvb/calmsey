@@ -35,7 +35,7 @@ export const PotentialPartnersSection: React.FC<
 }) => {
   return (
     <section className={`w-full ${backgroundColor} py-16 md:py-24`}>
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="container mx-auto px-6 md:px-12">
         {/* Header Section */}
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-600 mb-8 tracking-wider">

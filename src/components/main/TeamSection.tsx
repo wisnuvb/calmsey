@@ -200,7 +200,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
 
   return (
     <section className="bg-white" id="ourteam">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-2xl sm:text-4xl lg:text-[38px] font-bold text-[#010107] mb-4 sm:mb-6 font-nunito leading-tight px-1">

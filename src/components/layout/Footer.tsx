@@ -152,7 +152,7 @@ export function Footer() {
   if (loading) {
     return (
       <footer className="bg-gradient-to-br from-[#1E0F39] via-[#2a1551] to-[#3a1d6f] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <div className="text-center">Loading...</div>
         </div>
       </footer>
@@ -162,7 +162,7 @@ export function Footer() {
   return (
     <footer className="bg-gradient-to-br from-[#1E0F39] via-[#2a1551] to-[#3a1d6f] text-white">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-32">
           {/* Logo and Brand Section - Left */}
           <div className="lg:col-span-4">

@@ -31,7 +31,7 @@ export const Lightbox: React.FC<LightboxProps> = ({
       role="button"
       aria-label="Close lightbox"
     >
-      <div className="relative max-w-7xl max-h-full">
+      <div className="relative container max-h-full">
         {/* Close button */}
         <button
           onClick={closeLightbox}

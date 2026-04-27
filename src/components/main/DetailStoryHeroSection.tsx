@@ -39,7 +39,7 @@ export function DetailStoryHeroSection({
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20 text-center">
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20 text-center">
         <P style="p1reg" className="text-white/80 mb-6">
           {date}
         </P>
