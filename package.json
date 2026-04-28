@@ -12,7 +12,7 @@
     "type": "git",
     "url": "https://github.com/calmsey/calmsey"
   },
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack --port 2039",

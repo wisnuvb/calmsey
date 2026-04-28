@@ -67,6 +67,9 @@ export default function NewArticlePage() {
     null
   );
   const [isAddingMultiplePhotos, setIsAddingMultiplePhotos] = useState(false);
+  const [isSelectingPartnerLogo, setIsSelectingPartnerLogo] = useState(false);
+  const [isSelectingFeaturedImage, setIsSelectingFeaturedImage] = useState(false);
+  const [isSelectingPosterImage, setIsSelectingPosterImage] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -327,18 +330,38 @@ export default function NewArticlePage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Featured Image URL
               </label>
-              <input
-                type="url"
-                value={articleData.featuredImage}
-                onChange={(e) =>
-                  setArticleData((prev) => ({
-                    ...prev,
-                    featuredImage: e.target.value,
-                  }))
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://example.com/image.jpg"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={articleData.featuredImage}
+                  onChange={(e) =>
+                    setArticleData((prev) => ({
+                      ...prev,
+                      featuredImage: e.target.value,
+                    }))
+                  }
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://example.com/image.jpg"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSelectingFeaturedImage(true);
+                    setIsSelectingPosterImage(false);
+                    setIsSelectingPartnerLogo(false);
+                    setCurrentPhotoIndex(null);
+                    setIsAddingMultiplePhotos(false);
+                    setMediaPickerOpen(true);
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2 whitespace-nowrap shrink-0"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  Browse
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Enter image URL or browse Media Library
+              </p>
             </div>
 
             <div>
@@ -524,20 +547,38 @@ export default function NewArticlePage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Video Poster Image URL
                   </label>
-                  <input
-                    type="url"
-                    value={articleData.posterImage}
-                    onChange={(e) =>
-                      setArticleData((prev) => ({
-                        ...prev,
-                        posterImage: e.target.value,
-                      }))
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://example.com/poster.jpg"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={articleData.posterImage}
+                      onChange={(e) =>
+                        setArticleData((prev) => ({
+                          ...prev,
+                          posterImage: e.target.value,
+                        }))
+                      }
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="https://example.com/poster.jpg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSelectingFeaturedImage(false);
+                        setIsSelectingPosterImage(true);
+                        setIsSelectingPartnerLogo(false);
+                        setCurrentPhotoIndex(null);
+                        setIsAddingMultiplePhotos(false);
+                        setMediaPickerOpen(true);
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2 whitespace-nowrap shrink-0"
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                      Browse
+                    </button>
+                  </div>
                   <p className="text-sm text-gray-500 mt-1">
-                    Optional: Thumbnail/poster image for video
+                    Optional: Thumbnail/poster image for video. Enter URL or
+                    browse Media Library.
                   </p>
                 </div>
 
@@ -573,23 +614,40 @@ export default function NewArticlePage() {
                       <label className="block text-xs text-gray-600 mb-1">
                         Organization Logo URL
                       </label>
-                      <input
-                        type="url"
-                        value={articleData.partnerOrganization?.logo || ""}
-                        onChange={(e) =>
-                          setArticleData((prev) => ({
-                            ...prev,
-                            partnerOrganization: {
-                              name: prev.partnerOrganization?.name || "",
-                              logo: e.target.value,
-                              fullName:
-                                prev.partnerOrganization?.fullName || "",
-                            },
-                          }))
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="https://example.com/logo.png"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="url"
+                          value={articleData.partnerOrganization?.logo || ""}
+                          onChange={(e) =>
+                            setArticleData((prev) => ({
+                              ...prev,
+                              partnerOrganization: {
+                                name: prev.partnerOrganization?.name || "",
+                                logo: e.target.value,
+                                fullName:
+                                  prev.partnerOrganization?.fullName || "",
+                              },
+                            }))
+                          }
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="https://example.com/logo.png"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsSelectingFeaturedImage(false);
+                            setIsSelectingPosterImage(false);
+                            setIsSelectingPartnerLogo(true);
+                            setCurrentPhotoIndex(null);
+                            setIsAddingMultiplePhotos(false);
+                            setMediaPickerOpen(true);
+                          }}
+                          className="px-3 py-2 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 flex items-center gap-1 whitespace-nowrap shrink-0"
+                        >
+                          <ImageIcon className="w-3 h-3" />
+                          Browse
+                        </button>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">
@@ -677,6 +735,10 @@ export default function NewArticlePage() {
                             <button
                               type="button"
                               onClick={() => {
+                                setIsSelectingFeaturedImage(false);
+                                setIsSelectingPosterImage(false);
+                                setIsSelectingPartnerLogo(false);
+                                setIsAddingMultiplePhotos(false);
                                 setCurrentPhotoIndex(index);
                                 setMediaPickerOpen(true);
                               }}
@@ -740,6 +802,9 @@ export default function NewArticlePage() {
                       <button
                         type="button"
                         onClick={() => {
+                          setIsSelectingFeaturedImage(false);
+                          setIsSelectingPosterImage(false);
+                          setIsSelectingPartnerLogo(false);
                           setCurrentPhotoIndex(null);
                           setIsAddingMultiplePhotos(true);
                           setMediaPickerOpen(true);
@@ -801,9 +866,34 @@ export default function NewArticlePage() {
           setMediaPickerOpen(false);
           setCurrentPhotoIndex(null);
           setIsAddingMultiplePhotos(false);
+          setIsSelectingPartnerLogo(false);
+          setIsSelectingFeaturedImage(false);
+          setIsSelectingPosterImage(false);
         }}
         onSelect={(selectedUrls) => {
-          if (isAddingMultiplePhotos && selectedUrls.length > 0) {
+          if (isSelectingFeaturedImage && selectedUrls.length > 0) {
+            setArticleData((prev) => ({
+              ...prev,
+              featuredImage: selectedUrls[0],
+            }));
+            setIsSelectingFeaturedImage(false);
+          } else if (isSelectingPosterImage && selectedUrls.length > 0) {
+            setArticleData((prev) => ({
+              ...prev,
+              posterImage: selectedUrls[0],
+            }));
+            setIsSelectingPosterImage(false);
+          } else if (isSelectingPartnerLogo && selectedUrls.length > 0) {
+            setArticleData((prev) => ({
+              ...prev,
+              partnerOrganization: {
+                name: prev.partnerOrganization?.name || "",
+                logo: selectedUrls[0],
+                fullName: prev.partnerOrganization?.fullName || "",
+              },
+            }));
+            setIsSelectingPartnerLogo(false);
+          } else if (isAddingMultiplePhotos && selectedUrls.length > 0) {
             // Add multiple photos from media library
             const newPhotos = selectedUrls.map((url, idx) => ({
               id: `photo-${Date.now()}-${idx}`,

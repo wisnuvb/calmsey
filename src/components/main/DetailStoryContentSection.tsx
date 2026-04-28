@@ -235,7 +235,7 @@ export function DetailStoryContentSection({
                           />
                         )}
                         <p className="font-work-sans font-normal text-base text-[#060726CC]">
-                          {partnerOrganization.name}
+                          {partnerOrganization.fullName || partnerOrganization.name}
                         </p>
                       </div>
 
