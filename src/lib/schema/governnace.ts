@@ -258,7 +258,7 @@ export const GOVERNANCE_SCHEMA: PageContentSchema = {
           id: "fiscal-sponsorship",
           title: "Fiscal Sponsorship Agreement",
           content:
-            '<p>Turning Tides operated under the <a href="https://turningtidesfacility.org/fiscal-sponsorship" aria-label="Learn more about our fiscal sponsorship agreement">fiscal sponsorship</a> of The Tenure Facility Fund, a US 501(c)3 not for profit subsidiary of the International Land and Forest Tenure Facility.</p>',
+            '<p>Turning Tides operated under the <a href="https://turningtidesfacility.org/fiscal-sponsorship" aria-label="Learn more about our fiscal sponsorship agreement">fiscal sponsorship</a> of The Tenure Facility Fund, a US 501(c)3 Not-for-profit subsidiary of the International Land and Forest Tenure Facility.</p>',
         },
         {
           id: "social-contract",

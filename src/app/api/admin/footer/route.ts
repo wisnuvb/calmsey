@@ -3,10 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
+import { findFooterBrandSafe } from "@/lib/prisma-fetch-footer-brand";
+import { mergeFooterBrand, type FooterBrandDTO } from "@/lib/footer-brand-defaults";
 
 /**
  * GET /api/admin/footer
- * Fetch all footer sections with links
+ * Fetch footer sections + brand column
  */
 export async function GET() {
   try {
@@ -26,7 +28,12 @@ export async function GET() {
       orderBy: { order: "asc" },
     });
 
-    return NextResponse.json({ sections });
+    const brandRow = await findFooterBrandSafe();
+
+    return NextResponse.json({
+      sections,
+      brand: mergeFooterBrand(brandRow ?? undefined),
+    });
   } catch (error) {
     console.error("Error fetching footer:", error);
     return NextResponse.json(
@@ -57,7 +64,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { sections } = body;
+    const { sections, brand } = body;
 
     if (!Array.isArray(sections)) {
       return NextResponse.json(
@@ -66,7 +73,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use transaction to ensure data consistency
+    type BrandInput = Partial<FooterBrandDTO> & Record<string, unknown>;
+
+    if (brand !== undefined && brand !== null && typeof brand === "object") {
+      const mergedBrand = mergeFooterBrand(brand as BrandInput);
+      await prisma.footerBrand.upsert({
+        where: { id: "singleton" },
+        create: {
+          id: "singleton",
+          mainLogoSrc: mergedBrand.mainLogoSrc,
+          mainLogoAlt: mergedBrand.mainLogoAlt,
+          mainLogoHref: mergedBrand.mainLogoHref,
+          sponsorLogoSrc: mergedBrand.sponsorLogoSrc,
+          sponsorLogoAlt: mergedBrand.sponsorLogoAlt,
+          sponsorshipParagraph: mergedBrand.sponsorshipParagraph,
+        },
+        update: {
+          mainLogoSrc: mergedBrand.mainLogoSrc,
+          mainLogoAlt: mergedBrand.mainLogoAlt,
+          mainLogoHref: mergedBrand.mainLogoHref,
+          sponsorLogoSrc: mergedBrand.sponsorLogoSrc,
+          sponsorLogoAlt: mergedBrand.sponsorLogoAlt,
+          sponsorshipParagraph: mergedBrand.sponsorshipParagraph,
+        },
+      });
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       // Delete all existing links first (due to foreign key constraint)
       await tx.footerLink.deleteMany({});
@@ -120,10 +152,13 @@ export async function POST(request: NextRequest) {
       return createdSections;
     });
 
+    const brandOut = await findFooterBrandSafe();
+
     return NextResponse.json({
       success: true,
       message: "Footer saved successfully",
       sections: result,
+      brand: mergeFooterBrand(brandOut ?? undefined),
     });
   } catch (error: any) {
     console.error("Error saving footer:", error);

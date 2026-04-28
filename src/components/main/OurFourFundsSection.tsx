@@ -8,17 +8,6 @@ import { H2, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
-/** Raw item from fundDetails.funds (admin Fund Details) - used so listing order matches admin */
-interface FundDetailsFundItem {
-  slug?: string;
-  id?: string;
-  headerTitle?: string;
-  headerSubtitle?: string;
-  headerHeroImageSrc?: string;
-  headerHeroImageAlt?: string;
-  intro?: string;
-}
-
 interface FundData {
   id: string;
   title: string;
@@ -27,7 +16,7 @@ interface FundData {
   imageAlt: string;
   icon: string; // Icon name: "Waves", "Globe", "Zap", "Lightbulb"
   learnMoreLink: string;
-  imagePosition: "left" | "right"; // Determines if image is on left or right
+  imagePosition: "left" | "right"; // Legacy CMS field; listing layout alternates by row index (starts image left)
 }
 
 interface Fund extends Omit<FundData, "icon"> {
@@ -111,31 +100,17 @@ const convertFundDataToFund = (fundData: FundData): Fund => ({
   icon: getIconComponent(fundData.icon),
 });
 
-const ICON_ORDER = ["Waves", "Globe", "Zap", "Lightbulb"] as const;
-
-/** Map fundDetails.funds item (admin order) to FundData for listing */
-function mapFundDetailsToFundData(
-  item: FundDetailsFundItem,
-  index: number,
+/** Prefix locale for internal /our-fund/... paths when CMS stores paths without `[lang]` */
+function normalizeOurFundLearnMoreLink(
+  link: string | undefined,
   language: string,
-): FundData {
-  const slug = item.slug || "";
-  const firstParagraph = item.intro
-    ? item.intro
-        .split(/\n\s*\n/)
-        .map((p) => p.trim())
-        .filter(Boolean)[0] || ""
-    : "";
-  return {
-    id: item.id || slug || `fund-${index}`,
-    title: item.headerTitle || "",
-    description: item.headerSubtitle || firstParagraph,
-    imageSrc: item.headerHeroImageSrc || "",
-    imageAlt: item.headerHeroImageAlt || "",
-    icon: ICON_ORDER[index % ICON_ORDER.length],
-    learnMoreLink: `/${language}/our-fund/${slug}`,
-    imagePosition: index % 2 === 0 ? "left" : "right",
-  };
+): string {
+  const raw = (link ?? "").trim();
+  if (!raw) return `/${language}/our-fund`;
+  if (/^https?:\/\//i.test(raw)) return raw;
+  const path = raw.startsWith("/") ? raw : `/${raw}`;
+  if (/^\/(en|id)(\/|$)/i.test(path)) return path;
+  return `/${language}${path}`;
 }
 
 export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
@@ -153,35 +128,32 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
     propDescription,
     "Turning Tides supports partners through four interacting funds, each of which supports different pathways toward change. Each fund is governed separately to increase responsiveness to partners' expressed needs and opportunities to create change.",
   );
-  // Prefer fundDetails.funds (same as admin Fund Details) so order and list match the admin
-  const fundDetailsList = getContentJSON<FundDetailsFundItem[]>(
-    "fundDetails.funds",
-    [],
-  );
+  /** Listing uses the "Our Four Funds" tab: array order = display order; copy comes from here, not Fund Details. */
   const fourFundsList = getContentJSON<FundData[]>("fourFunds.funds", []);
 
   let funds: Fund[];
-  const fromFundDetails =
-    Array.isArray(fundDetailsList) &&
-    fundDetailsList.length > 0 &&
-    fundDetailsList.some((f) => f?.headerTitle && f?.slug);
-  if (fromFundDetails) {
-    const mapped = fundDetailsList
-      .filter((f) => f?.slug)
-      .map((f, i) => mapFundDetailsToFundData(f, i, language))
-      .filter((f) => f.title && f.imageSrc);
-    funds =
-      mapped.length > 0
-        ? mapped.map(convertFundDataToFund)
-        : fourFundsList.length > 0
-          ? fourFundsList.map(convertFundDataToFund)
-          : defaultFundsData.map(convertFundDataToFund);
-  } else if (fourFundsList.length > 0) {
-    funds = fourFundsList.map(convertFundDataToFund);
+  if (fourFundsList.length > 0) {
+    funds = fourFundsList.map((item) =>
+      convertFundDataToFund({
+        ...item,
+        learnMoreLink: normalizeOurFundLearnMoreLink(
+          item.learnMoreLink,
+          language,
+        ),
+      }),
+    );
   } else if (propFunds && propFunds.length > 0) {
     funds = propFunds;
   } else {
-    funds = defaultFundsData.map(convertFundDataToFund);
+    funds = defaultFundsData.map((d) =>
+      convertFundDataToFund({
+        ...d,
+        learnMoreLink: normalizeOurFundLearnMoreLink(
+          d.learnMoreLink,
+          language,
+        ),
+      }),
+    );
   }
 
   return (
@@ -201,14 +173,13 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:gap-16">
-          {funds.map((fund) => (
+          {funds.map((fund, index) => (
             <div
               key={fund.id}
               className={cn(
                 "flex flex-col items-start gap-6 sm:gap-16",
-                fund.imagePosition === "left"
-                  ? "lg:flex-row"
-                  : "lg:flex-row-reverse",
+                /** Even index: image left; odd index: image right */
+                index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse",
               )}
             >
               {/* Image */}

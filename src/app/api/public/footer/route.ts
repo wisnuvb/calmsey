@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { findFooterBrandSafe } from "@/lib/prisma-fetch-footer-brand";
+import { mergeFooterBrand } from "@/lib/footer-brand-defaults";
 
 /**
  * GET /api/public/footer
- * Public API to fetch footer sections with links
+ * Public API: footer link sections + singleton brand column (logos / sponsorship copy)
  */
 export async function GET() {
   try {
@@ -18,7 +20,12 @@ export async function GET() {
       orderBy: { order: "asc" },
     });
 
-    return NextResponse.json({ sections });
+    const brandRow = await findFooterBrandSafe();
+
+    return NextResponse.json({
+      sections,
+      brand: mergeFooterBrand(brandRow ?? undefined),
+    });
   } catch (error) {
     console.error("Error fetching footer:", error);
     return NextResponse.json(

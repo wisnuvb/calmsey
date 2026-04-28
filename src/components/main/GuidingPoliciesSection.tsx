@@ -30,7 +30,7 @@ const defaultPolicies: Policy[] = [
     id: "fiscal-sponsorship",
     title: "Fiscal Sponsorship Agreement",
     content:
-      '<p>Turning Tides operated under the <a href="https://turningtidesfacility.org/fiscal-sponsorship" aria-label="Read more about Fiscal Sponsorship Agreement">fiscal sponsorship</a> of The Tenure Facility Fund, a US 501(c)3 not for profit subsidiary of the International Land and Forest Tenure Facility.</p>',
+      '<p>Turning Tides operated under the <a href="https://turningtidesfacility.org/fiscal-sponsorship" aria-label="Read more about Fiscal Sponsorship Agreement">fiscal sponsorship</a> of The Tenure Facility Fund, a US 501(c)3 Not-for-profit subsidiary of the International Land and Forest Tenure Facility.</p>',
   },
   {
     id: "social-contract",
@@ -157,11 +157,9 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 sm:px-28">
-            <div className="text-left sm:col-span-4 text-[#010107] font-normal font-nunito text-2xl space-y-2">
-              <p className="">
-                Last Update
-              </p>
-              <p className="">{lastUpdate}</p>
+            <div className="text-left sm:col-span-4 text-[#010107] font-normal font-nunito flex flex-row flex-wrap items-baseline gap-x-2 text-lg sm:flex-col sm:gap-x-0 sm:space-y-2 sm:text-2xl">
+              <p>Last Update</p>
+              <p>{lastUpdate}</p>
             </div>
 
             <div className="text-left sm:col-span-8">

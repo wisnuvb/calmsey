@@ -6,6 +6,11 @@ import { useToast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  mergeFooterBrand,
+  type FooterBrandDTO,
+} from "@/lib/footer-brand-defaults";
 
 interface FooterLink {
   id?: string;
@@ -28,6 +33,9 @@ export default function FooterManagerPage() {
   // const router = useRouter();
   const { addToast } = useToast();
   const [sections, setSections] = useState<FooterSection[]>([]);
+  const [brand, setBrand] = useState<FooterBrandDTO>(() =>
+    mergeFooterBrand(null),
+  );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -42,6 +50,7 @@ export default function FooterManagerPage() {
       if (response.ok) {
         const data = await response.json();
         setSections(data.sections || []);
+        setBrand(mergeFooterBrand(data.brand ?? undefined));
       }
     } catch (error) {
       console.error("Error fetching footer:", error);
@@ -53,6 +62,10 @@ export default function FooterManagerPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateBrand = (field: keyof FooterBrandDTO, value: string) => {
+    setBrand((prev) => ({ ...prev, [field]: value }));
   };
 
   const addSection = () => {
@@ -121,7 +134,7 @@ export default function FooterManagerPage() {
       const response = await fetch("/api/admin/footer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sections }),
+        body: JSON.stringify({ sections, brand }),
       });
 
       if (response.ok) {
@@ -161,9 +174,84 @@ export default function FooterManagerPage() {
           Footer Manager
         </h1>
         <p className="text-gray-600">
-          Manage footer sections and links. Changes will be reflected on the
-          frontend immediately.
+          Manage footer navigation and the brand column (logos, sponsorship
+          copy).
         </p>
+      </div>
+
+      <div className="border border-gray-200 rounded-lg p-6 bg-white mb-8 space-y-4">
+        <h2 className="text-xl font-semibold text-gray-900">
+          Brand column (left)
+        </h2>
+        <p className="text-sm text-gray-600">
+          Turning Tides logo link, sponsor logo, and fiscal sponsorship paragraph
+          shown to the left of footer link columns.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="brand-main-logo">Main logo URL</Label>
+            <Input
+              id="brand-main-logo"
+              value={brand.mainLogoSrc}
+              onChange={(e) => updateBrand("mainLogoSrc", e.target.value)}
+              className="mt-1"
+              placeholder="/assets/Logo-white.png"
+            />
+          </div>
+          <div>
+            <Label htmlFor="brand-main-logo-alt">Main logo alt text</Label>
+            <Input
+              id="brand-main-logo-alt"
+              value={brand.mainLogoAlt}
+              onChange={(e) => updateBrand("mainLogoAlt", e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <Label htmlFor="brand-main-logo-href">
+              Main logo destination (relative path OK)
+            </Label>
+            <Input
+              id="brand-main-logo-href"
+              value={brand.mainLogoHref}
+              onChange={(e) => updateBrand("mainLogoHref", e.target.value)}
+              className="mt-1"
+              placeholder="/"
+            />
+          </div>
+          <div>
+            <Label htmlFor="brand-sponsor-logo">Sponsor logo URL</Label>
+            <Input
+              id="brand-sponsor-logo"
+              value={brand.sponsorLogoSrc}
+              onChange={(e) => updateBrand("sponsorLogoSrc", e.target.value)}
+              className="mt-1"
+              placeholder="/assets/Logo-TenureFacility.png"
+            />
+          </div>
+          <div>
+            <Label htmlFor="brand-sponsor-logo-alt">Sponsor logo alt text</Label>
+            <Input
+              id="brand-sponsor-logo-alt"
+              value={brand.sponsorLogoAlt}
+              onChange={(e) => updateBrand("sponsorLogoAlt", e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <Label htmlFor="brand-sponsor-text">Sponsorship paragraph</Label>
+            <Textarea
+              id="brand-sponsor-text"
+              value={brand.sponsorshipParagraph}
+              onChange={(e) =>
+                updateBrand("sponsorshipParagraph", e.target.value)
+              }
+              className="mt-1 min-h-[120px]"
+              placeholder="Turning Tides is a fiscally sponsored project..."
+            />
+          </div>
+        </div>
       </div>
 
       <div className="space-y-6 mb-8">

@@ -3,6 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import {
+  mergeFooterBrand,
+  type FooterBrandDTO,
+} from "@/lib/footer-brand-defaults";
+import { getImageUrl } from "@/lib/utils";
 import { useLanguage } from "../public/LanguageProvider";
 
 /**
@@ -56,6 +61,9 @@ interface FooterSection {
 export function Footer() {
   const { language } = useLanguage();
   const [footerSections, setFooterSections] = useState<FooterSection[]>([]);
+  const [brand, setBrand] = useState<FooterBrandDTO>(() =>
+    mergeFooterBrand(null),
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -68,9 +76,11 @@ export function Footer() {
       if (response.ok) {
         const data = await response.json();
         setFooterSections(data.sections || []);
+        setBrand(mergeFooterBrand(data.brand ?? undefined));
       }
     } catch (error) {
       console.error("Error fetching footer:", error);
+      setBrand(mergeFooterBrand(null));
       // Fallback to default sections if API fails
       setFooterSections([
         {
@@ -166,11 +176,17 @@ export function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-32">
           {/* Logo and Brand Section - Left */}
           <div className="lg:col-span-4">
-            <Link href="/">
+            <Link
+              href={resolveFooterLinkHref(
+                brand.mainLogoHref,
+                language,
+                "SELF",
+              )}
+            >
               <div className="w-auto h-32 relative mr-3">
                 <Image
-                  src="/assets/Logo-white.png"
-                  alt="Turning Tides Logo"
+                  src={getImageUrl(brand.mainLogoSrc)}
+                  alt={brand.mainLogoAlt}
                   fill
                   className="object-contain"
                 />
@@ -179,16 +195,14 @@ export function Footer() {
             <div className="border-t border-white/50 my-8" />
             <div className="flex items-start gap-6">
               <Image
-                src="/assets/Logo-TenureFacility.png"
-                alt="Tenure Facility Logo"
+                src={getImageUrl(brand.sponsorLogoSrc)}
+                alt={brand.sponsorLogoAlt}
                 width={100}
                 height={100}
                 className="w-auto h-11 object-contain"
               />
-              <p className="font-work-sans font-normal text-base text-white/80 leading-[27px] tracking-[0%]">
-                Turning Tides is a fiscally sponsored project of the Tenure
-                Facility Fund, a US 501(c)3, which is a not for profit
-                subsidiary of the International Land and Forest Tenure Facility.
+              <p className="font-work-sans font-normal text-base text-white/80 leading-[27px] tracking-[0%] whitespace-pre-line">
+                {brand.sponsorshipParagraph}
               </p>
             </div>
           </div>

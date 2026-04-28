@@ -67,7 +67,7 @@ export function GovernanceMeaningSection({
     <section className="bg-white py-16 lg:py-20">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-16 items-start">
-          <div className="space-y-6 sticky top-28">
+          <div className="space-y-6 block md:sticky top-28">
             <H2
               style="h1bold"
               className="text-[#010107] font-nunito text-2xl sm:text-[38px] leading-[120%] tracking-normal"
@@ -77,9 +77,7 @@ export function GovernanceMeaningSection({
             <P style="p1reg" className="text-[#060726CC] p">
               {subtitle}
             </P>
-          </div>
 
-          <div className="space-y-8">
             <div className="relative w-full aspect-[10/4.7] overflow-hidden rounded shadow-sm">
               <Image
                 src={getImageUrl(image)}
@@ -90,7 +88,9 @@ export function GovernanceMeaningSection({
                 priority
               />
             </div>
+          </div>
 
+          <div className="space-y-8">
             <div className="space-y-4">
               {paragraphs.map((paragraph, index) => (
                 <P

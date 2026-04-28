@@ -8,6 +8,11 @@ import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 const DEFAULT_FEEDBACK_FORM_EMBED_URL =
   "https://forms.cloud.microsoft/r/TjvKdyuTdH";
 
+/** Only this label opens the embedded Microsoft Form modal; any other uses `feedbackLink` like a normal link. */
+function isShareFeedbackModalLabel(label: string): boolean {
+  return label.trim().toLowerCase() === "share feedback";
+}
+
 interface FeedbackCalloutSectionProps {
   title?: string;
   description?: string;
@@ -78,6 +83,11 @@ export function FeedbackCalloutSection({
       ? embedFromCms.trim()
       : DEFAULT_FEEDBACK_FORM_EMBED_URL;
 
+  const openFeedbackInModal = isShareFeedbackModalLabel(feedbackText);
+
+  const primaryCtaClassName =
+    "inline-flex items-center justify-center gap-3 bg-white text-[#3C62ED] px-6 py-5 rounded-lg shadow-sm hover:bg-gray-100 transition-colors duration-200 w-full sm:w-[231px]";
+
   useEffect(() => {
     if (!feedbackModalOpen) return;
     const prevOverflow = document.body.style.overflow;
@@ -115,15 +125,21 @@ export function FeedbackCalloutSection({
 
           {/* Right: Buttons */}
           <div className="flex flex-col items-start lg:items-end gap-4">
-            <button
-              type="button"
-              onClick={() => setFeedbackModalOpen(true)}
-              className="inline-flex items-center justify-center gap-3 bg-white text-[#3C62ED] px-6 py-5 rounded-lg shadow-sm hover:bg-gray-100 transition-colors duration-200 w-full sm:w-[231px]"
-              aria-expanded={feedbackModalOpen}
-              aria-haspopup="dialog"
-            >
-              {feedbackText}
-            </button>
+            {openFeedbackInModal ? (
+              <button
+                type="button"
+                onClick={() => setFeedbackModalOpen(true)}
+                className={primaryCtaClassName}
+                aria-expanded={feedbackModalOpen}
+                aria-haspopup="dialog"
+              >
+                {feedbackText}
+              </button>
+            ) : (
+              <a href={feedbackLink} className={primaryCtaClassName}>
+                {feedbackText}
+              </a>
+            )}
             <a
               href={learnMoreLink}
               className="inline-flex items-center justify-center gap-3 border border-white/80 text-white px-6 py-5 rounded-lg hover:bg-white/10 transition-colors duration-200 w-full sm:w-[231px]"
@@ -141,7 +157,7 @@ export function FeedbackCalloutSection({
         </div>
       </div>
 
-      {feedbackModalOpen && (
+      {openFeedbackInModal && feedbackModalOpen && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 p-4"
           role="presentation"
