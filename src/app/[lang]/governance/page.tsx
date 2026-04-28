@@ -1,6 +1,7 @@
 import {
   FundingAcceptancePolicySection,
   GovernanceMeaningSection,
+  GovernancePolicyContactSection,
   GuidingPoliciesSection,
   FeedbackCalloutSection,
   HeroSection,
@@ -62,6 +63,7 @@ const GovernancePage = async ({ params }: GovernancePageProps) => {
       <SteeringCommitteeSection />
       <FundingAcceptancePolicySection />
       <GuidingPoliciesSection />
+      <GovernancePolicyContactSection />
       {/* <OurValuesPrinciplesSection /> */}
       {/* <GrantmakingProcessSection /> */}
       {/* <ConsultativeProcessSection /> */}

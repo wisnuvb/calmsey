@@ -237,6 +237,15 @@ export const PARTNER_STORIES_SCHEMA: PageContentSchema = {
       helpText: "URL for the feedback button (can be relative path like /feedback or full URL)",
     },
     {
+      key: "feedbackCallout.feedbackFormEmbedUrl",
+      label: "Feedback form embed URL (modal iframe)",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "https://forms.cloud.microsoft/r/TjvKdyuTdH",
+      helpText:
+        "Full URL loaded in the popup when Give Feedback is clicked. Leave blank to use the default Microsoft Form.",
+    },
+    {
       key: "feedbackCallout.learnMoreButtonText",
       label: "Learn More Button Text",
       type: "text",

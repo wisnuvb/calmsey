@@ -8,6 +8,7 @@ export const GOVERNANCE_SCHEMA: PageContentSchema = {
     "Steering Committee",
     "Funding Acceptance Policy",
     "Guiding Policies",
+    "Policy & Contact",
     "Feedback Callout",
   ],
   fields: [
@@ -338,6 +339,82 @@ export const GOVERNANCE_SCHEMA: PageContentSchema = {
       ],
     },
 
+    // Policy & Contact Section (GovernancePolicyContactSection)
+    {
+      key: "governancePolicyContact.leftTitle",
+      label: "Left column title",
+      type: "text",
+      section: "Policy & Contact",
+      defaultValue: "Policies not listed here",
+    },
+    {
+      key: "governancePolicyContact.leftBody",
+      label: "Left column body",
+      type: "textarea",
+      section: "Policy & Contact",
+      defaultValue:
+        "Some policies may currently be in development. Where policies are not listed, Turning Tides adheres to the legal and financial governance requirements of our fiscal sponsor, The Tenure Facility Fund, and the operational policies of the International Land and Forest Tenure Facility.",
+    },
+    {
+      key: "governancePolicyContact.rightTitle",
+      label: "Right column title",
+      type: "text",
+      section: "Policy & Contact",
+      defaultValue: "Contact Information",
+    },
+    {
+      key: "governancePolicyContact.rightIntro",
+      label: "Right column intro sentence",
+      type: "textarea",
+      section: "Policy & Contact",
+      defaultValue:
+        "For questions or clarification regarding governance or policies:",
+    },
+    {
+      key: "governancePolicyContact.emailLabel",
+      label: "Email row label",
+      type: "text",
+      section: "Policy & Contact",
+      defaultValue: "Email:",
+    },
+    {
+      key: "governancePolicyContact.contactEmail",
+      label: "Contact email address",
+      type: "text",
+      section: "Policy & Contact",
+      defaultValue: "info@TurningTidesFacility.org",
+      helpText: "Displayed as a clickable mailto link",
+    },
+    {
+      key: "governancePolicyContact.phoneLabel",
+      label: "Phone row label",
+      type: "text",
+      section: "Policy & Contact",
+      defaultValue: "Phone:",
+    },
+    {
+      key: "governancePolicyContact.addressLabel",
+      label: "Address row label",
+      type: "text",
+      section: "Policy & Contact",
+      defaultValue: "Mailing Address:",
+    },
+    {
+      key: "governancePolicyContact.phoneLine",
+      label: "Phone line (full text)",
+      type: "textarea",
+      section: "Policy & Contact",
+      defaultValue:
+        "+62 858 439 88093 (also available for whatsapp contact)",
+    },
+    {
+      key: "governancePolicyContact.addressLine",
+      label: "Mailing address (full text)",
+      type: "textarea",
+      section: "Policy & Contact",
+      defaultValue: "170 Norfolk Street #12, New York, NY 10002 USA",
+    },
+
     // Feedback Callout Section (Common section, same as About Us)
     {
       key: "feedbackCallout.title",
@@ -433,6 +510,15 @@ export const GOVERNANCE_SCHEMA: PageContentSchema = {
       section: "Feedback Callout",
       defaultValue: "/feedback",
       helpText: "URL for the feedback button (can be relative path like /feedback or full URL)",
+    },
+    {
+      key: "feedbackCallout.feedbackFormEmbedUrl",
+      label: "Feedback form embed URL (modal iframe)",
+      type: "text",
+      section: "Feedback Callout",
+      defaultValue: "https://forms.cloud.microsoft/r/TjvKdyuTdH",
+      helpText:
+        "Full URL loaded in the popup when Give Feedback is clicked. Leave blank to use the default Microsoft Form.",
     },
     {
       key: "feedbackCallout.learnMoreButtonText",

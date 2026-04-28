@@ -62,3 +62,4 @@ export * from "./OurValuesPrinciplesSection";
 export * from "./GovernanceMeaningSection";
 export * from "./FeedbackCalloutSection";
 export * from "./FundingAcceptancePolicySection";
+export * from "./GovernancePolicyContactSection";
