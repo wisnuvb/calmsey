@@ -34,12 +34,12 @@ interface WhereWeWorkSectionProps {
 }
 
 function parseDownloadOptions(
-  opts: DownloadOption[] | string | unknown
+  opts: DownloadOption[] | string | unknown,
 ): DownloadOption[] {
   if (Array.isArray(opts)) {
     return opts.filter(
       (o): o is DownloadOption =>
-        o && typeof o === "object" && "label" in o && "fileUrl" in o
+        o && typeof o === "object" && "label" in o && "fileUrl" in o,
     );
   }
   if (typeof opts === "string") {
@@ -76,42 +76,42 @@ export function WhereWeWorkSection({
   const title = getValue(
     "whereWeWork.title",
     propTitle,
-    "Where Does Turning Tides Work?"
+    "Where Does Turning Tides Work?",
   );
 
   const actionPlansText = getValue(
     "whereWeWork.actionPlansText",
     propActionPlansText,
-    "We have **developed action plans for Latin America and Africa**, and **mobilizing grants** for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda."
+    "We have **developed action plans for Latin America and Africa**, and **mobilizing grants** for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda.",
   );
 
   const actionPlansLinkText = getValue(
     "whereWeWork.actionPlansLinkText",
     propActionPlansLinkText,
-    "See Action Plans"
+    "See Action Plans",
   );
 
   const actionPlansModalTitle = getValue(
     "whereWeWork.actionPlansDownloadModalTitle",
     propActionPlansModalTitle,
-    "Download action plans"
+    "Download action plans",
   );
 
   const actionPlansDownloadItems = getContentJSON<DownloadItem[]>(
     "whereWeWork.actionPlansDownloadItems",
-    propActionPlansItems || []
+    propActionPlansItems || [],
   );
 
   const explorationText = getValue(
     "whereWeWork.explorationText",
     propExplorationText,
-    "We are also in **the exploration and engagement phase** – Brazil, India, Indonesia, Sri Lanka, Thailand."
+    "We are also in **the exploration and engagement phase** – Brazil, India, Indonesia, Sri Lanka, Thailand.",
   );
 
   const mapImage = getValue(
     "whereWeWork.mapImage",
     propMapImage,
-    "/assets/world-map.jpg"
+    "/assets/world-map.jpg",
   );
 
   // Use getImageUrl with validation built-in
@@ -120,24 +120,24 @@ export function WhereWeWorkSection({
   const partnersText = getValue(
     "whereWeWork.partnersText",
     propPartnersText,
-    'Our **"Partners Piloting"** partners were in Bangladesh, Thailand, Indonesia, Honduras, Senegal.'
+    'Our **"Partners Piloting"** partners were in Bangladesh, Thailand, Indonesia, Honduras, Senegal.',
   );
 
   const partnersLinkText = getValue(
     "whereWeWork.partnersLinkText",
     propPartnersLinkText,
-    "View Report"
+    "View Report",
   );
 
   const partnersModalTitle = getValue(
     "whereWeWork.partnersDownloadModalTitle",
     propPartnersModalTitle,
-    "Download Piloting Report"
+    "Download Piloting Report",
   );
 
   const partnersDownloadItems = getContentJSON<DownloadItem[]>(
     "whereWeWork.partnersDownloadItems",
-    propPartnersItems || []
+    propPartnersItems || [],
   );
 
   return (
@@ -166,12 +166,16 @@ export function WhereWeWorkSection({
               <button
                 type="button"
                 onClick={() =>
-                  actionPlansDownloadItems.length > 0 && setActionPlansModalOpen(true)
+                  actionPlansDownloadItems.length > 0 &&
+                  setActionPlansModalOpen(true)
                 }
                 className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
               >
                 <span>{actionPlansLinkText}</span>
-                <Download className="w-4 h-4 ml-1 group-hover:translate-y-0.5 transition-transform" aria-hidden />
+                <Download
+                  className="w-4 h-4 ml-1 group-hover:translate-y-0.5 transition-transform"
+                  aria-hidden
+                />
               </button>
             </div>
           </div>
@@ -189,7 +193,10 @@ export function WhereWeWorkSection({
           </div>
 
           <div className="flex items-start gap-4 mx-auto w-full sm:px-1">
-            <div className="w-4 h-4 bg-[#C4B5FD] flex-shrink-0 mt-1" />
+            <div
+              className="mt-1 box-border h-4 w-4 shrink-0 rounded-full border-[2px] border-[#172554] bg-transparent"
+              aria-hidden
+            />
             <div className="text-base text-gray-900 font-work-sans leading-relaxed min-w-0">
               <p className="mb-2 p">
                 {partnersText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
@@ -199,16 +206,22 @@ export function WhereWeWorkSection({
                   return <span key={index}>{part}</span>;
                 })}
               </p>
-              <button
-                type="button"
-                onClick={() =>
-                  partnersDownloadItems.length > 0 && setPartnersModalOpen(true)
-                }
-                className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
-              >
-                <span>{partnersLinkText}</span>
-                <Download className="w-4 h-4 ml-1 group-hover:translate-y-0.5 transition-transform" aria-hidden />
-              </button>
+              {!!partnersLinkText && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    partnersDownloadItems.length > 0 &&
+                    setPartnersModalOpen(true)
+                  }
+                  className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
+                >
+                  <span>{partnersLinkText}</span>
+                  <Download
+                    className="w-4 h-4 ml-1 group-hover:translate-y-0.5 transition-transform"
+                    aria-hidden
+                  />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -340,7 +353,9 @@ function DownloadItemRow({
           </p>
         </div>
       )}
-      <div className={`flex gap-2 ${hasTitle ? "flex-shrink-0" : "flex-1 justify-center sm:justify-start"}`}>
+      <div
+        className={`flex gap-2 ${hasTitle ? "flex-shrink-0" : "flex-1 justify-center sm:justify-start"}`}
+      >
         <select
           value={selectedIndex}
           onChange={(e) => setSelectedIndex(Number(e.target.value))}

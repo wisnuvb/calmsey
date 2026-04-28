@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { H2, P } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 import { MemberDetailModal } from "@/components/ui/MemberDetailModal";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { SteeringCommitteCard } from "./SteeringCommitteCard";
+import { MembersCarouselShell } from "./MembersCarouselShell";
 
 interface CommitteeMember {
   id: string;
@@ -106,31 +106,15 @@ export const SteeringCommitteeSection: React.FC<
     propMembers || defaultMembers,
   );
 
-  const [currentPage, setCurrentPage] = useState(0);
   const [selectedMember, setSelectedMember] = useState<CommitteeMember | null>(
     null,
   );
-  const membersPerPage = 4;
-  const totalPages = Math.ceil(members.length / membersPerPage);
-
-  const startIndex = currentPage * membersPerPage;
-  const endIndex = startIndex + membersPerPage;
-  const currentMembers = members.slice(startIndex, endIndex);
-
-  const handlePrevPage = () => {
-    setCurrentPage((prev) => (prev > 0 ? prev - 1 : totalPages - 1));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prev) => (prev < totalPages - 1 ? prev + 1 : 0));
-  };
-
-  const handlePageClick = (pageIndex: number) => {
-    setCurrentPage(pageIndex);
-  };
 
   return (
-    <section className={cn("w-full pb-16 lg:pb-24", backgroundColor)} id="steeringcommittees">
+    <section
+      className={cn("w-full pb-16 lg:pb-24", backgroundColor)}
+      id="steeringcommittees"
+    >
       <div className="container mx-auto px-4">
         {/* Title and Description */}
         <div className="mb-12 lg:mb-16 space-y-10">
@@ -140,76 +124,25 @@ export const SteeringCommitteeSection: React.FC<
           >
             {title}
           </H2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-            <P
-              style="p1reg"
-              className="text-[#060726CC] text-2xl font-normal leading-[140%] font-nunito-sans"
-            >
+          <div className="text-[#06072680] text-center max-w-4xl mx-auto space-y-4">
+            <P style="p1reg" className="p">
               {description}
             </P>
-            <P
-              style="p1reg"
-              className="text-[#06072680] p"
-            >
+            <P style="p1reg" className="p">
               {additionalDescription}
             </P>
           </div>
         </div>
 
-        {/* Committee Members Grid */}
-        <div className="relative">
-          {/* Navigation Buttons */}
-          {totalPages > 1 && (
-            <>
-              <button
-                onClick={handlePrevPage}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
-                aria-label="Previous page"
-              >
-                <ChevronLeft className="w-5 h-5 text-[#3C62ED]" />
-              </button>
-              <button
-                onClick={handleNextPage}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
-                aria-label="Next page"
-              >
-                <ChevronRight className="w-5 h-5 text-[#3C62ED]" />
-              </button>
-            </>
+        <MembersCarouselShell
+          members={members}
+          renderCard={(member) => (
+            <SteeringCommitteCard
+              member={member}
+              setSelectedMember={setSelectedMember}
+            />
           )}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {currentMembers.map((member) => (
-              <SteeringCommitteCard
-                key={member.id}
-                member={member}
-                setSelectedMember={setSelectedMember}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Pagination Indicator */}
-        {totalPages > 1 && (
-          <div className="flex justify-center mb-12">
-            <div className="flex gap-3">
-              {Array.from({ length: totalPages }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => handlePageClick(index)}
-                  className={cn(
-                    "w-12 h-1.5 rounded-full transition-all duration-300",
-                    currentPage === index
-                      ? "bg-[#3C62ED]"
-                      : "bg-[#E5E7EB] hover:bg-[#D1D5DB]",
-                  )}
-                  aria-label={`Go to page ${index + 1}`}
-                  aria-current={currentPage === index ? "true" : "false"}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        />
 
         {/* Bottom Text */}
         {bottomText && (

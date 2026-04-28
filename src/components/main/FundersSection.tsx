@@ -113,7 +113,7 @@ export function FundersSection({
 
   return (
     <section
-      className={cn("bg-white text-[#010107] py-16 lg:py-24", className)}
+      className={cn("bg-white text-[#010107] pb-16 lg:pb-24", className)}
       data-section="funders" id="funders"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-11">

@@ -93,7 +93,7 @@ const StoriesPage = async ({ params }: StoriesPageProps) => {
         dataSection="stories"
         className="h-[590px] !min-h-[590px]"
       />
-      <CommunityStoriesSection />
+      {/* <CommunityStoriesSection /> */}
       {/* <AllStoriesSection /> */}
       <AllStoriesListSection
         stories={stories}

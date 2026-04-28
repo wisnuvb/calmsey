@@ -540,7 +540,7 @@ export function GrantmakingSection({
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
             {/* Left Navigation */}
-            <aside className="lg:w-[478px] flex-shrink-0">
+            <aside className="lg:w-[478px] flex-shrink-0 lg:sticky lg:top-28 lg:self-start">
               <nav className="space-y-2">
                 {navigationItems.map((item) => {
                   const isActive = item.id === activeId;

@@ -681,3 +681,22 @@ model FooterLink {
 
   @@map("footer_links")
 }
+
+/// Singleton row (`id`: "singleton`): left-column logos + sponsorship copy in global footer.
+model FooterBrand {
+  id String @id @default("singleton")
+
+  mainLogoSrc          String @default("/assets/Logo-white.png")
+  mainLogoAlt          String @default("Turning Tides Logo")
+  mainLogoHref         String @default("/")
+
+  sponsorLogoSrc       String @default("/assets/Logo-TenureFacility.png")
+  sponsorLogoAlt       String @default("Tenure Facility Logo")
+
+  sponsorshipParagraph String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("footer_brand")
+}

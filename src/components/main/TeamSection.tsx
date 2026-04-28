@@ -2,12 +2,13 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { FaLinkedin } from "react-icons/fa";
+import { Linkedin } from "lucide-react";
+import { H2, P } from "@/components/ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import { useImageDominantColor } from "@/hooks/useImageDominantColor";
 import { MemberDetailModal } from "@/components/ui/MemberDetailModal";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
+import { MembersCarouselShell } from "./MembersCarouselShell";
 
 interface TeamMember {
   id: string;
@@ -22,7 +23,10 @@ interface TeamMember {
 interface TeamSectionProps {
   title?: string;
   description?: string;
+  /** Second column on large screens when non-empty */
+  additionalDescription?: string;
   members?: TeamMember[];
+  backgroundColor?: string;
 }
 
 function TeamMemberCard({
@@ -36,11 +40,11 @@ function TeamMemberCard({
   const { color: bgColor } = useImageDominantColor(imageUrl);
 
   return (
-    <div className="text-left">
-      {/* Photo with LinkedIn Icon */}
-      <div className="relative inline-block mb-4 w-full max-w-[250px] mx-auto cursor-pointer">
+    <div className="flex flex-col text-left">
+      {/* Same image pattern as SteeringCommitteCard: full cell width, 3:4 aspect */}
+      <div className="relative mb-4">
         <div
-          className="relative rounded-lg overflow-hidden transition-colors duration-500 aspect-[3/4]"
+          className="relative w-full aspect-[3/4] overflow-hidden rounded cursor-pointer"
           style={{ backgroundColor: bgColor }}
           role="button"
           tabIndex={0}
@@ -71,18 +75,17 @@ function TeamMemberCard({
             href={member.linkedinUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute bottom-2 left-2 w-8 h-8 bg-[#0077B5] rounded flex items-center justify-center hover:bg-[#005885] transition-colors shadow-md z-10"
+            className="absolute bottom-3 left-3 w-9 h-9 rounded-xl bg-white shadow-md border border-gray-100 flex items-center justify-center hover:shadow-lg transition-shadow duration-200 z-10"
             aria-label={`View LinkedIn profile of ${member.name} (opens in a new tab)`}
             onClick={(e) => e.stopPropagation()}
           >
-            <FaLinkedin className="w-4 h-4 text-white" />
+            <Linkedin className="w-4 h-4 text-[#3C62ED]" />
           </a>
         )}
       </div>
 
-      {/* Member Info */}
       <div
-        className="cursor-pointer"
+        className="space-y-1 cursor-pointer"
         role="button"
         tabIndex={0}
         onClick={onSelect}
@@ -94,15 +97,11 @@ function TeamMemberCard({
         }}
         aria-label={`View details for ${member.name}`}
       >
-        <h3 className="text-xl font-bold text-[#010107] mb-3 font-nunito leading-[140%] tracking-normal">
+        <h3 className="text-xl font-bold text-[#010107] font-nunito">
           {member.name}
         </h3>
-        <p className="text-base text-[#3C62ED] mb-[2px] font-work-sans font-normal leading-[27px] tracking-normal">
-          {member.role}
-        </p>
-        <p className="text-base text-[#3C62ED] font-work-sans font-normal leading-[27px] tracking-normal">
-          {member.location}
-        </p>
+        <p className="text-base text-[#3C62ED] font-work-sans">{member.role}</p>
+        <p className="text-base text-[#3C62ED] font-work-sans">{member.location}</p>
       </div>
     </div>
   );
@@ -161,112 +160,84 @@ const defaultMembers: TeamMember[] = [
 export const TeamSection: React.FC<TeamSectionProps> = ({
   title: propTitle,
   description: propDescription,
+  additionalDescription: propAdditionalDescription,
   members: propMembers,
+  backgroundColor,
 }) => {
   const { getValue, getContentJSON } = usePageContentHelpers();
 
-  // Get all values with priority: context > props > default
-  const title = getValue("team.title", propTitle, "The Turning Tides' Team");
+  const title = getValue(
+    "team.title",
+    propTitle,
+    "The Turning Tides' Team",
+  );
   const description = getValue(
     "team.description",
     propDescription,
     "Meet the Turning Tides' team - people from across the globe with combined experiences in progressive philanthropy, human rights, gender equity, community organizing, Indigenous affairs, equity law, and environmental justice.",
   );
+  const additionalDescription = getValue(
+    "team.additionalDescription",
+    propAdditionalDescription ?? "",
+    "",
+  );
   const members = getContentJSON<TeamMember[]>(
     "team.members",
     propMembers || defaultMembers,
   );
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
-  const itemsPerPage = 4;
-  const totalPages = Math.ceil(members.length / itemsPerPage);
 
-  const currentMembers = members.slice(
-    currentIndex,
-    currentIndex + itemsPerPage,
-  );
-
-  const goToPrevious = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? (totalPages - 1) * itemsPerPage : prev - itemsPerPage,
-    );
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) =>
-      prev >= (totalPages - 1) * itemsPerPage ? 0 : prev + itemsPerPage,
-    );
-  };
+  const hasSecondColumn =
+    typeof additionalDescription === "string" &&
+    additionalDescription.trim().length > 0;
 
   return (
-    <section className="bg-white" id="ourteam">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-          <h2 className="text-2xl sm:text-4xl lg:text-[38px] font-bold text-[#010107] mb-4 sm:mb-6 font-nunito leading-tight px-1">
+    <section
+      className={cn("w-full pb-16 lg:pb-24", backgroundColor ?? "bg-white")}
+      id="ourteam"
+    >
+      <div className="container mx-auto px-4">
+        <div className="mb-12 lg:mb-16 space-y-10">
+          <H2
+            style="h2bold"
+            className="text-[#010107] text-3xl sm:text-[38px] leading-[120%] tracking-normal text-center font-nunito"
+          >
             {title}
-          </h2>
-          <p className="text-base text-[#060726CC] max-w-4xl mx-auto leading-[27px] tracking-normal font-work-sans px-1">
-            {description}
-          </p>
-        </div>
-
-        {/* Mobile: horizontal scroll cards */}
-        <div className="sm:hidden mb-10 -mx-1 px-1">
-          <div className="flex gap-0 sm:gap-5 overflow-x-auto snap-x snap-mandatory pb-2 scroll-px-4 px-2 [scrollbar-width:thin]">
-            {members.map((member) => (
-              <div
-                key={member.id}
-                className="snap-center shrink-0 w-[min(280px,82vw)]"
+          </H2>
+          <div
+            className={cn(
+              "grid grid-cols-1 gap-10 lg:gap-14 items-start",
+              hasSecondColumn ? "lg:grid-cols-2" : "",
+            )}
+          >
+            <P
+              style="p1reg"
+              className="text-[#060726CC] text-2xl font-normal leading-[140%] font-nunito-sans"
+            >
+              {description}
+            </P>
+            {hasSecondColumn ? (
+              <P
+                style="p1reg"
+                className="text-[#06072680] p"
               >
-                <TeamMemberCard
-                  member={member}
-                  onSelect={() => setSelectedMember(member)}
-                />
-              </div>
-            ))}
+                {additionalDescription}
+              </P>
+            ) : null}
           </div>
         </div>
 
-        {/* sm+: paginated grid */}
-        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {currentMembers.map((member) => (
+        <MembersCarouselShell
+          members={members}
+          renderCard={(member) => (
             <TeamMemberCard
-              key={member.id}
               member={member}
               onSelect={() => setSelectedMember(member)}
             />
-          ))}
-        </div>
-
-        {/* Navigation Controls (desktop / tablet grid only) */}
-        {totalPages > 1 && (
-          <div className="hidden sm:flex justify-center items-center gap-4">
-            <button
-              onClick={goToPrevious}
-              className={cn(
-                "w-10 h-10 rounded-full border flex items-center justify-center transition-all",
-                "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200",
-              )}
-              aria-label="Previous team members"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={goToNext}
-              className={cn(
-                "w-10 h-10 rounded-full border flex items-center justify-center transition-all",
-                "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200",
-              )}
-              aria-label="Next team members"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        )}
+          )}
+        />
       </div>
 
-      {/* Team Member Modal */}
       <MemberDetailModal
         member={selectedMember}
         onClose={() => setSelectedMember(null)}

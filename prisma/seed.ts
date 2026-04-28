@@ -916,6 +916,21 @@ async function main() {
 
   console.log(`✅ Created ${defaultPages.length} default pages`);
 
+  await prisma.footerBrand.upsert({
+    where: { id: "singleton" },
+    update: {},
+    create: {
+      id: "singleton",
+      mainLogoSrc: "/assets/Logo-white.png",
+      mainLogoAlt: "Turning Tides Logo",
+      mainLogoHref: "/",
+      sponsorLogoSrc: "/assets/Logo-TenureFacility.png",
+      sponsorLogoAlt: "Tenure Facility Logo",
+      sponsorshipParagraph:
+        "Turning Tides is a fiscally sponsored project of the Tenure Facility Fund, a US 501(c)3, which is a Not-for-profit subsidiary of the International Land and Forest Tenure Facility.",
+    },
+  });
+
   console.log("✅ Database seeded successfully!");
   console.log(`
     📊 Created:

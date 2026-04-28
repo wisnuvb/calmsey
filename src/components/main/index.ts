@@ -15,6 +15,7 @@ export * from "./WhatWeWannaAchieveSection";
 export * from "./OurGoalSection";
 export * from "./SupportSection";
 export * from "./TeamSection";
+export * from "./MembersCarouselShell";
 export * from "./QuoteSection";
 export * from "./TheoryOfChangeSection";
 export * from "./GenesisSection";
