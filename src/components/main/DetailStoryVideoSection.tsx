@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Play } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import { getVideoEmbedInfo } from "@/lib/video-embed";
 
@@ -42,7 +42,7 @@ export function DetailStoryVideoSection({
           // Show as regular image if no video URL
           <div className="absolute inset-0 z-0">
             <Image
-              src={posterImage!}
+              src={getImageUrl(posterImage || "")}
               alt={title || "Image"}
               fill
               className="object-cover"
@@ -54,7 +54,7 @@ export function DetailStoryVideoSection({
             {posterImage ? (
               <div className="absolute inset-0 z-0">
                 <Image
-                  src={posterImage}
+                  src={getImageUrl(posterImage || "")}
                   alt={title || "Video thumbnail"}
                   fill
                   className="object-cover"
@@ -106,7 +106,7 @@ export function DetailStoryVideoSection({
                 controls
                 playsInline
                 className="w-full h-full object-cover"
-                poster={posterImage}
+                poster={getImageUrl(posterImage || "")}
               >
                 <source src={videoUrl} type="video/mp4" />
                 <source src={videoUrl} type="video/webm" />
