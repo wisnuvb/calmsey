@@ -44,6 +44,8 @@ interface UseMediaFilesOptions {
   initialFilter?: FileFilter;
   autoFetch?: boolean;
   itemsPerPage?: number;
+  /** When false, page changes do not scroll the window (use inside modals). Default true. */
+  scrollTopOnPageChange?: boolean;
 }
 
 export function useMediaFiles(options: UseMediaFilesOptions = {}) {
@@ -52,6 +54,7 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
     initialFilter = "all",
     autoFetch = true,
     itemsPerPage = 24,
+    scrollTopOnPageChange = true,
   } = options;
 
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
@@ -128,17 +131,25 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
     return () => clearTimeout(t);
   }, [search]);
 
-  // Handler untuk page change
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page);
-    // Scroll ke atas saat ganti page
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const resetPage = useCallback(() => {
+    setCurrentPage(1);
   }, []);
 
-  // Reset to page 1 when user changes search (input) or filter
+  // Handler untuk page change
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setCurrentPage(page);
+      if (scrollTopOnPageChange) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    },
+    [scrollTopOnPageChange],
+  );
+
+  // Reset to page 1 when debounced search or filter changes (avoid resetting every keystroke)
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, filter]);
+  }, [debouncedSearch, filter]);
 
   useEffect(() => {
     if (autoFetch) {
@@ -161,6 +172,7 @@ export function useMediaFiles(options: UseMediaFilesOptions = {}) {
     setFilter,
     currentPage,
     handlePageChange,
+    resetPage,
 
     // Actions
     refreshMediaFiles: fetchMediaFiles,

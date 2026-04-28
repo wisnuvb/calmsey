@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useMediaFiles } from "@/hooks/useMediaFiles";
 import { useMediaSelection } from "@/hooks/useMediaSelection";
 import { useMediaUpload } from "@/hooks/useMediaUpload";
 import Image from "next/image";
 import {
   X,
-  Search,
   Image as ImageIcon,
   File,
   Video,
@@ -16,6 +15,7 @@ import {
   Upload,
 } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
+import { Pagination } from "@/components/common/Pagination";
 
 interface MediaFile {
   id: string;
@@ -26,6 +26,22 @@ interface MediaFile {
   url: string;
   alt?: string;
   caption?: string;
+}
+
+function getMediaDisplayName(file: MediaFile): string {
+  const original = (file.originalName || "").trim();
+  if (original) return original;
+  const stored = (file.filename || "").trim();
+  if (stored) return stored;
+  const shortId = file.id.length > 12 ? `${file.id.slice(0, 8)}…` : file.id;
+  return `${shortId} (${file.mimeType || "file"})`;
+}
+
+function formatMimeShort(mimeType: string): string {
+  if (!mimeType) return "";
+  const [major, minor] = mimeType.split("/");
+  if (!minor) return mimeType;
+  return `${major}/${minor.length > 18 ? `${minor.slice(0, 16)}…` : minor}`;
 }
 
 type FileFilter = "all" | "images" | "documents" | "videos" | "audio";
@@ -44,29 +60,34 @@ export function MediaPickerModal({
   onClose,
   onSelect,
   mode = "single",
-  allowedTypes = ["all"],
   initialFilter = "all",
 }: MediaPickerModalProps) {
   const {
     filteredFiles,
     loading,
-    search,
     setSearch,
-    filter,
     setFilter,
     refreshMediaFiles,
+    pagination,
+    handlePageChange,
+    resetPage,
   } = useMediaFiles({
     initialFilter,
     autoFetch: isOpen,
+    scrollTopOnPageChange: false,
+    itemsPerPage: 24,
   });
 
   const { selectedFiles, toggleFileSelection, clearSelection } =
     useMediaSelection();
 
-  const [localSearch, setLocalSearch] = useState(search);
+  const [multiSelectUrls, setMultiSelectUrls] = useState<Map<string, string>>(
+    () => new Map(),
+  );
   const [showUploadModal, setShowUploadModal] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const uploadModalRef = useRef<HTMLDivElement>(null);
+  const gridScrollRef = useRef<HTMLDivElement>(null);
 
   const { uploading, uploadFiles } = useMediaUpload({
     onSuccess: () => {
@@ -76,36 +97,43 @@ export function MediaPickerModal({
   });
 
   useEffect(() => {
-    if (isOpen) {
-      refreshMediaFiles();
-      clearSelection();
-    }
-  }, [isOpen, refreshMediaFiles, clearSelection]);
+    if (!isOpen) return;
+    setFilter(initialFilter);
+    setSearch("");
+    resetPage();
+    clearSelection();
+    setMultiSelectUrls(new Map());
+  }, [isOpen, initialFilter, setFilter, setSearch, resetPage, clearSelection]);
 
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearch(localSearch);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [localSearch, setSearch]);
+  const handleClose = useCallback(() => {
+    clearSelection();
+    setMultiSelectUrls(new Map());
+    onClose();
+  }, [clearSelection, onClose]);
 
   const handleSelect = () => {
-    const selectedUrls = filteredFiles
-      .filter((file) => selectedFiles.has(file.id))
-      .map((file) => file.url);
-
+    const selectedUrls = Array.from(multiSelectUrls.values());
     onSelect(selectedUrls);
-    onClose();
-    clearSelection();
+    handleClose();
+  };
+
+  const handlePageChangeInModal = (page: number) => {
+    handlePageChange(page);
+    gridScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleFileClick = (file: MediaFile) => {
     if (mode === "single") {
       onSelect([file.url]);
-      onClose();
+      handleClose();
     } else {
       toggleFileSelection(file.id);
+      setMultiSelectUrls((prev) => {
+        const next = new Map(prev);
+        if (next.has(file.id)) next.delete(file.id);
+        else next.set(file.id, file.url);
+        return next;
+      });
     }
   };
 
@@ -130,7 +158,7 @@ export function MediaPickerModal({
         !modalRef.current.contains(event.target as Node) &&
         !showUploadModal
       ) {
-        onClose();
+        handleClose();
       }
       if (
         uploadModalRef.current &&
@@ -148,7 +176,7 @@ export function MediaPickerModal({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, onClose, showUploadModal]);
+  }, [isOpen, handleClose, showUploadModal]);
 
   // Upload modal handlers
   const [dragOver, setDragOver] = useState(false);
@@ -200,186 +228,143 @@ export function MediaPickerModal({
                 Add File
               </button>
               <button
-                onClick={onClose}
+                type="button"
+                onClick={handleClose}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
           </div>
+          
+          {/* Media grid + pagination */}
+          <div className="flex-1 flex flex-col min-h-0">
+            <div ref={gridScrollRef} className="flex-1 overflow-y-auto p-6">
+              {loading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-gray-500">Loading media...</div>
+                </div>
+              ) : filteredFiles.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+                  <ImageIcon className="w-16 h-16 mb-4 opacity-20" />
+                  <p>No files found</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {filteredFiles.map((file) => {
+                    const isSelected =
+                      mode === "multiple"
+                        ? multiSelectUrls.has(file.id)
+                        : selectedFiles.has(file.id);
+                    const isImage = file.mimeType.startsWith("image/");
 
-          {/* Filters & Search */}
-          <div className="p-6 border-b space-y-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                value={localSearch}
-                onChange={(e) => setLocalSearch(e.target.value)}
-                placeholder="Search files..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Filter Tabs */}
-            <div className="flex gap-2 flex-wrap">
-              {allowedTypes.includes("all") && (
-                <button
-                  onClick={() => setFilter("all")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "all"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                >
-                  All
-                </button>
-              )}
-              {allowedTypes.includes("images") && (
-                <button
-                  onClick={() => setFilter("images")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "images"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                >
-                  Images
-                </button>
-              )}
-              {allowedTypes.includes("documents") && (
-                <button
-                  onClick={() => setFilter("documents")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "documents"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                >
-                  Documents
-                </button>
-              )}
-              {allowedTypes.includes("videos") && (
-                <button
-                  onClick={() => setFilter("videos")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "videos"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                >
-                  Videos
-                </button>
-              )}
-              {allowedTypes.includes("audio") && (
-                <button
-                  onClick={() => setFilter("audio")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "audio"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                >
-                  Audios
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Media Grid */}
-          <div className="flex-1 overflow-y-auto p-6">
-            {loading ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="text-gray-500">Loading media...</div>
-              </div>
-            ) : filteredFiles.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-                <ImageIcon className="w-16 h-16 mb-4 opacity-20" />
-                <p>No files found</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {filteredFiles.map((file) => {
-                  const isSelected = selectedFiles.has(file.id);
-                  const isImage = file.mimeType.startsWith("image/");
-
-                  return (
-                    <div
-                      key={file.id}
-                      onClick={() => handleFileClick(file)}
-                      className={`relative group cursor-pointer rounded-lg border-2 overflow-hidden transition-all ${isSelected
-                          ? "border-blue-600 ring-2 ring-blue-200"
-                          : "border-gray-200 hover:border-blue-400"
+                    return (
+                      <div
+                        key={file.id}
+                        onClick={() => handleFileClick(file)}
+                        className={`relative group cursor-pointer rounded-lg border-2 overflow-hidden transition-all ${
+                          isSelected
+                            ? "border-blue-600 ring-2 ring-blue-200"
+                            : "border-gray-200 hover:border-blue-400"
                         }`}
-                    >
-                      {/* Checkbox for multiple mode */}
-                      {mode === "multiple" && (
-                        <div className="absolute top-2 right-2 z-10">
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => { }}
-                            className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                        </div>
-                      )}
-
-                      {/* Preview */}
-                      <div className="aspect-square bg-gray-100 flex items-center justify-center">
-                        {isImage ? (
-                          <Image
-                            src={getImageUrl(file.url)}
-                            alt={file.alt || file.originalName}
-                            width={200}
-                            height={200}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <div className="text-gray-400">
-                            {getFileIcon(file.mimeType)}
+                      >
+                        {/* Checkbox for multiple mode */}
+                        {mode === "multiple" && (
+                          <div className="absolute top-2 right-2 z-10">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => {}}
+                              className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
                           </div>
                         )}
-                      </div>
 
-                      {/* Info */}
-                      <div className="p-2 bg-white">
-                        <p className="text-xs font-medium text-gray-900 truncate">
-                          {file.originalName}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {formatFileSize(file.size)}
-                        </p>
-                      </div>
+                        {/* Preview */}
+                        <div className="aspect-square bg-gray-100 flex items-center justify-center">
+                          {isImage ? (
+                            <Image
+                              src={getImageUrl(file.url)}
+                              alt={file.alt || getMediaDisplayName(file)}
+                              width={200}
+                              height={200}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <div className="text-gray-400">
+                              {getFileIcon(file.mimeType)}
+                            </div>
+                          )}
+                        </div>
 
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-blue-600 bg-opacity-0 group-hover:bg-opacity-10 transition-all" />
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                        {/* Info */}
+                        <div className="p-2 bg-white">
+                          <p
+                            className="text-xs font-medium text-gray-900 truncate"
+                            title={getMediaDisplayName(file)}
+                          >
+                            {getMediaDisplayName(file)}
+                          </p>
+                          <p
+                            className="text-xs text-gray-400 truncate"
+                            title={file.url}
+                          >
+                            {formatMimeShort(file.mimeType)}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {formatFileSize(file.size)}
+                          </p>
+                        </div>
+
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-blue-600 bg-opacity-0 group-hover:bg-opacity-10 transition-all" />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Footer */}
           <div className="p-6 border-t bg-gray-50 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              {mode === "multiple" && selectedFiles.size > 0 && (
-                <span>{selectedFiles.size} file selected</span>
+            <div>
+              {!loading && pagination.totalCount > 0 && (
+                <div className="flex flex-col items-center gap-2">
+                  {pagination.totalPages > 1 && (
+                    <Pagination
+                      currentPage={pagination.page}
+                      totalPages={pagination.totalPages}
+                      onPageChange={handlePageChangeInModal}
+                    />
+                  )}
+                </div>
               )}
+              <div className="text-sm text-gray-600">
+                {mode === "multiple" && multiSelectUrls.size > 0 && (
+                  <span>{multiSelectUrls.size} file selected</span>
+                )}
+              </div>
             </div>
             <div className="flex gap-3">
               <button
-                onClick={onClose}
+                type="button"
+                onClick={handleClose}
                 className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
               >
                 Cancel
               </button>
               {mode === "multiple" && (
                 <button
+                  type="button"
                   onClick={handleSelect}
-                  disabled={selectedFiles.size === 0}
+                  disabled={multiSelectUrls.size === 0}
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Select ({selectedFiles.size})
+                  Select ({multiSelectUrls.size})
                 </button>
               )}
             </div>
@@ -412,10 +397,11 @@ export function MediaPickerModal({
             <div className="p-6">
               {/* Drag and Drop Area */}
               <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragOver
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                  dragOver
                     ? "border-blue-400 bg-blue-50"
                     : "border-gray-300 hover:border-gray-400"
-                  }`}
+                }`}
                 onDrop={handleDrop}
                 onDragOver={(e) => {
                   e.preventDefault();
