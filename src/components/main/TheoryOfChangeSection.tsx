@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useCallback, useMemo, useState } from "react";
-import React, { useCallback, useMemo, useState } from "react";
 import Image from "next/image";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
-import { Download } from "lucide-react";
 import { Download } from "lucide-react";
 
 interface TheoryOfChangeSectionProps {
