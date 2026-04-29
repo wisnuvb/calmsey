@@ -16,11 +16,82 @@ function normalizeAllowedOrigins(raw: string | undefined): string[] {
     .filter((o): o is string => !!o);
 }
 
-function isAllowedTarget(request: NextRequest, target: URL): boolean {
+/** True if dotted-quad parses as private / loopback / link-local IPv4 */
+function ipv4LooksPrivate(a: number, b: number): boolean {
+  if (a === 127 || a === 10 || a === 0) return true;
+  if (a === 169 && b === 254) return true;
+  if (a === 172 && b >= 16 && b <= 31) return true;
+  return a === 192 && b === 168;
+}
+
+/**
+ * SSRF heuristic: hostname is disallowed when it clearly points at local/private space.
+ * (Does not mitigate DNS rebinding to private IPs—that needs DNS + resolver checks.)
+ */
+function isDangerousHostname(hostname: string): boolean {
+  const h = hostname.toLowerCase();
+
+  if (h === "localhost") return true;
+  if (h.endsWith(".localhost")) return true;
+
+  const ipv4 = h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4) {
+    const [, aRaw, bRaw, cRaw, dRaw] = ipv4;
+    const digits = [
+      Number(aRaw),
+      Number(bRaw),
+      Number(cRaw),
+      Number(dRaw),
+    ] as const;
+    if (
+      digits.some((n) => !Number.isInteger(n) || n < 0 || n > 255)
+    ) {
+      return true;
+    }
+
+    const [a, b] = digits;
+
+    return ipv4LooksPrivate(a, b);
+  }
+
+  // IPv6
+  if (/:/.test(h)) {
+    const v = h.startsWith("[") && h.endsWith("]") ? h.slice(1, -1) : h;
+    const low = v.toLowerCase();
+
+    return (
+      low === "::1" ||
+      low.startsWith("fe80") ||
+      low.startsWith("fc") ||
+      low.startsWith("fd")
+    );
+  }
+
+  return h.endsWith(".local");
+}
+
+function allowsPublicHttpsUrl(target: URL): boolean {
+  if (target.protocol !== "https:") return false;
+  return !isDangerousHostname(target.hostname);
+}
+
+function isAllowedExternalUrl(request: NextRequest, target: URL): boolean {
   const siteOrigin = request.nextUrl.origin;
   if (target.origin === siteOrigin) return true;
+
   const extra = normalizeAllowedOrigins(process.env.DOWNLOAD_IMAGE_ALLOWED_ORIGINS);
-  return extra.includes(target.origin);
+  if (extra.includes(target.origin)) return true;
+
+  if (allowsPublicHttpsUrl(target)) return true;
+
+  const relaxHttp =
+    process.env.NODE_ENV !== "production" || process.env.VERCEL_ENV === "development";
+
+  if (relaxHttp && target.protocol === "http:" && !isDangerousHostname(target.hostname)) {
+    return true;
+  }
+
+  return false;
 }
 
 export async function GET(request: NextRequest) {
@@ -40,7 +111,7 @@ export async function GET(request: NextRequest) {
       if (!(targetUrl.protocol === "http:" || targetUrl.protocol === "https:")) {
         return new NextResponse("Invalid protocol", { status: 400 });
       }
-      if (!isAllowedTarget(request, targetUrl)) {
+      if (!isAllowedExternalUrl(request, targetUrl)) {
         return new NextResponse("Forbidden", { status: 403 });
       }
     } else {
