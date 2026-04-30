@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown, Send } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
+import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface GetInvolvedSectionProps {
   backgroundImage?: string;
@@ -16,15 +17,78 @@ interface GetInvolvedSectionProps {
   backgroundColor?: string;
 }
 
+/** Renders segments wrapped in ** as <strong>; rest as plain spans. */
+function bannerTextWithBold(text: string) {
+  const parts = text.split(/\*\*(.*?)\*\*/g);
+
+  return parts.map((part, index) =>
+    index % 2 === 1 ? (
+      <strong key={index} className="font-semibold text-white">
+        {part}
+      </strong>
+    ) : (
+      <React.Fragment key={index}>{part}</React.Fragment>
+    ),
+  );
+}
+
 export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
-  backgroundImage = "/assets/demo/get-involved.png",
-  backgroundImageAlt = "Workshop meeting with community members",
-  title = "Get connected",
-  subtitle = "",
-  overlayTitle = "Support tenure and surrounding human rights",
-  overlayDescription = "Join Turning Tides in supporting Indigenous Peoples, small-scale fishers, and coastal communities to secure and control their territories—work that is inseparable from environmental and social justice",
-  backgroundColor = "bg-white",
+  backgroundImage: propBackgroundImage,
+  backgroundImageAlt: propBackgroundImageAlt,
+  title: propTitle,
+  subtitle: propSubtitle,
+  overlayTitle: propOverlayTitle,
+  overlayDescription: propOverlayDescription,
+  backgroundColor: propBackgroundColor,
 }) => {
+  const { getValue } = usePageContentHelpers();
+
+  const backgroundImage = getValue(
+    "hero.backgroundImage",
+    propBackgroundImage,
+    "/assets/demo/get-involved.png",
+  );
+  const backgroundImageAlt = getValue(
+    "hero.backgroundImageAlt",
+    propBackgroundImageAlt,
+    "Workshop meeting with community members",
+  );
+  const title = getValue("hero.title", propTitle, "Get connected");
+  const subtitle = getValue("hero.subtitle", propSubtitle, "");
+
+  const overlayTitle = getValue(
+    "hero.overlayTitle",
+    propOverlayTitle,
+    "Support tenure and surrounding human rights",
+  );
+  const overlayDescription = getValue(
+    "hero.overlayDescription",
+    propOverlayDescription,
+    `Join Turning Tides in supporting Indigenous Peoples, small-scale fishers, and coastal communities to secure and control their territories—work that is inseparable from environmental and social justice`,
+  );
+
+  const backgroundColor =
+    propBackgroundColor && propBackgroundColor.trim() !== ""
+      ? propBackgroundColor
+      : "bg-white";
+
+  const submitButtonText = getValue(
+    "cta.buttonText",
+    undefined,
+    "Send Message",
+  );
+
+  const bannerLeftParagraph = getValue(
+    "cta.bannerLeftParagraph",
+    undefined,
+    "Supporting rights and tenure of local communities, small scale fishers, fish workers, and Indigenous Peoples.",
+  );
+  const bannerRightParagraph = getValue(
+    "cta.bannerRightParagraph",
+    undefined,
+    `If you are a group, organization, or collective that represents or directly serves local communities, small-scale fishers or fish workers, or Indigenous Peoples, **reach out to us and share your work and aspirations here.**`,
+  );
+
   const searchParams = useSearchParams();
   const becomeParam = searchParams.get("become");
 
@@ -37,7 +101,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
     message: "",
   });
 
-  // Sync partnershipType when URL has ?become=funder (e.g. after client-side nav)
   useEffect(() => {
     if (becomeParam === "funder") {
       setFormData((prev) => ({ ...prev, partnershipType: "Funding Partner" }));
@@ -85,7 +148,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
       }
 
       setSuccess(true);
-      // Reset form
       setFormData({
         fullName: "",
         email: "",
@@ -110,7 +172,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
       <h1 className="sr-only">Get Involved</h1>
       <div className="">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[600px]">
-          {/* Left Column - Background Image with Overlay */}
           <div className="relative">
             <div className="absolute inset-0">
               <Image
@@ -123,7 +184,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
               <div className="absolute inset-0 bg-black bg-opacity-50"></div>
             </div>
 
-            {/* Overlay Content */}
             <div className="relative z-10 p-8 md:p-12 flex flex-col justify-center h-full">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight font-nunito">
                 {overlayTitle}
@@ -132,7 +192,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
             </div>
           </div>
 
-          {/* Right Column - Form */}
           <div className="bg-white p-8 md:p-16 flex flex-col justify-center">
             <div className="max-w-md mx-auto w-full">
               <div className="mb-10">
@@ -147,7 +206,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Full Name and Email Row */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="fullName" className="sr-only">
@@ -183,7 +241,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   </div>
                 </div>
 
-                {/* Organization */}
                 <div className="relative">
                   <label htmlFor="organization" className="sr-only">
                     Company / Institute / Organization / Individual
@@ -208,7 +265,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
 
-                {/* Country */}
                 <div className="relative">
                   <label htmlFor="country" className="sr-only">
                     Country
@@ -232,7 +288,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
 
-                {/* Partnership Type */}
                 <div className="relative">
                   <label htmlFor="partnershipType" className="sr-only">
                     Partnership type
@@ -255,7 +310,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
 
-                {/* Message */}
                 <div>
                   <label htmlFor="message" className="sr-only">
                     Message
@@ -289,7 +343,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   </div>
                 )}
 
-                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -303,7 +356,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   ) : (
                     <>
                       <Send className="w-5 h-5" />
-                      Send Message
+                      {submitButtonText}
                     </>
                   )}
                 </button>
@@ -313,17 +366,9 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
         </div>
       </div>
       <div className="bg-[#3C62ED] py-[100px] px-[120px] flex items-center justify-between gap-[70px]">
-        <p className="text-white p max-w-[433px]">
-          Supporting rights and tenure of local communities, small scale
-          fishers, fish workers, and Indigenous Peoples.
-        </p>
+        <p className="text-white p max-w-[433px]">{bannerLeftParagraph}</p>
         <p className="text-white p max-w-[697px]">
-          If you are a group, organization, or collective that represents or
-          directly serves local communities, small-scale fishers or fish
-          workers, or Indigenous Peoples,{" "}
-          <span className="text-white">
-            reach out to us and share your work and aspirations here.
-          </span>
+          {bannerTextWithBold(bannerRightParagraph)}
         </p>
       </div>
     </section>

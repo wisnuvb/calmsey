@@ -1,4 +1,6 @@
 import { GetInvolvedSection } from "@/components/main";
+import { PageContentProvider } from "@/contexts/PageContentContext";
+import { getPageContentServer } from "@/lib/page-content-server";
 import React from "react";
 import { Metadata } from "next";
 
@@ -30,11 +32,18 @@ export async function generateMetadata({
 }
 
 const GetInvolvedPage = async ({ params }: PageProps) => {
-  await params; // Consume params to satisfy build check if needed
+  const { lang } = await params;
+  const language = lang || "en";
+  const content = await getPageContentServer("GET_INVOLVED", language);
+
   return (
-    <>
+    <PageContentProvider
+      content={content}
+      pageType="GET_INVOLVED"
+      language={language}
+    >
       <GetInvolvedSection />
-    </>
+    </PageContentProvider>
   );
 };
 

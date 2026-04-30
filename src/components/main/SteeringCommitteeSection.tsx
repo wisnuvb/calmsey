@@ -124,7 +124,7 @@ export const SteeringCommitteeSection: React.FC<
           >
             {title}
           </H2>
-          <div className="text-[#06072680] text-center max-w-4xl mx-auto space-y-4">
+          <div className="text-[#3F3F46] text-center max-w-4xl mx-auto space-y-4">
             <P style="p1reg" className="p">
               {description}
             </P>

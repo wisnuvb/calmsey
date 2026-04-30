@@ -221,6 +221,14 @@ export function Navbar() {
       }
     }
   };
+
+  const isDark =
+    !hasDynamicBackground ||
+    (isScrolled && !isHomePage) ||
+    !currentBackgroundAnalysis?.isLight;
+
+  console.log({ isScrolled });
+
   return (
     <nav
       className={cn(
@@ -317,9 +325,7 @@ export function Navbar() {
               "lg:hidden p-2 rounded-md transition-colors duration-300",
               isHomePage
                 ? "text-[#010107]"
-                : !hasDynamicBackground ||
-                    (isScrolled && !isHomePage) ||
-                    !currentBackgroundAnalysis?.isLight
+                : isDark
                   ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
                   : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-100",
             )}
@@ -337,11 +343,9 @@ export function Navbar() {
             "lg:hidden border-t transition-all duration-300",
             isHomePage
               ? "bg-white !text-[#010107]"
-              : !hasDynamicBackground ||
-                  (isScrolled && !isHomePage) ||
-                  !currentBackgroundAnalysis?.isLight
+              : isScrolled
                 ? "bg-[#3C62ED]/95 backdrop-blur-md border-blue-500/30"
-                : "bg-white border-gray-200",
+                : "bg-white border-gray-200 text-gray-800",
           )}
         >
           <div className="px-4 pt-2 pb-4 space-y-1">
@@ -353,9 +357,7 @@ export function Navbar() {
                   "block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300",
                   isHomePage
                     ? "text-[#010107]"
-                    : !hasDynamicBackground ||
-                        (isScrolled && !isHomePage) ||
-                        !currentBackgroundAnalysis?.isLight
+                    : isScrolled
                       ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
                       : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-50",
                 )}
@@ -368,12 +370,7 @@ export function Navbar() {
               <LanguageSwitcher
                 variant="drawer"
                 currentLanguage={language}
-                isDark={
-                  !isHomePage &&
-                  (!hasDynamicBackground ||
-                    (isScrolled && !isHomePage) ||
-                    !currentBackgroundAnalysis?.isLight)
-                }
+                isDark={!isHomePage && isScrolled}
               />
               <Link
                 href={`/${language}/get-involved`}
@@ -381,9 +378,7 @@ export function Navbar() {
                   "block w-full text-center px-6 py-2 border-2 rounded transition-all duration-300 text-sm font-medium",
                   isHomePage
                     ? "border-[#3C62ED] text-[#3C62ED]"
-                    : !hasDynamicBackground ||
-                        (isScrolled && !isHomePage) ||
-                        !currentBackgroundAnalysis?.isLight
+                    : isScrolled
                       ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
                       : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white",
                 )}
