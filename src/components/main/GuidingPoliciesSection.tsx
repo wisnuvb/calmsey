@@ -142,7 +142,7 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
   };
 
   return (
-    <section className={`w-full ${backgroundColor} py-16 md:py-24`} id="guidingpolicies">
+    <section className={`w-full ${backgroundColor} pb-16 md:pb-24`} id="guidingpolicies">
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-12">

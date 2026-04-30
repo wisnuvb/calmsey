@@ -61,7 +61,7 @@ const GovernancePage = async ({ params }: GovernancePageProps) => {
       />
       <GovernanceMeaningSection />
       <SteeringCommitteeSection />
-      <FundingAcceptancePolicySection />
+      {/* <FundingAcceptancePolicySection /> */}
       <GuidingPoliciesSection />
       <GovernancePolicyContactSection />
       {/* <OurValuesPrinciplesSection /> */}

@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GetInvolvedWebsiteSubmission",
+  "description": "Body JSON untuk trigger HTTP Power Automate — data dari form Get Involved di situs (POST /api/get-involved → webhook). Dipetakan ke pertanyaan Microsoft Form: Full Name, Email, Type of Entity, Country, Type of Partner, Comments.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fullName",
+    "email",
+    "organization",
+    "country",
+    "partnershipType",
+    "message"
+  ],
+  "properties": {
+    "fullName": {
+      "type": "string",
+      "title": "Full Name",
+      "description": "Microsoft Form Q1 — Full Name",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "email": {
+      "type": "string",
+      "title": "Email",
+      "description": "Microsoft Form Q2 — Email",
+      "format": "email",
+      "minLength": 1,
+      "maxLength": 320
+    },
+    "organization": {
+      "type": "string",
+      "title": "Type of Entity",
+      "description": "Microsoft Form Q3 — Type of Entity (nilai dari <select> situs; map ke label Company/Institute/Organization/Individual di langkah flow jika perlu)",
+      "enum": ["company", "institute", "organization", "individual"]
+    },
+    "country": {
+      "type": "string",
+      "title": "Country",
+      "description": "Microsoft Form Q4 — Country (nilai internal situs; map ke teks tampilan atau bebas di flow)",
+      "enum": ["indonesia", "philippines", "malaysia", "thailand", "other"]
+    },
+    "partnershipType": {
+      "type": "string",
+      "title": "Type of Partner",
+      "description": "Microsoft Form Q5 — Type of Partner",
+      "enum": [
+        "Funding Partner",
+        "Technical Partner",
+        "Community Partner",
+        "Research Partner"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "title": "Comments",
+      "description": "Microsoft Form Q6 — Please add your Comments if any",
+      "minLength": 1,
+      "maxLength": 5000
+    }
+  }
+}
