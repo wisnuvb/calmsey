@@ -98,7 +98,11 @@ export function TinyMCEEditor({
           "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
 
         // URL configurations
-        document_base_url: "/tinymce",
+        // Keep internal links as-is (e.g. /our-approach#theory-of-change)
+        // and prevent TinyMCE from rebasing them to /tinymce/...
+        document_base_url: "/",
+        convert_urls: false,
+        relative_urls: false,
         skin_url: "/tinymce/skins/ui/oxide",
         content_css: "/tinymce/skins/content/default/content.css",
         theme_url: "/tinymce/themes/silver/theme.min.js",
@@ -137,7 +141,8 @@ export function TinyMCEEditor({
         image_title: true,
 
         // Link options
-        link_assume_external_targets: true,
+        // Do not force non-protocol links to be treated as external URLs.
+        link_assume_external_targets: false,
         link_title: false,
         target_list: [
           { title: "Same window", value: "" },

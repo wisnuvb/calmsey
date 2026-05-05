@@ -51,22 +51,38 @@ We support ongoing efforts to build accountability, respect and awareness amongs
     propImageAlt,
     "Theory of Change diagram showing how change happens",
   );
-
-  const resolvedImageSrc = useMemo(
-    () => getImageUrl(imageSrc),
-    [imageSrc],
+  const downloadImageUrl = getValue(
+    "theoryOfChange.downloadImageUrl",
+    "",
+    "/assets/our-view.webp",
   );
 
+  const normalizedDownloadImageUrl = useMemo(() => {
+    const raw = downloadImageUrl.trim();
+    if (raw === "") return "/assets/our-view.webp";
+    if (
+      !/^https?:\/\//i.test(raw) &&
+      raw.toLowerCase().includes("digitaloceanspaces.com")
+    ) {
+      return `https://${raw.replace(/^\/+/, "")}`;
+    }
+    return raw;
+  }, [downloadImageUrl]);
+
+  const resolvedImageSrc = useMemo(() => getImageUrl(imageSrc), [imageSrc]);
+
   const [downloadPending, setDownloadPending] = useState(false);
+  const [downloadError, setDownloadError] = useState("");
 
   const handleDownloadImage = useCallback(async () => {
     setDownloadPending(true);
+    setDownloadError("");
     try {
       const filename = (() => {
         try {
-          const pathname = resolvedImageSrc.startsWith("http")
-            ? new URL(resolvedImageSrc).pathname
-            : resolvedImageSrc;
+          const pathname = normalizedDownloadImageUrl.startsWith("http")
+            ? new URL(normalizedDownloadImageUrl).pathname
+            : normalizedDownloadImageUrl;
           const last = pathname.split("/").filter(Boolean).pop();
           return last?.includes(".") ? last : "theory-of-change.webp";
         } catch {
@@ -75,17 +91,17 @@ We support ongoing efforts to build accountability, respect and awareness amongs
       })();
 
       const absoluteUrl =
-        resolvedImageSrc.startsWith("http://") ||
-        resolvedImageSrc.startsWith("https://")
-          ? resolvedImageSrc
-          : `${window.location.origin}${resolvedImageSrc.startsWith("/") ? "" : "/"}${resolvedImageSrc}`;
+        normalizedDownloadImageUrl.startsWith("http://") ||
+        normalizedDownloadImageUrl.startsWith("https://")
+          ? normalizedDownloadImageUrl
+          : `${window.location.origin}${normalizedDownloadImageUrl.startsWith("/") ? "" : "/"}${normalizedDownloadImageUrl}`;
 
       const proxySrc =
-        resolvedImageSrc.startsWith("http://") ||
-        resolvedImageSrc.startsWith("https://") ||
-        resolvedImageSrc.startsWith("/")
-          ? resolvedImageSrc
-          : `/${resolvedImageSrc}`;
+        normalizedDownloadImageUrl.startsWith("http://") ||
+        normalizedDownloadImageUrl.startsWith("https://") ||
+        normalizedDownloadImageUrl.startsWith("/")
+          ? normalizedDownloadImageUrl
+          : `/${normalizedDownloadImageUrl}`;
 
       const downloadBlob = (blob: Blob, downloadName: string) => {
         const objectUrl = URL.createObjectURL(blob);
@@ -103,36 +119,42 @@ We support ongoing efforts to build accountability, respect and awareness amongs
         const proxyUrl = `/api/download-image?src=${encodeURIComponent(proxySrc)}`;
         const proxyRes = await fetch(proxyUrl);
         if (!proxyRes.ok) throw new Error("Proxy fetch failed");
+        const contentType = proxyRes.headers.get("content-type") || "";
+        if (!contentType.toLowerCase().startsWith("image/")) {
+          throw new Error("Proxy response is not an image");
+        }
         const blob = await proxyRes.blob();
         downloadBlob(blob, filename);
-      };
-
-      const tryViaAnchorProxy = () => {
-        const a = document.createElement("a");
-        a.href = `/api/download-image?src=${encodeURIComponent(proxySrc)}`;
-        a.download = filename;
-        a.rel = "noopener";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
       };
 
       try {
         const res = await fetch(absoluteUrl);
         if (!res.ok) throw new Error("Failed to fetch image");
+        const contentType = res.headers.get("content-type") || "";
+        if (!contentType.toLowerCase().startsWith("image/")) {
+          throw new Error("Direct response is not an image");
+        }
         const blob = await res.blob();
         downloadBlob(blob, filename);
       } catch {
         try {
           await tryViaProxyFetch();
         } catch {
-          tryViaAnchorProxy();
+          throw new Error(
+            "Download failed. Make sure the Download Image URL points directly to a public image file.",
+          );
         }
       }
+    } catch (error) {
+      setDownloadError(
+        error instanceof Error
+          ? error.message
+          : "Download failed. Please use a different image URL.",
+      );
     } finally {
       setDownloadPending(false);
     }
-  }, [resolvedImageSrc]);
+  }, [normalizedDownloadImageUrl]);
 
   const [isExpanded] = useState(true);
 
@@ -167,16 +189,25 @@ We support ongoing efforts to build accountability, respect and awareness amongs
         </div>
 
         <div className="flex justify-center mb-12">
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium font-work-sans disabled:opacity-60 disabled:pointer-events-none"
-            onClick={handleDownloadImage}
-            disabled={downloadPending}
-            aria-busy={downloadPending}
-          >
-            <Download className="w-4 h-4 shrink-0" aria-hidden />
-            {downloadPending ? "Downloading…" : "Download Here"}
-          </button>
+          <div className="w-full max-w-2xl">
+            <div className="flex justify-center">
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium font-work-sans disabled:opacity-60 disabled:pointer-events-none"
+                onClick={handleDownloadImage}
+                disabled={downloadPending}
+                aria-busy={downloadPending}
+              >
+                <Download className="w-4 h-4 shrink-0" aria-hidden />
+                {downloadPending ? "Downloading..." : "Download Here"}
+              </button>
+            </div>
+            {downloadError && (
+              <p className="mt-3 text-center text-sm text-red-600">
+                {downloadError}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Description Text */}

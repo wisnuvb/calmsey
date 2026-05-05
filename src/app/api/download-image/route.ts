@@ -136,6 +136,9 @@ export async function GET(request: NextRequest) {
 
     const contentType =
       upstream.headers.get("content-type") ?? "application/octet-stream";
+    if (!contentType.toLowerCase().startsWith("image/")) {
+      return new NextResponse("Upstream is not an image", { status: 415 });
+    }
     const pathname = targetUrl.pathname;
     const basename = pathname.split("/").filter(Boolean).pop() ?? "download";
     const safeName = basename.replace(/[^a-zA-Z0-9._-]/g, "_") || "download";

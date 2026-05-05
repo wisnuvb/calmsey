@@ -6,6 +6,7 @@ import {
   PartnerStoriesSection,
   StrategyDownloadSection,
   GrantmakingSection,
+  HeroSection,
 } from "@/components/main";
 import { getPageContentServer } from "@/lib/page-content-server";
 import { PageContentProviderWrapper } from "@/components/providers/PageContentProviderWrapper";
@@ -46,18 +47,18 @@ const HomePage = async ({ params }: HomePageProps) => {
       language={language}
     >
       {/* Note: gambar disini */}
-      <VideoHeroSection />
-      {/* <HeroSection
+      {/* <VideoHeroSection /> */}
+      <HeroSection
         variant="video"
         posterImage="/assets/demo/bg-video.png"
         videoUrl="/assets/video/8248432-hd_1280_720_30fps.mp4"
-      /> */}
-      <WhyTurningTidesSection />
+      />
+      {/* <WhyTurningTidesSection /> */}
       {/* <WhereWeWorkSection /> */}
       {/* <OngoingProjectsSection /> */}
       {/* <LatestArticlesSection /> */}
       {/* <OurWorkSection /> */}
-      <GrantmakingSection />
+      {/* <GrantmakingSection /> */}
       <VideoWeAreSection />
       <PartnerStoriesSection
         tag="COMMUNITY ECHOES"

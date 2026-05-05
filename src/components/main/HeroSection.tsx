@@ -164,19 +164,19 @@ export function HeroSection({
     return (
       <section className="relative bg-white pt-36" data-section={dataSection}>
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-[748px] w-full mx-auto mb-12 lg:mb-16">
+          <div className="text-center max-w-4xl w-full mx-auto mb-12 lg:mb-16">
             <H1
               style="h1bold"
               className="text-[#010107] text-[32px] sm:text-[48px] leading-[120%] tracking-[0%] mb-6 mx-auto"
             >
               {title}
             </H1>
-            <P style="p1reg" className="text-[#060726CC] max-w-4xl mx-auto">
+            <P style="p1reg" className="text-[#060726CC] max-w-4xl mx-auto p">
               {subtitle}
             </P>
           </div>
 
-          <div className="relative w-full">
+          <div className="relative w-full hidden">
             <div className="relative aspect-[10/4] rounded-sm overflow-hidden shadow-2xl">
               {!isPlaying && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 hover:bg-opacity-30 transition-all pointer-events-none z-10">

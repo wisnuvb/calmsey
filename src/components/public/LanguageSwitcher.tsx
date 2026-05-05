@@ -90,7 +90,8 @@ export function LanguageSwitcher({
   return (
     <div
       ref={rootRef}
-      className={cn("relative group", variant === "drawer" && "w-full")}
+      className={cn("relative group notranslate", variant === "drawer" && "w-full")}
+      translate="no"
     >
       <button
         type="button"

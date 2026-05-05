@@ -76,6 +76,7 @@ export function Navbar() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const { language } = useLanguage();
+  const isMachineTranslatedLanguage = language !== "en" && language !== "id";
 
   const isDetailOurFundPage = pathname.includes("/our-fund/");
 
@@ -227,7 +228,17 @@ export function Navbar() {
     (isScrolled && !isHomePage) ||
     !currentBackgroundAnalysis?.isLight;
 
-  console.log({ isScrolled });
+  const handleSafeNavigation = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    // Google Translate mutates DOM nodes. For translated languages
+    // (e.g. fr), force full-page navigation to avoid React hydration/reconcile crashes.
+    if (isMachineTranslatedLanguage) {
+      e.preventDefault();
+      window.location.href = href;
+    }
+  };
 
   return (
     <nav
@@ -243,7 +254,11 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link
+            href="/"
+            className="flex items-center"
+            onClick={(e) => handleSafeNavigation(e, "/")}
+          >
             <div className="w-[100px] h-[65px] relative">
               <Image
                 src={getLogoSrc()}
@@ -260,6 +275,9 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={`/${language}${link.href}`}
+                onClick={(e) =>
+                  handleSafeNavigation(e, `/${language}${link.href}`)
+                }
                 aria-label={`Go to ${link.label} page`}
                 className={cn(
                   "transition-colors duration-300 text-base font-normal",
@@ -303,6 +321,9 @@ export function Navbar() {
             {/* Get Involved Button */}
             <Link
               href={`/${language}/get-involved`}
+              onClick={(e) =>
+                handleSafeNavigation(e, `/${language}/get-involved`)
+              }
               className={cn(
                 "px-6 py-2 border-2 rounded transition-all duration-300 text-sm font-medium",
                 isHomePage
@@ -361,7 +382,10 @@ export function Navbar() {
                       ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
                       : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-50",
                 )}
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => {
+                  setIsOpen(false);
+                  handleSafeNavigation(e, `/${language}${link.href}`);
+                }}
               >
                 {link.label}
               </Link>
@@ -382,7 +406,10 @@ export function Navbar() {
                       ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
                       : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white",
                 )}
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => {
+                  setIsOpen(false);
+                  handleSafeNavigation(e, `/${language}/get-involved`);
+                }}
               >
                 Get Involved
               </Link>

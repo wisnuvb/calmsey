@@ -317,6 +317,15 @@ export const OUR_APPROACH_SCHEMA: PageContentSchema = {
       helpText: "Alternative text for the image (accessibility)",
     },
     {
+      key: "theoryOfChange.downloadImageUrl",
+      label: "Download Image URL",
+      type: "image",
+      section: "Theory of Change",
+      defaultValue: "/assets/our-view.webp",
+      helpText:
+        "Image URL used specifically by the Download Here button. This is independent from Theory of Change Diagram.",
+    },
+    {
       key: "theoryOfChange.showMoreText",
       label: "Show More Button Text",
       type: "text",
