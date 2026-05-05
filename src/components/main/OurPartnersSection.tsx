@@ -23,106 +23,7 @@ interface OurPartnersSectionProps {
   backgroundColor?: string;
 }
 
-const defaultPartners: Partner[] = [
-  {
-    id: "ledars",
-    name: "LEDARS",
-    logo: "/assets/partners/ledars-logo.png",
-    logoAlt: "LEDARS Logo",
-    website: "https://ledars.org",
-  },
-  {
-    id: "university-waterloo",
-    name: "University of Waterloo",
-    logo: "/assets/partners/university-waterloo-logo.png",
-    logoAlt: "University of Waterloo Logo",
-    website: "https://uwaterloo.ca",
-  },
-  {
-    id: "southern-fisherfolk",
-    name: "Southern Fisherfolk Women Association",
-    logo: "/assets/partners/southern-fisherfolk-logo.png",
-    logoAlt: "Southern Fisherfolk Women Association Logo",
-    website: "https://southernfisherfolk.org",
-  },
-  {
-    id: "solidar",
-    name: "SOLIDAR",
-    logo: "/assets/partners/solidar-logo.png",
-    logoAlt: "SOLIDAR Logo",
-    website: "https://solidar.org",
-  },
-  {
-    id: "save-andaman",
-    name: "Save Andaman Network",
-    logo: "/assets/partners/save-andaman-logo.png",
-    logoAlt: "Save Andaman Network Logo",
-    website: "https://saveandaman.org",
-  },
-  {
-    id: "iccas",
-    name: "ICCAs",
-    logo: "/assets/partners/iccas-logo.png",
-    logoAlt: "ICCAs Logo",
-    website: "https://iccas.org",
-  },
-  {
-    id: "ulab",
-    name: "ULAB",
-    logo: "/assets/partners/ulab-logo.png",
-    logoAlt: "University of Liberal Arts Bangladesh Logo",
-    website: "https://ulab.edu.bd",
-  },
-  {
-    id: "jnus",
-    name: "JNUS",
-    logo: "/assets/partners/jnus-logo.png",
-    logoAlt: "Jaringan Nelayan Tradisional Indonesia Logo",
-    website: "https://jnus.org",
-  },
-  {
-    id: "mercado-del-mar",
-    name: "Mercado del Mar",
-    logo: "/assets/partners/mercado-del-mar-logo.png",
-    logoAlt: "Mercado del Mar Logo",
-    website: "https://mercadodelmar.org",
-  },
-  {
-    id: "larecoturh",
-    name: "LARECOTURH",
-    logo: "/assets/partners/larecoturh-logo.png",
-    logoAlt: "LARECOTURH Logo",
-    website: "https://larecoturh.org",
-  },
-  {
-    id: "caopa",
-    name: "CAOPA",
-    logo: "/assets/partners/caopa-logo.png",
-    logoAlt: "CAOPA Logo",
-    website: "https://caopa.org",
-  },
-  {
-    id: "brwa",
-    name: "BRWA",
-    logo: "/assets/partners/brwa-logo.png",
-    logoAlt: "BRWA Logo",
-    website: "https://brwa.org",
-  },
-  {
-    id: "ykl-konservasi",
-    name: "YKL Konservasi Laut Indonesia",
-    logo: "/assets/partners/ykl-konservasi-logo.png",
-    logoAlt: "YKL Konservasi Laut Indonesia Logo",
-    website: "https://ykl.org",
-  },
-  {
-    id: "additional-partner",
-    name: "Additional Partner",
-    logo: "/assets/partners/additional-partner-logo.png",
-    logoAlt: "Additional Partner Logo",
-    website: "https://additionalpartner.org",
-  },
-];
+const defaultPartners: Partner[] = [];
 
 export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
   title: propTitle,
@@ -169,6 +70,13 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
     contextPartners.length > 0
       ? contextPartners
       : propPartners || defaultPartners;
+  const validPartners = partners.filter(
+    (partner) => typeof partner.logo === "string" && partner.logo.trim() !== ""
+  );
+
+  if (validPartners.length === 0) {
+    return null;
+  }
   return (
     <section
       className={`w-full ${backgroundColor || "bg-white"} pb-16 md:pb-24`}
@@ -184,7 +92,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
 
         {/* Partners: flex so baris terakhir tetap rata tengah jika item tidak penuh */}
         <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 mb-12">
-          {partners.map((partner) => (
+          {validPartners.map((partner) => (
             <div
               key={partner.id}
               className="flex h-auto w-[140px] shrink-0 items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 sm:w-[152px] md:w-[148px]"
