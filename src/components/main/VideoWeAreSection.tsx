@@ -64,7 +64,7 @@ export function VideoWeAreSection({
         className
       )}
     >
-      <div className="relative aspect-[21/9] min-h-[280px] w-full overflow-hidden rounded-2xl bg-slate-900 shadow-xl md:min-h-[360px]">
+      <div className="relative aspect-[16/9] min-h-[280px] w-full overflow-hidden rounded-2xl bg-slate-900 shadow-xl md:min-h-[360px]">
         {showPosterUi && (
           <>
             {posterImage ? (

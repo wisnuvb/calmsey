@@ -7,6 +7,15 @@ import { H1, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
+/** Hyphen that must not introduce a line break (keeps e.g. Re-Granting on one line). */
+const NB_HYPHEN = "\u2011";
+
+function keepReGrantingHyphenIntact(text: string): string {
+  return text.replace(/Re-Granting/gi, (segment) =>
+    segment.replace(/-/g, NB_HYPHEN),
+  );
+}
+
 interface HeroSectionProps {
   variant?: "video" | "simple" | "search" | "overlay-bottom";
   title?: string;
@@ -66,7 +75,9 @@ export function HeroSection({
       | "search"
       | "overlay-bottom") || propVariant;
 
-  const title = getValue("hero.title", propTitle, "");
+  const title = keepReGrantingHyphenIntact(
+    getValue("hero.title", propTitle, ""),
+  );
   const subtitle = getValue("hero.subtitle", propSubtitle, "");
 
   const videoUrlRaw = getValue("hero.videoUrl", propVideoUrl, "");
