@@ -39,7 +39,7 @@ const StoriesPage = async ({ params }: StoriesPageProps) => {
   const { lang } = await params;
   const language = lang || "en";
 
-  const content = await getPageContentServer("STORIES", language);
+  const content = await getPageContentServer("STORIES");
 
   // Get configuration from content
   const maxStories = parseInt(content["allStories.maxStories"] || "12");

@@ -37,7 +37,7 @@ const HomePage = async ({ params }: HomePageProps) => {
   const { lang } = await params;
   const language = lang || "en";
 
-  const content = await getPageContentServer("HOME", language);
+  const content = await getPageContentServer("HOME");
 
   return (
     <PageContentProviderWrapper

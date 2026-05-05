@@ -43,7 +43,7 @@ const GovernancePage = async ({ params }: GovernancePageProps) => {
   const { lang } = await params;
   const language = lang || "en";
 
-  const content = await getPageContentServer("GOVERNANCE", language);
+  const content = await getPageContentServer("GOVERNANCE");
 
   return (
     <PageContentProvider

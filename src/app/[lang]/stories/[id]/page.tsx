@@ -84,9 +84,7 @@ const DetailStoryPage = async ({ params }: DetailStoryPageProps) => {
   const shareUrl = await getShareUrl(lang, id);
 
   // Use STORIES page type or pass empty content if not needed
-  const content = await getPageContentServer("STORIES", language).catch(
-    () => ({}),
-  );
+  const content = await getPageContentServer("STORIES").catch(() => ({}));
 
   // Fetch article by slug
   const article = await prisma.article.findUnique({

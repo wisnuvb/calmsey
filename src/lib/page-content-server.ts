@@ -4,24 +4,42 @@ import { cache } from "react";
 
 export type PageContentMap = Record<string, string>;
 
+type TranslationWithContent = {
+  languageId: string;
+  pageContent: { key: string; value: string }[];
+};
+
 /**
- * Server-side function to fetch page content
- * Uses React cache() for automatic deduplication
+ * Pilih satu PageTranslation untuk konten CMS: tidak memakai locale dari URL.
+ * Urutan: konten non-kosong dengan languageId "en", lalu translasi lain yang punya pageContent, lalu en atau baris pertama.
+ */
+function pickPageTranslation(
+  translations: TranslationWithContent[]
+): TranslationWithContent | null {
+  if (translations.length === 0) return null;
+
+  const en = translations.find((t) => t.languageId === "en");
+  if (en && en.pageContent.length > 0) return en;
+
+  const withContent = translations.find((t) => t.pageContent.length > 0);
+  if (withContent) return withContent;
+
+  return en ?? translations[0];
+}
+
+/**
+ * Server-side fetch konten halaman (satu sumber kanonik per pageType, bukan per bahasa URL).
+ * Menggunakan React cache() untuk deduplikasi dalam satu request.
  */
 export const getPageContentServer = cache(
-  async (
-    pageType: string,
-    language: string = "en"
-  ): Promise<PageContentMap> => {
+  async (pageType: string): Promise<PageContentMap> => {
     try {
-      // Find page by pageType
       const page = await prisma.page.findFirst({
         where: {
           pageType: pageType as PageType,
         },
         include: {
           translations: {
-            where: { languageId: language },
             include: {
               pageContent: true,
             },
@@ -29,16 +47,18 @@ export const getPageContentServer = cache(
         },
       });
 
-      if (!page || !page.translations[0]) {
-        console.warn(
-          `No page content found for ${pageType} in language ${language}`
-        );
+      if (!page) {
+        console.warn(`No page found for ${pageType}`);
         return {};
       }
 
-      const translation = page.translations[0];
+      const translation = pickPageTranslation(page.translations);
 
-      // Convert PageContent array to Map
+      if (!translation) {
+        console.warn(`No page content translation for ${pageType}`);
+        return {};
+      }
+
       const contentMap: PageContentMap = {};
       translation.pageContent.forEach((item) => {
         contentMap[item.key] = item.value;
@@ -53,22 +73,23 @@ export const getPageContentServer = cache(
 );
 
 /**
- * Prefetch multiple page types at once
- * Useful for pages that need multiple page types
+ * Prefetch beberapa page type sekaligus
  */
 export async function prefetchPageContents(
-  pageTypes: string[],
-  language: string = "en"
+  pageTypes: string[]
 ): Promise<Record<string, PageContentMap>> {
   const results = await Promise.all(
     pageTypes.map(async (pageType) => ({
       pageType,
-      content: await getPageContentServer(pageType, language),
+      content: await getPageContentServer(pageType),
     }))
   );
 
-  return results.reduce((acc, { pageType, content }) => {
-    acc[pageType] = content;
-    return acc;
-  }, {} as Record<string, PageContentMap>);
+  return results.reduce(
+    (acc, { pageType, content }) => {
+      acc[pageType] = content;
+      return acc;
+    },
+    {} as Record<string, PageContentMap>
+  );
 }

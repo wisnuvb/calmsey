@@ -40,7 +40,7 @@ const OurWorkPage = async ({ params }: OurWorkPageProps) => {
   const { lang } = await params;
   const language = lang || "en";
 
-  const content = await getPageContentServer("OUR_WORK", language);
+  const content = await getPageContentServer("OUR_WORK");
 
   return (
     <PageContentProvider
