@@ -79,7 +79,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
   }
   return (
     <section
-      className={`w-full ${backgroundColor || "bg-white"} pb-16 md:pb-24`}
+      className={`w-full ${backgroundColor || "bg-white"} pb-16 md:pb-8`}
     >
       <div className="container mx-auto px-6 md:px-12">
         {/* Header Section */}
@@ -91,7 +91,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
         </div>
 
         {/* Partners: flex so baris terakhir tetap rata tengah jika item tidak penuh */}
-        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 mb-12">
+        {/* <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 mb-12">
           {validPartners.map((partner) => (
             <div
               key={partner.id}
@@ -114,7 +114,7 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
               </a>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* Call to Action */}
         {/* <div className="text-center">

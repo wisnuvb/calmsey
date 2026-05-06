@@ -1,5 +1,6 @@
 import {
   FeedbackCalloutSection,
+  GrantmakingSection,
   HeroSection,
   OurFourFundsSection,
   OurPartnersSection,
@@ -53,7 +54,7 @@ const OurFundPage = async ({ params }: OurFundPageProps) => {
         title="Our Funds"
         subtitle="Turning Tides supports partners through four interacting funds, each of which supports different pathways toward change. Each fund is governed separately to increase responsiveness to partners' expressed needs and opportunities to create change."
         backgroundImage="/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png"
-        className="h-[590px] !min-h-[590px]"
+        className="h-auto !min-h-[590px]"
       />
       {/* <GrantmakingSection
         navigationItems={[

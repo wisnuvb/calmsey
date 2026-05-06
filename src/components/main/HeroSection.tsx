@@ -224,7 +224,7 @@ export function HeroSection({
     return (
       <section
         className={cn(
-          "relative min-h-[400px] lg:min-h-[716px] flex items-center pt-20 bg-black",
+          "relative lg:min-h-[716px] flex items-center pt-20 bg-black",
           className
         )}
         data-section={dataSection}

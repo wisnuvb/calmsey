@@ -60,7 +60,7 @@ const AboutUsPage = async ({ params }: AboutUsPageProps) => {
         subtitle="We are a young organization built through wide-ranging consultation and by listening to the demands and priorities that Indigenous Peoples, small-scale fishers, and coastal communities have been articulating for years. We exist to support rights holders working to secure tenure over their territories—because territorial control is foundational to community agency and self-determination"
         backgroundImage="/assets/hero-about-us.webp"
         dataSection="about-us"
-        className="h-[590px] !min-h-[590px]"
+        className="h-auto !min-h-[590px]"
       />
       {/* <QuoteSection /> */}
 

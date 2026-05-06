@@ -57,7 +57,7 @@ const GovernancePage = async ({ params }: GovernancePageProps) => {
         subtitle="Turning Tides's conservation efforts - from protecting oceans and endangered species to supporting small-scale fishers, biodiversity conservation, and sustainable communities."
         backgroundImage="/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png"
         dataSection="governance"
-        className="h-[590px] !min-h-[590px]"
+        className="h-auto !min-h-[590px]"
       />
       <GovernanceMeaningSection />
       <SteeringCommitteeSection />
