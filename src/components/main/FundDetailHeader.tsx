@@ -12,7 +12,7 @@ interface FundDetailHeaderProps {
 export function FundDetailHeader({ header }: FundDetailHeaderProps) {
   return (
     <section
-      className="bg-white py-8 lg:pb-12 lg:pt-36"
+      className="bg-white py-8 lg:pb-12 pt-28 lg:pt-36"
       data-section="fund-detail-header"
     >
       <div className="container mx-auto px-4">

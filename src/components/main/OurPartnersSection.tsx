@@ -65,18 +65,18 @@ export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
   );
 
   // Get partners with priority: context > props > default
-  const contextPartners = getContentJSON<Partner[]>("partners.partners", []);
-  const partners =
-    contextPartners.length > 0
-      ? contextPartners
-      : propPartners || defaultPartners;
-  const validPartners = partners.filter(
-    (partner) => typeof partner.logo === "string" && partner.logo.trim() !== ""
-  );
+  // const contextPartners = getContentJSON<Partner[]>("partners.partners", []);
+  // const partners =
+  //   contextPartners.length > 0
+  //     ? contextPartners
+  //     : propPartners || defaultPartners;
+  // const validPartners = partners.filter(
+  //   (partner) => typeof partner.logo === "string" && partner.logo.trim() !== ""
+  // );
 
-  if (validPartners.length === 0) {
-    return null;
-  }
+  // if (validPartners.length === 0) {
+  //   return null;
+  // }
   return (
     <section
       className={`w-full ${backgroundColor || "bg-white"} pb-16 md:pb-8`}

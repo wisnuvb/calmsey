@@ -117,7 +117,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
   // Render based on content type
   if (content.type === "supported-unsupported") {
     return (
-      <section className="bg-white py-12 lg:py-16">
+      <section className="bg-white py-6 lg:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-12">
             {/* Intro */}
@@ -221,7 +221,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
 
   if (content.type === "partners-will") {
     return (
-      <section className="bg-white py-12 lg:py-16">
+      <section className="bg-white py-6 lg:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-12">
             {/* Intro */}
@@ -272,7 +272,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
 
   if (content.type === "custom") {
     return (
-      <section className="bg-white py-12 lg:py-16">
+      <section className="bg-white py-6 lg:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-12">
             {content.sections.map((section) => (

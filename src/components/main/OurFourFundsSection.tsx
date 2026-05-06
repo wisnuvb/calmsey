@@ -157,7 +157,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
   }
 
   return (
-    <section className={cn("bg-white py-16 lg:py-24", className)}>
+    <section className={cn("bg-white py-16 lg:py-24 mb-16", className)}>
       <div className="container mx-auto px-4">
         {/* Header Section - Centered */}
         <div className="max-w-4xl mx-auto text-center mb-14 space-y-8 hidden">
@@ -211,7 +211,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
                 </div>
                 <Link
                   href={fund.learnMoreLink}
-                  className="inline-flex items-center gap-2 px-8 py-5 bg-white border border-gray-300 text-[#3C62ED] rounded-md hover:bg-gray-50 transition-colors duration-300 font-normal w-fit mt-2 text-base"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3 sm:py-5 bg-white border border-gray-300 text-[#3C62ED] rounded-md hover:bg-gray-50 transition-colors duration-300 font-normal w-full sm:w-fit mt-2 text-base"
                 >
                   <span>Learn More</span>
                   <ArrowRight className="w-4 h-4" />
