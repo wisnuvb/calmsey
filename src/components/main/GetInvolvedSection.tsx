@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown, Send } from "lucide-react";
+import { useToast } from "@/components/ui/toast";
 import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
@@ -42,6 +43,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   backgroundColor: propBackgroundColor,
 }) => {
   const { getValue } = usePageContentHelpers();
+  const { addToast } = useToast();
 
   const backgroundImage = getValue(
     "hero.backgroundImage",
@@ -88,6 +90,21 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
     undefined,
     `If you are a group, organization, or collective that represents or directly serves local communities, small-scale fishers or fish workers, or Indigenous Peoples, **reach out to us and share your work and aspirations here.**`,
   );
+  const successToastTitle = getValue(
+    "cta.successToastTitle",
+    undefined,
+    "Message sent",
+  );
+  const successToastDescription = getValue(
+    "cta.successToastDescription",
+    undefined,
+    "Thank you! Your message has been sent.",
+  );
+  const messagePlaceholder = getValue(
+    "cta.messagePlaceholder",
+    undefined,
+    "Tell us about your work, goals, or the kind of partnership you are seeking.",
+  );
 
   const searchParams = useSearchParams();
   const becomeParam = searchParams.get("become");
@@ -108,7 +125,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   }, [becomeParam]);
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [charCount, setCharCount] = useState(0);
   const maxChars = 5000;
@@ -147,7 +163,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
         throw new Error(data.error || "Failed to send message");
       }
 
-      setSuccess(true);
       setFormData({
         fullName: "",
         email: "",
@@ -157,6 +172,11 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
         message: "",
       });
       setCharCount(0);
+      addToast({
+        type: "success",
+        title: successToastTitle,
+        description: successToastDescription,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -317,14 +337,14 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   <textarea
                     id="message"
                     name="message"
-                    placeholder="Tell us what you want..."
+                    placeholder={messagePlaceholder}
                     value={formData.message}
                     onChange={handleInputChange}
                     rows={5}
                     maxLength={maxChars}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-sm"
                     required
-                    aria-label="Tell us what you want"
+                    aria-label=""
                   />
                   <div className="text-right text-xs text-gray-500 mt-2">
                     {charCount} / {maxChars.toLocaleString()}
@@ -334,12 +354,6 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                 {error && (
                   <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
                     {error}
-                  </div>
-                )}
-
-                {success && (
-                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
-                    Thank you! Your message has been sent.
                   </div>
                 )}
 

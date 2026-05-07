@@ -67,6 +67,32 @@ export const GET_INVOLVED_SCHEMA: PageContentSchema = {
       defaultValue: "Send Message",
     },
     {
+      key: "cta.successToastTitle",
+      label: "Success toast title",
+      type: "text",
+      section: "Contact CTA",
+      defaultValue: "Message sent",
+      helpText: "Toast title shown after the form is submitted successfully.",
+    },
+    {
+      key: "cta.successToastDescription",
+      label: "Success toast description",
+      type: "textarea",
+      section: "Contact CTA",
+      defaultValue: "Thank you! Your message has been sent.",
+      helpText:
+        "Toast description shown after the form is submitted successfully.",
+    },
+    {
+      key: "cta.messagePlaceholder",
+      label: "Message field placeholder",
+      type: "textarea",
+      section: "Contact CTA",
+      defaultValue:
+        "Tell us about your work, goals, or the kind of partnership you are seeking.",
+      helpText: "Placeholder text shown inside the message textarea.",
+    },
+    {
       key: "cta.bannerLeftParagraph",
       label: "Blue banner — left paragraph",
       type: "textarea",
@@ -78,7 +104,7 @@ export const GET_INVOLVED_SCHEMA: PageContentSchema = {
       label: "Blue banner — right paragraph",
       type: "textarea",
       section: "Contact CTA",
-      helpText: 'Use **emphasized phrase** for optional bold styling.',
+      helpText: "Use **emphasized phrase** for optional bold styling.",
     },
   ],
 };
