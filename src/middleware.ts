@@ -140,6 +140,13 @@ export async function middleware(request: NextRequest) {
   return handleLanguageRouting(request, supportedLanguages, defaultLanguage);
 }
 
+/** Ambil nilai pertama bila proxy menggabungkan header duplikat (mis. "https, https"). */
+function firstForwardedValue(header: string | null): string | null {
+  if (!header) return null;
+  const first = header.split(",")[0];
+  return first?.trim() ?? null;
+}
+
 function handleLanguageRouting(
   request: NextRequest,
   supportedLanguages: string[],
@@ -150,9 +157,12 @@ function handleLanguageRouting(
 
   // Get the correct origin, handling proxy/load balancer scenarios
   // Priority: x-forwarded-host header > host header > nextUrl.origin
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
-  const host = request.headers.get("host");
+  const forwardedHost = firstForwardedValue(
+    request.headers.get("x-forwarded-host")
+  );
+  const forwardedProto =
+    firstForwardedValue(request.headers.get("x-forwarded-proto")) || "https";
+  const host = firstForwardedValue(request.headers.get("host"));
 
   let origin: string;
   if (forwardedHost) {
