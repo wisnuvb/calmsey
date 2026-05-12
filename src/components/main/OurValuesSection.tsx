@@ -152,7 +152,7 @@ export const OurValuesSection: React.FC<OurValuesSectionProps> = ({
   const [col1, col2, col3] = partitionValuesById(values);
 
   return (
-    <section className="bg-white py-16 lg:py-24" id="values">
+    <section className="bg-white py-16 lg:pb-24" id="values">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="mb-10 max-w-4xl lg:mb-14">
           <div className="mb-4 flex items-start gap-4">

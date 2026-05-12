@@ -160,7 +160,7 @@ export function OurGoalSection({
   };
 
   return (
-    <section className="bg-white pb-16 lg:py-24" id="goal">
+    <section className="bg-white pb-16 lg:pb-24" id="goal">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           {/* Left Column - Our Goal Content */}
