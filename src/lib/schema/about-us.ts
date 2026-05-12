@@ -137,44 +137,51 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
             title:
               "Center power with partners (i.e., Local communities, small-scale fishers, fish workers, and Indigenous Peoples, and the groups that legitimately serve and support them)",
             imageSrc: "/assets/partner1.webp",
-            className: "h-[400px] md:h-full",
+            className:
+              "h-[480px] min-h-[480px] md:h-full md:min-h-[480px]",
           },
           {
             id: "uphold-lived-experience",
             title: "Uphold lived experience and diverse knowledge.",
             imageSrc: "/assets/our-view.webp",
-            className: "h-[250px]",
+            className:
+              "h-[380px] min-h-[380px] sm:h-[420px] sm:min-h-[420px]",
           },
           {
             id: "base-trust",
             title: "Base our work on trust, responsiveness and service.",
             imageSrc: "/assets/slider-1.webp",
-            className: "h-[250px]",
+            className:
+              "h-[380px] min-h-[380px] sm:h-[420px] sm:min-h-[420px]",
           },
           {
             id: "transparency",
             title: "Prioritize transparency & accountability.",
             imageSrc: "/assets/slider-2.webp",
-            className: "h-[250px]",
+            className:
+              "h-[380px] min-h-[380px] sm:h-[420px] sm:min-h-[420px]",
           },
           {
             id: "foster-solidarity",
             title: "Foster solidarity and protect civic spaces.",
             imageSrc: "/assets/slider-3.webp",
-            className: "h-[250px]",
+            className:
+              "h-[380px] min-h-[380px] sm:h-[420px] sm:min-h-[420px]",
           },
           {
             id: "self-determination",
             title:
               "Prioritize and plan for self-determination and independence.",
             imageSrc: "/assets/achieve-1.webp",
-            className: "h-[250px]",
+            className:
+              "h-[380px] min-h-[380px] sm:h-[420px] sm:min-h-[420px]",
           },
           {
             id: "humility",
             title: "Commit to humility and reflexivity.",
             imageSrc: "/assets/gov-hero.webp",
-            className: "h-[400px] md:h-full",
+            className:
+              "h-[480px] min-h-[480px] md:h-full md:min-h-[480px]",
           },
         ],
         null,
@@ -201,9 +208,9 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
           label: "CSS Class (height)",
           type: "text",
           required: false,
-          placeholder: "h-[250px]",
+          placeholder: "h-[380px] min-h-[380px] sm:h-[420px]",
           helpText:
-            "CSS height class for the card (e.g., h-[250px] or h-[400px])",
+            "Tailwind height classes (e.g. short cards: h-[380px] min-h-[380px] sm:h-[420px]; tall: h-[480px] md:h-full md:min-h-[480px])",
         },
       ],
       helpText:
@@ -353,6 +360,15 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       helpText: "Title shown in the download modal",
     },
     {
+      key: "whereWeWork.actionPlansDownloadModalSubtitle",
+      label: "Action Plans Download Modal Subtitle",
+      type: "textarea",
+      section: "Where We Work",
+      defaultValue:
+        "Our approach, risk mitigation, milestones and estimate budget until 2030 ahead",
+      helpText: "Subtitle below the modal title (grey, smaller text)",
+    },
+    {
       key: "whereWeWork.actionPlansDownloadItems",
       label: "Action Plans Download Items",
       type: "multiple",
@@ -455,6 +471,14 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       section: "Where We Work",
       defaultValue: "Download Piloting Report",
       helpText: "Title shown in the download modal",
+    },
+    {
+      key: "whereWeWork.partnersDownloadModalSubtitle",
+      label: "Partners Download Modal Subtitle",
+      type: "textarea",
+      section: "Where We Work",
+      defaultValue: "",
+      helpText: "Optional subtitle below the partners download modal title",
     },
     {
       key: "whereWeWork.partnersDownloadItems",

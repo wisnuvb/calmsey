@@ -1,13 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Image from "next/image";
-import { CheckCircle2, Shield, Flag, Info, FileDown, X } from "lucide-react";
+import { CheckCircle2, Shield, Flag, Info, FileDown, X, FileText } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
 import { RichText } from "../ui/RichText";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { useLanguage } from "../public/LanguageProvider";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
+import { CountryCombobox } from "@/components/ui/country-combobox";
+import {
+  getCountrySelectOptions,
+  getCountryLabelForValue,
+} from "@/lib/countries";
+import { LanguageVariantPicker } from "@/components/main/LanguageVariantPicker";
+import { orderDownloadFilesEnglishFirst } from "@/lib/download-language-order";
 
 interface PracticeItem {
   id: string;
@@ -48,6 +55,11 @@ interface TabContent {
   downloadButtonText?: string;
   downloadButtonUrl?: string; // Legacy support
   downloadFiles?: DownloadFile[]; // New structure for multi-language
+  /** Left-column intro in PDF download modal; from CMS `downloadModalIntro`. */
+  downloadModalIntro?: string;
+  /** Optional hero image for download modal; falls back to `imageSrc`. */
+  downloadModalImageSrc?: string;
+  downloadModalImageAlt?: string;
 }
 
 interface NavigationItem {
@@ -77,6 +89,9 @@ interface MultipleFieldItem {
   downloadButtonText?: string;
   downloadButtonUrl?: string; // Legacy support
   downloadFiles?: string; // JSON string from multiple field
+  downloadModalIntro?: string;
+  downloadModalImageSrc?: string;
+  downloadModalImageAlt?: string;
 }
 
 interface GrantmakingSectionProps {
@@ -141,9 +156,305 @@ const defaultNavigationItems: NavigationItem[] = [
       paragraphs: [
         "Our grantmaking framework is designed to support communities in securing and strengthening their tenure rights through flexible, partner-centered approaches.",
       ],
+      downloadModalIntro:
+        "We help local communities, small-scale fishers, and Indigenous Peoples secure their rights in caring for lands, waters, and resources to achieve lasting impact. Our Grantmaking Framework guides us to where we can make the most difference.",
+      downloadModalImageSrc:
+        "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
+      downloadModalImageAlt: "Community fishing and livelihoods",
     },
   },
 ];
+
+/** Only if a tab has no modal intro and no first paragraph (edge case). */
+const GRANTMAKING_DOWNLOAD_MODAL_FALLBACK_BLURB =
+  "Learn more in our grantmaking framework document.";
+
+function GrantmakingFrameworkDownloadModal({
+  open,
+  onClose,
+  files,
+  tabContent,
+  getLanguageName,
+  normalizeUrl,
+}: {
+  open: boolean;
+  onClose: () => void;
+  files: DownloadFile[];
+  tabContent: TabContent;
+  getLanguageName: (code: string) => string;
+  normalizeUrl: (url: string) => string;
+}) {
+  const { language: currentLanguage } = useLanguage();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [userCountry, setUserCountry] = useState("");
+  const [selectedLangIndex, setSelectedLangIndex] = useState(0);
+  const [formError, setFormError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const countryOptions = useMemo(() => getCountrySelectOptions(), []);
+
+  const orderedFiles = useMemo(
+    () => orderDownloadFilesEnglishFirst(files),
+    [files],
+  );
+
+  const langOptions = useMemo(
+    () => orderedFiles.map((f) => ({ label: getLanguageName(f.language) })),
+    [orderedFiles, getLanguageName],
+  );
+
+  useEffect(() => {
+    if (!open) return;
+    setFullName("");
+    setEmail("");
+    setUserCountry("");
+    setFormError("");
+    setIsSubmitting(false);
+    const cur = currentLanguage.trim().toLowerCase();
+    const idx = orderedFiles.findIndex(
+      (f) => f.language.trim().toLowerCase() === cur,
+    );
+    setSelectedLangIndex(idx >= 0 ? idx : 0);
+  }, [open, orderedFiles, currentLanguage]);
+
+  const validateLeadForm = (): boolean => {
+    setFormError("");
+    if (!fullName.trim()) {
+      setFormError("Please enter your full name.");
+      return false;
+    }
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setFormError("Please enter a valid email address.");
+      return false;
+    }
+    if (!userCountry.trim()) {
+      setFormError("Please select your country.");
+      return false;
+    }
+    return true;
+  };
+
+  const getLeadData = useCallback(() => {
+    const cc = userCountry.trim().toLowerCase();
+    return {
+      fullName: fullName.trim(),
+      email: email.trim(),
+      countryCode: cc,
+      countryLabel: getCountryLabelForValue(cc) ?? cc,
+    };
+  }, [fullName, email, userCountry]);
+
+  const handleDownload = async () => {
+    if (!validateLeadForm()) return;
+    const file = orderedFiles[selectedLangIndex];
+    if (!file) return;
+    const url = normalizeUrl(file.url);
+
+    setIsSubmitting(true);
+    setFormError("");
+    try {
+      const lead = getLeadData();
+      const res = await fetch("/api/resource-downloads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: lead.fullName,
+          email: lead.email,
+          countryCode: lead.countryCode,
+          countryLabel: lead.countryLabel,
+          modalSource: "GRANTMAKING_FRAMEWORK",
+          documentItemId: tabContent.id,
+          documentTitle: tabContent.title?.trim() || null,
+          selectorType: "language",
+          selectedOptionLabel: getLanguageName(file.language),
+          fileUrl: url,
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      if (!res.ok) {
+        setFormError(
+          data.error ||
+            "Could not submit your details. Please try again shortly.",
+        );
+        return;
+      }
+      window.open(url, "_blank");
+      onClose();
+    } catch {
+      setFormError("Something went wrong. Check your connection and try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!open) return null;
+
+  const intro = tabContent.downloadModalIntro?.trim();
+  const firstParagraph = tabContent.paragraphs?.[0]?.trim();
+  const blurbSource =
+    intro ||
+    firstParagraph ||
+    GRANTMAKING_DOWNLOAD_MODAL_FALLBACK_BLURB;
+  const blurbRaw = blurbSource.replace(
+    /\*\*(.*?)\*\*/g,
+    "<strong>$1</strong>",
+  );
+
+  const heroTitle = tabContent.title || "Our Grantmaking Framework";
+
+  const modalHeroSrc = (
+    tabContent.downloadModalImageSrc?.trim() ||
+    tabContent.imageSrc?.trim() ||
+    ""
+  );
+  const modalHeroAlt =
+    tabContent.downloadModalImageAlt?.trim() ||
+    tabContent.imageAlt?.trim() ||
+    heroTitle;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+      role="presentation"
+    >
+      <div
+        className="relative flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl lg:max-h-[90vh] lg:flex-row"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="grantmaking-download-modal-title"
+      >
+        {/* Left: visual + copy */}
+        <div className="relative min-h-[220px] w-full shrink-0 lg:min-h-[420px] lg:w-1/2">
+          {modalHeroSrc ? (
+            <Image
+              src={getImageUrl(modalHeroSrc)}
+              alt={modalHeroAlt}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          ) : (
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-[#1e3a5f] to-[#0f172a]"
+              aria-hidden
+            />
+          )}
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b1220]/95 via-[#0b1220]/35 to-transparent"
+            aria-hidden
+          />
+          <div className="absolute left-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded bg-[#F97316] shadow-md">
+            <FileText className="h-6 w-6 text-white" aria-hidden />
+          </div>
+          <div className="absolute inset-x-0 bottom-0 z-10 p-6 pt-24 lg:p-8">
+            <h3 className="text-2xl font-bold leading-tight text-white font-nunito sm:text-3xl">
+              {heroTitle}
+            </h3>
+            <RichText
+              className="mt-3 text-sm leading-relaxed text-white/90 font-work-sans sm:text-base [&_strong]:font-semibold"
+              content={blurbRaw}
+            />
+          </div>
+        </div>
+
+        {/* Right: form */}
+        <div className="relative flex w-full flex-col overflow-y-auto lg:w-1/2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-4 top-4 z-10 rounded-md p-1 text-gray-900 transition-colors hover:bg-gray-100"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          <div className="p-6 pb-4 pr-12 pt-8 sm:p-8">
+            <h2
+              id="grantmaking-download-modal-title"
+              className="text-xl font-bold text-gray-900 font-nunito sm:text-2xl"
+            >
+              Download Full-PDF
+            </h2>
+            <p className="mt-2 text-sm text-gray-500 font-work-sans sm:text-base">
+              Clarifying funding priorities for stronger tenure rights.
+            </p>
+          </div>
+
+          <div className="flex flex-1 flex-col px-6 pb-8 sm:px-8">
+            <div className="space-y-3">
+              <label htmlFor="grantmaking-dl-fullname" className="sr-only">
+                Full name
+              </label>
+              <input
+                id="grantmaking-dl-fullname"
+                type="text"
+                autoComplete="name"
+                placeholder="Full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]"
+              />
+              <label htmlFor="grantmaking-dl-email" className="sr-only">
+                Email
+              </label>
+              <input
+                id="grantmaking-dl-email"
+                type="email"
+                autoComplete="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]"
+              />
+              <label htmlFor="grantmaking-dl-country" className="sr-only">
+                Country
+              </label>
+              <CountryCombobox
+                id="grantmaking-dl-country"
+                value={userCountry}
+                onValueChange={setUserCountry}
+                options={countryOptions}
+                placeholder="Select country"
+                aria-label="Select country"
+              />
+            </div>
+
+            {formError ? (
+              <p className="mt-3 text-sm text-red-600" role="alert">
+                {formError}
+              </p>
+            ) : null}
+
+            <div className="mt-6 flex flex-col gap-4 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
+              <LanguageVariantPicker
+                options={langOptions}
+                selectedIndex={Math.min(
+                  selectedLangIndex,
+                  Math.max(0, langOptions.length - 1),
+                )}
+                onSelectIndex={setSelectedLangIndex}
+                placeholder="Language"
+              />
+              <button
+                type="button"
+                onClick={handleDownload}
+                disabled={isSubmitting || files.length === 0}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#3C62ED] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#2d4fd6] disabled:opacity-50 sm:w-auto sm:min-w-[200px]"
+              >
+                <FileDown className="h-5 w-5 shrink-0" aria-hidden />
+                {isSubmitting ? "Please wait…" : "Download Now"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function GrantmakingSection({
   navigationItems: propNavigationItems,
@@ -153,10 +464,11 @@ export function GrantmakingSection({
   contentKey = "grantmaking.navigationItems",
 }: GrantmakingSectionProps = {}) {
   const { getContentJSON } = usePageContentHelpers();
-  const { language: currentLanguage } = useLanguage();
   const { languages: activeLanguages } = useActiveLanguages();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalDownloadFiles, setModalDownloadFiles] = useState<DownloadFile[]>([]);
+  const [downloadModal, setDownloadModal] = useState<{
+    files: DownloadFile[];
+    tab: TabContent;
+  } | null>(null);
 
   // Transform multiple field format to NavigationItem format
   const transformMultipleToNavigationItems = (
@@ -413,6 +725,18 @@ export function GrantmakingSection({
               numberedListFooter: String(item.numberedListFooter),
             }),
             ...(infoBlockFooter && { infoBlockFooter }),
+            ...(typeof item.downloadModalIntro === "string" &&
+              item.downloadModalIntro.trim() && {
+                downloadModalIntro: item.downloadModalIntro.trim(),
+              }),
+            ...(typeof item.downloadModalImageSrc === "string" &&
+              item.downloadModalImageSrc.trim() && {
+                downloadModalImageSrc: item.downloadModalImageSrc.trim(),
+              }),
+            ...(typeof item.downloadModalImageAlt === "string" &&
+              item.downloadModalImageAlt.trim() && {
+                downloadModalImageAlt: item.downloadModalImageAlt.trim(),
+              }),
             ...(item.downloadButtonLabel && {
               downloadButtonLabel: String(item.downloadButtonLabel),
             }),
@@ -497,40 +821,26 @@ export function GrantmakingSection({
     return lang?.name || langCode.toUpperCase();
   };
 
-  // Handle download click
-  const handleDownloadClick = (e: React.MouseEvent, downloadFiles?: DownloadFile[], downloadButtonUrl?: string) => {
+  const handleDownloadClick = (
+    e: React.MouseEvent,
+    tab: TabContent,
+    downloadFiles?: DownloadFile[],
+    downloadButtonUrl?: string,
+  ) => {
     e.preventDefault();
 
-    // New structure: use downloadFiles if available
-    const files = downloadFiles && downloadFiles.length > 0
-      ? downloadFiles
-      : downloadButtonUrl
-        ? [{ language: "en", url: downloadButtonUrl }]
-        : [];
+    const files =
+      downloadFiles && downloadFiles.length > 0
+        ? downloadFiles
+        : downloadButtonUrl
+          ? [{ language: "en", url: downloadButtonUrl }]
+          : [];
 
     if (files.length === 0) {
       return;
     }
 
-    if (files.length === 1) {
-      // If only one file, download directly
-      const file = files[0];
-      const url = file.url.startsWith("/")
-        ? file.url
-        : ensureHttpsUrl(file.url);
-      window.open(url, "_blank");
-    } else {
-      // Show modal to select language
-      setModalDownloadFiles(files);
-      setIsModalOpen(true);
-    }
-  };
-
-  // Handle language selection
-  const handleLanguageSelect = (file: DownloadFile) => {
-    const url = file.url.startsWith("/") ? file.url : ensureHttpsUrl(file.url);
-    window.open(url, "_blank");
-    setIsModalOpen(false);
+    setDownloadModal({ files, tab });
   };
 
   return (
@@ -785,11 +1095,14 @@ export function GrantmakingSection({
                               "Read the full-version of our Grantmaking Framework"}
                           </p>
                           <button
-                            onClick={(e) => handleDownloadClick(
-                              e,
-                              activeContent.downloadFiles,
-                              activeContent.downloadButtonUrl
-                            )}
+                            onClick={(e) =>
+                              handleDownloadClick(
+                                e,
+                                activeContent,
+                                activeContent.downloadFiles,
+                                activeContent.downloadButtonUrl,
+                              )
+                            }
                             className="bg-[#3C62ED] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2d4fd6] transition-colors flex items-center gap-2 whitespace-nowrap"
                           >
                             <FileDown className="w-5 h-5" />
@@ -809,55 +1122,18 @@ export function GrantmakingSection({
         </div>
       </section>
 
-      {/* Language Selection Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Select Language
-              </h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Close modal"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            <p className="text-gray-600 mb-6">
-              Choose your preferred language to download the document:
-            </p>
-            <div className="space-y-2">
-              {modalDownloadFiles.map((file) => (
-                <button
-                  key={file.language}
-                  onClick={() => handleLanguageSelect(file)}
-                  className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${file.language === currentLanguage
-                    ? "border-blue-500 bg-blue-50 text-blue-900"
-                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
-                    }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">
-                      {getLanguageName(file.language)}
-                    </span>
-                    {file.language === currentLanguage && (
-                      <span className="text-xs text-blue-600">(Current)</span>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="mt-6 w-full px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+      {downloadModal ? (
+        <GrantmakingFrameworkDownloadModal
+          open
+          files={downloadModal.files}
+          tabContent={downloadModal.tab}
+          getLanguageName={getLanguageName}
+          normalizeUrl={(url) =>
+            url.startsWith("/") ? url : ensureHttpsUrl(url)
+          }
+          onClose={() => setDownloadModal(null)}
+        />
+      ) : null}
     </div>
   );
 }

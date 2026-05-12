@@ -19,43 +19,43 @@ const defaultValues: ValueItem[] = [
     title:
       "Center power with partners (i.e., Local communities, small-scale fishers, fish workers, and Indigenous Peoples, and the groups that legitimately serve and support them)",
     imageSrc: "/assets/partner1.webp",
-    className: "h-[400px] md:h-full", // Tall item
+    className: "h-[480px] min-h-[480px] md:h-full md:min-h-[480px]",
   },
   {
     id: "uphold-lived-experience",
     title: "Uphold lived experience and diverse knowledge.",
     imageSrc: "/assets/our-view.webp",
-    className: "h-[250px]",
+    className: "h-[380px] min-h-[380px] sm:h-[420px] sm:min-h-[420px]",
   },
   {
     id: "base-trust",
     title: "Base our work on trust, responsiveness and service.",
     imageSrc: "/assets/slider-1.webp",
-    className: "h-[250px]",
+    className: "h-[380px] min-h-[380px] sm:h-[420px] sm:min-h-[420px]",
   },
   {
     id: "transparency",
     title: "Prioritize transparency & accountability.",
     imageSrc: "/assets/slider-2.webp",
-    className: "h-[250px]",
+    className: "h-[380px] min-h-[380px] sm:h-[420px] sm:min-h-[420px]",
   },
   {
     id: "foster-solidarity",
     title: "Foster solidarity and protect civic spaces.",
     imageSrc: "/assets/slider-3.webp",
-    className: "h-[250px]",
+    className: "h-[380px] min-h-[380px] sm:h-[420px] sm:min-h-[420px]",
   },
   {
     id: "self-determination",
     title: "Prioritize and plan for self-determination and independence.",
     imageSrc: "/assets/achieve-1.webp",
-    className: "h-[250px]",
+    className: "h-[380px] min-h-[380px] sm:h-[420px] sm:min-h-[420px]",
   },
   {
     id: "humility",
     title: "Commit to humility and reflexivity.",
     imageSrc: "/assets/gov-hero.webp",
-    className: "h-[400px] md:h-full", // Tall item
+    className: "h-[480px] min-h-[480px] md:h-full md:min-h-[480px]",
   },
 ];
 
@@ -70,18 +70,18 @@ export const OurValuesSection: React.FC<OurValuesSectionProps> = ({
   description: propDescription,
   values: propValues,
 }) => {
-  const { getValue, getContentJSON } = usePageContentHelpers()
+  const { getValue, getContentJSON } = usePageContentHelpers();
 
   // Get all values with priority: context > props > default
   const title = getValue("values.title", propTitle, "Our Values");
   const description = getValue(
     "values.description",
     propDescription,
-    "Our values and principles were built through consultation with partners, discussion with the Steering Committee, and established practices of liberatory grantmaking. They guide our decisions, interactions, and approach to our work—they are foundational to who we are as an organization."
+    "Our values and principles were built through consultation with partners, discussion with the Steering Committee, and established practices of liberatory grantmaking. They guide our decisions, interactions, and approach to our work—they are foundational to who we are as an organization.",
   );
   const values = getContentJSON<ValueItem[]>(
     "values.items",
-    propValues || defaultValues
+    propValues || defaultValues,
   );
 
   // Split values into columns for the masonry layout
@@ -155,17 +155,21 @@ const ValueCard: React.FC<{ item: ValueItem }> = ({ item }) => {
   return (
     <div
       className={cn(
-        "relative w-full rounded-sm overflow-hidden group",
-        item.className
+        "relative w-full rounded-sm overflow-hidden group bg-neutral-900",
+        item.className,
       )}
     >
-      {/* Background Image */}
-      <Image
-        src={getImageUrl(item.imageSrc)}
-        alt={item.title}
-        fill
-        className="object-cover transition-transform duration-500 group-hover:scale-105"
-      />
+      {/* Gambar: object-contain + rata atas agar wajah di area atas foto tidak terpotong */}
+      <div className="pointer-events-none absolute inset-0 flex items-start justify-center min-h-0 pt-0">
+        <Image
+          src={getImageUrl(item.imageSrc)}
+          alt={item.title}
+          width={1600}
+          height={1067}
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="h-full w-auto max-w-full object-contain object-[center_top] origin-top transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+        />
+      </div>
 
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />

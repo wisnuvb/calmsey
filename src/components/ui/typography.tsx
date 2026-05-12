@@ -52,9 +52,9 @@ interface TypographyProps {
 // Style mappings — headings use Nunito; body text uses Work Sans
 const styleClasses: Record<TypographyStyle, string> = {
   h2bold:
-    "font-bold text-[38px] leading-[120%] tracking-normal align-middle font-nunito",
+    "font-bold text-[30px] sm:text-[38px] leading-[120%] tracking-normal align-middle font-nunito",
   h2reg:
-    "font-normal text-[38px] leading-[120%] tracking-normal align-middle font-nunito",
+    "font-normal text-[30px] sm:text-[38px] leading-[120%] tracking-normal align-middle font-nunito",
 
   p1reg: "font-work-sans font-normal text-base leading-[27px] align-middle",
   p2reg: "font-work-sans font-normal text-sm leading-[150%] align-middle",

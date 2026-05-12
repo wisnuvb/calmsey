@@ -200,7 +200,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
         <div className="mb-12 lg:mb-16 space-y-10">
           <H2
             style="h2bold"
-            className="text-[#010107] text-3xl sm:text-[38px] leading-[120%] tracking-normal text-center font-nunito"
+            className="text-[#010107] text-center"
           >
             {title}
           </H2>
@@ -210,19 +210,9 @@ export const TeamSection: React.FC<TeamSectionProps> = ({
               hasSecondColumn ? "lg:grid-cols-2" : "",
             )}
           >
-            <P
-              style="p1reg"
-              className="text-[#060726CC] text-2xl font-normal leading-[140%] font-nunito-sans"
-            >
-              {description}
-            </P>
+            <P className="text-[#060726CC]">{description}</P>
             {hasSecondColumn ? (
-              <P
-                style="p1reg"
-                className="text-[#06072680] p"
-              >
-                {additionalDescription}
-              </P>
+              <P className="text-[#06072680]">{additionalDescription}</P>
             ) : null}
           </div>
         </div>

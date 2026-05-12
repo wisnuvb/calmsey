@@ -1,5 +1,75 @@
+import { LOCALE_COOKIE_NAME } from "@/lib/constants";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+
+const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
+function localeCookieOptions() {
+  return {
+    path: "/" as const,
+    maxAge: LOCALE_COOKIE_MAX_AGE,
+    sameSite: "lax" as const,
+  };
+}
+
+/** Cocokkan Accept-Language ke daftar bahasa yang didukung (urutan q, lalu prioritas daftar). */
+function matchAcceptLanguage(
+  acceptLanguage: string | null,
+  supportedLanguages: string[]
+): string | null {
+  if (!acceptLanguage) return null;
+  const prefs: { lang: string; q: number }[] = [];
+  for (const part of acceptLanguage.split(",")) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const [tag, ...params] = trimmed.split(";").map((s) => s.trim());
+    if (!tag) continue;
+    const base = tag.split("-")[0]?.toLowerCase();
+    if (!base) continue;
+    let q = 1;
+    for (const p of params) {
+      const m = /^q=([\d.]+)$/i.exec(p);
+      if (m) q = parseFloat(m[1]);
+    }
+    prefs.push({ lang: base, q });
+  }
+  prefs.sort((a, b) => b.q - a.q);
+  for (const { lang } of prefs) {
+    if (supportedLanguages.includes(lang)) return lang;
+  }
+  return null;
+}
+
+function resolveActiveLanguage(
+  request: NextRequest,
+  supportedLanguages: string[],
+  defaultLanguage: string
+): string {
+  const fromCookie = firstForwardedValue(
+    request.cookies.get(LOCALE_COOKIE_NAME)?.value ?? null
+  );
+  if (fromCookie && supportedLanguages.includes(fromCookie)) {
+    return fromCookie;
+  }
+  const fromAccept = matchAcceptLanguage(
+    request.headers.get("accept-language"),
+    supportedLanguages
+  );
+  if (fromAccept) return fromAccept;
+  return defaultLanguage;
+}
+
+function matchedPathLocale(
+  pathname: string,
+  supportedLanguages: string[]
+): string | null {
+  return (
+    supportedLanguages.find(
+      (locale) =>
+        pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
+    ) ?? null
+  );
+}
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -154,6 +224,11 @@ function handleLanguageRouting(
 ) {
   const pathname = request.nextUrl.pathname;
   const searchParams = request.nextUrl.search;
+  const activeLanguage = resolveActiveLanguage(
+    request,
+    supportedLanguages,
+    defaultLanguage
+  );
 
   // Get the correct origin, handling proxy/load balancer scenarios
   // Priority: x-forwarded-host header > host header > nextUrl.origin
@@ -187,46 +262,65 @@ function handleLanguageRouting(
     }
   }
 
-  // Check if pathname starts with a language code
-  const pathnameHasValidLocale = supportedLanguages.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
-
-  // If no valid language in pathname
-  if (!pathnameHasValidLocale) {
-    // Extract potential language from pathname
-    const segments = pathname.split("/");
-    const possibleLang = segments[1];
-
-    // If it's an invalid language, redirect to default language (correct the URL)
-    if (
-      possibleLang &&
-      possibleLang.length === 2 &&
-      !supportedLanguages.includes(possibleLang)
-    ) {
-      const newUrl = new URL(`/${defaultLanguage}${pathname}`, origin);
-      newUrl.search = searchParams;
-      return NextResponse.redirect(newUrl, 307);
-    }
-
-    // Path without lang: REWRITE (not redirect) so browser URL and hash are preserved
-    if (pathname !== "/") {
-      const newUrl = new URL(
-        `/${defaultLanguage}${pathname}`,
-        origin
-      );
-      newUrl.search = searchParams;
-      return NextResponse.rewrite(newUrl);
-    }
-
-    // Root: REWRITE to /en so user sees / without redirect
-    if (pathname === "/") {
-      const newUrl = new URL(`/${defaultLanguage}`, origin);
-      return NextResponse.rewrite(newUrl);
-    }
+  const localeFromPath = matchedPathLocale(pathname, supportedLanguages);
+  if (localeFromPath) {
+    const res = NextResponse.next();
+    res.cookies.set(
+      LOCALE_COOKIE_NAME,
+      localeFromPath,
+      localeCookieOptions()
+    );
+    return res;
   }
 
-  return NextResponse.next();
+  // Tanpa prefix bahasa di URL
+  const segments = pathname.split("/");
+  const possibleLang = segments[1];
+
+  // If it's an invalid language, redirect ke locale aktif (buang segmen salah)
+  if (
+    possibleLang &&
+    possibleLang.length === 2 &&
+    !supportedLanguages.includes(possibleLang)
+  ) {
+    const withoutInvalid = pathname.replace(/^\/[^/]+/, "") || "/";
+    const newPath =
+      withoutInvalid === "/"
+        ? `/${activeLanguage}`
+        : `/${activeLanguage}${withoutInvalid}`;
+    const newUrl = new URL(newPath, origin);
+    newUrl.search = searchParams;
+    const res = NextResponse.redirect(newUrl, 307);
+    res.cookies.set(
+      LOCALE_COOKIE_NAME,
+      activeLanguage,
+      localeCookieOptions()
+    );
+    return res;
+  }
+
+  // Path tanpa lang: REWRITE agar URL browser & hash tetap
+  if (pathname !== "/") {
+    const newUrl = new URL(`/${activeLanguage}${pathname}`, origin);
+    newUrl.search = searchParams;
+    const res = NextResponse.rewrite(newUrl);
+    res.cookies.set(
+      LOCALE_COOKIE_NAME,
+      activeLanguage,
+      localeCookieOptions()
+    );
+    return res;
+  }
+
+  // Root: REWRITE ke locale aktif; URL browser tetap "/"
+  const rootUrl = new URL(`/${activeLanguage}`, origin);
+  const rootRes = NextResponse.rewrite(rootUrl);
+  rootRes.cookies.set(
+    LOCALE_COOKIE_NAME,
+    activeLanguage,
+    localeCookieOptions()
+  );
+  return rootRes;
 }
 
 export const config = {

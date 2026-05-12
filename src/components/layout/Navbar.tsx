@@ -199,17 +199,20 @@ export function Navbar() {
   }, [pathname, hasDynamicBackground]);
 
   const getLogoSrc = () => {
-    // Jika halaman home, selalu gunakan logo putih
+    if (isOpen) {
+      return "/assets/Logo-white.png";
+    }
+    // If home page, always use white logo
     if (isHomePage) {
       return "/assets/Logo-blue.png";
     }
 
-    // Untuk halaman tanpa dynamic background, selalu gunakan logo putih
+    // For pages without dynamic background, always use white logo
     if (!hasDynamicBackground) {
       return "/assets/Logo-white.png";
     }
 
-    // Untuk halaman dengan dynamic background (home & get-involved)
+    // For pages with dynamic background (home & get-involved)
     if (isScrolled) {
       return "/assets/Logo-white.png";
     } else {
@@ -230,7 +233,7 @@ export function Navbar() {
 
   const handleSafeNavigation = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    href: string
+    href: string,
   ) => {
     // Google Translate mutates DOM nodes. For translated languages
     // (e.g. fr), force full-page navigation to avoid React hydration/reconcile crashes.
@@ -244,11 +247,13 @@ export function Navbar() {
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
-        isHomePage
-          ? "bg-white !text-[#010107]"
-          : isScrolled
-            ? "bg-[#3C62ED]/95 backdrop-blur-md shadow-lg"
-            : "bg-transparent",
+        isOpen
+          ? "bg-[#3C62ED] text-white shadow-lg"
+          : isHomePage
+            ? "bg-white !text-[#010107]"
+            : isScrolled
+              ? "bg-[#3C62ED]/95 backdrop-blur-md shadow-lg"
+              : "bg-transparent",
       )}
     >
       <div className="container mx-auto px-4">
@@ -325,14 +330,10 @@ export function Navbar() {
                 handleSafeNavigation(e, `/${language}/get-involved`)
               }
               className={cn(
-                "px-6 py-2 border-2 rounded transition-all duration-300 text-sm font-medium",
-                isHomePage
-                  ? "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white"
-                  : !hasDynamicBackground ||
-                      (isScrolled && !isHomePage) ||
-                      !currentBackgroundAnalysis?.isLight
-                    ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
-                    : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white",
+                "px-6 py-3 rounded transition-all duration-300 text-sm font-medium",
+                isScrolled && !isHomePage
+                  ? "bg-white text-[#3C62ED] hover:bg-white/90"
+                  : "bg-[#3C62ED] text-white hover:bg-[#2F56E6]",
               )}
             >
               Get Involved
@@ -344,11 +345,13 @@ export function Navbar() {
             onClick={toggleMenu}
             className={cn(
               "lg:hidden p-2 rounded-md transition-colors duration-300",
-              isHomePage
-                ? "text-[#010107]"
-                : isDark
-                  ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
-                  : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-100",
+              isOpen
+                ? "text-white hover:text-white hover:bg-white/10"
+                : isHomePage
+                  ? "text-[#010107]"
+                  : isDark
+                    ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
+                    : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-100",
             )}
             aria-label="Toggle menu"
           >
@@ -361,12 +364,7 @@ export function Navbar() {
       {isOpen && (
         <div
           className={cn(
-            "lg:hidden border-t transition-all duration-300",
-            isHomePage
-              ? "bg-white !text-[#010107]"
-              : isScrolled
-                ? "bg-[#3C62ED]/95 backdrop-blur-md border-blue-500/30"
-                : "bg-white border-gray-200 text-gray-800",
+            "lg:hidden border-t transition-all duration-300 bg-[#3C62ED] text-white border-[#3C62ED]",
           )}
         >
           <div className="px-4 pt-2 pb-4 space-y-1">
@@ -376,11 +374,7 @@ export function Navbar() {
                 href={`/${language}${link.href}`}
                 className={cn(
                   "block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300",
-                  isHomePage
-                    ? "text-[#010107]"
-                    : isScrolled
-                      ? "text-white hover:text-blue-300 hover:bg-blue-500/20"
-                      : "text-gray-700 hover:text-[#3C62ED] hover:bg-gray-50",
+                  "text-white hover:text-white hover:bg-white/10",
                 )}
                 onClick={(e) => {
                   setIsOpen(false);
@@ -394,17 +388,12 @@ export function Navbar() {
               <LanguageSwitcher
                 variant="drawer"
                 currentLanguage={language}
-                isDark={!isHomePage && isScrolled}
+                isDark
               />
               <Link
                 href={`/${language}/get-involved`}
                 className={cn(
-                  "block w-full text-center px-6 py-2 border-2 rounded transition-all duration-300 text-sm font-medium",
-                  isHomePage
-                    ? "border-[#3C62ED] text-[#3C62ED]"
-                    : isScrolled
-                      ? "border-white text-white hover:bg-white hover:text-[#3C62ED]"
-                      : "border-[#3C62ED] text-[#3C62ED] hover:bg-[#3C62ED] hover:text-white",
+                  "block w-full text-center px-6 py-3 rounded transition-all duration-300 text-sm font-medium bg-white text-[#3C62ED] hover:bg-white/90",
                 )}
                 onClick={(e) => {
                   setIsOpen(false);

@@ -284,6 +284,36 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           helpText:
             "Use a public path (e.g. /downloads/…). Private SharePoint/OneDrive links return access denied for public users.",
         },
+        {
+          key: "downloadModalIntro",
+          label: "Download modal — intro text (left panel)",
+          type: "textarea",
+          required: false,
+          defaultValue:
+            "We help local communities, small-scale fishers, and Indigenous Peoples secure their rights in caring for lands, waters, and resources to achieve lasting impact. Our Grantmaking Framework guides us to where we can make the most difference.",
+          placeholder:
+            "Short text shown beside the image in the PDF download modal…",
+          helpText:
+            "Shown in the download modal left column under the title. Supports **bold**. If empty, the first content paragraph is used; if there is no paragraph, a short default line is shown.",
+        },
+        {
+          key: "downloadModalImageSrc",
+          label: "Download modal — hero image",
+          type: "image",
+          required: false,
+          placeholder: "/assets/example-modal-hero.jpg",
+          helpText:
+            "Background image for the left side of the PDF download modal. If empty, the tab’s main Image URL is used; if that is also empty, a solid gradient is shown.",
+        },
+        {
+          key: "downloadModalImageAlt",
+          label: "Download modal — hero image alt text",
+          type: "text",
+          required: false,
+          placeholder: "Description of the modal hero image",
+          helpText:
+            "Accessibility label for the modal hero image. If empty, the tab’s Image Alt Text or title is used.",
+        },
       ],
       defaultValue: JSON.stringify(
         [
@@ -372,6 +402,11 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
               "Read the full-version of our Grantmaking Framework",
             downloadButtonText: "Download Now",
             downloadButtonUrl: "/downloads/grantmaking-framework.pdf",
+            downloadModalIntro:
+              "We help local communities, small-scale fishers, and Indigenous Peoples secure their rights in caring for lands, waters, and resources to achieve lasting impact. Our Grantmaking Framework guides us to where we can make the most difference.",
+            downloadModalImageSrc:
+              "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
+            downloadModalImageAlt: "Community fishing and livelihoods",
           },
         ],
         null,

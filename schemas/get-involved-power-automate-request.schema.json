@@ -34,11 +34,18 @@
       "description": "Microsoft Form Q3 — Type of Entity (nilai dari <select> situs; map ke label Company/Institute/Organization/Individual di langkah flow jika perlu)",
       "enum": ["company", "institute", "organization", "individual"]
     },
+    "organizationName": {
+      "type": "string",
+      "title": "Company / Institute / Organization name",
+      "description": "Wajib jika organization bukan \"individual\". Dikirim ke Power Automate sebagai organizationName (null jika individual).",
+      "maxLength": 500
+    },
     "country": {
       "type": "string",
       "title": "Country",
-      "description": "Microsoft Form Q4 — Country (nilai internal situs; map ke teks tampilan atau bebas di flow)",
-      "enum": ["indonesia", "philippines", "malaysia", "thailand", "other"]
+      "description": "Microsoft Form Q4 — Nama negara bahasa Inggris (dari kode ISO 3166-1 alpha-2 di situs; lihat src/lib/countries.ts).",
+      "minLength": 1,
+      "maxLength": 120
     },
     "partnershipType": {
       "type": "string",

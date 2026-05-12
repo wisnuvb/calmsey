@@ -1,12 +1,29 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { ChevronDown, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
+import { CountryCombobox } from "@/components/ui/country-combobox";
+import { SearchableCombobox } from "@/components/ui/searchable-combobox";
+import { getCountrySelectOptions } from "@/lib/countries";
+
+const ENTITY_TYPE_COMBO_OPTIONS = [
+  { value: "company", label: "Company" },
+  { value: "institute", label: "Institute" },
+  { value: "organization", label: "Organization" },
+  { value: "individual", label: "Individual" },
+] as const;
+
+const PARTNERSHIP_TYPE_COMBO_OPTIONS = [
+  { value: "Funding Partner", label: "Funding Partner" },
+  { value: "Technical Partner", label: "Technical Partner" },
+  { value: "Community Partner", label: "Community Partner" },
+  { value: "Research Partner", label: "Research Partner" },
+] as const;
 
 interface GetInvolvedSectionProps {
   backgroundImage?: string;
@@ -31,6 +48,20 @@ function bannerTextWithBold(text: string) {
       <React.Fragment key={index}>{part}</React.Fragment>
     ),
   );
+}
+
+/** Label field nama entitas sesuai tipe yang dipilih. */
+function entityNameLabel(
+  entityType: string,
+): "Company name" | "Institute name" | "Organization name" {
+  switch (entityType) {
+    case "company":
+      return "Company name";
+    case "institute":
+      return "Institute name";
+    default:
+      return "Organization name";
+  }
 }
 
 export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
@@ -113,6 +144,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
     fullName: "",
     email: "",
     organization: "",
+    organizationName: "",
     country: "",
     partnershipType: becomeParam === "funder" ? "Funding Partner" : "",
     message: "",
@@ -129,13 +161,20 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   const [charCount, setCharCount] = useState(0);
   const maxChars = 5000;
 
+  const countryOptions = useMemo(() => getCountrySelectOptions(), []);
+
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      if (name === "organization" && value === "individual") {
+        return { ...prev, organization: value, organizationName: "" };
+      }
+      return { ...prev, [name]: value };
+    });
 
     if (name === "message") {
       setCharCount(value.length);
@@ -145,8 +184,24 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setLoading(true);
     setError("");
+
+    if (!formData.organization.trim()) {
+      setError("Please select company, institute, organization, or individual");
+      return;
+    }
+
+    if (!formData.country.trim()) {
+      setError("Please select a country");
+      return;
+    }
+
+    if (!formData.partnershipType.trim()) {
+      setError("Please select type of partner");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await fetch("/api/get-involved", {
@@ -167,6 +222,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
         fullName: "",
         email: "",
         organization: "",
+        organizationName: "",
         country: "",
         partnershipType: "",
         message: "",
@@ -265,69 +321,85 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   <label htmlFor="organization" className="sr-only">
                     Company / Institute / Organization / Individual
                   </label>
-                  <select
+                  <SearchableCombobox
                     id="organization"
-                    name="organization"
                     value={formData.organization}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
-                    required
+                    onValueChange={(organization) =>
+                      setFormData((prev) =>
+                        organization === "individual"
+                          ? {
+                              ...prev,
+                              organization,
+                              organizationName: "",
+                            }
+                          : { ...prev, organization },
+                      )
+                    }
+                    options={[...ENTITY_TYPE_COMBO_OPTIONS]}
+                    placeholder="Company / Institute / Organization / Individual"
+                    searchPlaceholder="Search…"
+                    emptyResultsMessage="No matches"
+                    listboxLabel="Type of entity"
+                    listHeightClassName="h-[220px]"
                     aria-label="Company / Institute / Organization / Individual"
-                  >
-                    <option value="">
-                      Company / Institute / Organization / Individual
-                    </option>
-                    <option value="company">Company</option>
-                    <option value="institute">Institute</option>
-                    <option value="organization">Organization</option>
-                    <option value="individual">Individual</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  />
                 </div>
+
+                {formData.organization &&
+                  formData.organization !== "individual" && (
+                    <div>
+                      <label htmlFor="organizationName" className="sr-only">
+                        {entityNameLabel(formData.organization)}
+                      </label>
+                      <input
+                        id="organizationName"
+                        type="text"
+                        name="organizationName"
+                        placeholder={entityNameLabel(formData.organization)}
+                        value={formData.organizationName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                        required
+                        maxLength={500}
+                        aria-label={entityNameLabel(formData.organization)}
+                      />
+                    </div>
+                  )}
 
                 <div className="relative">
                   <label htmlFor="country" className="sr-only">
                     Country
                   </label>
-                  <select
+                  <CountryCombobox
                     id="country"
-                    name="country"
                     value={formData.country}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
-                    required
+                    onValueChange={(country) =>
+                      setFormData((prev) => ({ ...prev, country }))
+                    }
+                    options={countryOptions}
+                    placeholder="Select country"
                     aria-label="Country"
-                  >
-                    <option value="">Select Country</option>
-                    <option value="indonesia">Indonesia</option>
-                    <option value="philippines">Philippines</option>
-                    <option value="malaysia">Malaysia</option>
-                    <option value="thailand">Thailand</option>
-                    <option value="other">Other</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  />
                 </div>
 
                 <div className="relative">
                   <label htmlFor="partnershipType" className="sr-only">
                     Partnership type
                   </label>
-                  <select
+                  <SearchableCombobox
                     id="partnershipType"
-                    name="partnershipType"
                     value={formData.partnershipType}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
-                    required
+                    onValueChange={(partnershipType) =>
+                      setFormData((prev) => ({ ...prev, partnershipType }))
+                    }
+                    options={[...PARTNERSHIP_TYPE_COMBO_OPTIONS]}
+                    placeholder="Type of partner"
+                    searchPlaceholder="Search…"
+                    emptyResultsMessage="No matches"
+                    listboxLabel="Partnership type"
+                    listHeightClassName="h-[220px]"
                     aria-label="Partnership type"
-                  >
-                    <option value="">Type of partner</option>
-                    <option value="Funding Partner">Funding Partner</option>
-                    <option value="Technical Partner">Technical Partner</option>
-                    <option value="Community Partner">Community Partner</option>
-                    <option value="Research Partner">Research Partner</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  />
                 </div>
 
                 <div>

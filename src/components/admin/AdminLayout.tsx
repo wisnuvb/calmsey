@@ -17,6 +17,7 @@ import {
   ArrowRightOnRectangleIcon,
   PencilSquareIcon,
   QueueListIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 
 const navigation = [
@@ -27,6 +28,7 @@ const navigation = [
   { name: "Tags", href: "/admin/tags", icon: TagIcon },
   { name: "Media", href: "/admin/media", icon: PhotoIcon },
   { name: "Partner Stories", href: "/admin/articles", icon: DocumentTextIcon },
+  { name: "Resource downloads", href: "/admin/resource-downloads", icon: ArrowDownTrayIcon },
   { name: "Footer", href: "/admin/footer", icon: QueueListIcon },
   // { name: "Pages", href: "/admin/pages", icon: DocumentTextIcon },
   // { name: "Brandkits", href: "/admin/brandkits", icon: PaletteIcon },

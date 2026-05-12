@@ -1,5 +1,6 @@
 "use client";
 
+import { LOCALE_COOKIE_NAME } from "@/lib/constants";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { SupportedLanguage } from "@/lib/public-api";
@@ -37,6 +38,10 @@ export function LanguageSwitcher({
   // Handle language change with page reload for stability
   const handleLanguageChange = (languageId: string, url: string) => {
     setOpen(false);
+    const maxAge = 60 * 60 * 24 * 365;
+    document.cookie = `${LOCALE_COOKIE_NAME}=${encodeURIComponent(
+      languageId
+    )}; path=/; max-age=${maxAge}; SameSite=Lax`;
     window.location.href = url;
   };
 
@@ -90,7 +95,10 @@ export function LanguageSwitcher({
   return (
     <div
       ref={rootRef}
-      className={cn("relative group notranslate", variant === "drawer" && "w-full")}
+      className={cn(
+        "relative group notranslate",
+        variant === "drawer" && "w-full",
+      )}
       translate="no"
     >
       <button
@@ -100,10 +108,12 @@ export function LanguageSwitcher({
         onClick={() => setOpen((o) => !o)}
         className={cn(
           "flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-md",
-          variant === "drawer" && "w-full justify-center",
-          isDark
-            ? "text-white hover:text-gray-100"
-            : "text-gray-700 hover:text-gray-600"
+          variant === "drawer" &&
+            "w-full justify-center bg-white text-[#3C62ED] hover:bg-white/90",
+          variant !== "drawer" &&
+            (isDark
+              ? "text-white hover:text-gray-100"
+              : "text-gray-700 hover:text-gray-600"),
         )}
       >
         <span className="uppercase">{currentLanguageId}</span>
@@ -124,7 +134,7 @@ export function LanguageSwitcher({
 
       <div
         className={cn(
-          "absolute mt-2 bg-white rounded-md shadow-lg transition-all duration-200 z-[60]",
+          "absolute mt-2 bg-white rounded-md shadow-lg transition-all duration-200 z-[60] border border-gray-200",
           variant === "navbar" && "right-0 w-48",
           variant === "drawer" && "left-0 right-0 w-auto",
           open

@@ -3,8 +3,14 @@
 import Image from "next/image";
 import { Download, X } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
+import { LanguageVariantPicker } from "@/components/main/LanguageVariantPicker";
+import { getCountryLabelForValue } from "@/lib/countries";
+import { CountryCombobox } from "@/components/ui/country-combobox";
+import { SearchableCombobox } from "@/components/ui/searchable-combobox";
+import { getCountrySelectOptions } from "@/lib/countries";
+import { orderLanguageLabelsEnglishFirst } from "@/lib/download-language-order";
 
 interface DownloadOption {
   label: string;
@@ -97,6 +103,18 @@ export function WhereWeWorkSection({
     "Download action plans",
   );
 
+  const actionPlansModalSubtitle = getValue(
+    "whereWeWork.actionPlansDownloadModalSubtitle",
+    undefined,
+    "Our approach, risk mitigation, milestones and estimate budget until 2030 ahead",
+  );
+
+  const partnersModalSubtitle = getValue(
+    "whereWeWork.partnersDownloadModalSubtitle",
+    undefined,
+    "",
+  );
+
   const actionPlansDownloadItems = getContentJSON<DownloadItem[]>(
     "whereWeWork.actionPlansDownloadItems",
     propActionPlansItems || [],
@@ -145,7 +163,7 @@ export function WhereWeWorkSection({
       <div className="container mx-auto px-4 sm:px-6 lg:px-0">
         {/* Title */}
         <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-3xl sm:text-[38px] font-nunito font-bold text-[#010107]">
+          <h2 className="font-nunito text-[30px] font-bold leading-[120%] text-[#010107] sm:text-[38px]">
             {title}
           </h2>
         </div>
@@ -154,7 +172,7 @@ export function WhereWeWorkSection({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10 mb-4 lg:mb-8 mx-auto px-3 sm:px-6 lg:px-0">
           <div className="flex items-start gap-4 mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#3C62ED] flex-shrink-0 mt-1" />
-            <div className="text-base text-gray-900 font-work-sans leading-relaxed min-w-0">
+            <div className="min-w-0">
               <p className="mb-2 p">
                 {actionPlansText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
                   if (index % 2 === 1) {
@@ -182,7 +200,7 @@ export function WhereWeWorkSection({
 
           <div className="flex items-start gap-4 mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#7db5bb] flex-shrink-0 mt-1" />
-            <p className="text-base text-gray-900 font-work-sans leading-relaxed p min-w-0">
+            <p className="p min-w-0 text-gray-900">
               {explorationText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
                 if (index % 2 === 1) {
                   return <strong key={index}>{part}</strong>;
@@ -197,7 +215,7 @@ export function WhereWeWorkSection({
               className="mt-1 box-border h-4 w-4 shrink-0 rounded-full border-[2px] border-[#172554] bg-transparent"
               aria-hidden
             />
-            <div className="text-base text-gray-900 font-work-sans leading-relaxed min-w-0">
+            <div className="min-w-0">
               <p className="mb-2 p">
                 {partnersText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
                   if (index % 2 === 1) {
@@ -253,8 +271,10 @@ export function WhereWeWorkSection({
       {actionPlansModalOpen && (
         <DownloadFilesModal
           title={actionPlansModalTitle}
+          subtitle={actionPlansModalSubtitle}
+          modalSource="ACTION_PLANS"
           items={actionPlansDownloadItems}
-          downloadButtonText="Download"
+          downloadButtonText="Download Now"
           onClose={() => setActionPlansModalOpen(false)}
         />
       )}
@@ -263,6 +283,8 @@ export function WhereWeWorkSection({
       {partnersModalOpen && (
         <DownloadFilesModal
           title={partnersModalTitle}
+          subtitle={partnersModalSubtitle}
+          modalSource="PARTNERS"
           items={partnersDownloadItems}
           downloadButtonText="Download Now"
           onClose={() => setPartnersModalOpen(false)}
@@ -274,42 +296,148 @@ export function WhereWeWorkSection({
 
 function DownloadFilesModal({
   title,
+  subtitle,
+  modalSource,
   items,
   downloadButtonText,
   onClose,
 }: {
   title: string;
+  subtitle?: string;
+  modalSource: "ACTION_PLANS" | "PARTNERS";
   items: DownloadItem[];
   downloadButtonText: string;
   onClose: () => void;
 }) {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [userCountry, setUserCountry] = useState("");
+  const [formError, setFormError] = useState("");
+  const countryOptions = useMemo(() => getCountrySelectOptions(), []);
+
+  const validateLeadForm = (): boolean => {
+    setFormError("");
+    if (!fullName.trim()) {
+      setFormError("Please enter your full name.");
+      return false;
+    }
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setFormError("Please enter a valid email address.");
+      return false;
+    }
+    if (!userCountry.trim()) {
+      setFormError("Please select your country.");
+      return false;
+    }
+    return true;
+  };
+
+  const getLeadData = useCallback(() => {
+    const cc = userCountry.trim().toLowerCase();
+    return {
+      fullName: fullName.trim(),
+      email: email.trim(),
+      countryCode: cc,
+      countryLabel: getCountryLabelForValue(cc) ?? cc,
+    };
+  }, [fullName, email, userCountry]);
+
+  const subtitleText = subtitle?.trim() ?? "";
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       onClick={onClose}
+      role="presentation"
     >
       <div
-        className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="download-modal-title"
       >
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
-          <button
-            onClick={onClose}
-            className="p-1 text-gray-400 hover:text-gray-600 rounded transition-colors"
-            aria-label="Close"
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-md p-1 text-gray-900 hover:bg-gray-100 transition-colors z-10"
+          aria-label="Close"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        <div className="p-6 sm:p-8 pb-4 pr-12">
+          <h2
+            id="download-modal-title"
+            className="text-xl sm:text-2xl font-bold text-gray-900 font-nunito leading-tight"
           >
-            <X className="w-6 h-6" />
-          </button>
+            {title}
+          </h2>
+          {subtitleText ? (
+            <p className="mt-2 text-sm sm:text-base text-[#060726]/80 font-work-sans leading-snug">
+              {subtitleText}
+            </p>
+          ) : null}
         </div>
-        <div className="p-6 space-y-6">
-          {items.map((item) => (
-            <DownloadItemRow
-              key={item.id}
-              item={item}
-              downloadButtonText={downloadButtonText}
+
+        <div className="px-6 sm:px-8 pb-8 space-y-5">
+          <div className="space-y-3">
+            <label htmlFor="download-modal-fullname" className="sr-only">
+              Full name
+            </label>
+            <input
+              id="download-modal-fullname"
+              type="text"
+              autoComplete="name"
+              placeholder="Full name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]"
             />
-          ))}
+            <label htmlFor="download-modal-email" className="sr-only">
+              Email
+            </label>
+            <input
+              id="download-modal-email"
+              type="email"
+              autoComplete="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]"
+            />
+            <label htmlFor="download-modal-country" className="sr-only">
+              Country
+            </label>
+            <CountryCombobox
+              id="download-modal-country"
+              value={userCountry}
+              onValueChange={setUserCountry}
+              options={countryOptions}
+              placeholder="Select country"
+              aria-label="Country"
+            />
+          </div>
+
+          {formError ? (
+            <p className="text-sm text-red-600" role="alert">
+              {formError}
+            </p>
+          ) : null}
+
+          <div className="space-y-6 pt-1">
+            {items.map((item) => (
+              <DownloadItemRow
+                key={item.id}
+                item={item}
+                modalSource={modalSource}
+                downloadButtonText={downloadButtonText}
+                validateLeadForm={validateLeadForm}
+                getLeadData={getLeadData}
+                reportError={setFormError}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -318,68 +446,145 @@ function DownloadFilesModal({
 
 function DownloadItemRow({
   item,
+  modalSource,
   downloadButtonText,
+  validateLeadForm,
+  getLeadData,
+  reportError,
 }: {
   item: DownloadItem;
+  modalSource: "ACTION_PLANS" | "PARTNERS";
   downloadButtonText: string;
+  validateLeadForm: () => boolean;
+  getLeadData: () => {
+    fullName: string;
+    email: string;
+    countryCode: string;
+    countryLabel: string;
+  };
+  reportError: (message: string) => void;
 }) {
-  const options = parseDownloadOptions(item.downloadOptions);
+  const options = useMemo(() => {
+    const parsed = parseDownloadOptions(item.downloadOptions);
+    return item.selectorType === "language"
+      ? orderLanguageLabelsEnglishFirst(parsed)
+      : parsed;
+  }, [item.downloadOptions, item.selectorType]);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleDownload = () => {
+  const variantOptions = useMemo(
+    () =>
+      options.map((o, i) => ({
+        value: String(i),
+        label: o.label,
+      })),
+    [options],
+  );
+
+  const handleDownload = async () => {
+    if (!validateLeadForm()) return;
     const opt = options[selectedIndex];
-    if (opt?.fileUrl) {
-      const url =
-        opt.fileUrl.startsWith("/") || opt.fileUrl.startsWith("http")
-          ? opt.fileUrl
-          : `https://${opt.fileUrl}`;
+    if (!opt?.fileUrl) return;
+
+    const url =
+      opt.fileUrl.startsWith("/") || opt.fileUrl.startsWith("http")
+        ? opt.fileUrl
+        : `https://${opt.fileUrl}`;
+
+    setIsSubmitting(true);
+    reportError("");
+    try {
+      const lead = getLeadData();
+      const res = await fetch("/api/resource-downloads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: lead.fullName,
+          email: lead.email,
+          countryCode: lead.countryCode,
+          countryLabel: lead.countryLabel,
+          modalSource,
+          documentItemId: item.id,
+          documentTitle: item.title?.trim() || null,
+          selectorType: item.selectorType,
+          selectedOptionLabel: opt.label,
+          fileUrl: url,
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      if (!res.ok) {
+        reportError(
+          data.error ||
+            "Could not submit your details. Please try again shortly.",
+        );
+        return;
+      }
       window.open(url, "_blank");
+    } catch {
+      reportError("Something went wrong. Check your connection and try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const selectorPlaceholder =
-    item.selectorType === "country" ? "Select Country" : "Select Language";
+    item.selectorType === "country" ? "Select country" : "Select language";
 
   const hasTitle = item.title && item.title.trim().length > 0;
 
   return (
-    <div
-      className={`flex flex-col sm:flex-row gap-3 ${!hasTitle ? "sm:justify-center" : "sm:items-center"}`}
-    >
-      {hasTitle && (
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900 truncate">
-            {item.title}
-          </p>
-        </div>
-      )}
-      <div
-        className={`flex gap-2 ${hasTitle ? "flex-shrink-0" : "flex-1 justify-center sm:justify-start"}`}
-      >
-        <select
-          value={selectedIndex}
-          onChange={(e) => setSelectedIndex(Number(e.target.value))}
-          className="px-3 py-2 border border-gray-300 rounded-md text-sm min-w-[140px]"
-          aria-label={selectorPlaceholder}
-        >
-          {options.length === 0 ? (
-            <option value={0}>{selectorPlaceholder}</option>
+    <div className="w-full space-y-3">
+      {hasTitle ? (
+        <p className="text-sm font-medium text-gray-900">{item.title}</p>
+      ) : null}
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+        <div className="flex shrink-0 justify-center sm:justify-start sm:pt-0">
+          {item.selectorType === "language" ? (
+            <LanguageVariantPicker
+              options={options}
+              selectedIndex={selectedIndex}
+              onSelectIndex={setSelectedIndex}
+              placeholder={selectorPlaceholder}
+            />
+          ) : options.length === 0 ? (
+            <button
+              type="button"
+              disabled
+              className="inline-flex min-h-[48px] w-full min-w-[140px] items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-400 sm:w-[180px]"
+            >
+              {selectorPlaceholder}
+            </button>
           ) : (
-            options.map((opt, i) => (
-              <option key={i} value={i}>
-                {opt.label}
-              </option>
-            ))
+            <div className="w-full min-w-[140px] sm:w-[180px]">
+              <SearchableCombobox
+                id={`download-variant-${item.id}`}
+                value={String(Math.min(selectedIndex, options.length - 1))}
+                onValueChange={(v) => setSelectedIndex(Number(v))}
+                options={variantOptions}
+                placeholder={selectorPlaceholder}
+                searchPlaceholder="Search…"
+                emptyResultsMessage="No matches"
+                listboxLabel={selectorPlaceholder}
+                listHeightClassName="h-[200px]"
+                aria-label={selectorPlaceholder}
+                className="min-h-[48px]"
+              />
+            </div>
           )}
-        </select>
+        </div>
+
         <button
           type="button"
-          onClick={handleDownload}
-          disabled={options.length === 0}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          onClick={() => void handleDownload()}
+          disabled={options.length === 0 || isSubmitting}
+          className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-lg bg-[#3C62ED] px-5 py-3.5 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#3558d4] disabled:cursor-not-allowed disabled:opacity-50 font-work-sans"
         >
-          <Download className="w-4 h-4" />
-          {downloadButtonText}
+          <Download className="h-5 w-5 shrink-0" aria-hidden />
+          {isSubmitting ? "Submitting…" : downloadButtonText}
         </button>
       </div>
     </div>

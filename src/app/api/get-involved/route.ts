@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  getCountryLabelForValue,
+  isAllowedCountryValue,
+} from "@/lib/countries";
 
 /** Normalizes env if someone pasted a markdown link `[label](url)` by mistake. */
 function normalizeWebhookUrl(raw: string | undefined): string | undefined {
@@ -12,10 +16,19 @@ function normalizeWebhookUrl(raw: string | undefined): string | undefined {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { fullName, email, organization, country, partnershipType, message } =
-      body;
+    const {
+      fullName,
+      email,
+      organization,
+      organizationName,
+      country,
+      partnershipType,
+      message,
+    } = body;
 
-    // Validation
+    const entityTypes = ["company", "institute", "organization", "individual"] as const;
+
+    // Validation — empty fields to make "All fields are required" message still valid
     if (
       !fullName ||
       !email ||
@@ -30,6 +43,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const orgType =
+      typeof organization === "string" ? organization.trim().toLowerCase() : "";
+    if (!entityTypes.includes(orgType as (typeof entityTypes)[number])) {
+      return NextResponse.json(
+        { error: "Invalid type of entity" },
+        { status: 400 }
+      );
+    }
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -37,6 +59,44 @@ export async function POST(request: NextRequest) {
         { error: "Format email tidak valid" },
         { status: 400 }
       );
+    }
+
+    const countryNormalized =
+      typeof country === "string" ? country.trim().toLowerCase() : "";
+    if (!isAllowedCountryValue(countryNormalized)) {
+      return NextResponse.json(
+        { error: "Invalid or unsupported country" },
+        { status: 400 }
+      );
+    }
+    const countryLabel = getCountryLabelForValue(countryNormalized);
+    if (!countryLabel) {
+      return NextResponse.json(
+        { error: "Invalid or unsupported country" },
+        { status: 400 }
+      );
+    }
+
+    let trimmedOrganizationName: string | undefined;
+    if (orgType !== "individual") {
+      const raw =
+        typeof organizationName === "string" ? organizationName.trim() : "";
+      if (!raw) {
+        return NextResponse.json(
+          {
+            error:
+              "Company name, Institute name, or Organization name is required",
+          },
+          { status: 400 }
+        );
+      }
+      if (raw.length > 500) {
+        return NextResponse.json(
+          { error: "Organization name is too long" },
+          { status: 400 }
+        );
+      }
+      trimmedOrganizationName = raw;
     }
 
     const webhookUrl = normalizeWebhookUrl(
@@ -53,8 +113,9 @@ export async function POST(request: NextRequest) {
     const powerAutomatePayload = {
       fullName,
       email,
-      entityType: organization,
-      country,
+      entityType: orgType,
+      organizationName: trimmedOrganizationName ?? null,
+      country: countryLabel,
       partnerType: partnershipType,
       message,
     };

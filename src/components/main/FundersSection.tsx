@@ -118,7 +118,7 @@ export function FundersSection({
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-11">
         {/* Title */}
-        <h2 className="text-xl sm:text-[38px] text-[#010107] text-center tracking-wider font-nunito font-bold">
+        <h2 className="text-center font-nunito text-[30px] font-bold leading-[120%] text-[#010107] sm:text-[38px]">
           {title}
         </h2>
 
@@ -147,14 +147,14 @@ export function FundersSection({
           ))}
         </div>
 
-        {/* Call to Action */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 lg:gap-16 max-w-xl sm:max-w-full mx-auto w-full">
-          <p className="text-[#060726CC] text-base leading-[150%] tracking-normal font-work-sans text-center line-clamp-3">
+        {/* Call to action: teks dibungkus (~2 baris), rata kiri; tombol rapat di samping */}
+        <div className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-start gap-4 sm:gap-5 w-full max-w-5xl mx-auto">
+          <p className="p max-w-xl text-left text-[#060726CC] sm:max-w-2xl">
             {ctaText}
           </p>
           <Link
             href={buttonLink}
-            className="inline-flex items-center justify-center px-8 py-5 bg-white border border-[#CADBEA] text-[#010107] text-base rounded-[4px] hover:bg-gray-50 transition-colors font-normal font-work-sans whitespace-nowrap"
+            className="inline-flex shrink-0 items-center justify-center px-8 py-5 bg-white border border-[#CADBEA] text-[#010107] text-base rounded-[4px] hover:bg-gray-50 transition-colors font-normal font-work-sans whitespace-nowrap"
           >
             {buttonText}
           </Link>

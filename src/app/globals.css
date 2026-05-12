@@ -38,7 +38,7 @@
 }
 
 .prose p {
-  @apply mb-4 leading-[27px];
+  @apply mb-4 font-work-sans text-base leading-[27px];
 }
 
 .prose ul,

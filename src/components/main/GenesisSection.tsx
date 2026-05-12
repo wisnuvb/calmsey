@@ -65,16 +65,13 @@ export function GenesisSection({
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
-        <h2 className="text-center text-3xl sm:text-4xl lg:text-[38px] font-bold text-[#3C62ED] font-nunito mb-8">
+        <h2 className="mb-8 text-left font-nunito text-[30px] font-bold leading-[120%] text-[#3C62ED] sm:text-center sm:text-[38px]">
           {title}
         </h2>
 
         {/* Intro Paragraph */}
-        <div className="max-w-4xl mx-auto mb-8 sm:mb-12 lg:mb-16 px-1">
-          <P
-            style="p1reg"
-            className="text-[#060726CC] text-center font-work-sans"
-          >
+        <div className="mb-8 max-w-4xl px-1 sm:mb-12 lg:mb-16 mx-auto">
+          <P className="text-left text-[#060726CC] sm:text-center">
             {introParagraph}
           </P>
         </div>
@@ -88,14 +85,9 @@ export function GenesisSection({
         >
           {/* Left Column - Main Text */}
           <div className="space-y-5 sm:space-y-6 px-1 lg:px-0">
-            <P
-              style="p1reg"
-              className="text-[#060726CC] font-work-sans"
-            >
-              {mainParagraph}
-            </P>
+            <P className="text-[#060726CC] p">{mainParagraph}</P>
             <div
-              className="text-[#060726CC] font-work-sans text-base font-normal leading-[27px]"
+              className="p text-[#060726CC]"
               dangerouslySetInnerHTML={{
                 __html: closingParagraph.replace(
                   /\*\*(.*?)\*\*/g,

@@ -373,6 +373,28 @@ model ContactSubmission {
   @@map("contact_submissions")
 }
 
+/// Lead form + file choice when users download gated resources on the site.
+model ResourceDownloadSubmission {
+  id                  String   @id @default(cuid())
+  fullName            String   @db.VarChar(500)
+  email               String   @db.VarChar(320)
+  countryCode         String   @db.VarChar(16)
+  countryLabel        String   @db.VarChar(200)
+  /// ACTION_PLANS | PARTNERS | GRANTMAKING_FRAMEWORK
+  modalSource         String   @db.VarChar(32)
+  documentItemId      String?  @db.VarChar(128)
+  documentTitle       String?  @db.Text
+  selectorType        String   @db.VarChar(16)
+  selectedOptionLabel String   @db.VarChar(500)
+  fileUrl             String   @db.Text
+  createdAt           DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email])
+  @@index([modalSource])
+  @@map("resource_download_submissions")
+}
+
 model Tag {
   id       String       @id @default(cuid())
   name     String       @unique

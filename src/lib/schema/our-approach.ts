@@ -265,11 +265,41 @@ export const OUR_APPROACH_SCHEMA: PageContentSchema = {
         {
           key: "downloadButtonUrl",
           label: "Download Button URL",
-          type: "text",
+          type: "file",
           required: false,
           placeholder: "/downloads/example.pdf",
           helpText:
             "Use a public URL or path (e.g. /downloads/… in public/). Private SharePoint/OneDrive links will show access denied for visitors.",
+        },
+        {
+          key: "downloadModalIntro",
+          label: "Download modal — intro text (left panel)",
+          type: "textarea",
+          required: false,
+          defaultValue:
+            "We help local communities, small-scale fishers, and Indigenous Peoples secure their rights in caring for lands, waters, and resources to achieve lasting impact. Our Grantmaking Framework guides us to where we can make the most difference.",
+          placeholder:
+            "Short text shown beside the image in the PDF download modal…",
+          helpText:
+            "Shown in the download modal left column under the title. Supports **bold**. If empty, the first content paragraph is used; if there is no paragraph, a short default line is shown.",
+        },
+        {
+          key: "downloadModalImageSrc",
+          label: "Download modal — hero image",
+          type: "image",
+          required: false,
+          placeholder: "/assets/example-modal-hero.jpg",
+          helpText:
+            "Background image for the left side of the PDF download modal. If empty, the tab’s main Image URL is used; if that is also empty, a solid gradient is shown.",
+        },
+        {
+          key: "downloadModalImageAlt",
+          label: "Download modal — hero image alt text",
+          type: "text",
+          required: false,
+          placeholder: "Description of the modal hero image",
+          helpText:
+            "Accessibility label for the modal hero image. If empty, the tab’s Image Alt Text or title is used.",
         },
       ],
     },

@@ -6,6 +6,9 @@ export const SUPPORTED_LANGUAGES = ["en", "id"] as const;
 export type SupportedLanguage = string; // Changed to string to support dynamic languages
 export const DEFAULT_LANGUAGE = "en"; // Fallback default
 
+/** Cookie diset middleware + client agar path tanpa prefix bahasa di-rewrite ke locale aktif. */
+export const LOCALE_COOKIE_NAME = "ttf-locale";
+
 // Legacy function for backward compatibility
 export function isValidLanguage(lang: string): boolean {
   // This is now a synchronous fallback - use dynamic-languages.ts for full functionality
