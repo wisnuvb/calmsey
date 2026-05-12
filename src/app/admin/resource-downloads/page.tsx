@@ -90,7 +90,7 @@ export default function ResourceDownloadsAdminPage() {
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">
-            Resource downloads
+            Download Activity
           </h1>
           <p className="mt-1 text-sm text-gray-500">
             Submissions from resource download lead forms (Where We Work,
@@ -136,7 +136,9 @@ export default function ResourceDownloadsAdminPage() {
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading…</div>
         ) : rows.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No submissions yet.</div>
+          <div className="p-8 text-center text-gray-500">
+            No submissions yet.
+          </div>
         ) : (
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
