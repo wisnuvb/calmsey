@@ -147,7 +147,7 @@ export function FundersSection({
           ))}
         </div>
 
-        {/* Call to action: teks dibungkus (~2 baris), rata kiri; tombol rapat di samping */}
+        {/* Call to action: wrapper text (~2 lines), left aligned; button right aligned */}
         <div className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-start gap-4 sm:gap-5 w-full max-w-5xl mx-auto">
           <p className="p max-w-xl text-left text-[#060726CC] sm:max-w-2xl">
             {ctaText}
