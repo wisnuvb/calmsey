@@ -44,7 +44,20 @@ export function LanguageSwitcher({
     )}; path=/; max-age=${maxAge}; SameSite=Lax`;
     // Reload dokumen penuh: state Google Translate + widget tidak reliable setelah
     // beberapa kali navigasi klien; reload memastikan locale & GT bersih setiap ganti bahasa.
-    window.location.assign(url);
+    //
+    // Di prod, middleware sering memakai URL tanpa prefix (rewrite ke /{locale}/...).
+    // Beralih ke bahasa default menghasilkan href yang sama dengan pathname browser
+    // (mis. tetap `/about-us`). `assign` ke URL identik sering tidak memicu fetch —
+    // cookie sudah berubah tapi halaman tidak reload. Paksa reload bila path sama.
+    const targetPath = new URL(url, window.location.origin).pathname;
+    const currentPath = window.location.pathname;
+    const norm = (p: string) =>
+      p === "/" ? "/" : p.replace(/\/+$/, "") || "/";
+    if (norm(targetPath) === norm(currentPath)) {
+      window.location.reload();
+    } else {
+      window.location.assign(url);
+    }
   };
 
   const getLanguageUrl = (languageId: string) => {
