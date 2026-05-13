@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "../public/LanguageProvider";
+import { clientNavigateWithGoogleTranslateSafety } from "@/lib/safe-client-navigation";
 
 interface RichTextProps {
   content: string;
@@ -45,17 +46,23 @@ export function RichText({ content, className }: RichTextProps) {
           e.preventDefault();
           // Normalize relative hash links (like "our-approach#vision" to "/our-approach#vision")
           let href = rawHref.startsWith("/") ? rawHref : `/${rawHref}`;
-          
+
           // Inject language prefix if it's missing to avoid middleware reload which drops the hash
-          if (language && !href.startsWith(`/${language}/`) && href !== `/${language}`) {
-             href = `/${language}${href}`;
+          if (
+            language &&
+            !href.startsWith(`/${language}/`) &&
+            href !== `/${language}`
+          ) {
+            href = `/${language}${href}`;
           }
-          
-          router.push(href);
+
           const anchorId = href.includes("#")
             ? (href.split("#")[1] ?? "").split("?")[0]
             : "";
-          if (anchorId) {
+
+          void (async () => {
+            await clientNavigateWithGoogleTranslateSafety(router, href);
+            if (!anchorId) return;
             const scrollToHash = (attempts: number) => {
               const el = document.getElementById(anchorId);
               if (el) {
@@ -67,7 +74,7 @@ export function RichText({ content, className }: RichTextProps) {
               }
             };
             window.setTimeout(() => scrollToHash(0), 80);
-          }
+          })();
         }
       }
     };

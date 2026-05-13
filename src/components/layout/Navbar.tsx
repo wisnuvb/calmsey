@@ -8,8 +8,8 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "../public/LanguageProvider";
 import { LanguageSwitcher } from "../public/LanguageSwitcher";
-import { shouldForceFullPageNavigationForLocale } from "@/lib/browser-translate";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { clientNavigateWithGoogleTranslateSafety } from "@/lib/safe-client-navigation";
 
 interface NavLink {
   label: string;
@@ -73,6 +73,7 @@ export function Navbar() {
   } | null>(null);
 
   const pathname = usePathname();
+  const router = useRouter();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -235,12 +236,10 @@ export function Navbar() {
     e: React.MouseEvent<HTMLAnchorElement>,
     href: string,
   ) => {
-    // Google Translate mutates DOM nodes (termasuk locale `id`). Paksa navigasi
-    // penuh agar React tidak reconcile terhadap DOM yang sudah diubah GT.
-    if (shouldForceFullPageNavigationForLocale(language)) {
-      e.preventDefault();
-      window.location.href = href;
-    }
+    if (language === "en") return;
+
+    e.preventDefault();
+    void clientNavigateWithGoogleTranslateSafety(router, href);
   };
 
   return (

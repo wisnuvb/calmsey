@@ -2,7 +2,11 @@
 
 import { createContext, useContext, ReactNode, useEffect } from "react";
 import { SupportedLanguage } from "@/lib/public-api";
-import { translatePage, toGoogleTranslateCode } from "@/lib/browser-translate";
+import {
+  translatePage,
+  toGoogleTranslateCode,
+  scheduleGoogleTranslateWarmup,
+} from "@/lib/browser-translate";
 
 interface LanguageContextType {
   language: SupportedLanguage;
@@ -25,19 +29,35 @@ export function LanguageProvider({
     isDefaultLanguage: language === "en",
   };
 
+  useEffect(() => {
+    scheduleGoogleTranslateWarmup();
+  }, []);
+
   // Trigger browser translation when language changes
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const googleTranslateCode = toGoogleTranslateCode(language);
+    if (typeof window === "undefined") return;
 
-      // Use translatePage which handles both browser translation and Google Translate fallback
-      translatePage({
-        targetLanguage: googleTranslateCode,
-        sourceLanguage: "en", // Content is always in English
-      }).catch((error) => {
-        console.error("[LanguageProvider] Translation error:", error);
+    const googleTranslateCode = toGoogleTranslateCode(language);
+
+    let cancelled = false;
+    let innerRaf = 0;
+    const outerRaf = window.requestAnimationFrame(() => {
+      innerRaf = window.requestAnimationFrame(() => {
+        if (cancelled) return;
+        void translatePage({
+          targetLanguage: googleTranslateCode,
+          sourceLanguage: "en", // Content is always in English
+        }).catch((error) => {
+          console.error("[LanguageProvider] Translation error:", error);
+        });
       });
-    }
+    });
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(outerRaf);
+      if (innerRaf) window.cancelAnimationFrame(innerRaf);
+    };
   }, [language]);
 
   return (

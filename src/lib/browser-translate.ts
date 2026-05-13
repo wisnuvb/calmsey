@@ -202,14 +202,18 @@ export function isGoogleTranslateAvailable(): boolean {
   );
 }
 
+/** URL skrip element GT (sama untuk preload + inject). */
+export const GOOGLE_TRANSLATE_ELEMENT_SCRIPT_URL =
+  "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+
 /**
  * Wait for Google Translate select element to be available
  * Uses polling to check for element availability
  */
 function waitForTranslateSelect(
   callback: (select: HTMLSelectElement) => void,
-  maxAttempts = 20,
-  interval = 200
+  maxAttempts = 24,
+  interval = 80
 ): void {
   let attempts = 0;
 
@@ -268,8 +272,7 @@ export function initGoogleTranslateWidget(
     if (!document.getElementById("google-translate-script")) {
       const script = document.createElement("script");
       script.id = "google-translate-script";
-      script.src =
-        "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.src = GOOGLE_TRANSLATE_ELEMENT_SCRIPT_URL;
       script.async = true;
       script.onerror = () => {
         console.error("[Translation] Failed to load Google Translate script");
@@ -419,16 +422,13 @@ async function forceGoogleTranslate(targetLanguage: string): Promise<void> {
               subtree: false,
             });
 
-            // Timeout after 5 seconds
+            // Timeout: jangan blokir terlalu lama — terjemahan bisa selesai setelahnya
             setTimeout(() => {
               observer.disconnect();
               if (!translated) {
-                console.log(
-                  "[Translation] Translation may not have completed, but continuing..."
-                );
                 resolve();
               }
-            }, 5000);
+            }, 2200);
           } else {
             // Already translated
             translated = true;
@@ -446,17 +446,17 @@ async function forceGoogleTranslate(targetLanguage: string): Promise<void> {
           }
         }, 500);
 
-        // Final retry after longer delay
+        // Final retry — resolve agar pemanggil tidak menunggu terlalu lama
         setTimeout(() => {
           if (!translated) {
             attemptTranslate();
-            resolve(); // Resolve anyway after 3 seconds
+            resolve();
           }
-        }, 3000);
+        }, 1200);
       },
-      30,
-      300
-    ); // Wait up to 9 seconds (30 attempts * 300ms)
+      28,
+      100
+    );
   });
 }
 
@@ -483,33 +483,53 @@ export async function translatePage(config: TranslationConfig): Promise<void> {
     return;
   }
 
-  // Always use Google Translate widget for consistent auto-translation
-  // This ensures immediate translation across all browsers
-  console.log(
-    `[Translation] Initializing Google Translate for ${targetLanguage}`
-  );
-
   try {
-    // Initialize widget and wait for it to be ready
     await initGoogleTranslateWidget(targetLanguage);
 
-    // Force translation after widget is initialized
-    await forceGoogleTranslate(targetLanguage);
+    // Jangan tunggu forceGoogleTranslate selesai — biarkan jalan async supaya
+    // navigasi ganti bahasa terasa responsif; retry ringan tetap di bawah.
+    void forceGoogleTranslate(targetLanguage).catch(() => {});
 
-    // Additional retry mechanism - check if translation happened
-    setTimeout(() => {
+    const bumpCombo = () => {
       const select = document.querySelector(
         ".goog-te-combo"
       ) as HTMLSelectElement;
-
       if (select && select.value !== targetLanguage) {
-        console.log(`[Translation] Retrying translation to ${targetLanguage}`);
         select.value = targetLanguage;
         select.dispatchEvent(new Event("change", { bubbles: true }));
       }
-    }, 2000);
+    };
+    setTimeout(bumpCombo, 400);
+    setTimeout(bumpCombo, 1200);
   } catch (error) {
     console.error("[Translation] Error during translation:", error);
+  }
+}
+
+/**
+ * Preload skrip widget di idle agar unduhan dimulai lebih awal (cache saat translatePage inject).
+ * Tidak menjalankan callback `googleTranslateElementInit` — menghindari bentrok dengan initGoogleTranslateWidget.
+ */
+export function scheduleGoogleTranslateWarmup(): void {
+  if (typeof document === "undefined") return;
+  if (document.querySelector('link[data-gt-script-preload="1"]')) return;
+
+  const append = () => {
+    if (document.querySelector('link[data-gt-script-preload="1"]')) return;
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "script";
+    link.href = GOOGLE_TRANSLATE_ELEMENT_SCRIPT_URL;
+    link.setAttribute("data-gt-script-preload", "1");
+    document.head.appendChild(link);
+  };
+
+  const ric = (window as unknown as { requestIdleCallback?: typeof requestIdleCallback })
+    .requestIdleCallback;
+  if (typeof ric === "function") {
+    ric(append, { timeout: 3200 });
+  } else {
+    window.setTimeout(append, 600);
   }
 }
 
@@ -535,9 +555,77 @@ export function clearTranslation(): void {
     ) as HTMLSelectElement;
     if (select) {
       select.value = "";
-      select.dispatchEvent(new Event("change"));
+      select.dispatchEvent(new Event("change", { bubbles: true }));
     }
   }
+}
+
+/**
+ * True setelah Google Translate menerapkan terjemahan (kelas pada `document.body`).
+ * Dipakai sebelum navigasi klien agar React tidak reconcile terhadap DOM yang dibungkus GT.
+ */
+export function isGoogleTranslateDomActive(): boolean {
+  if (typeof document === "undefined") return false;
+  const b = document.body;
+  return (
+    b.classList.contains("translated-ltr") ||
+    b.classList.contains("translated-rtl")
+  );
+}
+
+/**
+ * Mengembalikan DOM ke teks sumber (clear widget) sebelum transisi rute klien Next.js.
+ * Menunggu kelas `translated-*` hilang dari `body`, atau timeout.
+ */
+export async function awaitGoogleTranslateDomRestoredForClientNavigation(
+  maxWaitMs = 2500,
+): Promise<void> {
+  if (typeof document === "undefined") return;
+
+  if (!isGoogleTranslateDomActive()) {
+    return;
+  }
+
+  clearTranslation();
+
+  if (!isGoogleTranslateDomActive()) {
+    await new Promise<void>((r) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => r()));
+    });
+    return;
+  }
+
+  await new Promise<void>((resolve) => {
+    let finished = false;
+    const done = () => {
+      if (finished) return;
+      finished = true;
+      window.clearTimeout(timeoutId);
+      mo.disconnect();
+      resolve();
+    };
+
+    const timeoutId = window.setTimeout(done, maxWaitMs);
+
+    const mo = new MutationObserver(() => {
+      if (!isGoogleTranslateDomActive()) {
+        done();
+      }
+    });
+
+    mo.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    if (!isGoogleTranslateDomActive()) {
+      done();
+    }
+  });
+
+  await new Promise<void>((r) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => r()));
+  });
 }
 
 /**
@@ -682,18 +770,6 @@ export const LANGUAGE_CODES: Record<string, string> = {
   bo: "bo", // Tibetan
   ii: "ii", // Sichuan Yi
 };
-
-/**
- * Locale yang bukan `en` memicu `translatePage` dengan sumber "en", sehingga
- * widget Google Translate memutasi pohon DOM. Navigasi klien Next.js/React
- * setelah mutasi itu dapat memunculkan NotFoundError pada `removeChild`.
- * @see LanguageProvider
- */
-export function shouldForceFullPageNavigationForLocale(
-  language: string
-): boolean {
-  return language !== "en";
-}
 
 /**
  * Convert internal language code to Google Translate code

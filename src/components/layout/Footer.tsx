@@ -9,7 +9,8 @@ import {
 } from "@/lib/footer-brand-defaults";
 import { getImageUrl } from "@/lib/utils";
 import { useLanguage } from "../public/LanguageProvider";
-import { shouldForceFullPageNavigationForLocale } from "@/lib/browser-translate";
+import { useRouter } from "next/navigation";
+import { clientNavigateWithGoogleTranslateSafety } from "@/lib/safe-client-navigation";
 
 /**
  * Resolves internal footer link href to include current language prefix and preserve hash.
@@ -50,7 +51,8 @@ function handleFooterInternalNav(
   e: MouseEvent<HTMLAnchorElement>,
   language: string,
   href: string,
-  target: "SELF" | "BLANK"
+  target: "SELF" | "BLANK",
+  router: { push: (h: string) => void },
 ) {
   if (target === "BLANK") return;
   if (
@@ -60,10 +62,10 @@ function handleFooterInternalNav(
   ) {
     return;
   }
-  if (shouldForceFullPageNavigationForLocale(language)) {
-    e.preventDefault();
-    window.location.href = href;
-  }
+  if (language === "en") return;
+
+  e.preventDefault();
+  void clientNavigateWithGoogleTranslateSafety(router, href);
 }
 
 interface FooterLink {
@@ -80,6 +82,7 @@ interface FooterSection {
 }
 
 export function Footer() {
+  const router = useRouter();
   const { language } = useLanguage();
   const [footerSections, setFooterSections] = useState<FooterSection[]>([]);
   const [brand, setBrand] = useState<FooterBrandDTO>(() =>
@@ -206,7 +209,7 @@ export function Footer() {
             <Link
               href={logoHref}
               onClick={(e) =>
-                handleFooterInternalNav(e, language, logoHref, "SELF")
+                handleFooterInternalNav(e, language, logoHref, "SELF", router)
               }
             >
               <div className="w-auto h-32 relative mr-3">
@@ -264,6 +267,7 @@ export function Footer() {
                               language,
                               linkHref,
                               link.target,
+                              router,
                             )
                           }
                           className="text-sm text-white hover:text-[#C4DF99] transition-colors"

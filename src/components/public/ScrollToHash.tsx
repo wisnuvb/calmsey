@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 /**
@@ -11,20 +11,32 @@ import { usePathname } from "next/navigation";
  *
  * Uses retry + MutationObserver because target elements (e.g. #ourteam in TeamSection)
  * may render late on first load/reload - client components mount progressively.
+ *
+ * Also handles `hashchange` with the same retry path: when locale forces
+ * `window.location.href` to the same pathname with a new hash, the document often does
+ * not reload, so the pathname-based effect does not re-run and a one-shot scroll was
+ * too fragile.
  */
 export function ScrollToHash() {
   const pathname = usePathname();
-  const scrollAttemptedRef = useRef(false);
 
   useEffect(() => {
-    const hash =
-      typeof window !== "undefined" ? window.location.hash.slice(1) : "";
-    if (!hash) return;
+    const getHashId = () => {
+      const raw =
+        typeof window !== "undefined" ? window.location.hash.slice(1) : "";
+      if (!raw) return "";
+      try {
+        return decodeURIComponent(raw.split("?")[0] ?? "");
+      } catch {
+        return raw.split("?")[0] ?? "";
+      }
+    };
 
-    scrollAttemptedRef.current = false;
+    const scrollAttemptedRef = { current: false };
 
-    const scrollToElement = (): boolean => {
-      const element = document.getElementById(hash);
+    const scrollToElement = (hashId: string): boolean => {
+      if (!hashId) return false;
+      const element = document.getElementById(hashId);
       if (element) {
         element.scrollIntoView({ behavior: "smooth", block: "start" });
         return true;
@@ -32,58 +44,68 @@ export function ScrollToHash() {
       return false;
     };
 
-    // Retry at intervals - client sections may mount late (TeamSection, etc.)
-    const delays = [50, 150, 350, 600, 1000, 1500];
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    let cleanupScroll: (() => void) | undefined;
 
-    for (const delay of delays) {
-      const timer = setTimeout(() => {
-        if (scrollAttemptedRef.current) return;
-        if (scrollToElement()) {
-          scrollAttemptedRef.current = true;
-        }
-      }, delay);
-      timers.push(timer);
-    }
+    const runHashScroll = (hashId: string) => {
+      cleanupScroll?.();
+      cleanupScroll = undefined;
 
-    // MutationObserver: scroll as soon as target element appears in DOM
-    const mainContent = document.getElementById("main-content");
-    const observerTarget = mainContent ?? document.body;
+      if (!hashId) return;
 
-    const observer = new MutationObserver(() => {
-      if (scrollAttemptedRef.current) return;
-      if (scrollToElement()) {
-        scrollAttemptedRef.current = true;
-        observer.disconnect();
+      scrollAttemptedRef.current = false;
+
+      const delays = [50, 150, 350, 600, 1000, 1500];
+      const timers: ReturnType<typeof setTimeout>[] = [];
+
+      for (const delay of delays) {
+        const timer = setTimeout(() => {
+          if (scrollAttemptedRef.current) return;
+          if (scrollToElement(hashId)) {
+            scrollAttemptedRef.current = true;
+          }
+        }, delay);
+        timers.push(timer);
       }
-    });
 
-    observer.observe(observerTarget, {
-      childList: true,
-      subtree: true,
-    });
+      const mainContent = document.getElementById("main-content");
+      const observerTarget = mainContent ?? document.body;
+
+      const observer = new MutationObserver(() => {
+        if (scrollAttemptedRef.current) return;
+        if (scrollToElement(hashId)) {
+          scrollAttemptedRef.current = true;
+          observer.disconnect();
+        }
+      });
+
+      observer.observe(observerTarget, {
+        childList: true,
+        subtree: true,
+      });
+
+      cleanupScroll = () => {
+        timers.forEach((t) => clearTimeout(t));
+        observer.disconnect();
+      };
+    };
+
+    const tick = () => {
+      runHashScroll(getHashId());
+    };
+
+    tick();
+
+    const onHashChange = () => {
+      tick();
+    };
+
+    window.addEventListener("hashchange", onHashChange);
 
     return () => {
-      timers.forEach((t) => clearTimeout(t));
-      observer.disconnect();
+      window.removeEventListener("hashchange", onHashChange);
+      cleanupScroll?.();
     };
   }, [pathname]);
-
-  // Also handle hash change on same page (e.g. in-page anchor clicks)
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hash =
-        typeof window !== "undefined" ? window.location.hash.slice(1) : "";
-      if (!hash) return;
-      const element = document.getElementById(hash);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    };
-
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
 
   return null;
 }

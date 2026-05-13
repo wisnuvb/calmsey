@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { SupportedLanguage } from "@/lib/public-api";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { cn } from "@/lib/utils";
+import { scheduleGoogleTranslateWarmup } from "@/lib/browser-translate";
 
 interface LanguageSwitcherProps {
   currentLanguage: SupportedLanguage;
@@ -35,14 +36,15 @@ export function LanguageSwitcher({
     return () => document.removeEventListener("mousedown", onDoc);
   }, [open]);
 
-  // Handle language change with page reload for stability
   const handleLanguageChange = (languageId: string, url: string) => {
     setOpen(false);
     const maxAge = 60 * 60 * 24 * 365;
     document.cookie = `${LOCALE_COOKIE_NAME}=${encodeURIComponent(
       languageId
     )}; path=/; max-age=${maxAge}; SameSite=Lax`;
-    window.location.href = url;
+    // Reload dokumen penuh: state Google Translate + widget tidak reliable setelah
+    // beberapa kali navigasi klien; reload memastikan locale & GT bersih setiap ganti bahasa.
+    window.location.assign(url);
   };
 
   const getLanguageUrl = (languageId: string) => {
@@ -105,7 +107,10 @@ export function LanguageSwitcher({
         type="button"
         aria-expanded={open}
         aria-haspopup="listbox"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          scheduleGoogleTranslateWarmup();
+          setOpen((o) => !o);
+        }}
         className={cn(
           "flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-md",
           variant === "drawer" &&
