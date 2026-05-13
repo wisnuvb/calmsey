@@ -40,7 +40,7 @@ const OurApproachPage = async ({ params }: OurApproachPageProps) => {
   const { lang } = await params;
   const language = lang || "en";
 
-  const content = await getPageContentServer("OUR_APPROACH");
+  const content = await getPageContentServer("OUR_APPROACH", language);
   return (
     <PageContentProvider
       content={content}

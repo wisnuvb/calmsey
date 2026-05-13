@@ -327,7 +327,7 @@ export async function getFundDetailBySlug(
   language: string = "en"
 ): Promise<FundDetail | null> {
   try {
-    const content = await getPageContentServer("OUR_FUND");
+    const content = await getPageContentServer("OUR_FUND", language);
 
     // Try new structured format first: fundDetails.funds (multiple field with individual fields)
     const fundDetailsKey = "fundDetails.funds";
@@ -414,7 +414,7 @@ export async function getAllFundDetails(
   language: string = "en"
 ): Promise<FundDetail[]> {
   try {
-    const content = await getPageContentServer("OUR_FUND");
+    const content = await getPageContentServer("OUR_FUND", language);
     const funds: FundDetail[] = [];
 
     // Try new format first: fundDetails.funds (multiple field)

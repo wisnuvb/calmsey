@@ -46,7 +46,7 @@ const AboutUsPage = async ({ params }: AboutUsPageProps) => {
   const { lang } = await params;
   const language = lang || "en";
 
-  const content = await getPageContentServer("ABOUT_US");
+  const content = await getPageContentServer("ABOUT_US", language);
 
   return (
     <PageContentProvider

@@ -41,7 +41,7 @@ const OurFundPage = async ({ params }: OurFundPageProps) => {
   const { lang } = await params;
   const language = lang || "en";
 
-  const content = await getPageContentServer("OUR_FUND");
+  const content = await getPageContentServer("OUR_FUND", language);
 
   return (
     <PageContentProvider

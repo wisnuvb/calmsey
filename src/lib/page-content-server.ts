@@ -9,16 +9,20 @@ type TranslationWithContent = {
   pageContent: { key: string; value: string }[];
 };
 
+function normalizeLangId(id: string): string {
+  return id.trim().toLowerCase();
+}
+
 /**
- * Pilih satu PageTranslation untuk konten CMS: tidak memakai locale dari URL.
- * Urutan: konten non-kosong dengan languageId "en", lalu translasi lain yang punya pageContent, lalu en atau baris pertama.
+ * Pilih translasi tanpa locale URL (legacy).
+ * Urutan: konten non-kosong "en", lalu translasi lain yang punya pageContent, lalu fallback.
  */
 function pickPageTranslation(
-  translations: TranslationWithContent[]
+  translations: TranslationWithContent[],
 ): TranslationWithContent | null {
   if (translations.length === 0) return null;
 
-  const en = translations.find((t) => t.languageId === "en");
+  const en = translations.find((t) => normalizeLangId(t.languageId) === "en");
   if (en && en.pageContent.length > 0) return en;
 
   const withContent = translations.find((t) => t.pageContent.length > 0);
@@ -28,11 +32,38 @@ function pickPageTranslation(
 }
 
 /**
- * Server-side fetch konten halaman (satu sumber kanonik per pageType, bukan per bahasa URL).
- * Menggunakan React cache() untuk deduplikasi dalam satu request.
+ * Prioritas: locale dari URL (jika ada konten) → EN → pickPageTranslation legacy.
+ */
+function pickPageTranslationForLocale(
+  translations: TranslationWithContent[],
+  requestedLanguage: string,
+): TranslationWithContent | null {
+  if (translations.length === 0) return null;
+
+  const lang = normalizeLangId(requestedLanguage || "en");
+
+  const forLocale = translations.find(
+    (t) => normalizeLangId(t.languageId) === lang && t.pageContent.length > 0,
+  );
+  if (forLocale) return forLocale;
+
+  const en = translations.find(
+    (t) => normalizeLangId(t.languageId) === "en" && t.pageContent.length > 0,
+  );
+  if (en) return en;
+
+  return pickPageTranslation(translations);
+}
+
+/**
+ * Server-side fetch konten halaman per `pageType` dan locale URL.
+ * React `cache()` mem-kunci per `(pageType, language)` dalam satu request.
  */
 export const getPageContentServer = cache(
-  async (pageType: string): Promise<PageContentMap> => {
+  async (
+    pageType: string,
+    language: string = "en",
+  ): Promise<PageContentMap> => {
     try {
       const page = await prisma.page.findFirst({
         where: {
@@ -52,7 +83,10 @@ export const getPageContentServer = cache(
         return {};
       }
 
-      const translation = pickPageTranslation(page.translations);
+      const translation = pickPageTranslationForLocale(
+        page.translations,
+        language,
+      );
 
       if (!translation) {
         console.warn(`No page content translation for ${pageType}`);
@@ -69,20 +103,21 @@ export const getPageContentServer = cache(
       console.error("Error fetching page content:", error);
       return {};
     }
-  }
+  },
 );
 
 /**
- * Prefetch beberapa page type sekaligus
+ * Prefetch beberapa page type sekaligus untuk locale yang sama.
  */
 export async function prefetchPageContents(
-  pageTypes: string[]
+  pageTypes: string[],
+  language: string = "en",
 ): Promise<Record<string, PageContentMap>> {
   const results = await Promise.all(
     pageTypes.map(async (pageType) => ({
       pageType,
-      content: await getPageContentServer(pageType),
-    }))
+      content: await getPageContentServer(pageType, language),
+    })),
   );
 
   return results.reduce(
@@ -90,6 +125,6 @@ export async function prefetchPageContents(
       acc[pageType] = content;
       return acc;
     },
-    {} as Record<string, PageContentMap>
+    {} as Record<string, PageContentMap>,
   );
 }

@@ -34,7 +34,7 @@ export async function generateMetadata({
 const GetInvolvedPage = async ({ params }: PageProps) => {
   const { lang } = await params;
   const language = lang || "en";
-  const content = await getPageContentServer("GET_INVOLVED");
+  const content = await getPageContentServer("GET_INVOLVED", language);
 
   return (
     <PageContentProvider
