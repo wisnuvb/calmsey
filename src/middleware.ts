@@ -49,8 +49,9 @@ function resolveActiveLanguage(
   const fromCookie = firstForwardedValue(
     request.cookies.get(LOCALE_COOKIE_NAME)?.value ?? null
   );
-  if (fromCookie && supportedLanguages.includes(fromCookie)) {
-    return fromCookie;
+  const cookieLang = fromCookie?.trim().toLowerCase();
+  if (cookieLang && supportedLanguages.includes(cookieLang)) {
+    return cookieLang;
   }
   const fromAccept = matchAcceptLanguage(
     request.headers.get("accept-language"),

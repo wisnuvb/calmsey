@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { clearMiddlewareLocaleRuntimeCache } from "@/lib/middleware-locale-config";
 
 export interface DynamicLanguage {
   id: string;
@@ -84,4 +85,6 @@ export async function getSupportedLanguages(): Promise<string[]> {
 export function clearLanguageCache(): void {
   activeLanguagesCache = null;
   cacheTimestamp = 0;
+  // Membantu deployment non-Edge/monolith; di Vercel Edge cache middleware terpisah (~60s TTL).
+  clearMiddlewareLocaleRuntimeCache();
 }
