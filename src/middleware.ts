@@ -1,4 +1,5 @@
 import { LOCALE_COOKIE_NAME } from "@/lib/constants";
+import { getMiddlewareLocaleConfig } from "@/lib/middleware-locale-config";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -91,122 +92,8 @@ export async function middleware(request: NextRequest) {
   // Maintenance mode check is handled in [lang]/layout.tsx
   // This middleware only handles language routing
 
-  // Temporary: Use hardcoded languages that match database
-  const supportedLanguages = [
-    "af",
-    "am",
-    "ar",
-    "ay",
-    "az",
-    "be",
-    "bg",
-    "bi",
-    "bn",
-    "bo",
-    "bs",
-    "cs",
-    "cy",
-    "da",
-    "de",
-    "dz",
-    "el",
-    "en",
-    "es",
-    "et",
-    "fa",
-    "fi",
-    "fj",
-    "fo",
-    "fr",
-    "ga",
-    "gn",
-    "ha",
-    "haw",
-    "he",
-    "hi",
-    "ho",
-    "hr",
-    "ht",
-    "hu",
-    "hy",
-    "id",
-    "ig",
-    "ii",
-    "is",
-    "it",
-    "ja",
-    "ka",
-    "kk",
-    "kl",
-    "km",
-    "ko",
-    "ku",
-    "ky",
-    "lb",
-    "lo",
-    "lt",
-    "lv",
-    "md",
-    "mg",
-    "mh",
-    "mk",
-    "mn",
-    "ms",
-    "mt",
-    "my",
-    "na",
-    "nd",
-    "ne",
-    "nl",
-    "no",
-    "ny",
-    "om",
-    "pau",
-    "pl",
-    "ps",
-    "pt",
-    "qu",
-    "rm",
-    "ro",
-    "ru",
-    "rw",
-    "se",
-    "si",
-    "sk",
-    "sl",
-    "sm",
-    "sn",
-    "so",
-    "sq",
-    "sr",
-    "ss",
-    "st",
-    "sv",
-    "sw",
-    "ta",
-    "tg",
-    "th",
-    "ti",
-    "tk",
-    "tl",
-    "tn",
-    "to",
-    "tpi",
-    "tr",
-    "ts",
-    "tvl",
-    "ug",
-    "uk",
-    "ur",
-    "uz",
-    "ve",
-    "vi",
-    "xh",
-    "yo",
-    "zh",
-    "zu",
-  ];
-  const defaultLanguage = "en";
+  const { supportedLanguages, defaultLanguage } =
+    await getMiddlewareLocaleConfig(request);
 
   return handleLanguageRouting(request, supportedLanguages, defaultLanguage);
 }
@@ -278,10 +165,12 @@ function handleLanguageRouting(
   const segments = pathname.split("/");
   const possibleLang = segments[1];
 
-  // If it's an invalid language, redirect ke locale aktif (buang segmen salah)
+  // Segmen pertama 2–3 huruf kecil yang bukan bahasa aktif di DB → bukan locale valid
+  const looksLikeLocaleSegment =
+    !!possibleLang && /^[a-z]{2,3}$/.test(possibleLang);
+
   if (
-    possibleLang &&
-    possibleLang.length === 2 &&
+    looksLikeLocaleSegment &&
     !supportedLanguages.includes(possibleLang)
   ) {
     const withoutInvalid = pathname.replace(/^\/[^/]+/, "") || "/";

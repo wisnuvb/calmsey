@@ -22,9 +22,12 @@ export async function GET(request: NextRequest) {
 
     if (
       modalSource &&
-      ["ACTION_PLANS", "PARTNERS", "GRANTMAKING_FRAMEWORK"].includes(
-        modalSource,
-      )
+      [
+        "ACTION_PLANS",
+        "PARTNERS",
+        "GRANTMAKING_FRAMEWORK",
+        "STRATEGY_2030",
+      ].includes(modalSource)
     ) {
       where.modalSource = modalSource;
     }

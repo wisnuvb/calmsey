@@ -1,25 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useActiveLanguages } from "@/hooks/useActiveLanguages";
+import {
+  resolveLanguageVariantFlagImgUrl,
+  emojiToTwemoji72Url,
+} from "@/lib/language-variant-flag";
 
-export type LanguageVariantOption = { label: string };
+export type LanguageVariantOption = {
+  label: string;
+  /** Cocokkan ke `languages.id` di DB untuk kolom `flag` (emoji/URL). */
+  languageId?: string;
+};
 
-/** Emoji bendera dari label bahasa (untuk picker). */
-export function languageLabelToFlag(label: string): string {
-  const l = label.trim().toLowerCase();
-  if (/^(english|en)(\b|\s|$)/.test(l) || l === "en") return "🇬🇧";
-  if (/español|spanish|^es(\b|\s|$)/.test(l)) return "🇪🇸";
-  if (/indonesia|indonesian|bahasa(\s|-)?indonesia|^id(\b|\s|$)/.test(l))
-    return "🇮🇩";
-  if (/français|french|^fr(\b|\s|$)/.test(l)) return "🇫🇷";
-  if (/chinese|中文|mandarin|中文（|简体|繁体|^zh(\b|\s|$)/.test(l)) return "🇨🇳";
-  if (/deutsch|german|^de(\b|\s|$)/.test(l)) return "🇩🇪";
-  if (/português|portuguese|^pt(\b|\s|$)/.test(l)) return "🇵🇹";
-  if (/日本語|japanese|^ja(\b|\s|$)/.test(l)) return "🇯🇵";
-  return "🌐";
+/** Re-export untuk kompatibilitas impor lama. */
+export { languageLabelToFlag } from "@/lib/language-variant-flag";
+
+function VariantFlagImg({
+  src,
+  title,
+}: {
+  src: string;
+  title: string;
+}) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- Twemoji CDN, ikon kecil
+    <img
+      src={src}
+      alt=""
+      title={title}
+      width={50}
+      height={50}
+      loading="lazy"
+      decoding="async"
+      draggable={false}
+      className="h-12 w-12 select-none object-cover"
+    />
+  );
 }
 
 export function LanguageVariantPicker({
@@ -34,7 +54,38 @@ export function LanguageVariantPicker({
   placeholder: string;
 }) {
   const [open, setOpen] = useState(false);
+  const { languages, loading } = useActiveLanguages();
+
   const selected = options[selectedIndex];
+
+  const languagesForResolve = useMemo(
+    () =>
+      languages.map((l) => ({
+        id: l.id,
+        name: l.name,
+        flag: l.flag,
+      })),
+    [languages],
+  );
+
+  const placeholderSrc = useMemo(
+    () => emojiToTwemoji72Url("🌐")!,
+    [],
+  );
+
+  const selectedFlagSrc = useMemo(() => {
+    if (!selected) return placeholderSrc;
+    if (loading && languagesForResolve.length === 0) return placeholderSrc;
+    return resolveLanguageVariantFlagImgUrl(languagesForResolve, {
+      label: selected.label,
+      languageId: selected.languageId,
+    });
+  }, [
+    selected,
+    languagesForResolve,
+    loading,
+    placeholderSrc,
+  ]);
 
   if (options.length === 0) {
     return (
@@ -58,12 +109,10 @@ export function LanguageVariantPicker({
           aria-expanded={open}
         >
           <span
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-50 text-base leading-none"
+            className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-50 ring-1 ring-gray-100"
             aria-hidden
           >
-            {selected
-              ? languageLabelToFlag(selected.label)
-              : languageLabelToFlag("English")}
+            <VariantFlagImg src={selectedFlagSrc} title={selected.label} />
           </span>
           <ChevronDown className="h-4 w-4 shrink-0 text-gray-400" />
         </button>
@@ -80,32 +129,41 @@ export function LanguageVariantPicker({
             aria-label={placeholder}
             className="max-h-64 overflow-y-auto py-0.5"
           >
-            {options.map((opt, i) => (
-              <button
-                key={`${opt.label}-${i}`}
-                type="button"
-                role="option"
-                aria-selected={i === selectedIndex}
-                onClick={() => {
-                  onSelectIndex(i);
-                  setOpen(false);
-                }}
-                className={cn(
-                  "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm transition-colors",
-                  i === selectedIndex
-                    ? "bg-indigo-50 font-medium text-indigo-600"
-                    : "text-gray-900 hover:bg-gray-50",
-                )}
-              >
-                <span
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-50 text-base leading-none"
-                  aria-hidden
+            {options.map((opt, i) => {
+              const rowSrc =
+                loading && languagesForResolve.length === 0
+                  ? placeholderSrc
+                  : resolveLanguageVariantFlagImgUrl(languagesForResolve, {
+                      label: opt.label,
+                      languageId: opt.languageId,
+                    });
+              return (
+                <button
+                  key={`${opt.label}-${i}-${opt.languageId ?? ""}`}
+                  type="button"
+                  role="option"
+                  aria-selected={i === selectedIndex}
+                  onClick={() => {
+                    onSelectIndex(i);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm transition-colors",
+                    i === selectedIndex
+                      ? "bg-indigo-50 font-medium text-indigo-600"
+                      : "text-gray-900 hover:bg-gray-50",
+                  )}
                 >
-                  {languageLabelToFlag(opt.label)}
-                </span>
-                <span className="min-w-0 flex-1 truncate">{opt.label}</span>
-              </button>
-            ))}
+                  <span
+                    className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-50 ring-1 ring-gray-100"
+                    aria-hidden
+                  >
+                    <VariantFlagImg src={rowSrc} title={opt.label} />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{opt.label}</span>
+                </button>
+              );
+            })}
           </div>
         </Popover.Content>
       </Popover.Portal>

@@ -11,30 +11,37 @@ function isTwoLetterRegion(code: string): boolean {
   return code.length === 2 && /^[A-Z]{2}$/.test(code);
 }
 
+/** Alphabetical A–Z by label; entries with `value === "other"` always last. */
+function sortCountryOptionsOtherLast(options: CountryOption[]): CountryOption[] {
+  const others = options.filter((o) => o.value === "other");
+  const rest = options
+    .filter((o) => o.value !== "other")
+    .sort((a, b) => a.label.localeCompare(b.label, "en"));
+  return [...rest, ...others];
+}
+
+const FALLBACK_COUNTRIES: CountryOption[] = [
+  { value: "id", label: "Indonesia" },
+  { value: "ph", label: "Philippines" },
+  { value: "my", label: "Malaysia" },
+  { value: "th", label: "Thailand" },
+  { value: "us", label: "United States" },
+  { value: "gb", label: "United Kingdom" },
+  { value: "other", label: "Other" },
+];
+
 /**
- * Country list for <select>: from runtime Intl (without npm dependency).
- * Fallback if API is not available (browser is very old).
+ * Bangun daftar negara dari `Intl` (tanpa cache). Dipakai di server (API) dan
+ * oleh `getCountrySelectOptions()` setelah cache miss.
+ * Fallback singkat hanya jika `Intl` tidak mendukung atau error.
  */
-export function getCountrySelectOptions(): CountryOption[] {
-  if (cache) return cache;
-
-  const fallback: CountryOption[] = [
-    { value: "id", label: "Indonesia" },
-    { value: "ph", label: "Philippines" },
-    { value: "my", label: "Malaysia" },
-    { value: "th", label: "Thailand" },
-    { value: "us", label: "United States" },
-    { value: "gb", label: "United Kingdom" },
-    { value: "other", label: "Other" },
-  ];
-
+export function buildCountrySelectOptions(): CountryOption[] {
   try {
     const intl = Intl as typeof Intl & {
       supportedValuesOf?: (key: string) => string[];
     };
     if (typeof intl.supportedValuesOf !== "function") {
-      cache = fallback.sort((a, b) => a.label.localeCompare(b.label, "en"));
-      return cache;
+      return sortCountryOptionsOtherLast([...FALLBACK_COUNTRIES]);
     }
 
     const codes = intl
@@ -52,12 +59,21 @@ export function getCountrySelectOptions(): CountryOption[] {
       .sort((a, b) => a.label.localeCompare(b.label, "en"));
 
     const withoutOther = fromIntl.filter((o) => o.value !== "other");
-    cache = [...withoutOther, { value: "other", label: "Other" }];
-    return cache;
+    return [...withoutOther, { value: "other", label: "Other" }];
   } catch {
-    cache = fallback.sort((a, b) => a.label.localeCompare(b.label, "en"));
-    return cache;
+    return sortCountryOptionsOtherLast([...FALLBACK_COUNTRIES]);
   }
+}
+
+/**
+ * Country list for <select>: sama dengan `buildCountrySelectOptions()` dengan
+ * cache modul (server / validasi API). Di browser form, prefer fetch
+ * `GET /api/public/countries` agar daftar penuh tidak bergantung pada dukungan Intl di klien.
+ */
+export function getCountrySelectOptions(): CountryOption[] {
+  if (cache) return cache;
+  cache = buildCountrySelectOptions();
+  return cache;
 }
 
 /** Label to send to webhook / automation (country name, not code). */

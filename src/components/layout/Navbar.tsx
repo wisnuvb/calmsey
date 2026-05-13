@@ -8,6 +8,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "../public/LanguageProvider";
 import { LanguageSwitcher } from "../public/LanguageSwitcher";
+import { shouldForceFullPageNavigationForLocale } from "@/lib/browser-translate";
 import { usePathname } from "next/navigation";
 
 interface NavLink {
@@ -76,7 +77,6 @@ export function Navbar() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const { language } = useLanguage();
-  const isMachineTranslatedLanguage = language !== "en" && language !== "id";
 
   const isDetailOurFundPage = pathname.includes("/our-fund/");
 
@@ -235,9 +235,9 @@ export function Navbar() {
     e: React.MouseEvent<HTMLAnchorElement>,
     href: string,
   ) => {
-    // Google Translate mutates DOM nodes. For translated languages
-    // (e.g. fr), force full-page navigation to avoid React hydration/reconcile crashes.
-    if (isMachineTranslatedLanguage) {
+    // Google Translate mutates DOM nodes (termasuk locale `id`). Paksa navigasi
+    // penuh agar React tidak reconcile terhadap DOM yang sudah diubah GT.
+    if (shouldForceFullPageNavigationForLocale(language)) {
       e.preventDefault();
       window.location.href = href;
     }

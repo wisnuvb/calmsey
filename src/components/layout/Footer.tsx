@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import {
   mergeFooterBrand,
   type FooterBrandDTO,
 } from "@/lib/footer-brand-defaults";
 import { getImageUrl } from "@/lib/utils";
 import { useLanguage } from "../public/LanguageProvider";
+import { shouldForceFullPageNavigationForLocale } from "@/lib/browser-translate";
 
 /**
  * Resolves internal footer link href to include current language prefix and preserve hash.
@@ -43,6 +44,26 @@ function resolveFooterLinkHref(
       : `/${language}${pathname}`;
 
   return resolvedPath + hash;
+}
+
+function handleFooterInternalNav(
+  e: MouseEvent<HTMLAnchorElement>,
+  language: string,
+  href: string,
+  target: "SELF" | "BLANK"
+) {
+  if (target === "BLANK") return;
+  if (
+    href.startsWith("http://") ||
+    href.startsWith("https://") ||
+    !href.startsWith("/")
+  ) {
+    return;
+  }
+  if (shouldForceFullPageNavigationForLocale(language)) {
+    e.preventDefault();
+    window.location.href = href;
+  }
 }
 
 interface FooterLink {
@@ -169,6 +190,12 @@ export function Footer() {
     );
   }
 
+  const logoHref = resolveFooterLinkHref(
+    brand.mainLogoHref,
+    language,
+    "SELF",
+  );
+
   return (
     <footer className="bg-gradient-to-br from-[#1E0F39] via-[#2a1551] to-[#3a1d6f] text-white">
       {/* Main Footer Content */}
@@ -177,11 +204,10 @@ export function Footer() {
           {/* Logo and Brand Section - Left */}
           <div className="lg:col-span-4">
             <Link
-              href={resolveFooterLinkHref(
-                brand.mainLogoHref,
-                language,
-                "SELF",
-              )}
+              href={logoHref}
+              onClick={(e) =>
+                handleFooterInternalNav(e, language, logoHref, "SELF")
+              }
             >
               <div className="w-auto h-32 relative mr-3">
                 <Image
@@ -216,26 +242,37 @@ export function Footer() {
                     {section.title}
                   </h3>
                   <ul className="space-y-2">
-                    {section.links.map((link) => (
+                    {section.links.map((link) => {
+                      const linkHref = resolveFooterLinkHref(
+                        link.href,
+                        language,
+                        link.target,
+                      );
+                      return (
                       <li key={link.id}>
                         <Link
-                          href={resolveFooterLinkHref(
-                            link.href,
-                            language,
-                            link.target
-                          )}
+                          href={linkHref}
                           target={link.target === "BLANK" ? "_blank" : "_self"}
                           rel={
                             link.target === "BLANK"
                               ? "noopener noreferrer"
                               : undefined
                           }
+                          onClick={(e) =>
+                            handleFooterInternalNav(
+                              e,
+                              language,
+                              linkHref,
+                              link.target,
+                            )
+                          }
                           className="text-sm text-white hover:text-[#C4DF99] transition-colors"
                         >
                           {link.label}
                         </Link>
                       </li>
-                    ))}
+                    );
+                    })}
                   </ul>
                 </div>
               ))}

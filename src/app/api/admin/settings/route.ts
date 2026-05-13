@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ROLE_ADMIN } from "@/lib/auth-helpers";
+import { clearLanguageCache } from "@/lib/dynamic-languages";
 
 export async function GET() {
   try {
@@ -76,6 +77,10 @@ export async function PUT(request: NextRequest) {
         }
       }
     });
+
+    if (languages) {
+      clearLanguageCache();
+    }
 
     return NextResponse.json({
       success: true,

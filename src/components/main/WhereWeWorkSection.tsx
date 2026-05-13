@@ -15,6 +15,8 @@ import { orderLanguageLabelsEnglishFirst } from "@/lib/download-language-order";
 interface DownloadOption {
   label: string;
   fileUrl: string;
+  /** Opsional: cocokkan ke `languages.id` untuk bendera dari DB. */
+  languageId?: string;
 }
 
 interface DownloadItem {
@@ -43,10 +45,25 @@ function parseDownloadOptions(
   opts: DownloadOption[] | string | unknown,
 ): DownloadOption[] {
   if (Array.isArray(opts)) {
-    return opts.filter(
-      (o): o is DownloadOption =>
-        o && typeof o === "object" && "label" in o && "fileUrl" in o,
-    );
+    return opts
+      .filter(
+        (o): o is object =>
+          o !== null && typeof o === "object" && "label" in o && "fileUrl" in o,
+      )
+      .map((raw) => {
+        const o = raw as Record<string, unknown>;
+        const label = o.label;
+        const fileUrl = o.fileUrl;
+        if (typeof label !== "string" || typeof fileUrl !== "string") {
+          return null;
+        }
+        const out: DownloadOption = { label, fileUrl };
+        if (typeof o.languageId === "string" && o.languageId.trim()) {
+          out.languageId = o.languageId.trim().toLowerCase();
+        }
+        return out;
+      })
+      .filter((x): x is DownloadOption => x !== null);
   }
   if (typeof opts === "string") {
     try {

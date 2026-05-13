@@ -92,10 +92,8 @@ import {
   type DynamicLanguage,
 } from "./dynamic-languages";
 
-// Legacy constants for backward compatibility (will be deprecated)
-export const SUPPORTED_LANGUAGES = ["en", "id"] as const;
 export type SupportedLanguage = string; // Changed to string to support dynamic languages
-export const DEFAULT_LANGUAGE = "en"; // Fallback default
+export const DEFAULT_LANGUAGE = "en"; // Fallback bila DB belum siap
 
 // Dynamic language functions
 export async function getSupportedLanguages(): Promise<string[]> {

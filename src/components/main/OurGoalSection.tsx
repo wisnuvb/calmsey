@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Download, X } from "lucide-react";
+import { Download } from "lucide-react";
 import Image from "next/image";
 import { H2, H3, P } from "../ui/typography";
 import { RichText } from "../ui/RichText";
 import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
-import { useLanguage } from "../public/LanguageProvider";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
+import {
+  STRATEGY_2030_DOCUMENT_IDS,
+  Strategy2030DownloadLeadModal,
+} from "@/components/main/Strategy2030DownloadLeadModal";
 
 interface DownloadFile {
   language: string;
@@ -41,47 +44,45 @@ export function OurGoalSection({
   strategyDownloadText: propStrategyDownloadText,
 }: OurGoalSectionProps = {}) {
   const { getValue, getContentJSON } = usePageContentHelpers();
-  const { language: currentLanguage } = useLanguage();
   const { languages: activeLanguages } = useActiveLanguages();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalDownloadFiles, setModalDownloadFiles] = useState<DownloadFile[]>([]);
+  const [strategyModalOpen, setStrategyModalOpen] = useState(false);
 
   // Get all values with priority: context > props > default
   const title = getValue("goal.title", propTitle, "Our Goal");
   const description1 = getValue(
     "goal.description1",
     propDescription1,
-    "Implement and champion new approaches to funding that center power with, and provide resources directly to, local communities, small scale fishers and fish workers, and Indigenous Peoples, and the groups that legitimately serve them."
+    "Implement and champion new approaches to funding that center power with, and provide resources directly to, local communities, small scale fishers and fish workers, and Indigenous Peoples, and the groups that legitimately serve them.",
   );
   const description2 = getValue(
     "goal.description2",
     propDescription2,
-    "With more appropriate and equitable resourcing, actors - across scales - can build rights recognition and conditions that ensure tenure security."
+    "With more appropriate and equitable resourcing, actors - across scales - can build rights recognition and conditions that ensure tenure security.",
   );
   const strategyTitle = getValue(
     "goal.strategyTitle",
     propStrategyTitle,
-    "The Strategy to 2030"
+    "The Strategy to 2030",
   );
   const strategyDescription = getValue(
     "goal.strategyDescription",
     propStrategyDescription,
-    "See our multi-scale & geographic approach, how we identify the challenges, create risk mitigation, milestones and estimate budget until 2030 ahead."
+    "See our multi-scale & geographic approach, how we identify the challenges, create risk mitigation, milestones and estimate budget until 2030 ahead.",
   );
   const strategyImage = getValue(
     "goal.strategyImage",
     propStrategyImage,
-    "/assets/demo/strategy.png"
+    "/assets/demo/strategy.png",
   );
   const strategyImageAlt = getValue(
     "goal.strategyImageAlt",
     propStrategyImageAlt,
-    "Strategy to 2030"
+    "Strategy to 2030",
   );
   // Get download files - new structure
   const contextDownloadFiles = getContentJSON<DownloadFile[]>(
     "goal.strategyDownloadFiles",
-    []
+    [],
   );
   const downloadFiles =
     contextDownloadFiles.length > 0
@@ -92,7 +93,7 @@ export function OurGoalSection({
   const legacyDownloadUrl = getValue(
     "goal.strategyDownloadUrl",
     propStrategyDownloadUrl,
-    ""
+    "",
   );
   const finalDownloadFiles =
     downloadFiles.length > 0
@@ -104,10 +105,27 @@ export function OurGoalSection({
   const strategyDownloadText = getValue(
     "goal.strategyDownloadText",
     propStrategyDownloadText,
-    "Download"
+    "Download",
   );
 
-  // Helper function to ensure URL has https:// protocol
+  const strategyDownloadModalTitle = getValue(
+    "goal.strategyDownloadModalTitle",
+    undefined,
+    "Download Strategy to 2030",
+  );
+
+  const strategyDownloadModalSubtitle = getValue(
+    "goal.strategyDownloadModalSubtitle",
+    undefined,
+    "Enter your details to download. We use this information to understand interest in our strategy document.",
+  );
+
+  const strategyDownloadModalButtonText = getValue(
+    "goal.strategyDownloadModalButtonText",
+    undefined,
+    "Download now",
+  );
+
   const ensureHttpsUrl = (url: string): string => {
     if (!url || url.trim() === "") {
       return url;
@@ -115,48 +133,24 @@ export function OurGoalSection({
 
     const trimmedUrl = url.trim();
 
-    // Jika sudah memiliki protokol (http:// atau https://), return as-is
     if (/^https?:\/\//i.test(trimmedUrl)) {
       return trimmedUrl;
     }
 
-    // Jika dimulai dengan // (protocol-relative), tambahkan https:
     if (trimmedUrl.startsWith("//")) {
       return `https:${trimmedUrl}`;
     }
 
-    // Jika tidak ada protokol, tambahkan https://
+    if (trimmedUrl.startsWith("/")) {
+      return trimmedUrl;
+    }
+
     return `https://${trimmedUrl}`;
   };
 
-  // Get language name helper
   const getLanguageName = (langCode: string): string => {
     const lang = activeLanguages.find((l) => l.id === langCode);
     return lang?.name || langCode.toUpperCase();
-  };
-
-  // Handle download click
-  const handleDownloadClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (finalDownloadFiles.length === 1) {
-      // If only one file, download directly
-      const file = finalDownloadFiles[0];
-      const url = file.url.startsWith("/")
-        ? file.url
-        : ensureHttpsUrl(file.url);
-      window.open(url, "_blank");
-    } else {
-      // Show modal to select language
-      setModalDownloadFiles(finalDownloadFiles);
-      setIsModalOpen(true);
-    }
-  };
-
-  // Handle language selection
-  const handleLanguageSelect = (file: DownloadFile) => {
-    const url = file.url.startsWith("/") ? file.url : ensureHttpsUrl(file.url);
-    window.open(url, "_blank");
-    setIsModalOpen(false);
   };
 
   return (
@@ -168,9 +162,7 @@ export function OurGoalSection({
             {/* Icon and Heading */}
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                {/* <div className="w-12 h-12 bg-[#6BB7BC] rounded-[12px] flex items-center justify-center"> */}
                 <div className="bg-[#3C62ED] p-3 rounded-lg">
-                  {/* <Target className="w-6 h-6 text-white" /> */}
                   <svg
                     width="18"
                     height="18"
@@ -207,7 +199,6 @@ export function OurGoalSection({
 
           {/* Right Column - Strategy Card */}
           <div className="space-y-8 relative">
-            {/* Strategy Description */}
             <div className="p-6 border border-[#CADBEA] bg-white w-full rounded items-center justify-between grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Image
                 src={getImageUrl(strategyImage)}
@@ -226,7 +217,10 @@ export function OurGoalSection({
                 <P className="text-[#06072680]">{strategyDescription}</P>
 
                 <button
-                  onClick={handleDownloadClick}
+                  type="button"
+                  onClick={() =>
+                    finalDownloadFiles.length > 0 && setStrategyModalOpen(true)
+                  }
                   className="inline-flex items-center justify-center px-6 py-3 bg-white text-base text-[#010107] font-normal border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full"
                 >
                   <Download className="w-4 h-4 mr-2" />
@@ -238,54 +232,23 @@ export function OurGoalSection({
         </div>
       </div>
 
-      {/* Language Selection Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Select Language
-              </h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Close modal"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            <p className="text-gray-600 mb-6">
-              Choose your preferred language to download the strategy document:
-            </p>
-            <div className="space-y-2">
-              {modalDownloadFiles.map((file) => (
-                <button
-                  key={file.language}
-                  onClick={() => handleLanguageSelect(file)}
-                  className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${file.language === currentLanguage
-                    ? "border-blue-500 bg-blue-50 text-blue-900"
-                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700"
-                    }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">
-                      {getLanguageName(file.language)}
-                    </span>
-                    {file.language === currentLanguage && (
-                      <span className="text-xs text-blue-600">(Current)</span>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="mt-6 w-full px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+      {strategyModalOpen && (
+        <Strategy2030DownloadLeadModal
+          key={finalDownloadFiles
+            .map((f) => `${f.language.trim()}:${f.url.trim()}`)
+            .join("|")}
+          title={strategyDownloadModalTitle}
+          subtitle={strategyDownloadModalSubtitle}
+          downloadButtonText={strategyDownloadModalButtonText}
+          documentTitle={strategyTitle}
+          documentItemId={STRATEGY_2030_DOCUMENT_IDS.ourGoalCard}
+          formFieldIdPrefix="goal-strategy-dl"
+          headingId="goal-strategy-download-modal-title"
+          files={finalDownloadFiles}
+          getLanguageName={getLanguageName}
+          normalizeUrl={ensureHttpsUrl}
+          onClose={() => setStrategyModalOpen(false)}
+        />
       )}
     </section>
   );

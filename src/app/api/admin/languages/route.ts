@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, ROLE_ADMIN, ROLE_AUTHOR } from "@/lib/auth-helpers";
+import { clearLanguageCache } from "@/lib/dynamic-languages";
 
 export async function GET(request: NextRequest) {
   try {
@@ -229,6 +230,8 @@ export async function POST(request: NextRequest) {
         },
       });
     });
+
+    clearLanguageCache();
 
     return NextResponse.json(
       {

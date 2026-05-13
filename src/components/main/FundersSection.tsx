@@ -148,8 +148,8 @@ export function FundersSection({
         </div>
 
         {/* Call to action: wrapper text (~2 lines), left aligned; button right aligned */}
-        <div className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-start gap-4 sm:gap-5 w-full max-w-5xl mx-auto">
-          <p className="p max-w-xl text-left text-[#060726CC] sm:max-w-2xl">
+        <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-start gap-4 sm:gap-5 w-full max-w-5xl mx-auto">
+          <p className="p max-w-xl text-center sm:text-left text-[#060726CC] sm:max-w-2xl">
             {ctaText}
           </p>
           <Link

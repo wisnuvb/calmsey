@@ -199,7 +199,7 @@ function GrantmakingFrameworkDownloadModal({
   );
 
   const langOptions = useMemo(
-    () => orderedFiles.map((f) => ({ label: getLanguageName(f.language) })),
+    () => orderedFiles.map((f) => ({ label: getLanguageName(f.language), languageId: f.language })),
     [orderedFiles, getLanguageName],
   );
 

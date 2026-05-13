@@ -58,9 +58,9 @@ export function MembersCarouselShell<T extends { id: string }>({
       {/* Mobile: horizontal scroll cards */}
       <div className="sm:hidden mb-12 -mx-1 px-1">
         <div className={scrollInnerClass}>
-          {members.map((member) => (
+          {members.map((member, index) => (
             <div
-              key={member.id}
+              key={`${index}-${member.id}`}
               className="snap-center shrink-0 w-[min(280px,82vw)]"
             >
               {renderCard(member)}
@@ -93,8 +93,10 @@ export function MembersCarouselShell<T extends { id: string }>({
         )}
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {currentMembers.map((member) => (
-            <div key={member.id}>{renderCard(member)}</div>
+          {currentMembers.map((member, index) => (
+            <div key={`${startIndex + index}-${member.id}`}>
+              {renderCard(member)}
+            </div>
           ))}
         </div>
       </div>

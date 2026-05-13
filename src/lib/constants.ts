@@ -1,13 +1,13 @@
-// Language constants for middleware and public API
-// Note: These are legacy constants. Use dynamic-languages.ts for database-driven languages
-
-// Legacy constants for backward compatibility
-export const SUPPORTED_LANGUAGES = ["en", "id"] as const;
-export type SupportedLanguage = string; // Changed to string to support dynamic languages
-export const DEFAULT_LANGUAGE = "en"; // Fallback default
+// Language-related constants (routing memakai tabel `languages` via API + middleware)
+// Lihat: `src/lib/dynamic-languages.ts`, `src/lib/middleware-locale-config.ts`
 
 /** Cookie diset middleware + client agar path tanpa prefix bahasa di-rewrite ke locale aktif. */
 export const LOCALE_COOKIE_NAME = "ttf-locale";
+
+export type SupportedLanguage = string;
+
+/** Fallback sinkron bila tidak bisa cek DB (prefer `getValidLanguage` async dari `public-api`). */
+export const DEFAULT_LANGUAGE = "en";
 
 // Legacy function for backward compatibility
 export function isValidLanguage(lang: string): boolean {

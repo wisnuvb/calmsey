@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Send } from "lucide-react";
@@ -9,7 +9,7 @@ import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { CountryCombobox } from "@/components/ui/country-combobox";
 import { SearchableCombobox } from "@/components/ui/searchable-combobox";
-import { getCountrySelectOptions } from "@/lib/countries";
+import { getCountrySelectOptions, type CountryOption } from "@/lib/countries";
 
 const ENTITY_TYPE_COMBO_OPTIONS = [
   { value: "company", label: "Company" },
@@ -161,7 +161,43 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   const [charCount, setCharCount] = useState(0);
   const maxChars = 5000;
 
-  const countryOptions = useMemo(() => getCountrySelectOptions(), []);
+  const [countryOptions, setCountryOptions] = useState<CountryOption[]>([]);
+  const [countryOptionsLoading, setCountryOptionsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/public/countries");
+        const json = (await res.json()) as {
+          success?: boolean;
+          data?: CountryOption[];
+        };
+        if (
+          !cancelled &&
+          res.ok &&
+          json.success &&
+          Array.isArray(json.data) &&
+          json.data.length > 0
+        ) {
+          setCountryOptions(json.data);
+        } else if (!cancelled) {
+          setCountryOptions(getCountrySelectOptions());
+        }
+      } catch {
+        if (!cancelled) {
+          setCountryOptions(getCountrySelectOptions());
+        }
+      } finally {
+        if (!cancelled) {
+          setCountryOptionsLoading(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -377,7 +413,12 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                       setFormData((prev) => ({ ...prev, country }))
                     }
                     options={countryOptions}
-                    placeholder="Select country"
+                    disabled={countryOptionsLoading}
+                    placeholder={
+                      countryOptionsLoading
+                        ? "Loading countries…"
+                        : "Select country"
+                    }
                     aria-label="Country"
                   />
                 </div>

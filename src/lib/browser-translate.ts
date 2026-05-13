@@ -684,6 +684,18 @@ export const LANGUAGE_CODES: Record<string, string> = {
 };
 
 /**
+ * Locale yang bukan `en` memicu `translatePage` dengan sumber "en", sehingga
+ * widget Google Translate memutasi pohon DOM. Navigasi klien Next.js/React
+ * setelah mutasi itu dapat memunculkan NotFoundError pada `removeChild`.
+ * @see LanguageProvider
+ */
+export function shouldForceFullPageNavigationForLocale(
+  language: string
+): boolean {
+  return language !== "en";
+}
+
+/**
  * Convert internal language code to Google Translate code
  */
 export function toGoogleTranslateCode(languageCode: string): string {

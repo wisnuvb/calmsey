@@ -1,15 +1,22 @@
 import { MetadataRoute } from "next";
-import { PublicAPI, SUPPORTED_LANGUAGES } from "@/lib/public-api";
+import {
+  getDefaultLanguage,
+  getSupportedLanguages,
+} from "@/lib/dynamic-languages";
+import { PublicAPI } from "@/lib/public-api";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://calmsey.com"; // Replace with your domain
 
   const sitemap: MetadataRoute.Sitemap = [];
 
+  const supportedLanguages = await getSupportedLanguages();
+  const defaultLang = await getDefaultLanguage();
+
   // Add homepage for each language
-  SUPPORTED_LANGUAGES.forEach((lang) => {
+  supportedLanguages.forEach((lang) => {
     sitemap.push({
-      url: lang === "en" ? baseUrl : `${baseUrl}/${lang}`,
+      url: lang === defaultLang ? baseUrl : `${baseUrl}/${lang}`,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1,
@@ -17,13 +24,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
 
   // Add articles for each language
-  for (const lang of SUPPORTED_LANGUAGES) {
+  for (const lang of supportedLanguages) {
     try {
       const articles = await PublicAPI.getRecentArticles(lang, 1000); // Get all articles
 
       articles.forEach((article) => {
         const url =
-          lang === "en"
+          lang === defaultLang
             ? `${baseUrl}/articles/${article.slug}`
             : `${baseUrl}/${lang}/articles/${article.slug}`;
 
@@ -40,13 +47,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Add categories for each language
-  for (const lang of SUPPORTED_LANGUAGES) {
+  for (const lang of supportedLanguages) {
     try {
       const categories = await PublicAPI.getCategoryHierarchy(lang);
 
       categories.forEach((category) => {
         const url =
-          lang === "en"
+          lang === defaultLang
             ? `${baseUrl}/${category.slug}`
             : `${baseUrl}/${lang}/${category.slug}`;
 
@@ -68,9 +75,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Add static pages
   const staticPages = ["contact", "articles"];
   staticPages.forEach((page) => {
-    SUPPORTED_LANGUAGES.forEach((lang) => {
+    supportedLanguages.forEach((lang) => {
       const url =
-        lang === "en" ? `${baseUrl}/${page}` : `${baseUrl}/${lang}/${page}`;
+        lang === defaultLang
+          ? `${baseUrl}/${page}`
+          : `${baseUrl}/${lang}/${page}`;
 
       sitemap.push({
         url,
