@@ -259,9 +259,9 @@ export function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link
-            href="/"
+            href={`/${language}`}
             className="flex items-center"
-            onClick={(e) => handleSafeNavigation(e, "/")}
+            onClick={(e) => handleSafeNavigation(e, `/${language}`)}
           >
             <div className="w-[100px] h-[65px] relative">
               <Image

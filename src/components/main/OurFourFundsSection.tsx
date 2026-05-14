@@ -204,8 +204,8 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
                   <h3 className="text-2xl sm:text-[32px] leading-[120%] tracking-normal font-bold font-nunito text-[#3C62ED]">
                     {fund.title}
                   </h3>
-                  <p
-                    className="text-[#060726CC] p font-normal leading-relaxed"
+                  <div
+                    className="text-[#060726CC] font-normal leading-relaxed max-w-none [&_p]:mb-3 [&_p:last-child]:mb-0 [&_a]:text-[#3C62ED] [&_a]:font-medium [&_a]:no-underline hover:[&_a]:underline"
                     dangerouslySetInnerHTML={{ __html: fund.description }}
                   />
                 </div>

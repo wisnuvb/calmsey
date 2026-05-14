@@ -163,7 +163,10 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
             </div>
 
             <div className="text-left sm:col-span-8">
-              <p className="text-[#010107] p" dangerouslySetInnerHTML={{ __html: description }} />
+              <div
+                className="text-[#010107] font-normal font-nunito text-lg sm:text-2xl max-w-none [&_p]:mb-3 [&_p:last-child]:mb-0 [&_a]:text-[#3C62ED] [&_a]:font-medium [&_a]:no-underline hover:[&_a]:underline"
+                dangerouslySetInnerHTML={{ __html: description }}
+              />
             </div>
           </div>
         </div>
