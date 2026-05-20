@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { buildCountrySelectOptions } from "@/lib/countries";
 
 /**
- * Daftar negara untuk combobox di klien. Dibangun di server dengan `Intl`
- * (daftar penuh), agar tidak bergantung pada dukungan `Intl.supportedValuesOf`
- * di browser.
+ * List of countries for the combobox on the client. Built on the server with `Intl`
+ * (full list), so as not to rely on `Intl.supportedValuesOf` support
+ * in the browser.
  */
 export async function GET() {
   try {
@@ -13,7 +13,8 @@ export async function GET() {
       { success: true, data },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+          "Cache-Control":
+            "public, s-maxage=3600, stale-while-revalidate=86400",
         },
       },
     );

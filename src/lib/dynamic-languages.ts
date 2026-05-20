@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { clearMiddlewareLocaleRuntimeCache } from "@/lib/middleware-locale-config";
+import { normalizeLanguageFlag } from "@/lib/language-variant-flag";
 
 export interface DynamicLanguage {
   id: string;
@@ -40,11 +41,16 @@ export async function getActiveLanguages(): Promise<DynamicLanguage[]> {
       ],
     });
 
+    const normalized = languages.map((lang) => ({
+      ...lang,
+      flag: normalizeLanguageFlag(lang.id, lang.flag),
+    }));
+
     // Update cache
-    activeLanguagesCache = languages;
+    activeLanguagesCache = normalized;
     cacheTimestamp = now;
 
-    return languages;
+    return normalized;
   } catch (error) {
     console.error("Error fetching active languages:", error);
     // Return cache jika ada error

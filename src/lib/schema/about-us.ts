@@ -8,6 +8,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
     "Our Vision",
     "Our Values",
     "Our Goal",
+    "Annual Report",
     "Where We Work",
     "Our Team",
     "Funders",
@@ -39,8 +40,6 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       type: "image",
       section: "Hero",
     },
-
-    // We Are Video (sama kunci dengan beranda; konten tersimpan per halaman)
     {
       key: "weAreVideo.videoUrl",
       label: "Video URL",
@@ -48,14 +47,15 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       section: "We Are Video",
       placeholder: "https://www.youtube.com/watch?v=… atau https://vimeo.com/…",
       helpText:
-        "YouTube, Vimeo, atau URL file video langsung (mp4, webm, dll.).",
+        "Filled per About Us page (not homepage content). YouTube, Vimeo, or direct mp4/webm files.",
     },
     {
       key: "weAreVideo.posterImage",
       label: "Poster / Thumbnail",
       type: "image",
       section: "We Are Video",
-      helpText: "Gambar latar sebelum video diputar. Disarankan lebar besar (mis. 1920px).",
+      helpText:
+        "For live video files: used as a poster. For YouTube/Vimeo: optional (video autoplay muted in the background).",
     },
     {
       key: "weAreVideo.titleLine1",
@@ -322,6 +322,100 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       section: "Our Goal",
       defaultValue: "Download",
       helpText: "Text displayed on the download button",
+    },
+
+    // Annual Report Section
+    {
+      key: "annualReport.title",
+      label: "Title",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Turning Tides 2025 Annual Report",
+      helpText: "Main headline next to the icon",
+    },
+    {
+      key: "annualReport.badgeText",
+      label: "Badge text",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "COMING SOON",
+      helpText: "Optional pill next to the title; leave empty to hide",
+    },
+    {
+      key: "annualReport.description",
+      label: "Description",
+      type: "textarea",
+      section: "Annual Report",
+      defaultValue:
+        "Learn more about Turning Tides' accomplishments, initiatives, and organizational growth throughout the year. The upcoming report highlights our dedication to accountability and sustainable impact.",
+    },
+    {
+      key: "annualReport.buttonText",
+      label: "Download button label",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Download",
+      helpText: "Opens the lead form modal when download files are configured",
+    },
+    {
+      key: "annualReport.downloadFiles",
+      label: "PDF files by language",
+      type: "multiple",
+      section: "Annual Report",
+      helpText:
+        "Add at least one file to enable the Download button. Users choose language in the modal.",
+      itemLabel: "Download File",
+      itemSchema: [
+        {
+          key: "language",
+          label: "Language",
+          type: "select",
+          required: true,
+          optionsFrom: "languages",
+          placeholder: "Select language",
+          helpText:
+            "Daftar diambil dari Settings → Languages (hanya bahasa aktif). Nilai tersimpan adalah kode bahasa (mis. en, id).",
+        },
+        {
+          key: "url",
+          label: "PDF File URL",
+          type: "file",
+          required: true,
+          placeholder: "/downloads/annual-report-2025-en.pdf",
+          helpText: "URL to the PDF for this language",
+        },
+      ],
+    },
+    {
+      key: "annualReport.downloadModalTitle",
+      label: "Download modal — title",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Download Annual Report",
+    },
+    {
+      key: "annualReport.downloadModalSubtitle",
+      label: "Download modal — subtitle",
+      type: "textarea",
+      section: "Annual Report",
+      defaultValue:
+        "Enter your details to download. We use this information to understand interest in our annual report.",
+    },
+    {
+      key: "annualReport.downloadModalButtonText",
+      label: "Download modal — confirm button",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Download now",
+    },
+    {
+      key: "annualReport.downloadDocumentTitle",
+      label: "Download document title (analytics)",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Turning Tides 2025 Annual Report",
+      helpText:
+        "Stored with submissions in Download Activity; can match the section title",
     },
 
     // Where We Work Section

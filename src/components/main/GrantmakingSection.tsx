@@ -15,6 +15,7 @@ import {
 } from "@/lib/countries";
 import { LanguageVariantPicker } from "@/components/main/LanguageVariantPicker";
 import { orderDownloadFilesEnglishFirst } from "@/lib/download-language-order";
+import { createDownloadLanguageNameResolver } from "@/lib/download-language-labels";
 
 interface PracticeItem {
   id: string;
@@ -88,7 +89,7 @@ interface MultipleFieldItem {
   downloadButtonLabel?: string;
   downloadButtonText?: string;
   downloadButtonUrl?: string; // Legacy support
-  downloadFiles?: string; // JSON string from multiple field
+  downloadFiles?: string | DownloadFile[]; // JSON string or array from nested multiple field
   downloadModalIntro?: string;
   downloadModalImageSrc?: string;
   downloadModalImageAlt?: string;
@@ -174,6 +175,7 @@ function GrantmakingFrameworkDownloadModal({
   onClose,
   files,
   tabContent,
+  downloadButtonText,
   getLanguageName,
   normalizeUrl,
 }: {
@@ -181,6 +183,7 @@ function GrantmakingFrameworkDownloadModal({
   onClose: () => void;
   files: DownloadFile[];
   tabContent: TabContent;
+  downloadButtonText?: string;
   getLanguageName: (code: string) => string;
   normalizeUrl: (url: string) => string;
 }) {
@@ -430,15 +433,17 @@ function GrantmakingFrameworkDownloadModal({
             ) : null}
 
             <div className="mt-6 flex flex-col gap-4 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-              <LanguageVariantPicker
-                options={langOptions}
-                selectedIndex={Math.min(
-                  selectedLangIndex,
-                  Math.max(0, langOptions.length - 1),
-                )}
-                onSelectIndex={setSelectedLangIndex}
-                placeholder="Language"
-              />
+              {langOptions.length > 0 ? (
+                <LanguageVariantPicker
+                  options={langOptions}
+                  selectedIndex={Math.min(
+                    selectedLangIndex,
+                    Math.max(0, langOptions.length - 1),
+                  )}
+                  onSelectIndex={setSelectedLangIndex}
+                  placeholder="Select language"
+                />
+              ) : null}
               <button
                 type="button"
                 onClick={handleDownload}
@@ -446,7 +451,9 @@ function GrantmakingFrameworkDownloadModal({
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#3C62ED] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#2d4fd6] disabled:opacity-50 sm:w-auto sm:min-w-[200px]"
               >
                 <FileDown className="h-5 w-5 shrink-0" aria-hidden />
-                {isSubmitting ? "Please wait…" : "Download Now"}
+                {isSubmitting
+                  ? "Please wait…"
+                  : downloadButtonText?.trim() || "Download Now"}
               </button>
             </div>
           </div>
@@ -669,28 +676,33 @@ export function GrantmakingSection({
           }
         }
 
-        // Parse downloadFiles (JSON array format from multiple field)
+        // Parse downloadFiles (nested multiple: JSON string or array)
         const downloadFiles: DownloadFile[] = [];
-        if (item.downloadFiles && typeof item.downloadFiles === "string") {
-          try {
-            const parsed = JSON.parse(item.downloadFiles);
-            if (Array.isArray(parsed)) {
-              parsed.forEach((file: unknown) => {
-                if (
-                  file &&
-                  typeof file === "object" &&
-                  "language" in file &&
-                  "url" in file
-                ) {
-                  downloadFiles.push({
-                    language: String((file as { language: unknown; url: unknown }).language),
-                    url: String((file as { language: unknown; url: unknown }).url),
-                  });
-                }
-              });
+        if (item.downloadFiles) {
+          let parsed: unknown = item.downloadFiles;
+          if (typeof item.downloadFiles === "string") {
+            try {
+              parsed = JSON.parse(item.downloadFiles);
+            } catch {
+              parsed = [];
             }
-          } catch {
-            // Skip invalid JSON
+          }
+          if (Array.isArray(parsed)) {
+            parsed.forEach((file: unknown) => {
+              if (
+                file &&
+                typeof file === "object" &&
+                "language" in file &&
+                "url" in file
+              ) {
+                const entry = file as { language: unknown; url: unknown };
+                const language = String(entry.language).trim();
+                const url = String(entry.url).trim();
+                if (language && url) {
+                  downloadFiles.push({ language, url });
+                }
+              }
+            });
           }
         }
 
@@ -815,11 +827,10 @@ export function GrantmakingSection({
     return `https://${trimmedUrl}`;
   };
 
-  // Get language name helper
-  const getLanguageName = (langCode: string): string => {
-    const lang = activeLanguages.find((l) => l.id === langCode);
-    return lang?.name || langCode.toUpperCase();
-  };
+  const getLanguageName = useMemo(
+    () => createDownloadLanguageNameResolver(activeLanguages),
+    [activeLanguages],
+  );
 
   const handleDownloadClick = (
     e: React.MouseEvent,
@@ -1127,6 +1138,7 @@ export function GrantmakingSection({
           open
           files={downloadModal.files}
           tabContent={downloadModal.tab}
+          downloadButtonText={downloadModal.tab.downloadButtonText}
           getLanguageName={getLanguageName}
           normalizeUrl={(url) =>
             url.startsWith("/") ? url : ensureHttpsUrl(url)

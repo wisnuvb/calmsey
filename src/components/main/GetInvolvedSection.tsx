@@ -3,27 +3,16 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { Send } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { CountryCombobox } from "@/components/ui/country-combobox";
-import { SearchableCombobox } from "@/components/ui/searchable-combobox";
 import { getCountrySelectOptions, type CountryOption } from "@/lib/countries";
 
-const ENTITY_TYPE_COMBO_OPTIONS = [
-  { value: "company", label: "Company" },
-  { value: "institute", label: "Institute" },
-  { value: "organization", label: "Organization" },
-  { value: "individual", label: "Individual" },
-] as const;
-
-const PARTNERSHIP_TYPE_COMBO_OPTIONS = [
-  { value: "Funding Partner", label: "Funding Partner" },
-  { value: "Technical Partner", label: "Technical Partner" },
-  { value: "Community Partner", label: "Community Partner" },
-  { value: "Research Partner", label: "Research Partner" },
-] as const;
+const FORM_LABEL_CLASS =
+  "mb-2 block font-work-sans text-sm font-semibold text-[#010107]";
+const FORM_INPUT_CLASS =
+  "w-full rounded-lg border border-gray-200 bg-white px-4 py-3 font-work-sans text-sm text-[#010107] outline-none transition-colors placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]/40";
 
 interface GetInvolvedSectionProps {
   backgroundImage?: string;
@@ -50,20 +39,6 @@ function bannerTextWithBold(text: string) {
   );
 }
 
-/** Label field nama entitas sesuai tipe yang dipilih. */
-function entityNameLabel(
-  entityType: string,
-): "Company name" | "Institute name" | "Organization name" {
-  switch (entityType) {
-    case "company":
-      return "Company name";
-    case "institute":
-      return "Institute name";
-    default:
-      return "Organization name";
-  }
-}
-
 export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   backgroundImage: propBackgroundImage,
   backgroundImageAlt: propBackgroundImageAlt,
@@ -86,8 +61,12 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
     propBackgroundImageAlt,
     "Workshop meeting with community members",
   );
-  const title = getValue("hero.title", propTitle, "Get connected");
-  const subtitle = getValue("hero.subtitle", propSubtitle, "");
+  const title = getValue("hero.title", propTitle, "Connect With Us");
+  const subtitle = getValue(
+    "hero.subtitle",
+    propSubtitle,
+    "Please tell us about the nature of your interest or connection, and we'll do our best to respond and connect you with the right person on our team.",
+  );
 
   const overlayTitle = getValue(
     "hero.overlayTitle",
@@ -136,6 +115,34 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
     undefined,
     "Tell us about your work, goals, or the kind of partnership you are seeking.",
   );
+  const formNote = getValue(
+    "cta.formNote",
+    undefined,
+    "we do not accept unsolicited grant proposals through this form. For information on how we partner with grantees, please see our Grantmaking Framework and Action Plans.",
+  );
+  const nameLabel = getValue("cta.nameLabel", undefined, "Your name");
+  const emailLabel = getValue("cta.emailLabel", undefined, "Email");
+  const countryLabel = getValue(
+    "cta.countryLabel",
+    undefined,
+    "Please indicate the country or region you are interested in",
+  );
+  const messageLabel = getValue("cta.messageLabel", undefined, "Your message");
+  const namePlaceholder = getValue(
+    "cta.namePlaceholder",
+    undefined,
+    "Joseph Hans",
+  );
+  const emailPlaceholder = getValue(
+    "cta.emailPlaceholder",
+    undefined,
+    "example@email.com",
+  );
+  const countryPlaceholder = getValue(
+    "cta.countryPlaceholder",
+    undefined,
+    "Country or region of interest",
+  );
 
   const searchParams = useSearchParams();
   const becomeParam = searchParams.get("become");
@@ -143,18 +150,9 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    organization: "",
-    organizationName: "",
     country: "",
-    partnershipType: becomeParam === "funder" ? "Funding Partner" : "",
     message: "",
   });
-
-  useEffect(() => {
-    if (becomeParam === "funder") {
-      setFormData((prev) => ({ ...prev, partnershipType: "Funding Partner" }));
-    }
-  }, [becomeParam]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -205,12 +203,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
     >,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => {
-      if (name === "organization" && value === "individual") {
-        return { ...prev, organization: value, organizationName: "" };
-      }
-      return { ...prev, [name]: value };
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === "message") {
       setCharCount(value.length);
@@ -222,22 +215,15 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
 
     setError("");
 
-    if (!formData.organization.trim()) {
-      setError("Please select company, institute, organization, or individual");
-      return;
-    }
-
     if (!formData.country.trim()) {
-      setError("Please select a country");
-      return;
-    }
-
-    if (!formData.partnershipType.trim()) {
-      setError("Please select type of partner");
+      setError("Please select a country or region");
       return;
     }
 
     setLoading(true);
+
+    const partnershipType =
+      becomeParam === "funder" ? "Funding Partner" : "General Inquiry";
 
     try {
       const response = await fetch("/api/get-involved", {
@@ -245,7 +231,12 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          organization: "individual",
+          organizationName: "",
+          partnershipType,
+        }),
       });
 
       const data = await response.json();
@@ -257,10 +248,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
       setFormData({
         fullName: "",
         email: "",
-        organization: "",
-        organizationName: "",
         country: "",
-        partnershipType: "",
         message: "",
       });
       setCharCount(0);
@@ -281,130 +269,83 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
       className={`w-full ${backgroundColor} pt-20 md:pt-24`}
       data-section="get-involved"
     >
-      <h1 className="sr-only">Get Involved</h1>
+      <h1 className="sr-only">Connect With Us</h1>
       <div className="">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[600px]">
-          <div className="relative">
+        <div className="grid min-h-[600px] grid-cols-1 gap-0 lg:grid-cols-2">
+          <div className="relative min-h-[480px] lg:min-h-[600px]">
             <div className="absolute inset-0">
               <Image
                 src={getImageUrl(backgroundImage)}
                 alt={backgroundImageAlt}
                 fill
-                className="object-cover"
+                className="object-cover object-[50%_65%] lg:object-[50%_70%]"
                 priority
               />
-              <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
             </div>
 
-            <div className="relative z-10 p-8 md:p-12 flex flex-col justify-center h-full">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 leading-tight font-nunito">
-                {overlayTitle}
-              </h2>
-              <p className="text-white/95 p">{overlayDescription}</p>
+            <div className="relative z-10 flex min-h-[480px] flex-col items-start justify-start px-8 pb-10 pt-10 md:px-10 md:pb-12 md:pt-14 lg:min-h-[600px] lg:px-12 lg:pt-16 lg:pb-16">
+              <div className="max-w-md lg:max-w-[28rem]">
+                <h2 className="font-nunito text-[2rem] font-bold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-[2.75rem] lg:leading-[1.12]">
+                  {overlayTitle}
+                </h2>
+                <p className="mt-6 font-work-sans text-base font-normal leading-relaxed text-white sm:text-[17px] sm:leading-[1.55]">
+                  {overlayDescription}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-8 md:p-16 flex flex-col justify-center">
-            <div className="max-w-md mx-auto w-full">
-              <div className="mb-10">
-                <h3 className="text-4xl font-bold text-gray-900 mb-2 font-nunito">
+          <div className="flex flex-col justify-center bg-white p-8 md:p-12 lg:p-16">
+            <div className="mx-auto w-full max-w-2xl">
+              <header className="mb-8 md:mb-10">
+                <h3 className="mb-3 font-nunito text-3xl font-bold leading-tight text-[#010107] md:text-4xl">
                   {title}
                 </h3>
-                {subtitle && (
-                  <p className="text-gray-600 text-base font-work-sans">
+                {subtitle ? (
+                  <p className="font-work-sans text-base leading-relaxed text-[#4B5563]">
                     {subtitle}
                   </p>
-                )}
-              </div>
+                ) : null}
+              </header>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
-                    <label htmlFor="fullName" className="sr-only">
-                      Full name
+                    <label htmlFor="fullName" className={FORM_LABEL_CLASS}>
+                      {nameLabel}
                     </label>
                     <input
                       id="fullName"
                       type="text"
                       name="fullName"
-                      placeholder="Full name"
+                      placeholder={namePlaceholder}
                       value={formData.fullName}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                      className={FORM_INPUT_CLASS}
                       required
-                      aria-label="Full name"
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="sr-only">
-                      Email
+                    <label htmlFor="email" className={FORM_LABEL_CLASS}>
+                      {emailLabel}
                     </label>
                     <input
                       id="email"
                       type="email"
                       name="email"
-                      placeholder="Email"
+                      placeholder={emailPlaceholder}
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                      className={FORM_INPUT_CLASS}
                       required
-                      aria-label="Email"
                     />
                   </div>
                 </div>
 
-                <div className="relative">
-                  <label htmlFor="organization" className="sr-only">
-                    Company / Institute / Organization / Individual
-                  </label>
-                  <SearchableCombobox
-                    id="organization"
-                    value={formData.organization}
-                    onValueChange={(organization) =>
-                      setFormData((prev) =>
-                        organization === "individual"
-                          ? {
-                              ...prev,
-                              organization,
-                              organizationName: "",
-                            }
-                          : { ...prev, organization },
-                      )
-                    }
-                    options={[...ENTITY_TYPE_COMBO_OPTIONS]}
-                    placeholder="Company / Institute / Organization / Individual"
-                    searchPlaceholder="Search…"
-                    emptyResultsMessage="No matches"
-                    listboxLabel="Type of entity"
-                    listHeightClassName="h-[220px]"
-                    aria-label="Company / Institute / Organization / Individual"
-                  />
-                </div>
-
-                {formData.organization &&
-                  formData.organization !== "individual" && (
-                    <div>
-                      <label htmlFor="organizationName" className="sr-only">
-                        {entityNameLabel(formData.organization)}
-                      </label>
-                      <input
-                        id="organizationName"
-                        type="text"
-                        name="organizationName"
-                        placeholder={entityNameLabel(formData.organization)}
-                        value={formData.organizationName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
-                        required
-                        maxLength={500}
-                        aria-label={entityNameLabel(formData.organization)}
-                      />
-                    </div>
-                  )}
-
-                <div className="relative">
-                  <label htmlFor="country" className="sr-only">
-                    Country
+                <div>
+                  <label htmlFor="country" className={FORM_LABEL_CLASS}>
+                    {countryLabel}
                   </label>
                   <CountryCombobox
                     id="country"
@@ -416,77 +357,61 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                     disabled={countryOptionsLoading}
                     placeholder={
                       countryOptionsLoading
-                        ? "Loading countries…"
-                        : "Select country"
+                        ? "Loading countries and regions…"
+                        : countryPlaceholder
                     }
-                    aria-label="Country"
-                  />
-                </div>
-
-                <div className="relative">
-                  <label htmlFor="partnershipType" className="sr-only">
-                    Partnership type
-                  </label>
-                  <SearchableCombobox
-                    id="partnershipType"
-                    value={formData.partnershipType}
-                    onValueChange={(partnershipType) =>
-                      setFormData((prev) => ({ ...prev, partnershipType }))
-                    }
-                    options={[...PARTNERSHIP_TYPE_COMBO_OPTIONS]}
-                    placeholder="Type of partner"
-                    searchPlaceholder="Search…"
-                    emptyResultsMessage="No matches"
-                    listboxLabel="Partnership type"
-                    listHeightClassName="h-[220px]"
-                    aria-label="Partnership type"
+                    searchPlaceholder="Search country or region…"
+                    className={FORM_INPUT_CLASS}
+                    aria-label={countryLabel}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="sr-only">
-                    Message
+                  <label htmlFor="message" className={FORM_LABEL_CLASS}>
+                    {messageLabel}
                   </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    placeholder={messagePlaceholder}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    rows={5}
-                    maxLength={maxChars}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-sm"
-                    required
-                    aria-label=""
-                  />
-                  <div className="text-right text-xs text-gray-500 mt-2">
-                    {charCount} / {maxChars.toLocaleString()}
+                  <div className="relative">
+                    <textarea
+                      id="message"
+                      name="message"
+                      placeholder={messagePlaceholder}
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      rows={8}
+                      maxLength={maxChars}
+                      className={`${FORM_INPUT_CLASS} min-h-[200px] resize-none pb-10`}
+                      required
+                    />
+                    <div
+                      className="pointer-events-none absolute bottom-3 right-4 font-work-sans text-xs text-gray-400"
+                      aria-live="polite"
+                    >
+                      {charCount} / {maxChars.toLocaleString("id-ID")}
+                    </div>
                   </div>
                 </div>
 
-                {error && (
-                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error ? (
+                  <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                     {error}
                   </div>
-                )}
+                ) : null}
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-[#3C62ED] hover:bg-[#3C62ED] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 mt-8"
-                >
-                  {loading ? (
-                    <>
-                      <span className="animate-spin">⏳</span>
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-5 h-5" />
-                      {submitButtonText}
-                    </>
-                  )}
-                </button>
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="inline-flex min-w-[160px] items-center justify-center rounded-lg bg-[#9BB5E8] px-8 py-3.5 font-work-sans text-base font-semibold text-white transition-colors hover:bg-[#8AA5DE] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {loading ? "Sending..." : submitButtonText}
+                  </button>
+                </div>
+
+                {formNote ? (
+                  <div className="rounded-lg bg-[#FDF8E8] px-5 py-4 font-work-sans text-sm leading-relaxed text-[#5C6B2E]">
+                    <span className="font-bold">Please note:</span> {formNote}
+                  </div>
+                ) : null}
               </form>
             </div>
           </div>

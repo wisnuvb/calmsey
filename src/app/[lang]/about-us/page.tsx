@@ -9,6 +9,8 @@ import {
   WhereWeWorkSection,
   FeedbackCalloutSection,
   VideoWeAreSection,
+  AnnualReportSection,
+  ANNUAL_REPORT_DOCUMENT_IDS,
 } from "@/components/main";
 import { PageContentProvider } from "@/contexts/PageContentContext";
 import { getPageContentServer } from "@/lib/page-content-server";
@@ -64,14 +66,16 @@ const AboutUsPage = async ({ params }: AboutUsPageProps) => {
       />
       {/* <QuoteSection /> */}
 
-      <div className="-mb-20 mt-20">
-        <VideoWeAreSection />
-      </div>
-
       <OurVisionSection />
       <OurValuesSection />
+      {/* <div className="-mb-20 mt-20">
+      </div> */}
+        <VideoWeAreSection />
       {/* <WhatWeWannaAchieveSection /> */}
       <OurGoalSection />
+      <AnnualReportSection
+        documentItemId={ANNUAL_REPORT_DOCUMENT_IDS.aboutUs}
+      />
       {/* <TheoryOfChangeSection /> */}
       <WhereWeWorkSection />
       <TeamSection />

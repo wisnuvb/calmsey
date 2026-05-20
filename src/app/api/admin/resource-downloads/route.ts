@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
         "PARTNERS",
         "GRANTMAKING_FRAMEWORK",
         "STRATEGY_2030",
+        "ANNUAL_REPORT",
       ].includes(modalSource)
     ) {
       where.modalSource = modalSource;

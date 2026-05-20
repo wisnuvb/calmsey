@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { normalizeLanguageFlag } from "@/lib/language-variant-flag";
 
 export async function GET() {
   try {
@@ -22,7 +23,10 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      data: languages,
+      data: languages.map((lang) => ({
+        ...lang,
+        flag: normalizeLanguageFlag(lang.id, lang.flag),
+      })),
     });
   } catch (error) {
     console.error("Error fetching active languages:", error);

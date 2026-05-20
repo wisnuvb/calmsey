@@ -7,6 +7,8 @@ export * from "./OngoingProjectsSection";
 export * from "./PartnerStoriesSection";
 export * from "./LatestArticlesSection";
 export * from "./StrategyDownloadSection";
+export * from "./AnnualReportSection";
+export { ANNUAL_REPORT_DOCUMENT_IDS } from "./Strategy2030DownloadLeadModal";
 export * from "./OurWorkSection";
 
 // About Us

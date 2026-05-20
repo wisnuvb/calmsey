@@ -1,12 +1,11 @@
 import React from "react";
 import {
-  VideoHeroSection,
-  WhyTurningTidesSection,
   VideoWeAreSection,
   PartnerStoriesSection,
   StrategyDownloadSection,
-  GrantmakingSection,
   HeroSection,
+  AnnualReportSection,
+  ANNUAL_REPORT_DOCUMENT_IDS,
 } from "@/components/main";
 import { getPageContentServer } from "@/lib/page-content-server";
 import { PageContentProviderWrapper } from "@/components/providers/PageContentProviderWrapper";
@@ -60,6 +59,7 @@ const HomePage = async ({ params }: HomePageProps) => {
       {/* <OurWorkSection /> */}
       {/* <GrantmakingSection /> */}
       <VideoWeAreSection />
+      <AnnualReportSection documentItemId={ANNUAL_REPORT_DOCUMENT_IDS.home} />
       <PartnerStoriesSection
         tag="COMMUNITY ECHOES"
         title="Stories From Our Partners"

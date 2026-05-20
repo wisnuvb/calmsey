@@ -9,6 +9,7 @@ export type CountryComboboxProps = {
   onValueChange: (value: string) => void;
   options: CountryOption[];
   placeholder?: string;
+  searchPlaceholder?: string;
   disabled?: boolean;
   className?: string;
   "aria-label"?: string;
@@ -16,7 +17,8 @@ export type CountryComboboxProps = {
 
 export function CountryCombobox({
   options,
-  placeholder = "Select country",
+  placeholder = "Country or region of interest",
+  searchPlaceholder = "Search country or region…",
   "aria-label": ariaLabel,
   ...rest
 }: CountryComboboxProps) {
@@ -25,9 +27,9 @@ export function CountryCombobox({
       {...rest}
       options={options}
       placeholder={placeholder}
-      searchPlaceholder="Search country…"
-      emptyResultsMessage="No countries found"
-      listboxLabel={ariaLabel ?? "Countries"}
+      searchPlaceholder={searchPlaceholder}
+      emptyResultsMessage="No countries or regions found"
+      listboxLabel={ariaLabel ?? "Country or region"}
       listHeightClassName="h-[280px]"
       aria-label={ariaLabel}
     />

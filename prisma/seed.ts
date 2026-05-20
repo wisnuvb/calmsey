@@ -6,10 +6,10 @@ const prisma = new PrismaClient();
 
 const worldLanguages = [
   // Major World Languages
-  { id: "en", name: "English", flag: "🇺🇸", isDefault: true, isActive: true },
+  { id: "en", name: "English", flag: "🇬🇧", isDefault: true, isActive: true },
   {
     id: "id",
-    name: "Indonesia",
+    name: "Bahasa Indonesia",
     flag: "🇮🇩",
     isDefault: false,
     isActive: false,

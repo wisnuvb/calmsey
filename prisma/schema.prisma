@@ -380,7 +380,7 @@ model ResourceDownloadSubmission {
   email               String   @db.VarChar(320)
   countryCode         String   @db.VarChar(16)
   countryLabel        String   @db.VarChar(200)
-  /// ACTION_PLANS | PARTNERS | GRANTMAKING_FRAMEWORK | STRATEGY_2030
+  /// ACTION_PLANS | PARTNERS | GRANTMAKING_FRAMEWORK | STRATEGY_2030 | ANNUAL_REPORT
   modalSource         String   @db.VarChar(32)
   documentItemId      String?  @db.VarChar(128)
   documentTitle       String?  @db.Text

@@ -136,6 +136,8 @@ export const SteeringCommitteeSection: React.FC<
 
         <MembersCarouselShell
           members={members}
+          desktopVariant="grid"
+          desktopGridClassName="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
           renderCard={(member) => (
             <SteeringCommitteCard
               member={member}

@@ -11,16 +11,25 @@ const DEFAULT_MOBILE_SCROLL_INNER_CLASS =
 export interface MembersCarouselShellProps<T extends { id: string }> {
   members: readonly T[];
   membersPerPage?: number;
+  /**
+   * Desktop layout: `paginated` = grid per halaman + panah (default, Steering Committee).
+   * `grid` = semua anggota dalam satu grid (Team).
+   */
+  desktopVariant?: "paginated" | "grid";
+  /** Tailwind grid classes when `desktopVariant` is `grid` or `paginated`. */
+  desktopGridClassName?: string;
   /** Card node (grid / scroll item); parent assigns keys inside map */
   renderCard: (member: T) => React.ReactNode;
   /** Overrides inner flex styles for horizontal scroll strip (Tailwind classes) */
   mobileScrollInnerClassName?: string;
 }
 
-/** Presentational carousel: mobile swipe row, desktop paginated grid with side arrows and dot pager (shared by Team + Steering). */
+/** Mobile carousel strip; desktop grid (full or paginated). Shared by Team + Steering. */
 export function MembersCarouselShell<T extends { id: string }>({
   members,
   membersPerPage = 4,
+  desktopVariant = "paginated",
+  desktopGridClassName = "grid sm:grid-cols-2 lg:grid-cols-4 gap-8",
   renderCard,
   mobileScrollInnerClassName,
 }: MembersCarouselShellProps<T>) {
@@ -55,7 +64,7 @@ export function MembersCarouselShell<T extends { id: string }>({
 
   return (
     <>
-      {/* Mobile: horizontal scroll cards */}
+      {/* Mobile: horizontal scroll carousel */}
       <div className="sm:hidden mb-12 -mx-1 px-1">
         <div className={scrollInnerClass}>
           {members.map((member, index) => (
@@ -69,39 +78,49 @@ export function MembersCarouselShell<T extends { id: string }>({
         </div>
       </div>
 
-      {/* sm+: paginated grid with side navigation */}
-      <div className="relative hidden sm:block">
-        {totalPages > 1 && (
+      {/* Desktop: full grid or paginated grid */}
+      <div className="relative hidden sm:block mb-12">
+        {desktopVariant === "grid" ? (
+          <div className={desktopGridClassName}>
+            {members.map((member, index) => (
+              <div key={`${index}-${member.id}`}>{renderCard(member)}</div>
+            ))}
+          </div>
+        ) : (
           <>
-            <button
-              type="button"
-              onClick={handlePrevPage}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
-              aria-label="Previous page"
-            >
-              <ChevronLeft className="w-5 h-5 text-[#3C62ED]" />
-            </button>
-            <button
-              type="button"
-              onClick={handleNextPage}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
-              aria-label="Next page"
-            >
-              <ChevronRight className="w-5 h-5 text-[#3C62ED]" />
-            </button>
+            {totalPages > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={handlePrevPage}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft className="w-5 h-5 text-[#3C62ED]" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextPage}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  aria-label="Next page"
+                >
+                  <ChevronRight className="w-5 h-5 text-[#3C62ED]" />
+                </button>
+              </>
+            )}
+
+            <div className={desktopGridClassName}>
+              {currentMembers.map((member, index) => (
+                <div key={`${startIndex + index}-${member.id}`}>
+                  {renderCard(member)}
+                </div>
+              ))}
+            </div>
           </>
         )}
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {currentMembers.map((member, index) => (
-            <div key={`${startIndex + index}-${member.id}`}>
-              {renderCard(member)}
-            </div>
-          ))}
-        </div>
       </div>
 
-      {totalPages > 1 && (
+      {desktopVariant === "paginated" && totalPages > 1 ? (
         <div className="hidden sm:flex justify-center mb-12">
           <div className="flex gap-3">
             {Array.from({ length: totalPages }).map((_, index) => (
@@ -121,7 +140,7 @@ export function MembersCarouselShell<T extends { id: string }>({
             ))}
           </div>
         </div>
-      )}
+      ) : null}
     </>
   );
 }

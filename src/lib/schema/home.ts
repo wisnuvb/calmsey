@@ -6,6 +6,7 @@ export const HOME_SCHEMA: PageContentSchema = {
     "Hero",
     "Why TurningTides",
     "We Are Video",
+    "Annual Report",
     "Grantmaking",
     "Partner Stories",
     "Where We Work",
@@ -161,7 +162,7 @@ export const HOME_SCHEMA: PageContentSchema = {
       helpText: "URL for the call-to-action button",
     },
 
-    // We Are Video (promo / embed)
+    // We Are Video (promo — konten terpisah per halaman; About Us mengisi field yang sama di schema ABOUT_US)
     {
       key: "weAreVideo.videoUrl",
       label: "Video URL",
@@ -169,14 +170,15 @@ export const HOME_SCHEMA: PageContentSchema = {
       section: "We Are Video",
       placeholder: "https://www.youtube.com/watch?v=… or https://vimeo.com/…",
       helpText:
-        "YouTube, Vimeo, or direct video file URL (mp4, webm, etc.).",
+        "YouTube, Vimeo, or direct file URL. Plays muted automatically on the home promo block.",
     },
     {
       key: "weAreVideo.posterImage",
       label: "Poster / Thumbnail",
       type: "image",
       section: "We Are Video",
-      helpText: "Background image before video is played. Recommended large width (e.g. 1920px).",
+      helpText:
+        "For direct video files: poster frame. For YouTube/Vimeo optional (embed autoplays muted).",
     },
     {
       key: "weAreVideo.titleLine1",
@@ -191,6 +193,100 @@ export const HOME_SCHEMA: PageContentSchema = {
       type: "text",
       section: "We Are Video",
       defaultValue: "",
+    },
+
+    // Annual Report Section
+    {
+      key: "annualReport.title",
+      label: "Title",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Turning Tides 2025 Annual Report",
+      helpText: "Main headline next to the icon",
+    },
+    {
+      key: "annualReport.badgeText",
+      label: "Badge text",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "COMING SOON",
+      helpText: "Optional pill next to the title; leave empty to hide",
+    },
+    {
+      key: "annualReport.description",
+      label: "Description",
+      type: "textarea",
+      section: "Annual Report",
+      defaultValue:
+        "Learn more about Turning Tides' accomplishments, initiatives, and organizational growth throughout the year. The upcoming report highlights our dedication to accountability and sustainable impact.",
+    },
+    {
+      key: "annualReport.buttonText",
+      label: "Download button label",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Download",
+      helpText: "Opens the lead form modal when download files are configured",
+    },
+    {
+      key: "annualReport.downloadFiles",
+      label: "PDF files by language",
+      type: "multiple",
+      section: "Annual Report",
+      helpText:
+        "Add at least one file to enable the Download button. Users choose language in the modal.",
+      itemLabel: "Download File",
+      itemSchema: [
+        {
+          key: "language",
+          label: "Language",
+          type: "select",
+          required: true,
+          optionsFrom: "languages",
+          placeholder: "Select language",
+          helpText:
+            "The list is taken from Settings → Languages (active languages only). The stored value is the language code (e.g., en, id).",
+        },
+        {
+          key: "url",
+          label: "PDF File URL",
+          type: "file",
+          required: true,
+          placeholder: "/downloads/annual-report-2025-en.pdf",
+          helpText: "URL to the PDF for this language",
+        },
+      ],
+    },
+    {
+      key: "annualReport.downloadModalTitle",
+      label: "Download modal — title",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Download Annual Report",
+    },
+    {
+      key: "annualReport.downloadModalSubtitle",
+      label: "Download modal — subtitle",
+      type: "textarea",
+      section: "Annual Report",
+      defaultValue:
+        "Enter your details to download. We use this information to understand interest in our annual report.",
+    },
+    {
+      key: "annualReport.downloadModalButtonText",
+      label: "Download modal — confirm button",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Download now",
+    },
+    {
+      key: "annualReport.downloadDocumentTitle",
+      label: "Download document title (analytics)",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Turning Tides 2025 Annual Report",
+      helpText:
+        "Stored with submissions in Download Activity; can match the section title",
     },
 
     // Grantmaking Section
@@ -269,8 +365,7 @@ export const HOME_SCHEMA: PageContentSchema = {
           type: "multiple",
           required: false,
           itemLabel: "Practice",
-          helpText:
-            "Optional practices list. Add practices with check icon.",
+          helpText: "Optional practices list. Add practices with check icon.",
           itemSchema: [
             {
               key: "id",
@@ -402,8 +497,7 @@ export const HOME_SCHEMA: PageContentSchema = {
           type: "text",
           required: false,
           placeholder: "Read the full-version of our Grantmaking Framework",
-          helpText:
-            "Optional label text displayed before the download button",
+          helpText: "Optional label text displayed before the download button",
         },
         {
           key: "downloadButtonText",
@@ -419,7 +513,8 @@ export const HOME_SCHEMA: PageContentSchema = {
           type: "text",
           required: false,
           placeholder: "/documents/framework.pdf",
-          helpText: "Legacy: Single file URL. Use 'Download Files' below for multi-language support.",
+          helpText:
+            "Legacy: Single file URL. Use 'Download Files' below for multi-language support.",
         },
         {
           key: "downloadFiles",
@@ -679,7 +774,7 @@ export const HOME_SCHEMA: PageContentSchema = {
           },
         ],
         null,
-        2
+        2,
       ),
       helpText: "Add, edit, or remove images for the gallery",
       itemLabel: "Image",
@@ -765,7 +860,7 @@ export const HOME_SCHEMA: PageContentSchema = {
           },
         ],
         null,
-        2
+        2,
       ),
     },
     {

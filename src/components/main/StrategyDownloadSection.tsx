@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { createDownloadLanguageNameResolver } from "@/lib/download-language-labels";
 import { Download } from "lucide-react";
 import { P } from "../ui/typography";
 import { useLanguage } from "../public/LanguageProvider";
@@ -138,11 +139,10 @@ export function StrategyDownloadSection({
     "Strategy to 2030",
   );
 
-  // Get language name helper
-  const getLanguageName = (langCode: string): string => {
-    const lang = activeLanguages.find((l) => l.id === langCode);
-    return lang?.name || langCode.toUpperCase();
-  };
+  const getLanguageName = useMemo(
+    () => createDownloadLanguageNameResolver(activeLanguages),
+    [activeLanguages],
+  );
 
   const handleDownloadClick = (e: React.MouseEvent) => {
     e.preventDefault();

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { createDownloadLanguageNameResolver } from "@/lib/download-language-labels";
 import { Download } from "lucide-react";
 import Image from "next/image";
 import { H2, H3, P } from "../ui/typography";
@@ -148,10 +149,10 @@ export function OurGoalSection({
     return `https://${trimmedUrl}`;
   };
 
-  const getLanguageName = (langCode: string): string => {
-    const lang = activeLanguages.find((l) => l.id === langCode);
-    return lang?.name || langCode.toUpperCase();
-  };
+  const getLanguageName = useMemo(
+    () => createDownloadLanguageNameResolver(activeLanguages),
+    [activeLanguages],
+  );
 
   return (
     <section className="bg-white pb-16 lg:pb-24" id="goal">

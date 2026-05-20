@@ -11,6 +11,8 @@ import { CountryCombobox } from "@/components/ui/country-combobox";
 import { SearchableCombobox } from "@/components/ui/searchable-combobox";
 import { getCountrySelectOptions } from "@/lib/countries";
 import { orderLanguageLabelsEnglishFirst } from "@/lib/download-language-order";
+import { normalizeDownloadLanguageOption } from "@/lib/download-language-labels";
+import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 
 interface DownloadOption {
   label: string;
@@ -481,12 +483,18 @@ function DownloadItemRow({
   };
   reportError: (message: string) => void;
 }) {
+  const { languages: activeLanguages } = useActiveLanguages();
+
   const options = useMemo(() => {
     const parsed = parseDownloadOptions(item.downloadOptions);
-    return item.selectorType === "language"
-      ? orderLanguageLabelsEnglishFirst(parsed)
-      : parsed;
-  }, [item.downloadOptions, item.selectorType]);
+    if (item.selectorType === "language") {
+      const normalized = parsed.map((o) =>
+        normalizeDownloadLanguageOption(o, activeLanguages),
+      );
+      return orderLanguageLabelsEnglishFirst(normalized);
+    }
+    return parsed;
+  }, [item.downloadOptions, item.selectorType, activeLanguages]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -495,6 +503,7 @@ function DownloadItemRow({
       options.map((o, i) => ({
         value: String(i),
         label: o.label,
+        languageId: o.languageId,
       })),
     [options],
   );
@@ -562,7 +571,10 @@ function DownloadItemRow({
         <div className="flex shrink-0 justify-center sm:justify-start sm:pt-0">
           {item.selectorType === "language" ? (
             <LanguageVariantPicker
-              options={options}
+              options={options.map((o) => ({
+                label: o.label,
+                languageId: o.languageId,
+              }))}
               selectedIndex={selectedIndex}
               onSelectIndex={setSelectedIndex}
               placeholder={selectorPlaceholder}

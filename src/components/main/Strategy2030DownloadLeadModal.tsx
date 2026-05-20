@@ -22,12 +22,24 @@ export const STRATEGY_2030_DOCUMENT_IDS = {
   homeBanner: "strategy-home-cta",
 } as const;
 
+/** Annual Report banner — bedakan Home vs About Us untuk analytics. */
+export const ANNUAL_REPORT_DOCUMENT_IDS = {
+  home: "annual-report-home",
+  aboutUs: "annual-report-about-us",
+} as const;
+
+export type ResourceDownloadModalSource =
+  | "STRATEGY_2030"
+  | "ANNUAL_REPORT";
+
 type Props = {
   title: string;
   subtitle?: string;
   downloadButtonText: string;
   documentTitle: string;
   documentItemId: string;
+  /** Untuk kolom `modalSource` di resource_download_submissions. */
+  modalSource?: ResourceDownloadModalSource;
   /** Prefix unik untuk `id` input (mis. `goal-strategy-dl`, `strategy-banner-dl`). */
   formFieldIdPrefix: string;
   /** `id` elemen judul modal (aria-labelledby). */
@@ -47,6 +59,7 @@ export function Strategy2030DownloadLeadModal({
   downloadButtonText,
   documentTitle,
   documentItemId,
+  modalSource = "STRATEGY_2030",
   formFieldIdPrefix,
   headingId,
   files,
@@ -143,7 +156,7 @@ export function Strategy2030DownloadLeadModal({
           email: lead.email,
           countryCode: lead.countryCode,
           countryLabel: lead.countryLabel,
-          modalSource: "STRATEGY_2030",
+          modalSource,
           documentItemId,
           documentTitle: documentTitle.trim() || null,
           selectorType: "language",

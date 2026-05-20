@@ -14,7 +14,7 @@ async function quickFix() {
   // Fix 1: Ensure languages exist
   console.log('1️⃣ Seeding languages...');
   const languages = [
-    { id: 'en', name: 'English', flag: '🇺🇸', isDefault: true, isActive: true },
+    { id: 'en', name: 'English', flag: '🇬🇧', isDefault: true, isActive: true },
     { id: 'id', name: 'Indonesia', flag: '🇮🇩', isDefault: false, isActive: true },
     { id: 'zh', name: 'Chinese (Mandarin)', flag: '🇨🇳', isDefault: false, isActive: false },
   ];

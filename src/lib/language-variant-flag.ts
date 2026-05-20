@@ -10,6 +10,18 @@ export type ActiveLanguageLike = {
   flag: string | null;
 };
 
+/** English uses UK flag (not US) across UI and stored language rows. */
+export function normalizeLanguageFlag(
+  languageId: string,
+  flag: string | null | undefined,
+): string | null {
+  const trimmed = flag?.trim();
+  if (languageId === "en") {
+    if (!trimmed || trimmed === "🇺🇸") return "🇬🇧";
+  }
+  return trimmed ?? null;
+}
+
 /** Emoji bendera dari label bahasa (heuristik bila tidak ada baris DB). */
 export function languageLabelToFlag(label: string): string {
   const l = label.trim().toLowerCase();
@@ -66,7 +78,10 @@ export function resolveLanguageVariantFlagImgUrl(
     languages.find((l) => l.id === rawLabel.toLowerCase()) ||
     languages.find((l) => l.name.toLowerCase() === rawLabel.toLowerCase());
 
-  const flagField = lang?.flag?.trim();
+  const flagField = lang
+    ? normalizeLanguageFlag(lang.id, lang.flag)
+    : null;
+
   if (flagField?.startsWith("http")) {
     return flagField;
   }

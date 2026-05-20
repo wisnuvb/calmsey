@@ -186,7 +186,7 @@ export function Footer() {
   if (loading) {
     return (
       <footer className="bg-gradient-to-br from-[#1E0F39] via-[#2a1551] to-[#3a1d6f] text-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="container mx-auto px-4 py-12 lg:py-16">
           <div className="text-center">Loading...</div>
         </div>
       </footer>
@@ -202,22 +202,23 @@ export function Footer() {
   return (
     <footer className="bg-gradient-to-br from-[#1E0F39] via-[#2a1551] to-[#3a1d6f] text-white">
       {/* Main Footer Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-32">
+      <div className="container mx-auto px-4 py-12 lg:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Logo and Brand Section - Left */}
-          <div className="lg:col-span-4">
+          <div>
             <Link
               href={logoHref}
               onClick={(e) =>
                 handleFooterInternalNav(e, language, logoHref, "SELF", router)
               }
+              className="inline-block w-full"
             >
-              <div className="w-auto h-32 relative mr-3">
+              <div className="relative h-32 w-full max-w-[220px] sm:max-w-[240px]">
                 <Image
                   src={getImageUrl(brand.mainLogoSrc)}
                   alt={brand.mainLogoAlt}
                   fill
-                  className="object-contain"
+                  className="object-contain object-left"
                 />
               </div>
             </Link>
@@ -237,8 +238,8 @@ export function Footer() {
           </div>
 
           {/* Navigation Links - 3 Columns */}
-          <div className="lg:col-span-7 space-y-11">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {footerSections.map((section) => (
                 <div key={section.id}>
                   <h3 className="text-base font-semibold mb-4 text-[#C4DF99]">

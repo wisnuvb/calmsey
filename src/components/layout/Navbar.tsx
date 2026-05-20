@@ -335,7 +335,7 @@ export function Navbar() {
                   : "bg-[#3C62ED] text-white hover:bg-[#2F56E6]",
               )}
             >
-              Get Involved
+              Connect With Us
             </Link>
           </div>
 
@@ -399,7 +399,7 @@ export function Navbar() {
                   handleSafeNavigation(e, `/${language}/get-involved`);
                 }}
               >
-                Get Involved
+                Connect With Us
               </Link>
             </div>
           </div>

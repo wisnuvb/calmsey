@@ -1,7 +1,7 @@
 export const worldLanguages = [
   // Major World Languages
-  { id: "en", name: "English", flag: "🇺🇸", isDefault: true, isActive: true },
-  { id: "id", name: "Indonesia", flag: "🇮🇩", isDefault: false, isActive: true },
+  { id: "en", name: "English", flag: "🇬🇧", isDefault: true, isActive: true },
+  { id: "id", name: "Bahasa Indonesia", flag: "🇮🇩", isDefault: false, isActive: true },
   {
     id: "zh",
     name: "Chinese (Mandarin)",

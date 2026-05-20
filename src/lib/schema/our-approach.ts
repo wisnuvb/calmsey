@@ -264,12 +264,41 @@ export const OUR_APPROACH_SCHEMA: PageContentSchema = {
         },
         {
           key: "downloadButtonUrl",
-          label: "Download Button URL",
+          label: "Download Button URL (Legacy)",
           type: "file",
           required: false,
           placeholder: "/downloads/example.pdf",
           helpText:
-            "Use a public URL or path (e.g. /downloads/… in public/). Private SharePoint/OneDrive links will show access denied for visitors.",
+            "Legacy: single file only. Use «PDF files by language» below for multiple languages. Public path (e.g. /downloads/…).",
+        },
+        {
+          key: "downloadFiles",
+          label: "PDF files by language",
+          type: "multiple",
+          required: false,
+          itemLabel: "Download File",
+          helpText:
+            "Add one PDF per language. Visitors choose language in the download modal. Leave empty to use the legacy URL above.",
+          itemSchema: [
+            {
+              key: "language",
+              label: "Language",
+              type: "select",
+              required: true,
+              optionsFrom: "languages",
+              placeholder: "Select language",
+              helpText:
+                "List from Settings → Languages (active only). Stored value is the language code (e.g. en, id).",
+            },
+            {
+              key: "url",
+              label: "PDF File URL",
+              type: "file",
+              required: true,
+              placeholder: "/downloads/framework-en.pdf",
+              helpText: "URL to the PDF for this language",
+            },
+          ],
         },
         {
           key: "downloadModalIntro",

@@ -60,6 +60,8 @@ export interface MultipleItemField {
   helpText?: string;
   defaultValue?: string;
   options?: Array<{ value: string; label: string }>; // For select type
+  /** When type is "select", populate options from Settings → Languages (active only). */
+  optionsFrom?: "languages";
   itemSchema?: MultipleItemField[]; // For nested multiple fields
   itemLabel?: string; // Label for nested multiple items
   /** Optional for type "html": editor height, menubar, toolbar, etc. */
@@ -76,6 +78,8 @@ export interface FieldDefinition {
   helpText?: string;
   placeholder?: string;
   options?: Array<{ value: string; label: string }>; // For select type
+  /** When type is "select", populate options from Settings → Languages (active only). */
+  optionsFrom?: "languages";
   validation?: {
     min?: number;
     max?: number;
