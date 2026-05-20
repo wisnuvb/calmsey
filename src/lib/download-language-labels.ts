@@ -142,15 +142,15 @@ export function createDownloadLanguageNameResolver(
 }
 
 /** Normalisasi opsi bahasa dari CMS (Where We Work, dll.). */
-export function normalizeDownloadLanguageOption(
-  option: { label: string; languageId?: string },
-  languages: readonly DownloadLanguageRow[],
-): { label: string; languageId?: string } {
+export function normalizeDownloadLanguageOption<
+  T extends { label: string; languageId?: string },
+>(option: T, languages: readonly DownloadLanguageRow[]): T {
   const languageId =
     option.languageId?.trim().toLowerCase() ||
     inferLanguageIdFromLabel(option.label);
 
   return {
+    ...option,
     languageId,
     label: resolveDownloadLanguageLabel(
       languageId ?? option.label,

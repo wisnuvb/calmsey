@@ -485,7 +485,7 @@ function DownloadItemRow({
 }) {
   const { languages: activeLanguages } = useActiveLanguages();
 
-  const options = useMemo(() => {
+  const options = useMemo((): DownloadOption[] => {
     const parsed = parseDownloadOptions(item.downloadOptions);
     if (item.selectorType === "language") {
       const normalized = parsed.map((o) =>
