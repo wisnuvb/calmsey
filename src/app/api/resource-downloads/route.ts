@@ -12,6 +12,7 @@ const MODAL_SOURCES = new Set([
   "STRATEGY_2030",
   "ANNUAL_REPORT",
   "GUIDING_POLICIES",
+  "FUND_DETAIL",
 ]);
 const SELECTOR_TYPES = new Set(["language", "country"]);
 

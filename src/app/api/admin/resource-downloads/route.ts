@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
         "STRATEGY_2030",
         "ANNUAL_REPORT",
         "GUIDING_POLICIES",
+        "FUND_DETAIL",
       ].includes(modalSource)
     ) {
       where.modalSource = modalSource;

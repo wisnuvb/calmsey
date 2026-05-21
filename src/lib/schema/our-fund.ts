@@ -1255,11 +1255,75 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
         },
         {
           key: "ctaFile",
-          label: "CTA File URL",
+          label: "CTA File URL (Legacy)",
           type: "file",
           required: false,
           placeholder: "/downloads/file.pdf",
-          helpText: "File URL for download (for pdf-download type)",
+          helpText:
+            "Legacy: single PDF only. Use «CTA PDF files by language» below for multiple languages. If ctaDownloadFiles is empty, this URL is used as the English fallback.",
+        },
+        {
+          key: "ctaDownloadFiles",
+          label: "CTA PDF files by language",
+          type: "multiple",
+          required: false,
+          itemLabel: "Download File",
+          helpText:
+            "For pdf-download: add at least one PDF so the download modal is enabled. Visitors choose language in the modal.",
+          itemSchema: [
+            {
+              key: "language",
+              label: "Language",
+              type: "select",
+              required: true,
+              optionsFrom: "languages",
+              placeholder: "Select language",
+              helpText:
+                "List from Settings → Languages (active only). Stored value is the language code (e.g. en, id).",
+            },
+            {
+              key: "url",
+              label: "PDF File URL",
+              type: "file",
+              required: true,
+              placeholder: "/downloads/knowledge-action-plan-en.pdf",
+              helpText: "URL to the PDF for this language",
+            },
+          ],
+        },
+        {
+          key: "ctaDownloadModalTitle",
+          label: "CTA Download modal — title",
+          type: "text",
+          required: false,
+          placeholder: "Download Action Plan",
+          helpText: "Title shown when the visitor opens the download modal",
+        },
+        {
+          key: "ctaDownloadModalSubtitle",
+          label: "CTA Download modal — subtitle",
+          type: "textarea",
+          required: false,
+          placeholder:
+            "Enter your details to download. We use this information to understand interest in this document.",
+          helpText:
+            "Text below the modal title (lead form instructions). Same pattern as Annual Report download modal.",
+        },
+        {
+          key: "ctaDownloadModalButtonText",
+          label: "CTA Download modal — confirm button",
+          type: "text",
+          required: false,
+          placeholder: "Download now",
+        },
+        {
+          key: "ctaDownloadDocumentTitle",
+          label: "CTA Download document title (analytics)",
+          type: "text",
+          required: false,
+          placeholder: "Knowledge Action Fund Action Plan",
+          helpText:
+            "Stored with submissions in Download Activity; can match the CTA Text",
         },
         {
           key: "ctaIcon",
@@ -1411,6 +1475,18 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
             ctaType: "pdf-download",
             ctaText: "Knowledge Action Fund Action Plan",
             ctaFile: "/assets/funds/knowledge-action-fund-action-plan.pdf",
+            ctaDownloadFiles: [
+              {
+                language: "en",
+                url: "/assets/funds/knowledge-action-fund-action-plan.pdf",
+              },
+            ],
+            ctaDownloadModalTitle: "Knowledge Action Fund Action Plan",
+            ctaDownloadModalSubtitle:
+              "Enter your details to download. We use this information to understand interest in our action plan.",
+            ctaDownloadModalButtonText: "Download now",
+            ctaDownloadDocumentTitle:
+              "Knowledge Action Fund Action Plan",
             ctaIcon: "file-pdf",
             ctaStyle: "primary",
           },

@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   CheckCircle2,
   X,
@@ -10,14 +12,65 @@ import {
 } from "lucide-react";
 import { H3, P } from "../ui/typography";
 import { RichText } from "../ui/RichText";
-import type { FundContent } from "@/types/fund-detail";
+import type { CTA, FundContent } from "@/types/fund-detail";
 import { cn } from "@/lib/utils";
+import { useActiveLanguages } from "@/hooks/useActiveLanguages";
+import { createDownloadLanguageNameResolver } from "@/lib/download-language-labels";
+import { Strategy2030DownloadLeadModal } from "@/components/main/Strategy2030DownloadLeadModal";
 
 interface FundDetailContentProps {
   content: FundContent;
+  /** URL slug untuk identitas unik dokumen/modal pada halaman ini */
+  fundSlug: string;
 }
 
-export function FundDetailContent({ content }: FundDetailContentProps) {
+function getPdfDownloadRowsForCta(
+  cta: CTA,
+): Array<{ language: string; url: string }> {
+  const rows: Array<{ language: string; url: string }> = [];
+  for (const entry of cta.downloadFiles ?? []) {
+    const fr = entry as unknown as Record<string, unknown>;
+    const languageRaw = fr.language ?? fr.lang;
+    const language =
+      typeof languageRaw === "string" ? languageRaw.trim() : "";
+    let url = "";
+    for (const key of ["url", "href", "fileUrl", "file"] as const) {
+      const v = fr[key];
+      if (typeof v === "string" && v.trim()) {
+        url = v.trim();
+        break;
+      }
+    }
+    if (language && url) rows.push({ language, url });
+  }
+  if (rows.length > 0) return rows;
+  const legacy = typeof cta.file === "string" ? cta.file.trim() : "";
+  if (legacy.length > 0) return [{ language: "en", url: legacy }];
+  return [];
+}
+
+function ensureHttpsLikePublicDownloadUrl(url: string): string {
+  if (!url || url.trim() === "") return url;
+  const trimmedUrl = url.trim();
+  if (/^https?:\/\//i.test(trimmedUrl)) return trimmedUrl;
+  if (trimmedUrl.startsWith("//")) return `https:${trimmedUrl}`;
+  if (trimmedUrl.startsWith("/")) return trimmedUrl;
+  return `https://${trimmedUrl}`;
+}
+
+export function FundDetailContent({ content, fundSlug }: FundDetailContentProps) {
+  const [pdfModalCta, setPdfModalCta] = useState<CTA | null>(null);
+  const [portalMounted, setPortalMounted] = useState(false);
+  const { languages: activeLanguages } = useActiveLanguages();
+
+  useEffect(() => {
+    setPortalMounted(true);
+  }, []);
+
+  const getLanguageName = useMemo(
+    () => createDownloadLanguageNameResolver(activeLanguages),
+    [activeLanguages],
+  );
   const renderIcon = (iconType: string) => {
     switch (iconType) {
       case "check":
@@ -42,27 +95,27 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
       "inline-flex items-center gap-2 px-8 py-4 rounded-md font-medium transition-colors duration-300";
 
     if (cta.type === "pdf-download") {
-      const isExternal = cta.file?.startsWith("http") ?? false;
+      const rows = getPdfDownloadRowsForCta(cta);
+      const canDownload = rows.length > 0;
       return (
-        <a
-          href={cta.file}
-          download={
-            !isExternal && cta.text
-              ? `${cta.text.replace(/\s+/g, "-")}.pdf`
-              : undefined
-          }
-          target={isExternal ? "_blank" : undefined}
-          rel={isExternal ? "noopener noreferrer" : undefined}
+        <button
+          type="button"
+          disabled={!canDownload}
+          onClick={(e) => {
+            e.preventDefault();
+            if (canDownload) setPdfModalCta(cta);
+          }}
           className={cn(
             baseButtonClasses,
             "gap-3 rounded-lg bg-[#3C62ED] text-white hover:bg-[#2d4fd6]",
+            !canDownload && "opacity-45 cursor-not-allowed hover:bg-[#3C62ED]",
           )}
           aria-label={`Download ${cta.text}`}
         >
           <FileText className="w-5 h-5 flex-shrink-0" aria-hidden />
           <span>{cta.text}</span>
           <Download className="w-5 h-5 flex-shrink-0" aria-hidden />
-        </a>
+        </button>
       );
     }
 
@@ -106,6 +159,49 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
     return null;
   };
 
+  const pdfModalRows = pdfModalCta ? getPdfDownloadRowsForCta(pdfModalCta) : [];
+
+  const pdfModalSection =
+    pdfModalCta && pdfModalRows.length > 0 ? (
+      <Strategy2030DownloadLeadModal
+        key={pdfModalRows.map((f) => `${f.language}:${f.url}`).join("|")}
+        modalSource="FUND_DETAIL"
+        title={
+          pdfModalCta.downloadModalTitle?.trim() ||
+          pdfModalCta.text ||
+          "Download"
+        }
+        subtitle={
+          pdfModalCta.downloadModalSubtitle?.trim() ||
+          "Enter your details to download. We use this information to understand interest in this document."
+        }
+        downloadButtonText={
+          pdfModalCta.downloadModalButtonText?.trim() || "Download now"
+        }
+        documentTitle={
+          pdfModalCta.downloadDocumentTitle?.trim() ||
+          pdfModalCta.text ||
+          "Fund document"
+        }
+        documentItemId={`fund-detail-${fundSlug}`}
+        formFieldIdPrefix={`fund-detail-dl-${fundSlug.replace(/[^a-z0-9-]/gi, "-")}`}
+        headingId={`fund-detail-download-modal-${fundSlug.replace(/[^a-z0-9-]/gi, "-")}`}
+        files={pdfModalRows}
+        getLanguageName={getLanguageName}
+        normalizeUrl={ensureHttpsLikePublicDownloadUrl}
+        onClose={() => setPdfModalCta(null)}
+      />
+    ) : null;
+
+  /** Portal ke body — hindari stacking/overflow ancestor; Navbar juga z-50 */
+  const pdfModalPortal =
+    portalMounted &&
+    pdfModalSection &&
+    typeof document !== "undefined" &&
+    document.body
+      ? createPortal(pdfModalSection, document.body)
+      : pdfModalSection;
+
   const renderParagraphWithHtml = (text: string, key?: string) => (
     <RichText
       key={key}
@@ -117,6 +213,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
   // Render based on content type
   if (content.type === "supported-unsupported") {
     return (
+      <>
       <section className="bg-white py-6 lg:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-12">
@@ -209,18 +306,21 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
               </div>
             )}
 
-            {/* CTA (fallback if no how to apply) */}
-            {content.cta && !content.howToApplySection && (
+            {/* Main fund CTA (e.g. PDF download) — shown after How to apply when both exist */}
+            {content.cta && (
               <div className="pt-6">{renderCTA(content.cta)}</div>
             )}
           </div>
         </div>
       </section>
+      {pdfModalPortal}
+      </>
     );
   }
 
   if (content.type === "partners-will") {
     return (
+      <>
       <section className="bg-white py-6 lg:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-12">
@@ -265,6 +365,8 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
           </div>
         </div>
       </section>
+      {pdfModalPortal}
+      </>
     );
   }
 
@@ -272,6 +374,7 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
 
   if (content.type === "custom") {
     return (
+      <>
       <section className="bg-white py-6 lg:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-12">
@@ -371,6 +474,8 @@ export function FundDetailContent({ content }: FundDetailContentProps) {
           </div>
         </div>
       </section>
+      {pdfModalPortal}
+      </>
     );
   }
 

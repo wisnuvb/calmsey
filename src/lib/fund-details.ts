@@ -1,4 +1,16 @@
-import type { FundDetail, FundContent, SupportedUnsupportedContent, PartnersWillContent, CustomContent, CTA, IconType, CTAType, HowToApplySection, ActionPlanItem } from "@/types/fund-detail";
+import type {
+  FundDetail,
+  FundContent,
+  SupportedUnsupportedContent,
+  PartnersWillContent,
+  CustomContent,
+  CTA,
+  CTADownloadFile,
+  IconType,
+  CTAType,
+  HowToApplySection,
+  ActionPlanItem,
+} from "@/types/fund-detail";
 import { getPageContentServer } from "@/lib/page-content-server";
 import { getPageSchema } from "@/lib/page-content-schema";
 
@@ -23,6 +35,102 @@ import { getPageSchema } from "@/lib/page-content-schema";
  * 
  * @see FundHeader and FundContent types in @/types/fund-detail
  */
+
+function parseCtaDownloadFilesFromFund(
+  fund: Record<string, unknown>,
+): CTADownloadFile[] {
+  const raw = fund.ctaDownloadFiles;
+  let rows: unknown[] = [];
+  if (Array.isArray(raw)) {
+    rows = raw;
+  } else if (typeof raw === "string" && raw.trim()) {
+    try {
+      const parsed = JSON.parse(raw) as unknown;
+      if (Array.isArray(parsed)) rows = parsed;
+    } catch {
+      // ignore invalid JSON
+    }
+  }
+  const out: CTADownloadFile[] = [];
+  for (const row of rows) {
+    if (!row || typeof row !== "object") continue;
+    const r = row as Record<string, unknown>;
+    const languageRaw =
+      r.language ??
+      r.lang ??
+      ((r.locale as unknown) ?? "");
+    const language =
+      typeof languageRaw === "string" ? languageRaw.trim() : "";
+    const urlRaw = r.url ?? r.href ?? r.fileUrl ?? r.file;
+    const url = typeof urlRaw === "string" ? urlRaw.trim() : "";
+    if (language && url) out.push({ language, url });
+  }
+  return out;
+}
+
+function buildCtaFromFund(fund: Record<string, unknown>): CTA | undefined {
+  if (!fund.ctaType) return undefined;
+  const ctaFile =
+    typeof fund.ctaFile === "string" && fund.ctaFile.trim()
+      ? fund.ctaFile.trim()
+      : undefined;
+  let downloadFiles = parseCtaDownloadFilesFromFund(fund);
+  if (downloadFiles.length === 0 && ctaFile) {
+    downloadFiles = [{ language: "en", url: ctaFile }];
+  }
+  const opt = (key: string) => {
+    const v = fund[key];
+    return typeof v === "string" && v.trim() ? v.trim() : undefined;
+  };
+  return {
+    type: fund.ctaType as CTAType,
+    text: (fund.ctaText as string) || "",
+    link:
+      typeof fund.ctaLink === "string" && fund.ctaLink.trim()
+        ? fund.ctaLink.trim()
+        : undefined,
+    file: ctaFile,
+    icon: fund.ctaIcon as IconType | undefined,
+    style: ((fund.ctaStyle as string) || "primary") as
+      | "primary"
+      | "secondary"
+      | "outline",
+    ...(downloadFiles.length > 0 && { downloadFiles }),
+    ...(opt("ctaDownloadModalTitle") && {
+      downloadModalTitle: opt("ctaDownloadModalTitle"),
+    }),
+    ...(opt("ctaDownloadModalSubtitle") && {
+      downloadModalSubtitle: opt("ctaDownloadModalSubtitle"),
+    }),
+    ...(opt("ctaDownloadModalButtonText") && {
+      downloadModalButtonText: opt("ctaDownloadModalButtonText"),
+    }),
+    ...(opt("ctaDownloadDocumentTitle") && {
+      downloadDocumentTitle: opt("ctaDownloadDocumentTitle"),
+    }),
+  };
+}
+
+/** Legacy nested JSON payloads may omit downloadFiles — derive from single `file` */
+function normalizeCtaDownloads(cta: CTA | undefined): void {
+  if (!cta || cta.type !== "pdf-download") return;
+  const hasRows =
+    Array.isArray(cta.downloadFiles) && cta.downloadFiles.length > 0;
+  if (!hasRows && typeof cta.file === "string" && cta.file.trim()) {
+    cta.downloadFiles = [{ language: "en", url: cta.file.trim() }];
+  }
+}
+
+export function normalizeFundContentForDownloads(content: FundContent): void {
+  if (content.type === "supported-unsupported") {
+    normalizeCtaDownloads(content.cta);
+    normalizeCtaDownloads(content.howToApplySection?.cta);
+  } else if (content.type === "partners-will") {
+    normalizeCtaDownloads(content.cta);
+  } else if (content.type === "custom") {
+    normalizeCtaDownloads(content.cta);
+  }
+}
 
 /**
  * Transform flat fund data from multiple field to FundDetail structure
@@ -88,17 +196,7 @@ function transformFundData(fund: Record<string, unknown>): FundDetail | null {
         }
       }
 
-      // Build CTA
-      const cta: CTA | undefined = fund.ctaType
-        ? {
-          type: fund.ctaType as CTAType,
-          text: (fund.ctaText as string) || "",
-          link: (fund.ctaLink as string) || undefined,
-          file: (fund.ctaFile as string) || undefined,
-          icon: fund.ctaIcon as IconType | undefined,
-          style: ((fund.ctaStyle as string) || "primary") as "primary" | "secondary" | "outline",
-        }
-        : undefined;
+      const cta = buildCtaFromFund(fund);
 
       // Parse unsupported concluding paragraphs
       const unsupportedConcluding: string[] = [];
@@ -180,17 +278,7 @@ function transformFundData(fund: Record<string, unknown>): FundDetail | null {
         );
       }
 
-      // Build CTA
-      const cta: CTA | undefined = fund.ctaType
-        ? {
-          type: fund.ctaType as CTAType,
-          text: (fund.ctaText as string) || "",
-          link: (fund.ctaLink as string) || undefined,
-          file: (fund.ctaFile as string) || undefined,
-          icon: fund.ctaIcon as IconType | undefined,
-          style: ((fund.ctaStyle as string) || "primary") as "primary" | "secondary" | "outline",
-        }
-        : undefined;
+      const cta = buildCtaFromFund(fund);
 
       fundContent = {
         type: "partners-will",
@@ -263,17 +351,7 @@ function transformFundData(fund: Record<string, unknown>): FundDetail | null {
         }
       }
 
-      // Build CTA
-      const cta: CTA | undefined = fund.ctaType
-        ? {
-          type: fund.ctaType as CTAType,
-          text: (fund.ctaText as string) || "",
-          link: (fund.ctaLink as string) || undefined,
-          file: (fund.ctaFile as string) || undefined,
-          icon: fund.ctaIcon as IconType | undefined,
-          style: ((fund.ctaStyle as string) || "primary") as "primary" | "secondary" | "outline",
-        }
-        : undefined;
+      const cta = buildCtaFromFund(fund);
 
       fundContent = {
         type: "custom",
@@ -283,6 +361,8 @@ function transformFundData(fund: Record<string, unknown>): FundDetail | null {
     } else {
       return null;
     }
+
+    normalizeFundContentForDownloads(fundContent);
 
     return {
       id: String(fund.id || fund.slug || ""),
@@ -355,6 +435,8 @@ export async function getFundDetailBySlug(
                 ? JSON.parse(fund.content)
                 : fund.content;
 
+              normalizeFundContentForDownloads(fundContent);
+
               return {
                 id: fund.id || slug,
                 slug: fund.slug || slug,
@@ -387,6 +469,8 @@ export async function getFundDetailBySlug(
     // Parse JSON strings
     const header = JSON.parse(headerJson);
     const fundContent = JSON.parse(contentJson);
+
+    normalizeFundContentForDownloads(fundContent);
 
     // Get fund ID and slug from content or use slug as ID
     const idKey = `fund.${slug}.id`;
@@ -445,6 +529,8 @@ export async function getAllFundDetails(
                   ? JSON.parse(fund.content)
                   : fund.content;
 
+                normalizeFundContentForDownloads(fundContent);
+
                 funds.push({
                   id: fund.id || fund.slug,
                   slug: fund.slug,
@@ -489,6 +575,9 @@ export async function getAllFundDetails(
       try {
         const header = JSON.parse(headerJson);
         const fundContent = JSON.parse(contentJson);
+
+        normalizeFundContentForDownloads(fundContent);
+
         const fundId = content[idKey] || slug;
 
         funds.push({

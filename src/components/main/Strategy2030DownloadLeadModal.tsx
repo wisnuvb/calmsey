@@ -33,7 +33,8 @@ export const ANNUAL_REPORT_DOCUMENT_IDS = {
 export type ResourceDownloadModalSource =
   | "STRATEGY_2030"
   | "ANNUAL_REPORT"
-  | "GUIDING_POLICIES";
+  | "GUIDING_POLICIES"
+  | "FUND_DETAIL";
 
 type Props = {
   title: string;
@@ -224,7 +225,7 @@ export function Strategy2030DownloadLeadModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
       onClick={onClose}
       role="presentation"
     >

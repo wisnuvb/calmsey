@@ -51,7 +51,7 @@ export default async function DetailOurFundPage({ params }: PageProps) {
   return (
     <>
       <FundDetailHeader header={fund.header} />
-      <FundDetailContent content={fund.content} />
+      <FundDetailContent content={fund.content} fundSlug={fund.slug} />
     </>
   );
 }

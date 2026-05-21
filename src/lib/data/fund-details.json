@@ -126,6 +126,16 @@
           "type": "pdf-download",
           "text": "Knowledge Action Fund Action Plan",
           "file": "/assets/funds/knowledge-action-fund-action-plan.pdf",
+          "downloadFiles": [
+            {
+              "language": "en",
+              "url": "/assets/funds/knowledge-action-fund-action-plan.pdf"
+            }
+          ],
+          "downloadModalTitle": "Knowledge Action Fund Action Plan",
+          "downloadModalSubtitle": "Enter your details to download. We use this information to understand interest in our action plan.",
+          "downloadModalButtonText": "Download now",
+          "downloadDocumentTitle": "Knowledge Action Fund Action Plan",
           "icon": "file-pdf",
           "style": "primary"
         }

@@ -50,13 +50,25 @@ export interface PartnersWillSection {
   items: PartnersWillItem[];
 }
 
+export interface CTADownloadFile {
+  language: string;
+  url: string;
+}
+
 export interface CTA {
   type: CTAType;
   text: string;
   link?: string;
+  /** Legacy single-file URL for pdf-download; used as EN fallback when downloadFiles empty */
   file?: string;
   icon?: IconType;
   style: "primary" | "secondary" | "outline";
+  downloadFiles?: CTADownloadFile[];
+  downloadModalTitle?: string;
+  downloadModalSubtitle?: string;
+  downloadModalButtonText?: string;
+  /** Stored with Download Activity submissions */
+  downloadDocumentTitle?: string;
 }
 
 export interface HowToApplySection {
