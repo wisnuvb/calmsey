@@ -32,6 +32,7 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "build:glossary": "node scripts/build-glossary.mjs",
     "release": "git pull && npm install --legacy-peer-deps && yarn build && pm2 restart ecosystem.config.js",
     "push:main": "bash scripts/push-main.sh"
   },

@@ -281,3 +281,10 @@ iframe[src*="translate.google.com"] {
   height: 1px !important;
   overflow: hidden !important;
 }
+
+/* Glossary overrides: inline, inherit typography; notranslate keeps GT off approved terms */
+span.glossary-term {
+  display: inline;
+  font: inherit;
+  letter-spacing: inherit;
+}

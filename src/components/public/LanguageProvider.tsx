@@ -7,6 +7,13 @@ import {
   toGoogleTranslateCode,
   scheduleGoogleTranslateWarmup,
 } from "@/lib/browser-translate";
+import {
+  applyGlossaryToDocument,
+  hasGlossary,
+  removeGlossaryFromDocument,
+  scheduleGlossaryReapply,
+  stopGlossaryReapply,
+} from "@/lib/glossary";
 
 interface LanguageContextType {
   language: SupportedLanguage;
@@ -42,19 +49,33 @@ export function LanguageProvider({
     let cancelled = false;
     let innerRaf = 0;
     const outerRaf = window.requestAnimationFrame(() => {
-      innerRaf = window.requestAnimationFrame(() => {
+      innerRaf = window.requestAnimationFrame(async () => {
         if (cancelled) return;
-        void translatePage({
-          targetLanguage: googleTranslateCode,
-          sourceLanguage: "en", // Content is always in English
-        }).catch((error) => {
+        removeGlossaryFromDocument();
+        stopGlossaryReapply();
+
+        try {
+          if (language !== "en" && hasGlossary(language)) {
+            applyGlossaryToDocument(language);
+          }
+
+          await translatePage({
+            targetLanguage: googleTranslateCode,
+            sourceLanguage: "en",
+          });
+
+          if (!cancelled && language !== "en" && hasGlossary(language)) {
+            scheduleGlossaryReapply(language);
+          }
+        } catch (error) {
           console.error("[LanguageProvider] Translation error:", error);
-        });
+        }
       });
     });
 
     return () => {
       cancelled = true;
+      stopGlossaryReapply();
       window.cancelAnimationFrame(outerRaf);
       if (innerRaf) window.cancelAnimationFrame(innerRaf);
     };
