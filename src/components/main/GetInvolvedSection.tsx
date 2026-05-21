@@ -270,44 +270,67 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
       data-section="get-involved"
     >
       <h1 className="sr-only">Connect With Us</h1>
-      <div className="">
-        <div className="grid min-h-[600px] grid-cols-1 gap-0 lg:grid-cols-2">
-          <div className="relative min-h-[480px] lg:min-h-[600px]">
-            <div className="absolute inset-0">
-              <Image
-                src={getImageUrl(backgroundImage)}
-                alt={backgroundImageAlt}
-                fill
-                className="object-cover object-[50%_65%] lg:object-[50%_70%]"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent" />
-            </div>
 
-            <div className="relative z-10 flex min-h-[480px] flex-col items-start justify-start px-8 pb-10 pt-10 md:px-10 md:pb-12 md:pt-14 lg:min-h-[600px] lg:px-12 lg:pt-16 lg:pb-16">
-              <div className="max-w-md lg:max-w-[28rem]">
-                <h2 className="font-nunito text-[2rem] font-bold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-[2.75rem] lg:leading-[1.12]">
+      <div className="relative">
+        {/* Desktop: latar kiri (gambar) & kanan (putih) full-bleed */}
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 hidden w-1/2 lg:block"
+          aria-hidden
+        >
+          <Image
+            src={getImageUrl(backgroundImage)}
+            alt=""
+            fill
+            className="object-cover object-[50%_65%] lg:object-[50%_70%]"
+            priority
+            sizes="50vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
+        </div>
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 hidden w-1/2 bg-white lg:block"
+          aria-hidden
+        />
+
+        <div className="container relative mx-auto px-4">
+          <div className="grid min-h-0 grid-cols-1 lg:grid-cols-2 lg:min-h-[calc(100vh-5rem)]">
+            {/* Left: overlay copy (sejajar kiri dengan navbar/footer) */}
+            <div className="relative flex min-h-[480px] flex-col justify-end pb-10 pt-24 lg:min-h-full lg:pb-16 lg:pt-28">
+              <div className="absolute inset-0 lg:hidden">
+                <Image
+                  src={getImageUrl(backgroundImage)}
+                  alt={backgroundImageAlt}
+                  fill
+                  className="object-cover object-[50%_65%]"
+                  priority
+                  sizes="100vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
+              </div>
+
+              <div className="relative z-10 max-w-md lg:max-w-[28rem]">
+                <h2 className="font-nunito text-[2rem] font-bold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-[2.75rem] lg:leading-[1.12] px-4 sm:px-0">
                   {overlayTitle}
                 </h2>
-                <p className="mt-6 font-work-sans text-base font-normal leading-relaxed text-white sm:text-[17px] sm:leading-[1.55]">
+                <p className="mt-4 font-work-sans p px-4 sm:px-0 leading-relaxed text-white/95 sm:mt-6 sm:text-[17px] sm:leading-[1.55]">
                   {overlayDescription}
                 </p>
               </div>
             </div>
-          </div>
 
-          <div className="flex flex-col justify-center bg-white p-8 md:p-12 lg:p-16">
-            <div className="mx-auto w-full max-w-2xl">
-              <header className="mb-8 md:mb-10">
-                <h3 className="mb-3 font-nunito text-3xl font-bold leading-tight text-[#010107] md:text-4xl">
-                  {title}
-                </h3>
-                {subtitle ? (
-                  <p className="font-work-sans text-base leading-relaxed text-[#4B5563]">
-                    {subtitle}
-                  </p>
-                ) : null}
-              </header>
+            {/* Right: form (sejajar kanan dengan navbar/footer) */}
+            <div className="flex flex-col justify-center bg-white py-10 lg:bg-transparent lg:py-16 lg:pl-12 xl:pl-16">
+              <div className="w-full">
+                <header className="mb-8 md:mb-10">
+                  <h3 className="mb-3 font-nunito text-3xl font-bold leading-tight text-[#010107] md:text-4xl">
+                    {title}
+                  </h3>
+                  {subtitle ? (
+                    <p className="font-work-sans text-base leading-relaxed text-[#4B5563]">
+                      {subtitle}
+                    </p>
+                  ) : null}
+                </header>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -413,15 +436,21 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   </div>
                 ) : null}
               </form>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="bg-[#3C62ED] py-[100px] px-[120px] flex items-center justify-between gap-[70px]">
-        <p className="text-white p max-w-[433px]">{bannerLeftParagraph}</p>
-        <p className="text-white p max-w-[697px]">
-          {bannerTextWithBold(bannerRightParagraph)}
-        </p>
+
+      <div className="bg-[#3C62ED] py-10 sm:py-16 lg:py-[100px]">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center lg:gap-[70px]">
+            <p className="max-w-[433px] text-white p">{bannerLeftParagraph}</p>
+            <p className="max-w-[697px] text-white p">
+              {bannerTextWithBold(bannerRightParagraph)}
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

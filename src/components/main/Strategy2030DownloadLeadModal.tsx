@@ -9,6 +9,8 @@ import {
   getCountryLabelForValue,
 } from "@/lib/countries";
 import { LanguageVariantPicker } from "@/components/main/LanguageVariantPicker";
+import { SearchableCombobox } from "@/components/ui/searchable-combobox";
+import { resolveCountryOptionFlagImgUrl } from "@/lib/country-flag";
 import { orderDownloadFilesEnglishFirst } from "@/lib/download-language-order";
 
 export type Strategy2030DownloadFile = {
@@ -30,7 +32,8 @@ export const ANNUAL_REPORT_DOCUMENT_IDS = {
 
 export type ResourceDownloadModalSource =
   | "STRATEGY_2030"
-  | "ANNUAL_REPORT";
+  | "ANNUAL_REPORT"
+  | "GUIDING_POLICIES";
 
 type Props = {
   title: string;
@@ -47,6 +50,8 @@ type Props = {
   files: Strategy2030DownloadFile[];
   getLanguageName: (code: string) => string;
   normalizeUrl: (url: string) => string;
+  /** How file variants are grouped in the download picker (language vs country). */
+  fileSelectorType?: "language" | "country";
   onClose: () => void;
 };
 
@@ -65,6 +70,7 @@ export function Strategy2030DownloadLeadModal({
   files,
   getLanguageName,
   normalizeUrl,
+  fileSelectorType = "language",
   onClose,
 }: Props) {
   const { language: currentLanguage } = useLanguage();
@@ -72,13 +78,17 @@ export function Strategy2030DownloadLeadModal({
   const [email, setEmail] = useState("");
   const [userCountry, setUserCountry] = useState("");
   const [selectedLangIndex, setSelectedLangIndex] = useState(() => {
-    const ordered = orderDownloadFilesEnglishFirst(files);
+    const ordered =
+      fileSelectorType === "country"
+        ? sortFilesByCountryLabel(files)
+        : orderDownloadFilesEnglishFirst(files);
     const cur = currentLanguage.trim().toLowerCase();
     const idx = ordered.findIndex(
       (f) => f.language.trim().toLowerCase() === cur,
     );
     return idx >= 0 ? idx : 0;
   });
+  const [selectedCountryVariant, setSelectedCountryVariant] = useState("");
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const countryOptions = useMemo(() => getCountrySelectOptions(), []);
@@ -88,9 +98,12 @@ export function Strategy2030DownloadLeadModal({
     .join("|");
 
   const orderedFiles = useMemo(() => {
+    if (fileSelectorType === "country") {
+      return sortFilesByCountryLabel(files);
+    }
     return orderDownloadFilesEnglishFirst(files);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fileListFingerprint]);
+  }, [fileListFingerprint, fileSelectorType]);
 
   const langOptions = useMemo(
     () =>
@@ -101,15 +114,31 @@ export function Strategy2030DownloadLeadModal({
     [orderedFiles, getLanguageName],
   );
 
+  const countryFileOptions = useMemo(
+    () =>
+      orderedFiles.map((f) => ({
+        value: f.language,
+        label: getCountryLabelForValue(f.language) ?? f.language,
+      })),
+    [orderedFiles],
+  );
+
   useEffect(() => {
-    const ordered = orderDownloadFilesEnglishFirst(files);
+    const ordered =
+      fileSelectorType === "country"
+        ? sortFilesByCountryLabel(files)
+        : orderDownloadFilesEnglishFirst(files);
+    if (fileSelectorType === "country") {
+      setSelectedCountryVariant(ordered[0]?.language ?? "");
+      return;
+    }
     const cur = currentLanguage.trim().toLowerCase();
     const idx = ordered.findIndex(
       (f) => f.language.trim().toLowerCase() === cur,
     );
     setSelectedLangIndex(idx >= 0 ? idx : 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLanguage, fileListFingerprint]);
+  }, [currentLanguage, fileListFingerprint, fileSelectorType]);
 
   const validateLeadForm = (): boolean => {
     setFormError("");
@@ -140,7 +169,10 @@ export function Strategy2030DownloadLeadModal({
 
   const handleDownload = async () => {
     if (!validateLeadForm()) return;
-    const file = orderedFiles[selectedLangIndex];
+    const file =
+      fileSelectorType === "country"
+        ? orderedFiles.find((f) => f.language === selectedCountryVariant)
+        : orderedFiles[selectedLangIndex];
     if (!file) return;
     const url = normalizeUrl(file.url);
 
@@ -148,6 +180,10 @@ export function Strategy2030DownloadLeadModal({
     setFormError("");
     try {
       const lead = getLeadData();
+      const selectedOptionLabel =
+        fileSelectorType === "country"
+          ? getCountryLabelForValue(file.language) ?? file.language
+          : getLanguageName(file.language);
       const res = await fetch("/api/resource-downloads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -159,8 +195,8 @@ export function Strategy2030DownloadLeadModal({
           modalSource,
           documentItemId,
           documentTitle: documentTitle.trim() || null,
-          selectorType: "language",
-          selectedOptionLabel: getLanguageName(file.language),
+          selectorType: fileSelectorType,
+          selectedOptionLabel,
           fileUrl: url,
         }),
       });
@@ -269,15 +305,39 @@ export function Strategy2030DownloadLeadModal({
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch pt-1">
             <div className="flex shrink-0 justify-center sm:justify-start sm:pt-0">
-              <LanguageVariantPicker
-                options={langOptions}
-                selectedIndex={Math.min(
-                  selectedLangIndex,
-                  Math.max(0, langOptions.length - 1),
-                )}
-                onSelectIndex={setSelectedLangIndex}
-                placeholder="Select language"
-              />
+              {fileSelectorType === "country" ? (
+                <SearchableCombobox
+                  id={`${formFieldIdPrefix}-country-variant`}
+                  value={selectedCountryVariant}
+                  onValueChange={setSelectedCountryVariant}
+                  options={countryFileOptions}
+                  placeholder="Select country"
+                  searchPlaceholder="Search country…"
+                  listHeightClassName="h-[240px]"
+                  className="min-w-[180px]"
+                  aria-label="Select country"
+                  renderOptionLeading={(option) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={resolveCountryOptionFlagImgUrl(option.value)}
+                      alt=""
+                      width={28}
+                      height={28}
+                      className="h-7 w-7 rounded-full object-cover"
+                    />
+                  )}
+                />
+              ) : (
+                <LanguageVariantPicker
+                  options={langOptions}
+                  selectedIndex={Math.min(
+                    selectedLangIndex,
+                    Math.max(0, langOptions.length - 1),
+                  )}
+                  onSelectIndex={setSelectedLangIndex}
+                  placeholder="Select language"
+                />
+              )}
             </div>
 
             <button
@@ -293,5 +353,14 @@ export function Strategy2030DownloadLeadModal({
         </div>
       </div>
     </div>
+  );
+}
+
+function sortFilesByCountryLabel(files: Strategy2030DownloadFile[]) {
+  return [...files].sort((a, b) =>
+    (getCountryLabelForValue(a.language) ?? a.language).localeCompare(
+      getCountryLabelForValue(b.language) ?? b.language,
+      "en",
+    ),
   );
 }

@@ -11,6 +11,7 @@ const MODAL_SOURCES = new Set([
   "GRANTMAKING_FRAMEWORK",
   "STRATEGY_2030",
   "ANNUAL_REPORT",
+  "GUIDING_POLICIES",
 ]);
 const SELECTOR_TYPES = new Set(["language", "country"]);
 

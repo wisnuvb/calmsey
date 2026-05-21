@@ -21,6 +21,12 @@ export interface HtmlEditorOptions {
   menubar?: boolean;
   resize?: boolean;
   toolbar?: string;
+  /** Adds toolbar button to insert links that open a Microsoft Form in a modal on the public site. */
+  enableMicrosoftFormModal?: boolean;
+  /** Adds toolbar button to insert links that open a multi-language download modal on the public site. */
+  enableDownloadModal?: boolean;
+  /** Default URL pre-filled in the insert-form-modal dialog. */
+  defaultMicrosoftFormUrl?: string;
 }
 
 export type ContentFieldType =

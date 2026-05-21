@@ -24,8 +24,12 @@ export type SearchableComboboxProps = {
   listboxLabel?: string;
   /** Tinggi area scroll daftar opsi (Tailwind class) */
   listHeightClassName?: string;
+  /** Ikon/elemen di kiri label (trigger + setiap opsi) */
+  renderOptionLeading?: (option: SearchableComboboxOption) => React.ReactNode;
   disabled?: boolean;
   className?: string;
+  /** Extra classes for portaled popover panel (e.g. `z-[210]` when inside another modal). */
+  popoverContentClassName?: string;
   "aria-label"?: string;
 };
 
@@ -39,8 +43,10 @@ export function SearchableCombobox({
   emptyResultsMessage = "No results found",
   listboxLabel,
   listHeightClassName = "h-[280px]",
+  renderOptionLeading,
   disabled = false,
   className,
+  popoverContentClassName,
   "aria-label": ariaLabel,
 }: SearchableComboboxProps) {
   const [open, setOpen] = React.useState(false);
@@ -52,10 +58,12 @@ export function SearchableCombobox({
     if (!open) setQuery("");
   }, [open]);
 
-  const selectedLabel = React.useMemo(
-    () => options.find((o) => o.value === value)?.label ?? "",
+  const selectedOption = React.useMemo(
+    () => options.find((o) => o.value === value),
     [options, value],
   );
+
+  const selectedLabel = selectedOption?.label ?? "";
 
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -73,7 +81,7 @@ export function SearchableCombobox({
   };
 
   return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
+    <Popover.Root open={open} onOpenChange={setOpen} modal={false}>
       <Popover.Trigger asChild>
         <button
           type="button"
@@ -89,7 +97,12 @@ export function SearchableCombobox({
             className,
           )}
         >
-          <span className="truncate">{selectedLabel || placeholder}</span>
+          <span className="flex min-w-0 flex-1 items-center gap-2">
+            {selectedOption && renderOptionLeading
+              ? renderOptionLeading(selectedOption)
+              : null}
+            <span className="truncate">{selectedLabel || placeholder}</span>
+          </span>
           <ChevronDown className="h-5 w-5 shrink-0 text-gray-400" />
         </button>
       </Popover.Trigger>
@@ -99,6 +112,7 @@ export function SearchableCombobox({
           sideOffset={4}
           className={cn(
             "z-[100] rounded-lg border border-gray-200 bg-white p-2 shadow-lg outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+            popoverContentClassName,
           )}
           style={{ width: "var(--radix-popover-trigger-width)" }}
           onCloseAutoFocus={(e) => e.preventDefault()}
@@ -141,12 +155,13 @@ export function SearchableCombobox({
                     aria-selected={value === o.value}
                     onClick={() => handleSelect(o.value)}
                     className={cn(
-                      "flex w-full rounded-md px-2 py-2 text-left text-sm text-gray-900 hover:bg-gray-100",
+                      "flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-gray-900 hover:bg-gray-100",
                       value === o.value &&
                         "bg-blue-50 font-medium text-blue-700 hover:bg-blue-50",
                     )}
                   >
-                    {o.label}
+                    {renderOptionLeading ? renderOptionLeading(o) : null}
+                    <span className="truncate">{o.label}</span>
                   </button>
                 ))
               )}

@@ -10,14 +10,59 @@ export type ActiveLanguageLike = {
   flag: string | null;
 };
 
-/** English uses UK flag (not US) across UI and stored language rows. */
+const ENGLISH_REGIONAL_FLAGS = new Set(["🇺🇸", "🇬🇧", "EN", "GB", "US"]);
+
+/** Bendera UK untuk picker unduhan (Twemoji PNG — bukan teks "GB"). */
+export const ENGLISH_VARIANT_FLAG_EMOJI = "🇬🇧";
+
+/** Kode dua huruf untuk UI (en → EN, bukan GB dari emoji 🇬🇧). */
+export function getLanguageDisplayCode(languageId: string): string {
+  return languageId.trim().toUpperCase();
+}
+
+function isRegionalIndicatorEmoji(value: string): boolean {
+  const trimmed = value.trim();
+  const cps: number[] = [];
+  for (let i = 0; i < trimmed.length; ) {
+    const cp = trimmed.codePointAt(i)!;
+    cps.push(cp);
+    i += cp > 0xffff ? 2 : 1;
+  }
+  if (cps.length !== 2) return false;
+  return cps.every((cp) => cp >= 0x1f1e6 && cp <= 0x1f1ff);
+}
+
+/** True bila emoji bendera akan tampil sebagai huruf (mis. 🇬🇧 → "GB") di OS lama. */
+export function languageFlagRendersAsLetters(
+  languageId: string,
+  flag: string | null | undefined,
+): boolean {
+  const normalized = flag?.trim();
+  if (!normalized) return languageId === "en";
+  if (languageId === "en" && ENGLISH_REGIONAL_FLAGS.has(normalized)) {
+    return true;
+  }
+  return isRegionalIndicatorEmoji(normalized);
+}
+
+/**
+ * English never uses 🇬🇧/🇺🇸 in stored flag — those render as "GB"/"US" on some devices.
+ * UI should use {@link getLanguageDisplayCode} ("EN") instead.
+ */
 export function normalizeLanguageFlag(
   languageId: string,
   flag: string | null | undefined,
 ): string | null {
   const trimmed = flag?.trim();
   if (languageId === "en") {
-    if (!trimmed || trimmed === "🇺🇸") return "🇬🇧";
+    if (
+      !trimmed ||
+      ENGLISH_REGIONAL_FLAGS.has(trimmed) ||
+      isRegionalIndicatorEmoji(trimmed)
+    ) {
+      return null;
+    }
+    return trimmed;
   }
   return trimmed ?? null;
 }
@@ -25,7 +70,7 @@ export function normalizeLanguageFlag(
 /** Emoji bendera dari label bahasa (heuristik bila tidak ada baris DB). */
 export function languageLabelToFlag(label: string): string {
   const l = label.trim().toLowerCase();
-  if (/^(english|en)(\b|\s|$)/.test(l) || l === "en") return "🇬🇧";
+  if (/^(english|en)(\b|\s|$)/.test(l) || l === "en") return ENGLISH_VARIANT_FLAG_EMOJI;
   if (/español|spanish|^es(\b|\s|$)/.test(l)) return "🇪🇸";
   if (/indonesia|indonesian|bahasa(\s|-)?indonesia|^id(\b|\s|$)/.test(l))
     return "🇮🇩";
@@ -62,6 +107,10 @@ export function emojiToTwemoji72Url(emoji: string): string | null {
   return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.0/72x72/${parts.join("-")}.png`;
 }
 
+export function getEnglishVariantFlagImgUrl(): string {
+  return emojiToTwemoji72Url(ENGLISH_VARIANT_FLAG_EMOJI)!;
+}
+
 /**
  * URL gambar bendera untuk picker: prioritas `languages.flag` (URL atau emoji),
  * lalu kode wilayah dua huruf pada label, lalu heuristik nama bahasa.
@@ -77,6 +126,10 @@ export function resolveLanguageVariantFlagImgUrl(
     (idFromOpt && languages.find((l) => l.id === idFromOpt)) ||
     languages.find((l) => l.id === rawLabel.toLowerCase()) ||
     languages.find((l) => l.name.toLowerCase() === rawLabel.toLowerCase());
+
+  if (idFromOpt === "en" || lang?.id === "en") {
+    return getEnglishVariantFlagImgUrl();
+  }
 
   const flagField = lang
     ? normalizeLanguageFlag(lang.id, lang.flag)

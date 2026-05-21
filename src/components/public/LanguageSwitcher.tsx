@@ -7,6 +7,7 @@ import { SupportedLanguage } from "@/lib/public-api";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { cn } from "@/lib/utils";
 import { scheduleGoogleTranslateWarmup } from "@/lib/browser-translate";
+import { getLanguageDisplayCode } from "@/lib/language-variant-flag";
 
 interface LanguageSwitcherProps {
   currentLanguage: SupportedLanguage;
@@ -177,9 +178,12 @@ export function LanguageSwitcher({
                 }`}
               >
                 <div className="flex items-center space-x-2">
-                  {language.flag && (
-                    <span className="text-lg">{language.flag}</span>
-                  )}
+                  <span
+                    className="inline-flex min-w-[2rem] shrink-0 text-xs font-semibold uppercase text-gray-500 notranslate"
+                    aria-hidden
+                  >
+                    {getLanguageDisplayCode(language.id)}
+                  </span>
                   <span>{language.name}</span>
                   {language.isDefault && (
                     <span className="text-xs text-gray-500">(Default)</span>

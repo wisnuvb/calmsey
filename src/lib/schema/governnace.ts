@@ -335,6 +335,12 @@ export const GOVERNANCE_SCHEMA: PageContentSchema = {
           type: "html",
           label: "Policy Content",
           required: true,
+          helpText:
+            'Use the form or download icon next to Link. Download links support all languages (Settings) or all countries, with PDFs from Media Library. Normal links still work as usual.',
+          editorOptions: {
+            enableMicrosoftFormModal: true,
+            enableDownloadModal: true,
+          },
         },
       ],
     },

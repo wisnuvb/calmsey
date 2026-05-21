@@ -13,8 +13,13 @@ import {
   Music,
   Plus,
   Upload,
+  Search,
+  FolderOpen,
+  LayoutGrid,
+  List,
 } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
+import { formatFileSize, getFileTypeLabel } from "@/lib/media";
 import { Pagination } from "@/components/common/Pagination";
 
 interface MediaFile {
@@ -26,6 +31,7 @@ interface MediaFile {
   url: string;
   alt?: string;
   caption?: string;
+  createdAt?: string;
 }
 
 function getMediaDisplayName(file: MediaFile): string {
@@ -37,14 +43,21 @@ function getMediaDisplayName(file: MediaFile): string {
   return `${shortId} (${file.mimeType || "file"})`;
 }
 
-function formatMimeShort(mimeType: string): string {
-  if (!mimeType) return "";
-  const [major, minor] = mimeType.split("/");
-  if (!minor) return mimeType;
-  return `${major}/${minor.length > 18 ? `${minor.slice(0, 16)}…` : minor}`;
-}
-
 type FileFilter = "all" | "images" | "documents" | "videos" | "audio";
+
+const FILTER_OPTIONS: {
+  key: FileFilter;
+  label: string;
+  icon: typeof FolderOpen;
+}[] = [
+  { key: "all", label: "All Files", icon: FolderOpen },
+  { key: "images", label: "Images", icon: ImageIcon },
+  { key: "documents", label: "Documents", icon: File },
+  { key: "videos", label: "Videos", icon: Video },
+  { key: "audio", label: "Audio", icon: Music },
+];
+
+type ViewMode = "grid" | "list";
 
 interface MediaPickerModalProps {
   isOpen: boolean;
@@ -53,6 +66,8 @@ interface MediaPickerModalProps {
   mode?: "single" | "multiple";
   allowedTypes?: FileFilter[];
   initialFilter?: FileFilter;
+  /** Tailwind z-index class when opened above other modals (default `z-50`). */
+  overlayClassName?: string;
 }
 
 export function MediaPickerModal({
@@ -60,19 +75,35 @@ export function MediaPickerModal({
   onClose,
   onSelect,
   mode = "single",
+  allowedTypes,
   initialFilter = "all",
+  overlayClassName = "z-50",
 }: MediaPickerModalProps) {
+  const visibleFilters = FILTER_OPTIONS.filter((opt) => {
+    if (!allowedTypes || allowedTypes.length === 0) return true;
+    if (allowedTypes.includes("all")) return true;
+    return allowedTypes.includes(opt.key);
+  });
+
+  const resolvedInitialFilter =
+    visibleFilters.some((o) => o.key === initialFilter)
+      ? initialFilter
+      : (visibleFilters[0]?.key ?? "all");
+
   const {
     filteredFiles,
     loading,
+    search,
     setSearch,
+    filter,
     setFilter,
+    stats,
     refreshMediaFiles,
     pagination,
     handlePageChange,
     resetPage,
   } = useMediaFiles({
-    initialFilter,
+    initialFilter: resolvedInitialFilter,
     autoFetch: isOpen,
     scrollTopOnPageChange: false,
     itemsPerPage: 24,
@@ -85,6 +116,7 @@ export function MediaPickerModal({
     () => new Map(),
   );
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const modalRef = useRef<HTMLDivElement>(null);
   const uploadModalRef = useRef<HTMLDivElement>(null);
   const gridScrollRef = useRef<HTMLDivElement>(null);
@@ -98,12 +130,26 @@ export function MediaPickerModal({
 
   useEffect(() => {
     if (!isOpen) return;
-    setFilter(initialFilter);
+    setFilter(resolvedInitialFilter);
     setSearch("");
+    setViewMode("grid");
     resetPage();
     clearSelection();
     setMultiSelectUrls(new Map());
-  }, [isOpen, initialFilter, setFilter, setSearch, resetPage, clearSelection]);
+  }, [
+    isOpen,
+    resolvedInitialFilter,
+    setFilter,
+    setSearch,
+    resetPage,
+    clearSelection,
+  ]);
+
+  const handleFilterChange = (next: FileFilter) => {
+    setFilter(next);
+    resetPage();
+    gridScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleClose = useCallback(() => {
     clearSelection();
@@ -142,12 +188,6 @@ export function MediaPickerModal({
     if (mimeType.startsWith("video/")) return <Video className="w-5 h-5" />;
     if (mimeType.startsWith("audio/")) return <Music className="w-5 h-5" />;
     return <File className="w-5 h-5" />;
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
   // Handle click outside modal
@@ -199,11 +239,72 @@ export function MediaPickerModal({
     }
   };
 
+  const formatUploadedDate = (iso?: string) => {
+    if (!iso) return "—";
+    try {
+      return new Date(iso).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch {
+      return "—";
+    }
+  };
+
+  const renderFilePreview = (file: MediaFile, compact = false) => {
+    const isImage = file.mimeType.startsWith("image/");
+    const boxClass = compact
+      ? "h-10 w-10 shrink-0"
+      : "aspect-square w-full";
+
+    if (isImage) {
+      return (
+        <div
+          className={`${boxClass} overflow-hidden rounded bg-gray-100 flex items-center justify-center`}
+        >
+          <Image
+            src={getImageUrl(file.url)}
+            alt={file.alt || getMediaDisplayName(file)}
+            width={compact ? 40 : 200}
+            height={compact ? 40 : 200}
+            className={
+              compact
+                ? "h-full w-full object-cover"
+                : "h-full w-full object-cover"
+            }
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className={`${boxClass} flex items-center justify-center rounded bg-gray-100 text-gray-400`}
+      >
+        {getFileIcon(file.mimeType)}
+      </div>
+    );
+  };
+
+  const isFileSelected = (fileId: string) =>
+    mode === "multiple"
+      ? multiSelectUrls.has(fileId)
+      : selectedFiles.has(fileId);
+
   if (!isOpen) return null;
+
+  const uploadOverlayClassName =
+    overlayClassName === "z-50" ? "z-[60]" : "z-[260]";
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div
+        className={`fixed inset-0 ${overlayClassName} flex items-center justify-center bg-black bg-opacity-50`}
+      >
         <div
           ref={modalRef}
           className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col"
@@ -236,8 +337,113 @@ export function MediaPickerModal({
               </button>
             </div>
           </div>
+
+          {/* Stats summary */}
+          {stats.total > 0 ? (
+            <div className="grid grid-cols-2 gap-2 border-b bg-white px-6 py-3 sm:grid-cols-3 lg:grid-cols-6">
+              {[
+                { label: "Total Files", value: stats.total, className: "text-gray-900" },
+                { label: "Images", value: stats.images, className: "text-blue-600" },
+                { label: "Documents", value: stats.documents, className: "text-green-600" },
+                { label: "Videos", value: stats.videos, className: "text-purple-600" },
+                { label: "Audio", value: stats.audio, className: "text-orange-600" },
+                {
+                  label: "Total Size",
+                  value: formatFileSize(stats.totalSize),
+                  className: "text-gray-900",
+                },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-md border border-gray-100 bg-gray-50 px-3 py-2"
+                >
+                  <div className={`text-lg font-bold leading-tight ${item.className}`}>
+                    {item.value}
+                  </div>
+                  <div className="text-xs text-gray-500">{item.label}</div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {/* Search, filters & view mode — same layout as Media Library */}
+          <div className="border-b bg-white px-6 py-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 flex-1 flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
+                <div className="relative w-full min-w-[200px] sm:w-64 shrink-0">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="search"
+                    placeholder="Search files..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    aria-label="Search files"
+                  />
+                  {loading && filteredFiles.length > 0 ? (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+                      Searching…
+                    </span>
+                  ) : null}
+                </div>
+
+                {visibleFilters.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {visibleFilters.map((filterOption) => {
+                      const Icon = filterOption.icon;
+                      const isActive = filter === filterOption.key;
+                      return (
+                        <button
+                          key={filterOption.key}
+                          type="button"
+                          onClick={() => handleFilterChange(filterOption.key)}
+                          className={`inline-flex items-center whitespace-nowrap rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                            isActive
+                              ? "border-blue-300 bg-blue-100 text-blue-700"
+                              : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                          }`}
+                        >
+                          <Icon className="mr-1.5 h-4 w-4" />
+                          {filterOption.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="flex shrink-0 justify-end space-x-1">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("grid")}
+                  className={`rounded-md p-2 ${
+                    viewMode === "grid"
+                      ? "bg-blue-100 text-blue-700"
+                      : "text-gray-400 hover:text-gray-600"
+                  }`}
+                  aria-label="Grid view"
+                  aria-pressed={viewMode === "grid"}
+                >
+                  <LayoutGrid className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("list")}
+                  className={`rounded-md p-2 ${
+                    viewMode === "list"
+                      ? "bg-blue-100 text-blue-700"
+                      : "text-gray-400 hover:text-gray-600"
+                  }`}
+                  aria-label="List view"
+                  aria-pressed={viewMode === "list"}
+                >
+                  <List className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          </div>
           
-          {/* Media grid + pagination */}
+          {/* Media grid / list + pagination */}
           <div className="flex-1 flex flex-col min-h-0">
             <div ref={gridScrollRef} className="flex-1 overflow-y-auto p-6">
               {loading ? (
@@ -247,16 +453,16 @@ export function MediaPickerModal({
               ) : filteredFiles.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-gray-500">
                   <ImageIcon className="w-16 h-16 mb-4 opacity-20" />
-                  <p>No files found</p>
+                  <p>
+                    {search.trim() || filter !== "all"
+                      ? "No files match your search or filters"
+                      : "No files found"}
+                  </p>
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              ) : viewMode === "grid" ? (
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {filteredFiles.map((file) => {
-                    const isSelected =
-                      mode === "multiple"
-                        ? multiSelectUrls.has(file.id)
-                        : selectedFiles.has(file.id);
-                    const isImage = file.mimeType.startsWith("image/");
+                    const isSelected = isFileSelected(file.id);
 
                     return (
                       <div
@@ -268,86 +474,147 @@ export function MediaPickerModal({
                             : "border-gray-200 hover:border-blue-400"
                         }`}
                       >
-                        {/* Checkbox for multiple mode */}
                         {mode === "multiple" && (
                           <div className="absolute top-2 right-2 z-10">
                             <input
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => {}}
-                              className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                             />
                           </div>
                         )}
 
-                        {/* Preview */}
-                        <div className="aspect-square bg-gray-100 flex items-center justify-center">
-                          {isImage ? (
-                            <Image
-                              src={getImageUrl(file.url)}
-                              alt={file.alt || getMediaDisplayName(file)}
-                              width={200}
-                              height={200}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.currentTarget.style.display = "none";
-                              }}
-                            />
-                          ) : (
-                            <div className="text-gray-400">
-                              {getFileIcon(file.mimeType)}
-                            </div>
-                          )}
-                        </div>
+                        {renderFilePreview(file)}
 
-                        {/* Info */}
-                        <div className="p-2 bg-white">
+                        <div className="bg-white p-2">
                           <p
-                            className="text-xs font-medium text-gray-900 truncate"
+                            className="truncate text-xs font-medium text-gray-900"
                             title={getMediaDisplayName(file)}
                           >
                             {getMediaDisplayName(file)}
                           </p>
-                          <p
-                            className="text-xs text-gray-400 truncate"
-                            title={file.url}
-                          >
-                            {formatMimeShort(file.mimeType)}
+                          <p className="text-xs text-gray-500">
+                            {getFileTypeLabel(file.mimeType)}
                           </p>
                           <p className="text-xs text-gray-500">
                             {formatFileSize(file.size)}
                           </p>
                         </div>
 
-                        {/* Hover overlay */}
-                        <div className="absolute inset-0 bg-blue-600 bg-opacity-0 group-hover:bg-opacity-10 transition-all" />
+                        <div className="absolute inset-0 bg-blue-600 bg-opacity-0 transition-all group-hover:bg-opacity-10" />
                       </div>
                     );
                   })}
+                </div>
+              ) : (
+                <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        {mode === "multiple" ? (
+                          <th className="w-10 px-4 py-3" aria-label="Select" />
+                        ) : null}
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                          File
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                          Type
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                          Size
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                          Uploaded
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 bg-white">
+                      {filteredFiles.map((file) => {
+                        const isSelected = isFileSelected(file.id);
+                        return (
+                          <tr
+                            key={file.id}
+                            onClick={() => handleFileClick(file)}
+                            className={`cursor-pointer transition-colors hover:bg-gray-50 ${
+                              isSelected ? "bg-blue-50" : ""
+                            }`}
+                          >
+                            {mode === "multiple" ? (
+                              <td className="px-4 py-3">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => {}}
+                                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                              </td>
+                            ) : null}
+                            <td className="px-4 py-3">
+                              <div className="flex min-w-0 items-center gap-3">
+                                {renderFilePreview(file, true)}
+                                <span
+                                  className="truncate text-sm font-medium text-gray-900"
+                                  title={getMediaDisplayName(file)}
+                                >
+                                  {getMediaDisplayName(file)}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
+                              {getFileTypeLabel(file.mimeType)}
+                            </td>
+                            <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
+                              {formatFileSize(file.size)}
+                            </td>
+                            <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
+                              {formatUploadedDate(file.createdAt)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t bg-gray-50 flex items-center justify-between">
-            <div>
-              {!loading && pagination.totalCount > 0 && (
-                <div className="flex flex-col items-center gap-2">
-                  {pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between border-t bg-gray-50 p-6">
+            <div className="space-y-2">
+              {!loading && pagination.totalCount > 0 ? (
+                <>
+                  <p className="text-sm text-gray-600">
+                    Showing{" "}
+                    <span className="font-medium">
+                      {(pagination.page - 1) * pagination.limit + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-medium">
+                      {Math.min(
+                        pagination.page * pagination.limit,
+                        pagination.totalCount,
+                      )}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-medium">{pagination.totalCount}</span>{" "}
+                    results
+                  </p>
+                  {pagination.totalPages > 1 ? (
                     <Pagination
                       currentPage={pagination.page}
                       totalPages={pagination.totalPages}
                       onPageChange={handlePageChangeInModal}
                     />
-                  )}
-                </div>
-              )}
-              <div className="text-sm text-gray-600">
-                {mode === "multiple" && multiSelectUrls.size > 0 && (
-                  <span>{multiSelectUrls.size} file selected</span>
-                )}
-              </div>
+                  ) : null}
+                </>
+              ) : null}
+              {mode === "multiple" && multiSelectUrls.size > 0 ? (
+                <p className="text-sm text-gray-600">
+                  {multiSelectUrls.size} file selected
+                </p>
+              ) : null}
             </div>
             <div className="flex gap-3">
               <button
@@ -374,7 +641,9 @@ export function MediaPickerModal({
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
+        <div
+          className={`fixed inset-0 ${uploadOverlayClassName} flex items-center justify-center bg-black bg-opacity-50`}
+        >
           <div
             ref={uploadModalRef}
             className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4"

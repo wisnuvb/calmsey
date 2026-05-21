@@ -32,6 +32,9 @@ export function HtmlField({
         menubar={opts?.menubar}
         resize={opts?.resize}
         toolbar={opts?.toolbar}
+        enableMicrosoftFormModal={opts?.enableMicrosoftFormModal}
+        enableDownloadModal={opts?.enableDownloadModal}
+        defaultMicrosoftFormUrl={opts?.defaultMicrosoftFormUrl}
         onImageUpload={onImageUpload}
       />
       {field.helpText && (

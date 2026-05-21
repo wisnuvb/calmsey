@@ -30,6 +30,7 @@ export default function ResourceDownloadsAdminPage() {
     | "GRANTMAKING_FRAMEWORK"
     | "STRATEGY_2030"
     | "ANNUAL_REPORT"
+    | "GUIDING_POLICIES"
   >("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -51,7 +52,8 @@ export default function ResourceDownloadsAdminPage() {
         | "PARTNERS"
         | "GRANTMAKING_FRAMEWORK"
         | "STRATEGY_2030"
-        | "ANNUAL_REPORT",
+        | "ANNUAL_REPORT"
+        | "GUIDING_POLICIES",
     );
     setPage(1);
   };
@@ -94,6 +96,8 @@ export default function ResourceDownloadsAdminPage() {
             ? "Strategy to 2030 (Our Goal)"
             : s === "ANNUAL_REPORT"
               ? "Annual Report"
+              : s === "GUIDING_POLICIES"
+                ? "Guiding policies"
               : s;
 
   return (
@@ -137,6 +141,7 @@ export default function ResourceDownloadsAdminPage() {
             <option value="GRANTMAKING_FRAMEWORK">Grantmaking framework</option>
             <option value="STRATEGY_2030">Strategy to 2030 (Our Goal)</option>
             <option value="ANNUAL_REPORT">Annual Report</option>
+            <option value="GUIDING_POLICIES">Guiding policies</option>
           </select>
         </div>
       </div>

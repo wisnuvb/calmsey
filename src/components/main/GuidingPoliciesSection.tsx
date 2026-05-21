@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Handshake, ChevronDown, ChevronUp } from "lucide-react";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
+import { RichTextWithEmbeddedModals } from "./RichTextWithEmbeddedModals";
 
 interface Policy {
   id: string;
@@ -18,6 +19,9 @@ interface GuidingPoliciesSectionProps {
   policies?: Policy[];
   backgroundColor?: string;
 }
+
+const policyRichTextClassName =
+  "text-[#060726CC] font-normal font-work-sans text-base leading-relaxed prose prose-sm max-w-none [overflow-wrap:anywhere] [&_p]:[overflow-wrap:anywhere] [&_a]:break-all [&_a]:text-[#3C62ED] [&_a]:font-medium [&_a]:no-underline hover:[&_a]:underline";
 
 const defaultPolicies: Policy[] = [
   {
@@ -164,7 +168,7 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
 
             <div className="text-left sm:col-span-8">
               <div
-                className="text-[#010107] p max-w-none [&_p]:mb-3 [&_p:last-child]:mb-0 [&_a]:text-[#3C62ED] [&_a]:font-medium [&_a]:no-underline hover:[&_a]:underline"
+                className="text-[#010107] p max-w-none [overflow-wrap:anywhere] [&_p]:mb-3 [&_p:last-child]:mb-0 [&_a]:break-all [&_a]:text-[#3C62ED] [&_a]:font-medium [&_a]:no-underline hover:[&_a]:underline"
                 dangerouslySetInnerHTML={{ __html: description }}
               />
             </div>
@@ -176,7 +180,7 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
           {policies.map((policy) => (
             <div
               key={policy.id}
-              className="overflow-hidden"
+              className="rounded-sm"
               id={policy.id}
             >
               <button
@@ -198,10 +202,11 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
               </button>
 
               {expandedPolicy === policy.id && (
-                <div className="px-8 py-6 bg-[#EAF1F7] border-t border-[#EAF1F7]">
-                  <div
-                    className="text-[#060726CC] font-normal font-work-sans text-base leading-relaxed prose prose-sm max-w-none prose-a:text-[#3C62ED] prose-a:font-medium prose-a:no-underline hover:prose-a:underline"
-                    dangerouslySetInnerHTML={{ __html: policy.content }}
+                <div className="border-t border-[#EAF1F7] bg-[#EAF1F7] px-4 py-6 sm:px-8">
+                  <RichTextWithEmbeddedModals
+                    html={policy.content}
+                    className={policyRichTextClassName}
+                    modalTitleIdPrefix={`guiding-policy-${policy.id}`}
                   />
                 </div>
               )}
