@@ -24,6 +24,10 @@ import {
   type RichTextDownloadFile,
   type RichTextDownloadSelectorType,
 } from "@/lib/rich-text-download-modal";
+import type {
+  DownloadModalEditInitial,
+  FormModalEditInitial,
+} from "@/lib/rich-text-editor-modal-links";
 
 /** Above download insert dialog (`z-[200]`). */
 const NESTED_POPOVER_Z = "z-[210]";
@@ -35,10 +39,12 @@ export type RichTextInsertHostHandle = {
   openFormModalInsert: (
     selectedText: string,
     insert: InsertCallback,
+    initial?: FormModalEditInitial,
   ) => void;
   openDownloadModalInsert: (
     selectedText: string,
     insert: InsertCallback,
+    initial?: DownloadModalEditInitial,
   ) => void;
 };
 
@@ -55,11 +61,13 @@ interface RichTextInsertDialogsHostProps {
 type FormDialogState = {
   selectedText: string;
   insert: InsertCallback;
+  isEdit: boolean;
 };
 
 type DownloadDialogState = {
   selectedText: string;
   insert: InsertCallback;
+  isEdit: boolean;
 };
 
 function emptyDownloadRow(): RichTextDownloadFile {
@@ -167,22 +175,37 @@ export const RichTextInsertDialogsHost = forwardRef<
   );
 
   useImperativeHandle(ref, () => ({
-    openFormModalInsert: (selectedText, insert) => {
-      setFormLinkText(selectedText.trim());
-      setFormUrl(defaultMicrosoftFormUrl ?? "");
-      setFormDialog({ selectedText, insert });
+    openFormModalInsert: (selectedText, insert, initial) => {
+      setFormLinkText(initial?.linkText ?? selectedText.trim());
+      setFormUrl(initial?.formUrl ?? defaultMicrosoftFormUrl ?? "");
+      setFormDialog({
+        selectedText,
+        insert,
+        isEdit: Boolean(initial),
+      });
     },
-    openDownloadModalInsert: (selectedText, insert) => {
-      const trimmed = selectedText.trim();
+    openDownloadModalInsert: (selectedText, insert, initial) => {
+      const trimmed = initial?.linkText ?? selectedText.trim();
       setLinkText(trimmed);
-      setModalTitle(trimmed);
-      setModalSubtitle("");
-      setDownloadButtonText("Download");
-      setDocumentItemId(trimmed ? slugifyDocumentItemId(trimmed) : "");
-      setSelectorType("language");
-      setDownloadFiles([emptyDownloadRow()]);
+      setModalTitle(initial?.title ?? trimmed);
+      setModalSubtitle(initial?.subtitle ?? "");
+      setDownloadButtonText(initial?.downloadButtonText ?? "Download");
+      setDocumentItemId(
+        initial?.documentItemId ??
+          (trimmed ? slugifyDocumentItemId(trimmed) : ""),
+      );
+      setSelectorType(initial?.selectorType ?? "language");
+      setDownloadFiles(
+        initial?.files?.length
+          ? initial.files.map((file) => ({ ...file }))
+          : [emptyDownloadRow()],
+      );
       setDownloadError("");
-      setDownloadDialog({ selectedText, insert });
+      setDownloadDialog({
+        selectedText,
+        insert,
+        isEdit: Boolean(initial),
+      });
     },
   }));
 
@@ -314,7 +337,9 @@ export const RichTextInsertDialogsHost = forwardRef<
                 id="rich-text-form-insert-title"
                 className="text-lg font-semibold text-gray-900"
               >
-                Insert Microsoft Form modal link
+                {formDialog.isEdit
+                  ? "Edit Microsoft Form modal link"
+                  : "Insert Microsoft Form modal link"}
               </h3>
               <button
                 type="button"
@@ -360,7 +385,7 @@ export const RichTextInsertDialogsHost = forwardRef<
                 onClick={submitFormDialog}
                 className="rounded-lg bg-[#3C62ED] px-4 py-2 text-sm font-medium text-white"
               >
-                Insert
+                {formDialog.isEdit ? "Update" : "Insert"}
               </button>
             </div>
           </div>
@@ -386,11 +411,14 @@ export const RichTextInsertDialogsHost = forwardRef<
                   id="rich-text-download-insert-title"
                   className="text-lg font-semibold text-gray-900"
                 >
-                  Insert multi-language download link
+                  {downloadDialog.isEdit
+                    ? "Edit multi-language download link"
+                    : "Insert multi-language download link"}
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  Opens a download modal with language or country picker on the
-                  public site.
+                  {downloadDialog.isEdit
+                    ? "Update the selected download link. Place the cursor inside the link, then click the download toolbar icon."
+                    : "Opens a download modal with language or country picker on the public site."}
                 </p>
               </div>
               <button
@@ -617,7 +645,7 @@ export const RichTextInsertDialogsHost = forwardRef<
                 onClick={submitDownloadDialog}
                 className="rounded-lg bg-[#3C62ED] px-4 py-2 text-sm font-medium text-white"
               >
-                Insert
+                {downloadDialog.isEdit ? "Update" : "Insert"}
               </button>
             </div>
           </div>

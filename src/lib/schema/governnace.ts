@@ -336,7 +336,7 @@ export const GOVERNANCE_SCHEMA: PageContentSchema = {
           label: "Policy Content",
           required: true,
           helpText:
-            'Use the form or download icon next to Link. Download links support all languages (Settings) or all countries, with PDFs from Media Library. Normal links still work as usual.',
+            'Place the cursor inside an existing form/download link and click its toolbar icon to edit. Download links support all languages or countries, with PDFs from Media Library.',
           editorOptions: {
             enableMicrosoftFormModal: true,
             enableDownloadModal: true,

@@ -6,7 +6,17 @@ import {
   DEFAULT_MS_FORM_EMBED_URL,
   MS_FORM_MODAL_ATTR,
 } from "@/lib/ms-form-modal";
-import { RICH_TEXT_DOWNLOAD_MODAL_ATTRS } from "@/lib/rich-text-download-modal";
+import {
+  MS_DOWNLOAD_FILES_ATTR,
+  RICH_TEXT_DOWNLOAD_MODAL_ATTRS,
+} from "@/lib/rich-text-download-modal";
+import {
+  applyModalLinkInEditor,
+  getSelectedDownloadModalLink,
+  getSelectedFormModalLink,
+  readDownloadModalEditInitial,
+  readFormModalEditInitial,
+} from "@/lib/rich-text-editor-modal-links";
 import {
   RichTextInsertDialogsHost,
   type RichTextInsertHostHandle,
@@ -128,14 +138,20 @@ export function TinyMCEEditor({
               editor.ui.registry.addIcon("ms-form-modal", MS_FORM_ICON);
               editor.ui.registry.addButton("msformmodal", {
                 icon: "ms-form-modal",
-                tooltip: "Insert Microsoft Form modal link",
+                tooltip: "Insert or edit Microsoft Form modal link",
                 onAction: () => {
+                  const existing = getSelectedFormModalLink(editor);
                   const selectedText = editor.selection.getContent({
                     format: "text",
                   });
+                  const initial = existing
+                    ? readFormModalEditInitial(existing)
+                    : undefined;
                   insertHostRef.current?.openFormModalInsert(
-                    selectedText,
-                    (html) => editor.insertContent(html),
+                    initial?.linkText ?? selectedText,
+                    (html) =>
+                      applyModalLinkInEditor(editor, html, MS_FORM_MODAL_ATTR),
+                    initial,
                   );
                 },
               });
@@ -144,14 +160,24 @@ export function TinyMCEEditor({
             if (enableDownloadModal) {
               editor.ui.registry.addButton("msdownloadmodal", {
                 icon: "download",
-                tooltip: "Insert multi-language download modal link",
+                tooltip: "Insert or edit multi-language download modal link",
                 onAction: () => {
+                  const existing = getSelectedDownloadModalLink(editor);
                   const selectedText = editor.selection.getContent({
                     format: "text",
                   });
+                  const initial = existing
+                    ? readDownloadModalEditInitial(existing) ?? undefined
+                    : undefined;
                   insertHostRef.current?.openDownloadModalInsert(
-                    selectedText,
-                    (html) => editor.insertContent(html),
+                    initial?.linkText ?? selectedText,
+                    (html) =>
+                      applyModalLinkInEditor(
+                        editor,
+                        html,
+                        MS_DOWNLOAD_FILES_ATTR,
+                      ),
+                    initial,
                   );
                 },
               });

@@ -424,7 +424,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
                   <button
                     type="submit"
                     disabled={loading}
-                    className="inline-flex min-w-[160px] items-center justify-center rounded-lg bg-[#9BB5E8] px-8 py-3.5 font-work-sans text-base font-semibold text-white transition-colors hover:bg-[#8AA5DE] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex min-w-[160px] items-center justify-center rounded-lg bg-[#3C62ED] px-8 py-3.5 font-work-sans text-base font-semibold text-white transition-colors hover:bg-[#8AA5DE] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {loading ? "Sending..." : submitButtonText}
                   </button>
