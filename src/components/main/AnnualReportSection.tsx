@@ -1,11 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { createDownloadLanguageNameResolver } from "@/lib/download-language-labels";
+import { useMemo } from "react";
+import { orderDownloadFilesEnglishFirst } from "@/lib/download-language-order";
 import { BarChart3, Download } from "lucide-react";
-import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
-import { Strategy2030DownloadLeadModal } from "@/components/main/Strategy2030DownloadLeadModal";
 
 interface DownloadFile {
   language: string;
@@ -18,22 +16,20 @@ export interface AnnualReportSectionProps {
   className?: string;
 }
 
+function ensureHttpsUrl(url: string): string {
+  if (!url || url.trim() === "") return url;
+  const trimmedUrl = url.trim();
+  if (/^https?:\/\//i.test(trimmedUrl)) return trimmedUrl;
+  if (trimmedUrl.startsWith("//")) return `https:${trimmedUrl}`;
+  if (trimmedUrl.startsWith("/")) return trimmedUrl;
+  return `https://${trimmedUrl}`;
+}
+
 export function AnnualReportSection({
   documentItemId,
   className,
 }: AnnualReportSectionProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { languages: activeLanguages } = useActiveLanguages();
-  const { getValue, getContentJSON } = usePageContentHelpers();
-
-  const ensureHttpsUrl = (url: string): string => {
-    if (!url || url.trim() === "") return url;
-    const trimmedUrl = url.trim();
-    if (/^https?:\/\//i.test(trimmedUrl)) return trimmedUrl;
-    if (trimmedUrl.startsWith("//")) return `https:${trimmedUrl}`;
-    if (trimmedUrl.startsWith("/")) return trimmedUrl;
-    return `https://${trimmedUrl}`;
-  };
+  const { getValue, getContentJSON, language } = usePageContentHelpers();
 
   const title = getValue(
     "annualReport.title",
@@ -60,34 +56,22 @@ export function AnnualReportSection({
     (f) => f?.language?.trim() && f?.url?.trim(),
   );
 
-  const downloadModalTitle = getValue(
-    "annualReport.downloadModalTitle",
-    undefined,
-    "Download Annual Report",
-  );
-  const downloadModalSubtitle = getValue(
-    "annualReport.downloadModalSubtitle",
-    undefined,
-    "Enter your details to download. We use this information to understand interest in our annual report.",
-  );
-  const downloadModalButtonText = getValue(
-    "annualReport.downloadModalButtonText",
-    undefined,
-    "Download now",
-  );
-  const downloadDocumentTitle = getValue(
-    "annualReport.downloadDocumentTitle",
-    undefined,
-    title || "Annual Report",
-  );
-
-  const getLanguageName = useMemo(
-    () => createDownloadLanguageNameResolver(activeLanguages),
-    [activeLanguages],
-  );
+  const downloadUrl = useMemo(() => {
+    if (finalDownloadFiles.length === 0) return null;
+    const ordered = orderDownloadFilesEnglishFirst(finalDownloadFiles);
+    const cur = language.trim().toLowerCase();
+    const match = ordered.find(
+      (f) => f.language.trim().toLowerCase() === cur,
+    );
+    const file = match ?? ordered[0];
+    return ensureHttpsUrl(file.url);
+  }, [finalDownloadFiles, language]);
 
   const badgeTrimmed = badgeText.trim();
-  const canDownload = finalDownloadFiles.length > 0;
+  const canDownload = Boolean(downloadUrl);
+
+  const buttonClassName =
+    "inline-flex w-full items-center justify-center gap-2 rounded-md border border-[#e2e8f0] bg-white px-5 py-3.5 font-work-sans text-[15px] font-medium text-[#1e293b] shadow-none transition-colors hover:border-[#cbd5e1] hover:bg-[#fafafa] disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto sm:min-w-[148px] sm:px-6 sm:py-4";
 
   return (
     <section
@@ -128,44 +112,35 @@ export function AnnualReportSection({
           </div>
 
           <div className="flex w-full shrink-0 justify-stretch sm:justify-start lg:w-auto lg:justify-end">
-            <button
-              type="button"
-              disabled={!canDownload}
-              onClick={(e) => {
-                e.preventDefault();
-                if (canDownload) setIsModalOpen(true);
-              }}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-[#e2e8f0] bg-white px-5 py-3.5 font-work-sans text-[15px] font-medium text-[#1e293b] shadow-none transition-colors hover:border-[#cbd5e1] hover:bg-[#fafafa] disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto sm:min-w-[148px] sm:px-6 sm:py-4"
-            >
-              <Download
-                className="h-[18px] w-[18px] shrink-0 text-[#64748b] sm:h-5 sm:w-5"
-                aria-hidden
-              />
-              {buttonText}
-            </button>
+            {canDownload && downloadUrl ? (
+              <a
+                href={downloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonClassName}
+              >
+                <Download
+                  className="h-[18px] w-[18px] shrink-0 text-[#64748b] sm:h-5 sm:w-5"
+                  aria-hidden
+                />
+                {buttonText}
+              </a>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className={buttonClassName}
+              >
+                <Download
+                  className="h-[18px] w-[18px] shrink-0 text-[#64748b] sm:h-5 sm:w-5"
+                  aria-hidden
+                />
+                {buttonText}
+              </button>
+            )}
           </div>
         </div>
       </div>
-
-      {isModalOpen ? (
-        <Strategy2030DownloadLeadModal
-          key={finalDownloadFiles
-            .map((f) => `${f.language.trim()}:${f.url.trim()}`)
-            .join("|")}
-          modalSource="ANNUAL_REPORT"
-          title={downloadModalTitle}
-          subtitle={downloadModalSubtitle}
-          downloadButtonText={downloadModalButtonText}
-          documentTitle={downloadDocumentTitle}
-          documentItemId={documentItemId}
-          formFieldIdPrefix={`annual-report-${documentItemId}`}
-          headingId={`annual-report-download-modal-${documentItemId}`}
-          files={finalDownloadFiles}
-          getLanguageName={getLanguageName}
-          normalizeUrl={ensureHttpsUrl}
-          onClose={() => setIsModalOpen(false)}
-        />
-      ) : null}
     </section>
   );
 }
