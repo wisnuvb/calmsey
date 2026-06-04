@@ -95,9 +95,9 @@ export function AnnualReportSection({
       aria-labelledby={`annual-report-heading-${documentItemId}`}
       id="annualreport"
     >
-      <div className="bg-[#f0f4f8] container mx-auto px-4 py-8 sm:py-9 lg:py-10 lg:px-6 mb-10 lg:mb-20">
+      <div className="bg-[#f0f4f8] container mx-auto px-4 py-8 sm:py-9 lg:py-10 lg:px-8 mb-10 lg:mb-20">
         <div className="flex flex-col gap-8 sm:gap-9 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
-          <div className="flex min-w-0 flex-1 items-start gap-4 sm:gap-5 lg:items-center">
+          <div className="flex min-w-0 flex-1 items-start gap-4 sm:gap-7 lg:items-start">
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#3C62ED] shadow-sm sm:h-11 sm:w-11"
               aria-hidden
@@ -121,7 +121,7 @@ export function AnnualReportSection({
                   </span>
                 ) : null}
               </div>
-              <p className="max-w-2xl font-work-sans text-sm leading-[1.55] text-[#475569] sm:text-[15px] sm:leading-relaxed">
+              <p className="max-w-4xl font-work-sans text-sm leading-[1.55] text-[#475569] sm:text-[15px] sm:leading-relaxed">
                 {description}
               </p>
             </div>
