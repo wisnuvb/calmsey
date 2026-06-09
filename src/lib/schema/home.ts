@@ -197,12 +197,28 @@ export const HOME_SCHEMA: PageContentSchema = {
 
     // Annual Report Section
     {
+      key: "annualReport.thumbnail",
+      label: "Thumbnail",
+      type: "image",
+      section: "Annual Report",
+      helpText:
+        "Square image shown beside the title. Recommended size: 88×88px or larger.",
+    },
+    {
+      key: "annualReport.thumbnailAlt",
+      label: "Thumbnail alt text",
+      type: "text",
+      section: "Annual Report",
+      defaultValue: "Annual report",
+      helpText: "Accessibility description for the thumbnail image",
+    },
+    {
       key: "annualReport.title",
       label: "Title",
       type: "text",
       section: "Annual Report",
       defaultValue: "Turning Tides 2025 Annual Report",
-      helpText: "Main headline next to the icon",
+      helpText: "Main headline next to the thumbnail",
     },
     {
       key: "annualReport.badgeText",

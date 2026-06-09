@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
+import Image from "next/image";
 import { orderDownloadFilesEnglishFirst } from "@/lib/download-language-order";
 import { BarChart3, Download } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface DownloadFile {
@@ -47,6 +49,12 @@ export function AnnualReportSection({
     "Learn more about Turning Tides' accomplishments, initiatives, and organizational growth throughout the year. The upcoming report highlights our dedication to accountability and sustainable impact.",
   );
   const buttonText = getValue("annualReport.buttonText", undefined, "Download");
+  const thumbnail = getValue("annualReport.thumbnail", undefined, "").trim();
+  const thumbnailAlt = getValue(
+    "annualReport.thumbnailAlt",
+    undefined,
+    "Annual report",
+  );
 
   const contextDownloadFiles = getContentJSON<DownloadFile[]>(
     "annualReport.downloadFiles",
@@ -82,15 +90,27 @@ export function AnnualReportSection({
       <div className="bg-[#f0f4f8] container mx-auto px-4 py-8 sm:py-9 lg:py-10 lg:px-8 mb-10 lg:mb-20">
         <div className="flex flex-col gap-8 sm:gap-9 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
           <div className="flex min-w-0 flex-1 items-start gap-4 sm:gap-7 lg:items-start">
-            <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#3C62ED] shadow-sm sm:h-11 sm:w-11"
-              aria-hidden
-            >
-              <BarChart3
-                className="h-[22px] w-[22px] text-white sm:h-6 sm:w-6"
-                strokeWidth={2}
-              />
-            </div>
+            {thumbnail ? (
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg shadow-sm sm:h-20 sm:w-20">
+                <Image
+                  src={getImageUrl(thumbnail)}
+                  alt={thumbnailAlt}
+                  fill
+                  className="object-cover"
+                  sizes="80px"
+                />
+              </div>
+            ) : (
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#3C62ED] shadow-sm sm:h-11 sm:w-11"
+                aria-hidden
+              >
+                <BarChart3
+                  className="h-[22px] w-[22px] text-white sm:h-6 sm:w-6"
+                  strokeWidth={2}
+                />
+              </div>
+            )}
             <div className="min-w-0 flex-1 space-y-2.5 sm:space-y-3">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                 <h2
