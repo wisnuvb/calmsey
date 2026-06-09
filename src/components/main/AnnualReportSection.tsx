@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Image from "next/image";
 import { orderDownloadFilesEnglishFirst } from "@/lib/download-language-order";
-import { BarChart3, Download } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
@@ -79,7 +79,23 @@ export function AnnualReportSection({
   const canDownload = Boolean(downloadUrl);
 
   const buttonClassName =
-    "inline-flex w-full items-center justify-center gap-2 rounded-md border border-[#e2e8f0] bg-white px-5 py-3.5 font-work-sans text-[15px] font-medium text-[#1e293b] shadow-none transition-colors hover:border-[#cbd5e1] hover:bg-[#fafafa] disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto sm:min-w-[148px] sm:px-6 sm:py-4";
+    "inline-flex w-full items-center justify-center rounded-md bg-[#3C62ED] px-6 py-3 font-work-sans text-[15px] font-medium text-white transition-colors hover:bg-[#2d4fd6] disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto sm:min-w-[148px] sm:px-7 sm:py-3.5";
+
+  const ctaButton =
+    canDownload && downloadUrl ? (
+      <a
+        href={downloadUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={buttonClassName}
+      >
+        {buttonText}
+      </a>
+    ) : (
+      <button type="button" disabled className={buttonClassName}>
+        {buttonText}
+      </button>
+    );
 
   return (
     <section
@@ -87,31 +103,32 @@ export function AnnualReportSection({
       aria-labelledby={`annual-report-heading-${documentItemId}`}
       id="annualreport"
     >
-      <div className="bg-[#f0f4f8] container mx-auto px-4 py-8 sm:py-9 lg:py-10 lg:px-8 mb-10 lg:mb-20">
-        <div className="flex flex-col gap-8 sm:gap-9 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
-          <div className="flex min-w-0 flex-1 items-start gap-4 sm:gap-7 lg:items-start">
-            {thumbnail ? (
-              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg shadow-sm sm:h-20 sm:w-20">
-                <Image
-                  src={getImageUrl(thumbnail)}
-                  alt={thumbnailAlt}
-                  fill
-                  className="object-cover"
-                  sizes="80px"
-                />
-              </div>
-            ) : (
-              <div
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#3C62ED] shadow-sm sm:h-11 sm:w-11"
-                aria-hidden
-              >
-                <BarChart3
-                  className="h-[22px] w-[22px] text-white sm:h-6 sm:w-6"
-                  strokeWidth={2}
-                />
-              </div>
-            )}
-            <div className="min-w-0 flex-1 space-y-2.5 sm:space-y-3">
+      <div className="container mx-auto mb-10 px-4 lg:mb-20 lg:px-8">
+        <div className="flex flex-col overflow-hidden rounded-xl bg-[#f0f4f8] sm:flex-row sm:items-stretch">
+          {thumbnail ? (
+            <div className="relative h-40 w-full shrink-0 sm:h-auto sm:w-[150px] lg:w-[168px]">
+              <Image
+                src={getImageUrl(thumbnail)}
+                alt={thumbnailAlt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 150px, 168px"
+              />
+            </div>
+          ) : (
+            <div
+              className="flex h-40 w-full shrink-0 items-center justify-center bg-[#3C62ED] sm:h-auto sm:w-[150px] lg:w-[168px]"
+              aria-hidden
+            >
+              <BarChart3
+                className="h-8 w-8 text-white sm:h-10 sm:w-10"
+                strokeWidth={2}
+              />
+            </div>
+          )}
+
+          <div className="flex flex-1 flex-col gap-5 p-4 sm:flex-row sm:items-center sm:gap-6 sm:p-5 sm:pl-6 lg:gap-8 lg:p-6 lg:pl-8">
+            <div className="min-w-0 flex-1 space-y-2 sm:space-y-2.5">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                 <h2
                   id={`annual-report-heading-${documentItemId}`}
@@ -125,39 +142,12 @@ export function AnnualReportSection({
                   </span>
                 ) : null}
               </div>
-              <p className="max-w-4xl font-work-sans text-sm leading-[1.55] text-[#475569] sm:text-[15px] sm:leading-relaxed">
+              <p className="font-work-sans text-sm leading-[1.55] text-[#475569] sm:text-[15px] sm:leading-relaxed">
                 {description}
               </p>
             </div>
-          </div>
 
-          <div className="flex w-full shrink-0 justify-stretch sm:justify-start lg:w-auto lg:justify-end">
-            {canDownload && downloadUrl ? (
-              <a
-                href={downloadUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={buttonClassName}
-              >
-                <Download
-                  className="h-[18px] w-[18px] shrink-0 text-[#64748b] sm:h-5 sm:w-5"
-                  aria-hidden
-                />
-                {buttonText}
-              </a>
-            ) : (
-              <button
-                type="button"
-                disabled
-                className={buttonClassName}
-              >
-                <Download
-                  className="h-[18px] w-[18px] shrink-0 text-[#64748b] sm:h-5 sm:w-5"
-                  aria-hidden
-                />
-                {buttonText}
-              </button>
-            )}
+            <div className="w-full shrink-0 sm:w-auto">{ctaButton}</div>
           </div>
         </div>
       </div>

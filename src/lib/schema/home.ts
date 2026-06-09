@@ -202,7 +202,7 @@ export const HOME_SCHEMA: PageContentSchema = {
       type: "image",
       section: "Annual Report",
       helpText:
-        "Square image shown beside the title. Recommended size: 88×88px or larger.",
+        "Landscape image shown beside the title. Recommended size: 336×224px (3:2) or larger.",
     },
     {
       key: "annualReport.thumbnailAlt",
