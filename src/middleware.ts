@@ -80,7 +80,6 @@ export async function middleware(request: NextRequest) {
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/admin/") ||
-    pathname.startsWith("/monitoring") ||
     pathname.startsWith("/maintenance") ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/favicon.ico") ||
@@ -223,6 +222,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|admin|monitoring).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|admin).*)",
   ],
 };
