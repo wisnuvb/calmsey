@@ -19,10 +19,11 @@ Options:
   -h, --help      Show help
 
 Flow:
-  1. Run yarn build (abort if build fails)
+  1. Lint, type-check, dan next build lokal (abort if build fails)
   2. Commit staged changes
   3. Pull --rebase origin main
   4. Push origin main
+  5. Deploy: yarn deploy:prod (build lokal + upload .next ke server)
 EOF
 }
 
@@ -90,8 +91,10 @@ if [[ -z "$(git status --porcelain)" ]]; then
   exit 0
 fi
 
-echo "==> Build (must pass before commit & push)"
-yarn build
+echo "==> Build lokal (must pass before commit & push)"
+yarn lint
+yarn type-check
+yarn build:next
 
 echo
 read -r -p "Build OK. Continue with commit and push to origin/main? [y/N] " CONFIRM

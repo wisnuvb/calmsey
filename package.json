@@ -16,7 +16,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack --port 2039",
-    "build": "next build",
+    "build": "bash scripts/build-prod.sh",
+    "build:next": "next build --no-lint",
+    "deploy:prod": "bash scripts/push-build.sh",
+    "release:prod": "bash scripts/push-build.sh",
+    "pm2:restart": "bash scripts/pm2-restart.sh",
     "start": "next start",
     "postinstall": "node scripts/copy-tinymce.mjs",
     "lint": "next lint",
@@ -33,7 +37,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "build:glossary": "node scripts/build-glossary.mjs",
-    "release": "git pull && npm install --legacy-peer-deps && yarn build && pm2 restart ecosystem.config.js",
+    "release": "git pull && npm install --legacy-peer-deps && yarn build",
     "push:main": "bash scripts/push-main.sh"
   },
   "prisma": {
