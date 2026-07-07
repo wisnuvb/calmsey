@@ -13,11 +13,13 @@ import {
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { MicrosoftFormModal } from "./MicrosoftFormModal";
 import { Strategy2030DownloadLeadModal } from "./Strategy2030DownloadLeadModal";
+import type { ResourceDownloadModalSource } from "./Strategy2030DownloadLeadModal";
 
 interface RichTextWithEmbeddedModalsProps {
   html: string;
   className?: string;
   modalTitleIdPrefix?: string;
+  modalSource?: ResourceDownloadModalSource;
 }
 
 function ensureHttpsUrl(url: string): string {
@@ -33,6 +35,7 @@ export function RichTextWithEmbeddedModals({
   html,
   className,
   modalTitleIdPrefix = "rich-text-modal",
+  modalSource = "GUIDING_POLICIES",
 }: RichTextWithEmbeddedModalsProps) {
   const { languages: activeLanguages } = useActiveLanguages();
   const [formModal, setFormModal] = useState<{ title: string; url: string } | null>(
@@ -90,7 +93,7 @@ export function RichTextWithEmbeddedModals({
           downloadButtonText={downloadModal.downloadButtonText}
           documentTitle={downloadModal.title}
           documentItemId={downloadModal.documentItemId}
-          modalSource="GUIDING_POLICIES"
+          modalSource={modalSource}
           formFieldIdPrefix={`${modalTitleIdPrefix}-download`}
           headingId={`${modalTitleIdPrefix}-download-heading`}
           files={downloadModal.files}

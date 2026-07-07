@@ -301,11 +301,18 @@ function transformFundData(fund: Record<string, unknown>): FundDetail | null {
               // Parse section content (can be string or array)
               let sectionContent: string | string[] | undefined;
               if (section.content && typeof section.content === "string") {
-                const paragraphs = section.content
-                  .split(/\n\s*\n/)
-                  .map((p: string) => p.trim())
-                  .filter((p: string) => p.length > 0);
-                sectionContent = paragraphs.length === 1 ? paragraphs[0] : paragraphs;
+                const raw = section.content.trim();
+                const isHtml = /<[a-z][\s\S]*>/i.test(raw);
+                if (isHtml) {
+                  sectionContent = raw;
+                } else {
+                  const paragraphs = raw
+                    .split(/\n\s*\n/)
+                    .map((p: string) => p.trim())
+                    .filter((p: string) => p.length > 0);
+                  sectionContent =
+                    paragraphs.length === 1 ? paragraphs[0] : paragraphs;
+                }
               }
 
               // Parse section items

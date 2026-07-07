@@ -11,7 +11,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { H3, P } from "../ui/typography";
-import { RichText } from "../ui/RichText";
+import { FundDetailSectionContent } from "./FundDetailSectionContent";
 import type { CTA, FundContent } from "@/types/fund-detail";
 import { cn } from "@/lib/utils";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
@@ -202,13 +202,6 @@ export function FundDetailContent({ content, fundSlug }: FundDetailContentProps)
       ? createPortal(pdfModalSection, document.body)
       : pdfModalSection;
 
-  const renderParagraphWithHtml = (text: string, key?: string) => (
-    <RichText
-      key={key}
-      content={text}
-      className="text-[#060726CC] p [&_a]:text-[#3C62ED] [&_a]:underline [&_a:hover]:text-[#2d4fd6]"
-    />
-  );
 
   // Render based on content type
   if (content.type === "supported-unsupported") {
@@ -394,7 +387,11 @@ export function FundDetailContent({ content, fundSlug }: FundDetailContentProps)
                     {Array.isArray(section.content) ? (
                       section.content.map((para, index) =>
                         hasHtml(para) ? (
-                          renderParagraphWithHtml(para, `content-${index}`)
+                          <FundDetailSectionContent
+                            key={`content-${index}`}
+                            content={para}
+                            modalIdPrefix={`fund-detail-${fundSlug}-s${section.id}-c${index}`}
+                          />
                         ) : (
                           <P
                             key={index}
@@ -406,7 +403,10 @@ export function FundDetailContent({ content, fundSlug }: FundDetailContentProps)
                         ),
                       )
                     ) : hasHtml(section.content) ? (
-                      renderParagraphWithHtml(section.content)
+                      <FundDetailSectionContent
+                        content={section.content}
+                        modalIdPrefix={`fund-detail-${fundSlug}-s${section.id}`}
+                      />
                     ) : (
                       <P style="p1reg" className="text-[#060726CC] p">
                         {section.content}
@@ -446,23 +446,32 @@ export function FundDetailContent({ content, fundSlug }: FundDetailContentProps)
                   )}
 
                 {section.items && !section.actionPlanItems && (
-                  <ul className="space-y-4">
-                    {section.items.map((item) => (
-                      <li key={item.id} className="flex items-start gap-4">
-                        {item.icon && renderIcon(item.icon)}
-                        <div className="flex-1">
-                          {item.title && (
-                            <h4 className="font-semibold text-[#010107] mb-1 font-nunito">
-                              {item.title}
-                            </h4>
+                  <div className="border-l-4 border-[#FACC15] pl-6">
+                    <ul className="m-0 list-none space-y-4 p-0">
+                      {section.items.map((item) => (
+                        <li key={item.id} className="flex items-start gap-4">
+                          {item.icon ? (
+                            renderIcon(item.icon)
+                          ) : (
+                            <CheckCircle2
+                              className="mt-0.5 h-6 w-6 flex-shrink-0 text-[#5ABF87]"
+                              aria-hidden
+                            />
                           )}
-                          <P style="p1reg" className="text-[#060726CC] p">
-                            {item.description}
-                          </P>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                          <div className="flex-1">
+                            {item.title && (
+                              <h4 className="mb-1 font-nunito font-semibold text-[#010107]">
+                                {item.title}
+                              </h4>
+                            )}
+                            <P style="p1reg" className="text-[#060726CC] p">
+                              {item.description}
+                            </P>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
             ))}

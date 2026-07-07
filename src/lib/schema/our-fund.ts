@@ -1172,9 +1172,10 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
               required: false,
               placeholder: "Content paragraph.\n\nAnother paragraph.",
               helpText:
-                "Content paragraphs (separated by double newline). Supports HTML for links.",
+                "Content paragraphs and lists. Use the download-link toolbar button (next to Link) to add clickable download links that open a language picker modal on the public site.",
               editorOptions: {
                 height: 300,
+                enableDownloadModal: true,
               },
             },
             {
