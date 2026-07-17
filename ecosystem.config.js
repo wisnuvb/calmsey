@@ -9,10 +9,15 @@ module.exports = {
       exec_mode: "fork",
       env: {
         NODE_ENV: "production",
+        PORT: "2039",
       },
+      // Auto-restart saat crash / OOM (default true; ditulis eksplisit)
+      autorestart: true,
+      restart_delay: 3000,
+      exp_backoff_restart_delay: 100,
       // Memory & restart
-      max_memory_restart: "512M",
-      max_restarts: 10,
+      max_memory_restart: "1536M",
+      max_restarts: 15,
       min_uptime: "10s",
       // Graceful shutdown
       kill_timeout: 15000,

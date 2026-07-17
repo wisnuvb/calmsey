@@ -22,20 +22,29 @@ function firstForwarded(header: string | null): string | null {
 }
 
 /**
- * Origin untuk self-fetch middleware → /api/public/languages dari Edge Runtime.
+ * Origin untuk self-fetch middleware → /api/public/languages.
  *
- * Di production, `request.nextUrl.origin` sering salah (mis. internal host / localhost),
- * sehingga fetch gagal dan kita selalu pakai FALLBACK `["en","id"]` — locale lain di URL
- * di-strip atau diarahkan salah.
+ * Di VPS/PM2, fetch lewat domain publik sering kena redirect loop nginx
+ * (http→https, IP→domain, www↔non-www) → "redirect count exceeded".
  *
  * Urutan prioritas:
- * 1. `NEXT_PUBLIC_SITE_URL` atau `NEXT_PUBLIC_APP_URL` (domain publik, disarankan diset di prod)
- * 2. `VERCEL_URL` (hostname deployment Vercel, scheme https)
- * 3. Header `x-forwarded-host` + `x-forwarded-proto`
- * 4. Header `Host` + protocol dari NextRequest
- * 5. `request.nextUrl.origin`
+ * 1. Production self-hosted: `http://127.0.0.1:PORT` (langsung ke proses Next.js, tanpa nginx)
+ * 2. `MIDDLEWARE_INTERNAL_ORIGIN` (override manual, mis. port berbeda)
+ * 3. `NEXT_PUBLIC_SITE_URL` / `NEXT_PUBLIC_APP_URL` (Vercel / fallback)
+ * 4. `VERCEL_URL`
+ * 5. Header proxy / `request.nextUrl.origin`
  */
 export function resolveMiddlewareFetchOrigin(request: NextRequest): string {
+  const internalOverride = process.env.MIDDLEWARE_INTERNAL_ORIGIN?.trim();
+  if (internalOverride) {
+    return internalOverride.replace(/\/+$/, "");
+  }
+
+  if (process.env.NODE_ENV === "production" && !process.env.VERCEL_URL) {
+    const port = (process.env.PORT || "2039").trim();
+    return `http://127.0.0.1:${port}`;
+  }
+
   const fromEnv = (
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||

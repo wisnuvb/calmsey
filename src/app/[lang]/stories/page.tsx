@@ -1,7 +1,6 @@
 import React from "react";
 import {
   AllStoriesListSection,
-  CommunityStoriesSection,
   FeedbackCalloutSection,
   HeroSection,
 } from "@/components/main";

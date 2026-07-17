@@ -1,5 +1,4 @@
 import {
-  FundingAcceptancePolicySection,
   GovernanceMeaningSection,
   GovernancePolicyContactSection,
   GuidingPoliciesSection,
