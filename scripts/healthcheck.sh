@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
-# Cek apakah Next.js merespons; restart PM2 jika tidak.
-# Pasang di cron, mis. tiap 2 menit:
+# Wrapper cron: muat Node/PM2 path lalu jalankan healthcheck + email alert.
+#
+# Cron (tiap 2 menit):
 #   */2 * * * * /var/www/html/projects/turningtidesfacility/scripts/healthcheck.sh >> /var/www/html/projects/turningtidesfacility/logs/healthcheck.log 2>&1
 set -euo pipefail
 
-APP_NAME="turningtidesfacility"
-PORT="${PORT:-2039}"
-URL="http://127.0.0.1:${PORT}/api/public/languages"
-MAX_TIME=10
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
 
-if curl -sf --max-time "$MAX_TIME" -H "Accept: application/json" "$URL" >/dev/null; then
-  exit 0
+# NVM / PM2 path (sesuaikan versi Node di server jika perlu)
+export PATH="$HOME/.nvm/versions/node/v22.21.1/bin:$PATH"
+if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
+  # shellcheck source=/dev/null
+  source "$HOME/.nvm/nvm.sh"
 fi
 
-echo "$(date -Iseconds) [healthcheck] FAIL $URL — restarting $APP_NAME"
-pm2 restart "$APP_NAME" --update-env || pm2 start ecosystem.config.js --only "$APP_NAME"
+exec node "$ROOT/scripts/server-healthcheck.mjs"

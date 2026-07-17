@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ROLE_ADMIN } from "@/lib/auth-helpers";
 import { clearLanguageCache } from "@/lib/dynamic-languages";
+import {
+  GMAIL_PASSWORD_MASK,
+  SECRET_SETTING_KEYS,
+  maskSecretSettings,
+} from "@/lib/email/constants";
 
 export async function GET() {
   try {
@@ -21,7 +26,7 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: {
-        siteSettings,
+        siteSettings: maskSecretSettings(siteSettings),
         languages,
       },
     });
@@ -46,6 +51,13 @@ export async function PUT(request: NextRequest) {
       // Update site settings
       if (siteSettings) {
         for (const setting of siteSettings) {
+          if (
+            SECRET_SETTING_KEYS.has(setting.key) &&
+            (!setting.value?.trim() || setting.value === GMAIL_PASSWORD_MASK)
+          ) {
+            continue;
+          }
+
           await tx.siteSetting.upsert({
             where: { key: setting.key },
             update: {

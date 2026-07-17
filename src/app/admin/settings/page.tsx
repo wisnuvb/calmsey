@@ -9,6 +9,7 @@ import {
   CloudArrowUpIcon,
   CheckIcon,
   ExclamationTriangleIcon,
+  EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 import { GeneralSettings } from "@/components/admin/Settings/GeneralSettings";
 import { Language, SettingsData } from "@/components/admin/Settings/type";
@@ -33,7 +34,7 @@ export default function SettingsPage() {
     { id: "general", label: "General", icon: CogIcon },
     { id: "languages", label: "Languages", icon: GlobeAltIcon },
     { id: "security", label: "Security", icon: ShieldCheckIcon },
-    // { id: "email", label: "Email", icon: EnvelopeIcon },
+    { id: "email", label: "Email", icon: EnvelopeIcon },
     { id: "media", label: "Media", icon: PhotoIcon },
     // { id: "notifications", label: "Notifications", icon: BellIcon },
     { id: "backup", label: "Backup", icon: CloudArrowUpIcon },
@@ -82,12 +83,17 @@ export default function SettingsPage() {
   };
 
   const updateSetting = (key: string, value: string) => {
-    setSettings((prev) => ({
-      ...prev,
-      siteSettings: prev.siteSettings.map((setting) =>
-        setting.key === key ? { ...setting, value } : setting
-      ),
-    }));
+    setSettings((prev) => {
+      const exists = prev.siteSettings.some((s) => s.key === key);
+      return {
+        ...prev,
+        siteSettings: exists
+          ? prev.siteSettings.map((setting) =>
+              setting.key === key ? { ...setting, value } : setting,
+            )
+          : [...prev.siteSettings, { key, value, type: "TEXT" }],
+      };
+    });
     setUnsavedChanges(true);
   };
 

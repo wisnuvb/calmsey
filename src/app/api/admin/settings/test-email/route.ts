@@ -1,5 +1,11 @@
 import { requireAuth, ROLE_ADMIN } from "@/lib/auth-helpers";
-import { prisma } from "@/lib/prisma";
+import { parseEmailRecipients } from "@/lib/email/constants";
+import {
+  fetchGmailSettingsFromDb,
+  getSiteDisplayName,
+  isGmailConfigured,
+  sendGmailMessage,
+} from "@/lib/email/gmail-mailer";
 import { NextResponse } from "next/server";
 
 export async function POST() {
@@ -7,57 +13,36 @@ export async function POST() {
     const authResult = await requireAuth(ROLE_ADMIN);
     if (!authResult.success) return authResult.response;
 
-    // Get email settings
-    const emailSettings = await prisma.siteSetting.findMany({
-      where: {
-        key: {
-          in: ["smtp_host", "smtp_port", "from_email", "from_name"],
+    const settings = await fetchGmailSettingsFromDb();
+
+    if (!isGmailConfigured(settings)) {
+      return NextResponse.json(
+        {
+          error:
+            "Complete Gmail address, App Password, and alert recipient emails, then save.",
         },
-      },
+        { status: 400 },
+      );
+    }
+
+    const recipients = parseEmailRecipients(settings.server_alert_emails);
+    const siteName = getSiteDisplayName(settings);
+
+    await sendGmailMessage({
+      settings,
+      subject: `[${siteName}] Test email — Gmail configuration OK`,
+      text: `Test email from the ${siteName} admin panel.\n\nIf you received this message, Gmail is configured correctly for server alerts.`,
+      html: `<p>Test email from <strong>${siteName}</strong>.</p><p>If you received this message, Gmail is configured correctly for server alerts.</p>`,
     });
-
-    const settingsMap = emailSettings.reduce((acc, setting) => {
-      acc[setting.key] = setting.value;
-      return acc;
-    }, {} as Record<string, string>);
-
-    // TODO: Implement email sending logic with nodemailer or your preferred email service
-    // For now, we'll simulate a successful test
-
-    console.log("Test email settings:", settingsMap);
-
-    // Example with nodemailer (you'd need to install it):
-    /*
-    const nodemailer = require('nodemailer');
-    
-    const transporter = nodemailer.createTransporter({
-      host: settingsMap.smtp_host,
-      port: parseInt(settingsMap.smtp_port || '587'),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: `${settingsMap.from_name} <${settingsMap.from_email}>`,
-      to: session.user.email,
-      subject: 'Test Email from CMS',
-      text: 'This is a test email to verify your email configuration.',
-      html: '<p>This is a test email to verify your email configuration.</p>',
-    });
-    */
 
     return NextResponse.json({
       success: true,
-      message: "Test email sent successfully",
+      message: `Test email sent to: ${recipients.join(", ")}`,
     });
   } catch (error) {
     console.error("Test email error:", error);
-    return NextResponse.json(
-      { error: "Failed to send test email" },
-      { status: 500 }
-    );
+    const message =
+      error instanceof Error ? error.message : "Failed to send test email";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

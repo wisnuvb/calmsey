@@ -794,6 +794,10 @@ async function main() {
     },
     { key: "google_analytics_id", value: "", type: "TEXT" as const },
     { key: "maintenance_mode", value: "false", type: "BOOLEAN" as const },
+    { key: "gmail_address", value: "", type: "TEXT" as const },
+    { key: "gmail_app_password", value: "", type: "TEXT" as const },
+    { key: "server_alert_emails", value: "", type: "TEXT" as const },
+    { key: "from_name", value: "Turning Tides Facility", type: "TEXT" as const },
   ];
 
   for (const setting of siteSettings) {
