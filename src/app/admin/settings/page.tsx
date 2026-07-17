@@ -91,7 +91,10 @@ export default function SettingsPage() {
           ? prev.siteSettings.map((setting) =>
               setting.key === key ? { ...setting, value } : setting,
             )
-          : [...prev.siteSettings, { key, value, type: "TEXT" }],
+          : [
+              ...prev.siteSettings,
+              { id: crypto.randomUUID(), key, value, type: "TEXT" as const },
+            ],
       };
     });
     setUnsavedChanges(true);

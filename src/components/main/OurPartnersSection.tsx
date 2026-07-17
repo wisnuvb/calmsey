@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 
 interface Partner {
@@ -23,18 +21,15 @@ interface OurPartnersSectionProps {
   backgroundColor?: string;
 }
 
-const defaultPartners: Partner[] = [];
-
 export const OurPartnersSection: React.FC<OurPartnersSectionProps> = ({
   title: propTitle,
   description: propDescription,
-  partners: propPartners,
   // callToActionText: propCallToActionText,
   // buttonText: propButtonText,
   // buttonLink: propButtonLink,
   backgroundColor: propBackgroundColor,
 }) => {
-  const { getValue, getContentJSON } = usePageContentHelpers()
+  const { getValue } = usePageContentHelpers()
 
   // Get all values with priority: context > props > default
   const title = getValue("partners.title", propTitle, "Our Partners");

@@ -20,7 +20,6 @@ interface SelectFieldProps {
 type LangRow = { id: string; name: string; flag?: string | null };
 
 export function SelectField({ field, value, onChange, error }: SelectFieldProps) {
-  const staticOptions = field.options || [];
   const optionsFrom = field.optionsFrom;
 
   const [langOptions, setLangOptions] = useState<
@@ -72,8 +71,8 @@ export function SelectField({ field, value, onChange, error }: SelectFieldProps)
       }
       return base;
     }
-    return staticOptions;
-  }, [optionsFrom, langOptions, staticOptions, value]);
+    return field.options || [];
+  }, [optionsFrom, langOptions, field.options, value]);
 
   const loadingLanguages =
     optionsFrom === "languages" && langOptions === null;
