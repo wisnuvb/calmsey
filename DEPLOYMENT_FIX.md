@@ -130,6 +130,25 @@ Untuk mencegah error ini di masa depan:
 
 3. **Pastikan `.next` folder di-ignore di git** (sudah ada di `.gitignore`)
 
+4. **Jika API public 500 (languages/footer) dan log berisi `must start with the protocol mysql://`:**
+   PM2 mungkin menyuntikkan `DATABASE_URL` dari proyek lain (mis. PostgreSQL `supporter`), menimpa `.env` MySQL.
+
+   ```bash
+   cd /var/www/html/projects/turningtidesfacility
+   grep '^DATABASE_URL=' .env   # harus mysql://...
+   pm2 env 0 | grep DATABASE_URL  # jika postgresql://... → env tercemar
+
+   # Perbaikan: hapus dump proses lama, start bersih
+   pm2 delete turningtidesfacility
+   pm2 start ecosystem.config.js --only turningtidesfacility
+   pm2 save
+
+   # Atau gunakan script (setelah di-pull ke server):
+   bash scripts/pm2-ensure.sh
+   ```
+
+   Log aktual PM2: `logs/error-{pm_id}.log` (bukan `logs/error.log` literal).
+
 ## Catatan
 
 - Error ini biasanya terjadi setelah update Next.js atau perubahan besar di routing

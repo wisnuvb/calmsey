@@ -22,7 +22,7 @@ module.exports = {
       // Graceful shutdown
       kill_timeout: 15000,
       listen_timeout: 10000,
-      // Logging
+      // Logging — PM2 menulis out-{pm_id}.log / error-{pm_id}.log (bukan out.log literal)
       output: "/var/www/html/projects/turningtidesfacility/logs/out.log",
       error: "/var/www/html/projects/turningtidesfacility/logs/error.log",
       log_date_format: "YYYY-MM-DD HH:mm:ss Z",

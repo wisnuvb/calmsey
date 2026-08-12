@@ -37,8 +37,8 @@ echo "==> Next.js build"
 yarn build:next
 
 if [ "$PM2_REGISTERED" = "1" ]; then
-  echo "==> Restart PM2 $PM2_APP"
-  pm2 restart "$PM2_APP" --update-env || pm2 start ecosystem.config.js --only "$PM2_APP"
+  echo "==> Restart PM2 $PM2_APP (env bersih via pm2-ensure.sh)"
+  bash "$ROOT/scripts/pm2-ensure.sh"
 fi
 
 echo "==> Build selesai"

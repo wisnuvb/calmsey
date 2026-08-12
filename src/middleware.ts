@@ -76,13 +76,17 @@ function matchedPathLocale(
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Skip middleware for API routes, admin routes, maintenance page, and static files
+  // Skip middleware for API routes, admin routes, maintenance page, and static files.
+  // Juga skip probe WordPress (/wp-json, /wp-admin) agar tidak di-rewrite lalu di-proxy.
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/admin/") ||
     pathname.startsWith("/maintenance") ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/favicon.ico") ||
+    pathname.startsWith("/wp-json") ||
+    pathname.startsWith("/wp-admin") ||
+    pathname.startsWith("/xmlrpc.php") ||
     pathname.match(/\.(jpg|jpeg|png|gif|svg|css|js|ico|woff|woff2|ttf|eot)$/) ||
     pathname.includes(".")
   ) {
@@ -105,21 +109,23 @@ function firstForwardedValue(header: string | null): string | null {
   return first?.trim() ?? null;
 }
 
-function handleLanguageRouting(
-  request: NextRequest,
-  supportedLanguages: string[],
-  defaultLanguage: string
-) {
-  const pathname = request.nextUrl.pathname;
-  const searchParams = request.nextUrl.search;
-  const activeLanguage = resolveActiveLanguage(
-    request,
-    supportedLanguages,
-    defaultLanguage
-  );
+/**
+ * Origin publik untuk redirect browser.
+ * Jangan pakai IP mentah di production — sertifikat SSL hanya untuk domain,
+ * dan rewrite absolut ke IP membuat Next.js mem-proxy HTTPS → ERR_TLS_CERT_ALTNAME_INVALID.
+ */
+function resolvePublicOrigin(request: NextRequest): string {
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    ""
+  ).trim();
+  if (siteUrl) {
+    const trimmed = siteUrl.replace(/\/+$/, "");
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return `https://${trimmed}`;
+  }
 
-  // Get the correct origin, handling proxy/load balancer scenarios
-  // Priority: x-forwarded-host header > host header > nextUrl.origin
   const forwardedHost = firstForwardedValue(
     request.headers.get("x-forwarded-host")
   );
@@ -127,28 +133,44 @@ function handleLanguageRouting(
     firstForwardedValue(request.headers.get("x-forwarded-proto")) || "https";
   const host = firstForwardedValue(request.headers.get("host"));
 
-  let origin: string;
-  if (forwardedHost) {
-    // Use forwarded host if available (common in production with proxy/load balancer)
-    origin = `${forwardedProto}://${forwardedHost}`;
-  } else if (host) {
-    // Fallback to host header
-    const protocol = request.nextUrl.protocol || forwardedProto;
-    origin = `${protocol}//${host}`;
-  } else {
-    // Last resort: use nextUrl.origin
-    origin = request.nextUrl.origin;
+  const isIpHost = (h: string) =>
+    /^\d{1,3}(\.\d{1,3}){3}(:\d+)?$/.test(h) || h.startsWith("[");
+
+  if (forwardedHost && !isIpHost(forwardedHost)) {
+    return `${forwardedProto}://${forwardedHost}`;
   }
 
-  // Ensure origin doesn't contain localhost in production
-  // This is a safety check
-  if (process.env.NODE_ENV === "production" && origin.includes("localhost")) {
-    console.warn("Warning: Origin contains localhost in production:", origin);
-    // Try to construct from host header as fallback
-    if (host && !host.includes("localhost")) {
-      origin = `${forwardedProto}://${host}`;
-    }
+  if (host && !isIpHost(host)) {
+    const protocol =
+      request.nextUrl.protocol === "http:" || request.nextUrl.protocol === "https:"
+        ? request.nextUrl.protocol.replace(/:$/, "")
+        : forwardedProto;
+    return `${protocol}://${host}`;
   }
+
+  // Hindari origin berbasis IP (proxy TLS gagal); fallback ke nextUrl bila bukan IP
+  const nextOrigin = request.nextUrl.origin;
+  try {
+    const nextHost = new URL(nextOrigin).hostname;
+    if (!isIpHost(nextHost)) return nextOrigin;
+  } catch {
+    /* ignore */
+  }
+
+  return `${forwardedProto}://turningtidesfacility.org`;
+}
+
+function handleLanguageRouting(
+  request: NextRequest,
+  supportedLanguages: string[],
+  defaultLanguage: string
+) {
+  const pathname = request.nextUrl.pathname;
+  const activeLanguage = resolveActiveLanguage(
+    request,
+    supportedLanguages,
+    defaultLanguage
+  );
 
   const localeFromPath = matchedPathLocale(pathname, supportedLanguages);
   if (localeFromPath) {
@@ -178,8 +200,9 @@ function handleLanguageRouting(
       withoutInvalid === "/"
         ? `/${activeLanguage}`
         : `/${activeLanguage}${withoutInvalid}`;
-    const newUrl = new URL(newPath, origin);
-    newUrl.search = searchParams;
+    // Redirect: absolut URL dengan domain publik (bukan IP)
+    const newUrl = new URL(newPath, resolvePublicOrigin(request));
+    newUrl.search = request.nextUrl.search;
     const res = NextResponse.redirect(newUrl, 307);
     res.cookies.set(
       LOCALE_COOKIE_NAME,
@@ -189,28 +212,21 @@ function handleLanguageRouting(
     return res;
   }
 
-  // Path tanpa lang: REWRITE agar URL browser & hash tetap
+  // Rewrite HARUS memakai nextUrl.clone() (same-origin).
+  // Absolute URL ke host/IP lain → Next.js proxy eksternal → TLS error di production.
+  const rewriteUrl = request.nextUrl.clone();
   if (pathname !== "/") {
-    const newUrl = new URL(`/${activeLanguage}${pathname}`, origin);
-    newUrl.search = searchParams;
-    const res = NextResponse.rewrite(newUrl);
-    res.cookies.set(
-      LOCALE_COOKIE_NAME,
-      activeLanguage,
-      localeCookieOptions()
-    );
-    return res;
+    rewriteUrl.pathname = `/${activeLanguage}${pathname}`;
+  } else {
+    rewriteUrl.pathname = `/${activeLanguage}`;
   }
-
-  // Root: REWRITE ke locale aktif; URL browser tetap "/"
-  const rootUrl = new URL(`/${activeLanguage}`, origin);
-  const rootRes = NextResponse.rewrite(rootUrl);
-  rootRes.cookies.set(
+  const res = NextResponse.rewrite(rewriteUrl);
+  res.cookies.set(
     LOCALE_COOKIE_NAME,
     activeLanguage,
     localeCookieOptions()
   );
-  return rootRes;
+  return res;
 }
 
 export const config = {

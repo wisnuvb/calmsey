@@ -67,8 +67,8 @@ echo "==> Upload .next ke server"
 rsync -az --delete --progress \
   .next/ "$DEPLOY_SERVER:$DEPLOY_PATH/.next/"
 
-echo "==> Restart PM2 $PM2_APP"
-ssh_cmd "cd '$DEPLOY_PATH' && pm2 restart '$PM2_APP' --update-env || pm2 start ecosystem.config.js --only '$PM2_APP'"
+echo "==> Restart PM2 $PM2_APP (env bersih via pm2-ensure.sh)"
+ssh_cmd "cd '$DEPLOY_PATH' && bash scripts/pm2-ensure.sh"
 
 echo "==> Deploy selesai"
 echo "    Server: $DEPLOY_SERVER:$DEPLOY_PATH"
