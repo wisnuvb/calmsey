@@ -319,7 +319,7 @@ export const OUR_APPROACH_SCHEMA: PageContentSchema = {
           required: false,
           placeholder: "/assets/example-modal-hero.jpg",
           helpText:
-            "Background image for the left side of the PDF download modal. If empty, the tab’s main Image URL is used; if that is also empty, a solid gradient is shown.",
+            "Background image for the left side of the PDF download modal. If empty, the tab’s main Image URL is used; if that is also empty, a default community photo is shown.",
         },
         {
           key: "downloadModalImageAlt",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { CheckCircle2, Shield, Flag, Info, FileDown, X, FileText } from "lucide-react";
 import { cn, getImageUrl } from "@/lib/utils";
@@ -8,11 +8,6 @@ import { RichText } from "../ui/RichText";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { useLanguage } from "../public/LanguageProvider";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
-import { CountryCombobox } from "@/components/ui/country-combobox";
-import {
-  getCountrySelectOptions,
-  getCountryLabelForValue,
-} from "@/lib/countries";
 import { LanguageVariantPicker } from "@/components/main/LanguageVariantPicker";
 import { orderDownloadFilesEnglishFirst } from "@/lib/download-language-order";
 import { createDownloadLanguageNameResolver } from "@/lib/download-language-labels";
@@ -103,6 +98,39 @@ interface GrantmakingSectionProps {
   contentKey?: string; // Key to read from pageContent context (e.g., "grantmaking.navigationItems" or "support.navigationItems")
 }
 
+/** Hero image when CMS has no download modal / tab image configured. */
+const GRANTMAKING_DOWNLOAD_MODAL_DEFAULT_HERO =
+  "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png";
+
+/** Only if a tab has no modal intro and no first paragraph (edge case). */
+const GRANTMAKING_DOWNLOAD_MODAL_FALLBACK_BLURB =
+  "Learn more in our grantmaking framework document.";
+
+const GRANTMAKING_TENURE_DOWNLOAD_MODAL_INTRO =
+  "Learn more in our Marine, Coastal and Shoreline Tenure scoping report.";
+
+function applyDownloadModalDefaults(content: TabContent): TabContent {
+  const hasDownload =
+    (content.downloadFiles && content.downloadFiles.length > 0) ||
+    Boolean(content.downloadButtonUrl?.trim());
+
+  if (!hasDownload) return content;
+
+  const next = { ...content };
+
+  if (
+    !next.downloadModalImageSrc?.trim() &&
+    !next.imageSrc?.trim()
+  ) {
+    next.downloadModalImageSrc = GRANTMAKING_DOWNLOAD_MODAL_DEFAULT_HERO;
+    if (!next.downloadModalImageAlt?.trim()) {
+      next.downloadModalImageAlt = "Community fishing and livelihoods";
+    }
+  }
+
+  return next;
+}
+
 const defaultNavigationItems: NavigationItem[] = [
   {
     id: "approach",
@@ -140,13 +168,18 @@ const defaultNavigationItems: NavigationItem[] = [
   {
     id: "tenure",
     label: "What we understand by tenure",
-    content: {
+    content: applyDownloadModalDefaults({
       id: "tenure",
       title: "What we understand by tenure",
+      downloadModalIntro: GRANTMAKING_TENURE_DOWNLOAD_MODAL_INTRO,
+      downloadButtonLabel:
+        "Marine, Coastal and Shoreline Tenure — Scoping Report (2024)",
+      downloadButtonText: "Download",
+      downloadButtonUrl: "/downloads/marine-coastal-tenure-scoping-2024.pdf",
       paragraphs: [
         "Tenure refers to the relationship, whether legally or customarily defined, among people with respect to land, water, and resources. It determines who can use what resources, for how long, and under what conditions.",
       ],
-    },
+    }),
   },
   {
     id: "framework",
@@ -166,10 +199,6 @@ const defaultNavigationItems: NavigationItem[] = [
   },
 ];
 
-/** Only if a tab has no modal intro and no first paragraph (edge case). */
-const GRANTMAKING_DOWNLOAD_MODAL_FALLBACK_BLURB =
-  "Learn more in our grantmaking framework document.";
-
 function GrantmakingFrameworkDownloadModal({
   open,
   onClose,
@@ -188,13 +217,7 @@ function GrantmakingFrameworkDownloadModal({
   normalizeUrl: (url: string) => string;
 }) {
   const { language: currentLanguage } = useLanguage();
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [userCountry, setUserCountry] = useState("");
   const [selectedLangIndex, setSelectedLangIndex] = useState(0);
-  const [formError, setFormError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const countryOptions = useMemo(() => getCountrySelectOptions(), []);
 
   const orderedFiles = useMemo(
     () => orderDownloadFilesEnglishFirst(files),
@@ -208,11 +231,6 @@ function GrantmakingFrameworkDownloadModal({
 
   useEffect(() => {
     if (!open) return;
-    setFullName("");
-    setEmail("");
-    setUserCountry("");
-    setFormError("");
-    setIsSubmitting(false);
     const cur = currentLanguage.trim().toLowerCase();
     const idx = orderedFiles.findIndex(
       (f) => f.language.trim().toLowerCase() === cur,
@@ -220,76 +238,12 @@ function GrantmakingFrameworkDownloadModal({
     setSelectedLangIndex(idx >= 0 ? idx : 0);
   }, [open, orderedFiles, currentLanguage]);
 
-  const validateLeadForm = (): boolean => {
-    setFormError("");
-    if (!fullName.trim()) {
-      setFormError("Please enter your full name.");
-      return false;
-    }
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFormError("Please enter a valid email address.");
-      return false;
-    }
-    if (!userCountry.trim()) {
-      setFormError("Please select your country.");
-      return false;
-    }
-    return true;
-  };
-
-  const getLeadData = useCallback(() => {
-    const cc = userCountry.trim().toLowerCase();
-    return {
-      fullName: fullName.trim(),
-      email: email.trim(),
-      countryCode: cc,
-      countryLabel: getCountryLabelForValue(cc) ?? cc,
-    };
-  }, [fullName, email, userCountry]);
-
-  const handleDownload = async () => {
-    if (!validateLeadForm()) return;
+  const handleDownload = () => {
     const file = orderedFiles[selectedLangIndex];
     if (!file) return;
     const url = normalizeUrl(file.url);
-
-    setIsSubmitting(true);
-    setFormError("");
-    try {
-      const lead = getLeadData();
-      const res = await fetch("/api/resource-downloads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: lead.fullName,
-          email: lead.email,
-          countryCode: lead.countryCode,
-          countryLabel: lead.countryLabel,
-          modalSource: "GRANTMAKING_FRAMEWORK",
-          documentItemId: tabContent.id,
-          documentTitle: tabContent.title?.trim() || null,
-          selectorType: "language",
-          selectedOptionLabel: getLanguageName(file.language),
-          fileUrl: url,
-        }),
-      });
-      const data = (await res.json().catch(() => ({}))) as {
-        error?: string;
-      };
-      if (!res.ok) {
-        setFormError(
-          data.error ||
-            "Could not submit your details. Please try again shortly.",
-        );
-        return;
-      }
-      window.open(url, "_blank");
-      onClose();
-    } catch {
-      setFormError("Something went wrong. Check your connection and try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    window.open(url, "_blank");
+    onClose();
   };
 
   if (!open) return null;
@@ -299,6 +253,8 @@ function GrantmakingFrameworkDownloadModal({
   const blurbSource =
     intro ||
     firstParagraph ||
+    (tabContent.id === "tenure" ? GRANTMAKING_TENURE_DOWNLOAD_MODAL_INTRO : "") ||
+    tabContent.downloadButtonLabel?.trim() ||
     GRANTMAKING_DOWNLOAD_MODAL_FALLBACK_BLURB;
   const blurbRaw = blurbSource.replace(
     /\*\*(.*?)\*\*/g,
@@ -307,11 +263,10 @@ function GrantmakingFrameworkDownloadModal({
 
   const heroTitle = tabContent.title || "Our Grantmaking Framework";
 
-  const modalHeroSrc = (
+  const modalHeroSrc =
     tabContent.downloadModalImageSrc?.trim() ||
     tabContent.imageSrc?.trim() ||
-    ""
-  );
+    GRANTMAKING_DOWNLOAD_MODAL_DEFAULT_HERO;
   const modalHeroAlt =
     tabContent.downloadModalImageAlt?.trim() ||
     tabContent.imageAlt?.trim() ||
@@ -387,75 +342,28 @@ function GrantmakingFrameworkDownloadModal({
             </p>
           </div>
 
-          <div className="flex flex-1 flex-col px-6 pb-8 sm:px-8">
-            <div className="space-y-3">
-              <label htmlFor="grantmaking-dl-fullname" className="sr-only">
-                Full name
-              </label>
-              <input
-                id="grantmaking-dl-fullname"
-                type="text"
-                autoComplete="name"
-                placeholder="Full name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]"
+          <div className="flex flex-1 flex-col gap-4 px-6 pb-8 sm:px-8">
+            {langOptions.length > 0 ? (
+              <LanguageVariantPicker
+                options={langOptions}
+                selectedIndex={Math.min(
+                  selectedLangIndex,
+                  Math.max(0, langOptions.length - 1),
+                )}
+                onSelectIndex={setSelectedLangIndex}
+                placeholder="Select language"
+                className="w-full"
               />
-              <label htmlFor="grantmaking-dl-email" className="sr-only">
-                Email
-              </label>
-              <input
-                id="grantmaking-dl-email"
-                type="email"
-                autoComplete="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]"
-              />
-              <label htmlFor="grantmaking-dl-country" className="sr-only">
-                Country
-              </label>
-              <CountryCombobox
-                id="grantmaking-dl-country"
-                value={userCountry}
-                onValueChange={setUserCountry}
-                options={countryOptions}
-                placeholder="Select country"
-                aria-label="Select country"
-              />
-            </div>
-
-            {formError ? (
-              <p className="mt-3 text-sm text-red-600" role="alert">
-                {formError}
-              </p>
             ) : null}
-
-            <div className="mt-6 flex flex-col gap-4 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-              {langOptions.length > 0 ? (
-                <LanguageVariantPicker
-                  options={langOptions}
-                  selectedIndex={Math.min(
-                    selectedLangIndex,
-                    Math.max(0, langOptions.length - 1),
-                  )}
-                  onSelectIndex={setSelectedLangIndex}
-                  placeholder="Select language"
-                />
-              ) : null}
-              <button
-                type="button"
-                onClick={handleDownload}
-                disabled={isSubmitting || files.length === 0}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#3C62ED] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#2d4fd6] disabled:opacity-50 sm:w-auto sm:min-w-[200px]"
-              >
-                <FileDown className="h-5 w-5 shrink-0" aria-hidden />
-                {isSubmitting
-                  ? "Please wait…"
-                  : downloadButtonText?.trim() || "Download Now"}
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={files.length === 0}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#3C62ED] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#2d4fd6] disabled:opacity-50"
+            >
+              <FileDown className="h-5 w-5 shrink-0" aria-hidden />
+              {downloadButtonText?.trim() || "Download Now"}
+            </button>
           </div>
         </div>
       </div>
@@ -763,7 +671,11 @@ export function GrantmakingSection({
             ...(finalDownloadFiles.length > 0 && { downloadFiles: finalDownloadFiles }),
           },
         };
-      });
+      })
+      .map((item) => ({
+        ...item,
+        content: applyDownloadModalDefaults(item.content),
+      }));
   };
 
   // Get navigationItems with priority: context > props > default

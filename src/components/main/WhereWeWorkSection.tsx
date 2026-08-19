@@ -3,13 +3,10 @@
 import Image from "next/image";
 import { Download, X } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
 import { LanguageVariantPicker } from "@/components/main/LanguageVariantPicker";
-import { getCountryLabelForValue } from "@/lib/countries";
-import { CountryCombobox } from "@/components/ui/country-combobox";
 import { SearchableCombobox } from "@/components/ui/searchable-combobox";
-import { getCountrySelectOptions } from "@/lib/countries";
 import { orderLanguageLabelsEnglishFirst } from "@/lib/download-language-order";
 import { normalizeDownloadLanguageOption } from "@/lib/download-language-labels";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
@@ -328,39 +325,6 @@ function DownloadFilesModal({
   downloadButtonText: string;
   onClose: () => void;
 }) {
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [userCountry, setUserCountry] = useState("");
-  const [formError, setFormError] = useState("");
-  const countryOptions = useMemo(() => getCountrySelectOptions(), []);
-
-  const validateLeadForm = (): boolean => {
-    setFormError("");
-    if (!fullName.trim()) {
-      setFormError("Please enter your full name.");
-      return false;
-    }
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFormError("Please enter a valid email address.");
-      return false;
-    }
-    if (!userCountry.trim()) {
-      setFormError("Please select your country.");
-      return false;
-    }
-    return true;
-  };
-
-  const getLeadData = useCallback(() => {
-    const cc = userCountry.trim().toLowerCase();
-    return {
-      fullName: fullName.trim(),
-      email: email.trim(),
-      countryCode: cc,
-      countryLabel: getCountryLabelForValue(cc) ?? cc,
-    };
-  }, [fullName, email, userCountry]);
-
   const subtitleText = subtitle?.trim() ?? "";
 
   return (
@@ -399,64 +363,15 @@ function DownloadFilesModal({
           ) : null}
         </div>
 
-        <div className="px-6 sm:px-8 pb-8 space-y-5">
-          <div className="space-y-3">
-            <label htmlFor="download-modal-fullname" className="sr-only">
-              Full name
-            </label>
-            <input
-              id="download-modal-fullname"
-              type="text"
-              autoComplete="name"
-              placeholder="Full name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]"
+        <div className="px-6 sm:px-8 pb-8 space-y-6">
+          {items.map((item) => (
+            <DownloadItemRow
+              key={item.id}
+              item={item}
+              modalSource={modalSource}
+              downloadButtonText={downloadButtonText}
             />
-            <label htmlFor="download-modal-email" className="sr-only">
-              Email
-            </label>
-            <input
-              id="download-modal-email"
-              type="email"
-              autoComplete="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]"
-            />
-            <label htmlFor="download-modal-country" className="sr-only">
-              Country
-            </label>
-            <CountryCombobox
-              id="download-modal-country"
-              value={userCountry}
-              onValueChange={setUserCountry}
-              options={countryOptions}
-              placeholder="Select country"
-              aria-label="Country"
-            />
-          </div>
-
-          {formError ? (
-            <p className="text-sm text-red-600" role="alert">
-              {formError}
-            </p>
-          ) : null}
-
-          <div className="space-y-6 pt-1">
-            {items.map((item) => (
-              <DownloadItemRow
-                key={item.id}
-                item={item}
-                modalSource={modalSource}
-                downloadButtonText={downloadButtonText}
-                validateLeadForm={validateLeadForm}
-                getLeadData={getLeadData}
-                reportError={setFormError}
-              />
-            ))}
-          </div>
+          ))}
         </div>
       </div>
     </div>
@@ -467,21 +382,10 @@ function DownloadItemRow({
   item,
   modalSource,
   downloadButtonText,
-  validateLeadForm,
-  getLeadData,
-  reportError,
 }: {
   item: DownloadItem;
   modalSource: "ACTION_PLANS" | "PARTNERS";
   downloadButtonText: string;
-  validateLeadForm: () => boolean;
-  getLeadData: () => {
-    fullName: string;
-    email: string;
-    countryCode: string;
-    countryLabel: string;
-  };
-  reportError: (message: string) => void;
 }) {
   const { languages: activeLanguages } = useActiveLanguages();
 
@@ -496,7 +400,6 @@ function DownloadItemRow({
     return parsed;
   }, [item.downloadOptions, item.selectorType, activeLanguages]);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const variantOptions = useMemo(
     () =>
@@ -508,8 +411,7 @@ function DownloadItemRow({
     [options],
   );
 
-  const handleDownload = async () => {
-    if (!validateLeadForm()) return;
+  const handleDownload = () => {
     const opt = options[selectedIndex];
     if (!opt?.fileUrl) return;
 
@@ -518,42 +420,7 @@ function DownloadItemRow({
         ? opt.fileUrl
         : `https://${opt.fileUrl}`;
 
-    setIsSubmitting(true);
-    reportError("");
-    try {
-      const lead = getLeadData();
-      const res = await fetch("/api/resource-downloads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: lead.fullName,
-          email: lead.email,
-          countryCode: lead.countryCode,
-          countryLabel: lead.countryLabel,
-          modalSource,
-          documentItemId: item.id,
-          documentTitle: item.title?.trim() || null,
-          selectorType: item.selectorType,
-          selectedOptionLabel: opt.label,
-          fileUrl: url,
-        }),
-      });
-      const data = (await res.json().catch(() => ({}))) as {
-        error?: string;
-      };
-      if (!res.ok) {
-        reportError(
-          data.error ||
-            "Could not submit your details. Please try again shortly.",
-        );
-        return;
-      }
-      window.open(url, "_blank");
-    } catch {
-      reportError("Something went wrong. Check your connection and try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    window.open(url, "_blank");
   };
 
   const selectorPlaceholder =
@@ -608,12 +475,12 @@ function DownloadItemRow({
 
         <button
           type="button"
-          onClick={() => void handleDownload()}
-          disabled={options.length === 0 || isSubmitting}
+          onClick={() => handleDownload()}
+          disabled={options.length === 0}
           className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-lg bg-[#3C62ED] px-5 py-3.5 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#3558d4] disabled:cursor-not-allowed disabled:opacity-50 font-work-sans"
         >
           <Download className="h-5 w-5 shrink-0" aria-hidden />
-          {isSubmitting ? "Submitting…" : downloadButtonText}
+          {downloadButtonText}
         </button>
       </div>
     </div>

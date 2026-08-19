@@ -118,7 +118,7 @@ export function OurGoalSection({
   const strategyDownloadModalSubtitle = getValue(
     "goal.strategyDownloadModalSubtitle",
     undefined,
-    "Enter your details to download. We use this information to understand interest in our strategy document.",
+    "Select a language to download.",
   );
 
   const strategyDownloadModalButtonText = getValue(

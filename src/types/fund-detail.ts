@@ -67,7 +67,7 @@ export interface CTA {
   downloadModalTitle?: string;
   downloadModalSubtitle?: string;
   downloadModalButtonText?: string;
-  /** Stored with Download Activity submissions */
+  /** Optional document title for download modal context */
   downloadDocumentTitle?: string;
 }
 

@@ -286,7 +286,7 @@ export const HOME_SCHEMA: PageContentSchema = {
       type: "textarea",
       section: "Annual Report",
       defaultValue:
-        "Enter your details to download. We use this information to understand interest in our annual report.",
+        "Select a language to download.",
     },
     {
       key: "annualReport.downloadModalButtonText",
@@ -302,7 +302,7 @@ export const HOME_SCHEMA: PageContentSchema = {
       section: "Annual Report",
       defaultValue: "Turning Tides 2025 Annual Report",
       helpText:
-        "Stored with submissions in Download Activity; can match the section title",
+        "Optional label stored with the document title in analytics (legacy).",
     },
 
     // Grantmaking Section

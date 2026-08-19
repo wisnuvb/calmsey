@@ -173,7 +173,7 @@ export function FundDetailContent({ content, fundSlug }: FundDetailContentProps)
         }
         subtitle={
           pdfModalCta.downloadModalSubtitle?.trim() ||
-          "Enter your details to download. We use this information to understand interest in this document."
+          "Select a language to download."
         }
         downloadButtonText={
           pdfModalCta.downloadModalButtonText?.trim() || "Download now"

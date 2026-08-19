@@ -1,13 +1,9 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Download, X } from "lucide-react";
 import { useLanguage } from "@/components/public/LanguageProvider";
-import { CountryCombobox } from "@/components/ui/country-combobox";
-import {
-  getCountrySelectOptions,
-  getCountryLabelForValue,
-} from "@/lib/countries";
+import { getCountryLabelForValue } from "@/lib/countries";
 import { LanguageVariantPicker } from "@/components/main/LanguageVariantPicker";
 import { SearchableCombobox } from "@/components/ui/searchable-combobox";
 import { resolveCountryOptionFlagImgUrl } from "@/lib/country-flag";
@@ -57,15 +53,15 @@ type Props = {
 };
 
 /**
- * Modal lead + pemilih bahasa untuk unduhan Strategy 2030 (seragam Our Goal & banner home).
+ * Modal pemilih bahasa untuk unduhan Strategy 2030 (seragam Our Goal & banner home).
  */
 export function Strategy2030DownloadLeadModal({
   title,
   subtitle,
   downloadButtonText,
-  documentTitle,
-  documentItemId,
-  modalSource = "STRATEGY_2030",
+  documentTitle: _documentTitle,
+  documentItemId: _documentItemId,
+  modalSource: _modalSource = "STRATEGY_2030",
   formFieldIdPrefix,
   headingId,
   files,
@@ -75,9 +71,6 @@ export function Strategy2030DownloadLeadModal({
   onClose,
 }: Props) {
   const { language: currentLanguage } = useLanguage();
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [userCountry, setUserCountry] = useState("");
   const [selectedLangIndex, setSelectedLangIndex] = useState(() => {
     const ordered =
       fileSelectorType === "country"
@@ -90,9 +83,6 @@ export function Strategy2030DownloadLeadModal({
     return idx >= 0 ? idx : 0;
   });
   const [selectedCountryVariant, setSelectedCountryVariant] = useState("");
-  const [formError, setFormError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const countryOptions = useMemo(() => getCountrySelectOptions(), []);
 
   const fileListFingerprint = files
     .map((f) => `${f.language.trim()}:${f.url.trim()}`)
@@ -141,87 +131,18 @@ export function Strategy2030DownloadLeadModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, fileListFingerprint, fileSelectorType]);
 
-  const validateLeadForm = (): boolean => {
-    setFormError("");
-    if (!fullName.trim()) {
-      setFormError("Please enter your full name.");
-      return false;
-    }
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFormError("Please enter a valid email address.");
-      return false;
-    }
-    if (!userCountry.trim()) {
-      setFormError("Please select your country.");
-      return false;
-    }
-    return true;
-  };
-
-  const getLeadData = useCallback(() => {
-    const cc = userCountry.trim().toLowerCase();
-    return {
-      fullName: fullName.trim(),
-      email: email.trim(),
-      countryCode: cc,
-      countryLabel: getCountryLabelForValue(cc) ?? cc,
-    };
-  }, [fullName, email, userCountry]);
-
-  const handleDownload = async () => {
-    if (!validateLeadForm()) return;
+  const handleDownload = () => {
     const file =
       fileSelectorType === "country"
         ? orderedFiles.find((f) => f.language === selectedCountryVariant)
         : orderedFiles[selectedLangIndex];
     if (!file) return;
     const url = normalizeUrl(file.url);
-
-    setIsSubmitting(true);
-    setFormError("");
-    try {
-      const lead = getLeadData();
-      const selectedOptionLabel =
-        fileSelectorType === "country"
-          ? getCountryLabelForValue(file.language) ?? file.language
-          : getLanguageName(file.language);
-      const res = await fetch("/api/resource-downloads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: lead.fullName,
-          email: lead.email,
-          countryCode: lead.countryCode,
-          countryLabel: lead.countryLabel,
-          modalSource,
-          documentItemId,
-          documentTitle: documentTitle.trim() || null,
-          selectorType: fileSelectorType,
-          selectedOptionLabel,
-          fileUrl: url,
-        }),
-      });
-      const data = (await res.json().catch(() => ({}))) as {
-        error?: string;
-      };
-      if (!res.ok) {
-        setFormError(
-          data.error ||
-            "Could not submit your details. Please try again shortly.",
-        );
-        return;
-      }
-      window.open(url, "_blank");
-      onClose();
-    } catch {
-      setFormError("Something went wrong. Check your connection and try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    window.open(url, "_blank");
+    onClose();
   };
 
   const subtitleText = subtitle?.trim() ?? "";
-  const id = (suffix: string) => `${formFieldIdPrefix}-${suffix}`;
 
   return (
     <div
@@ -259,51 +180,7 @@ export function Strategy2030DownloadLeadModal({
           ) : null}
         </div>
 
-        <div className="px-6 sm:px-8 pb-8 space-y-5">
-          <div className="space-y-3">
-            <label htmlFor={id("fullname")} className="sr-only">
-              Full name
-            </label>
-            <input
-              id={id("fullname")}
-              type="text"
-              autoComplete="name"
-              placeholder="Full name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]"
-            />
-            <label htmlFor={id("email")} className="sr-only">
-              Email
-            </label>
-            <input
-              id={id("email")}
-              type="email"
-              autoComplete="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-transparent focus:ring-2 focus:ring-[#3C62ED]"
-            />
-            <label htmlFor={id("country")} className="sr-only">
-              Country
-            </label>
-            <CountryCombobox
-              id={id("country")}
-              value={userCountry}
-              onValueChange={setUserCountry}
-              options={countryOptions}
-              placeholder="Select country"
-              aria-label="Country"
-            />
-          </div>
-
-          {formError ? (
-            <p className="text-sm text-red-600" role="alert">
-              {formError}
-            </p>
-          ) : null}
-
+        <div className="px-6 sm:px-8 pb-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch pt-1">
             <div className="flex shrink-0 justify-center sm:justify-start sm:pt-0">
               {fileSelectorType === "country" ? (
@@ -343,12 +220,12 @@ export function Strategy2030DownloadLeadModal({
 
             <button
               type="button"
-              onClick={() => void handleDownload()}
-              disabled={orderedFiles.length === 0 || isSubmitting}
+              onClick={handleDownload}
+              disabled={orderedFiles.length === 0}
               className="inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-lg bg-[#3C62ED] px-5 py-3.5 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#3558d4] disabled:cursor-not-allowed disabled:opacity-50 font-work-sans"
             >
               <Download className="h-5 w-5 shrink-0" aria-hidden />
-              {isSubmitting ? "Submitting…" : downloadButtonText}
+              {downloadButtonText}
             </button>
           </div>
         </div>

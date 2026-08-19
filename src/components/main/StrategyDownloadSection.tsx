@@ -124,7 +124,7 @@ export function StrategyDownloadSection({
   const strategyDownloadModalSubtitle = getValue(
     "strategy.downloadModalSubtitle",
     undefined,
-    "Enter your details to download. We use this information to understand interest in our strategy document.",
+    "Select a language to download.",
   );
 
   const strategyDownloadModalButtonText = getValue(

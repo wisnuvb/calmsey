@@ -391,6 +391,11 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
             downloadButtonText: "Download",
             downloadButtonUrl:
               "/downloads/marine-coastal-tenure-scoping-2024.pdf",
+            downloadModalIntro:
+              "Learn more in our Marine, Coastal and Shoreline Tenure scoping report.",
+            downloadModalImageSrc:
+              "/assets/demo/f2646a1a9178debf7cb5581694b906ba8af3d607.png",
+            downloadModalImageAlt: "Community fishing and livelihoods",
           },
           {
             id: "framework",
@@ -1305,10 +1310,9 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           label: "CTA Download modal — subtitle",
           type: "textarea",
           required: false,
-          placeholder:
-            "Enter your details to download. We use this information to understand interest in this document.",
+          placeholder: "Select a language to download.",
           helpText:
-            "Text below the modal title (lead form instructions). Same pattern as Annual Report download modal.",
+            "Text below the modal title. Same pattern as Annual Report download modal.",
         },
         {
           key: "ctaDownloadModalButtonText",
@@ -1324,7 +1328,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
           required: false,
           placeholder: "Knowledge Action Fund Action Plan",
           helpText:
-            "Stored with submissions in Download Activity; can match the CTA Text",
+            "Optional label stored with the document title in analytics (legacy).",
         },
         {
           key: "ctaIcon",
@@ -1484,7 +1488,7 @@ export const OUR_FUND_SCHEMA: PageContentSchema = {
             ],
             ctaDownloadModalTitle: "Knowledge Action Fund Action Plan",
             ctaDownloadModalSubtitle:
-              "Enter your details to download. We use this information to understand interest in our action plan.",
+              "Select a language to download.",
             ctaDownloadModalButtonText: "Download now",
             ctaDownloadDocumentTitle:
               "Knowledge Action Fund Action Plan",
