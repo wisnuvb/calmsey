@@ -9,7 +9,29 @@ import { LanguageVariantPicker } from "@/components/main/LanguageVariantPicker";
 import { SearchableCombobox } from "@/components/ui/searchable-combobox";
 import { orderLanguageLabelsEnglishFirst } from "@/lib/download-language-order";
 import { normalizeDownloadLanguageOption } from "@/lib/download-language-labels";
+import { trackResourceDownload } from "@/lib/track-resource-download";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
+import { RichText } from "@/components/ui/RichText";
+
+const DEFAULT_ACTION_PLANS_TEXT =
+  '<p>We have <strong style="color: #3C62ED;">developed action plans for Latin America and Africa</strong>, and <strong style="color: #3C62ED;">mobilizing grants</strong> for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda.</p>';
+
+const DEFAULT_EXPLORATION_TEXT =
+  "<p>We are also in <strong>the exploration and engagement phase</strong> – Brazil, India, Indonesia, Sri Lanka, Thailand.</p>";
+
+const DEFAULT_PARTNERS_TEXT =
+  '<p>Our <strong>&quot;Partners Piloting&quot;</strong> partners were in Bangladesh, Thailand, Indonesia, Honduras, Senegal.</p>';
+
+const WHERE_WE_WORK_TEXT_CLASS =
+  "p min-w-0 text-gray-900 [&_p]:m-0 [&_p:not(:last-child)]:mb-2";
+
+function normalizeRichTextContent(content: string): string {
+  if (!content.trim()) return content;
+  if (/<[a-z][\s\S]*>/i.test(content.trim())) {
+    return content;
+  }
+  return content.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+}
 
 interface DownloadOption {
   label: string;
@@ -101,10 +123,12 @@ export function WhereWeWorkSection({
     "Where Does Turning Tides Work?",
   );
 
-  const actionPlansText = getValue(
-    "whereWeWork.actionPlansText",
-    propActionPlansText,
-    "We have **developed action plans for Latin America and Africa**, and **mobilizing grants** for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda.",
+  const actionPlansText = normalizeRichTextContent(
+    getValue(
+      "whereWeWork.actionPlansText",
+      propActionPlansText,
+      DEFAULT_ACTION_PLANS_TEXT,
+    ),
   );
 
   const actionPlansLinkText = getValue(
@@ -136,10 +160,12 @@ export function WhereWeWorkSection({
     propActionPlansItems || [],
   );
 
-  const explorationText = getValue(
-    "whereWeWork.explorationText",
-    propExplorationText,
-    "We are also in **the exploration and engagement phase** – Brazil, India, Indonesia, Sri Lanka, Thailand.",
+  const explorationText = normalizeRichTextContent(
+    getValue(
+      "whereWeWork.explorationText",
+      propExplorationText,
+      DEFAULT_EXPLORATION_TEXT,
+    ),
   );
 
   const mapImage = getValue(
@@ -151,10 +177,12 @@ export function WhereWeWorkSection({
   // Use getImageUrl with validation built-in
   const imageUrl = getImageUrl(mapImage, "/assets/world-map.jpg");
 
-  const partnersText = getValue(
-    "whereWeWork.partnersText",
-    propPartnersText,
-    'Our **"Partners Piloting"** partners were in Bangladesh, Thailand, Indonesia, Honduras, Senegal.',
+  const partnersText = normalizeRichTextContent(
+    getValue(
+      "whereWeWork.partnersText",
+      propPartnersText,
+      DEFAULT_PARTNERS_TEXT,
+    ),
   );
 
   const partnersLinkText = getValue(
@@ -185,18 +213,15 @@ export function WhereWeWorkSection({
         </div>
 
         {/* Legend Blocks */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10 mb-4 lg:mb-8 mx-auto px-3 sm:px-6 lg:px-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 mb-4 lg:mb-8 mx-auto px-3 sm:px-6 lg:px-0">
+          {/* Left column — Action Plans */}
           <div className="flex items-start gap-4 mx-auto w-full sm:px-1">
             <div className="w-4 h-4 bg-[#3C62ED] flex-shrink-0 mt-1" />
             <div className="min-w-0">
-              <p className="mb-2 p">
-                {actionPlansText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
-                  if (index % 2 === 1) {
-                    return <strong key={index}>{part}</strong>;
-                  }
-                  return <span key={index}>{part}</span>;
-                })}
-              </p>
+              <RichText
+                content={actionPlansText}
+                className={`mb-2 ${WHERE_WE_WORK_TEXT_CLASS}`}
+              />
               <button
                 type="button"
                 onClick={() =>
@@ -214,48 +239,43 @@ export function WhereWeWorkSection({
             </div>
           </div>
 
-          <div className="flex items-start gap-4 mx-auto w-full sm:px-1">
-            <div className="w-4 h-4 bg-[#7db5bb] flex-shrink-0 mt-1" />
-            <p className="p min-w-0 text-gray-900">
-              {explorationText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
-                if (index % 2 === 1) {
-                  return <strong key={index}>{part}</strong>;
-                }
-                return <span key={index}>{part}</span>;
-              })}
-            </p>
-          </div>
+          {/* Right column — Exploration + Partners */}
+          <div className="flex flex-col gap-6 lg:gap-8 mx-auto w-full sm:px-1">
+            <div className="flex items-start gap-4">
+              <div className="w-4 h-4 bg-[#7db5bb] flex-shrink-0 mt-1" />
+              <RichText
+                content={explorationText}
+                className={WHERE_WE_WORK_TEXT_CLASS}
+              />
+            </div>
 
-          <div className="flex items-start gap-4 mx-auto w-full sm:px-1">
-            <div
-              className="mt-1 box-border h-4 w-4 shrink-0 rounded-full border-[2px] border-[#172554] bg-transparent"
-              aria-hidden
-            />
-            <div className="min-w-0">
-              <p className="mb-2 p">
-                {partnersText.split(/\*\*(.*?)\*\*/g).map((part, index) => {
-                  if (index % 2 === 1) {
-                    return <strong key={index}>{part}</strong>;
-                  }
-                  return <span key={index}>{part}</span>;
-                })}
-              </p>
-              {!!partnersLinkText && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    partnersDownloadItems.length > 0 &&
-                    setPartnersModalOpen(true)
-                  }
-                  className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
-                >
-                  <span>{partnersLinkText}</span>
-                  <Download
-                    className="w-4 h-4 ml-1 group-hover:translate-y-0.5 transition-transform"
-                    aria-hidden
-                  />
-                </button>
-              )}
+            <div className="flex items-start gap-4">
+              <div
+                className="mt-1 box-border h-4 w-4 shrink-0 rounded-full border-[2px] border-[#172554] bg-transparent"
+                aria-hidden
+              />
+              <div className="min-w-0">
+                <RichText
+                  content={partnersText}
+                  className={`mb-2 ${WHERE_WE_WORK_TEXT_CLASS}`}
+                />
+                {!!partnersLinkText && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      partnersDownloadItems.length > 0 &&
+                      setPartnersModalOpen(true)
+                    }
+                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
+                  >
+                    <span>{partnersLinkText}</span>
+                    <Download
+                      className="w-4 h-4 ml-1 group-hover:translate-y-0.5 transition-transform"
+                      aria-hidden
+                    />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -419,6 +439,15 @@ function DownloadItemRow({
       opt.fileUrl.startsWith("/") || opt.fileUrl.startsWith("http")
         ? opt.fileUrl
         : `https://${opt.fileUrl}`;
+
+    trackResourceDownload({
+      modalSource,
+      documentItemId: item.id,
+      documentTitle: item.title?.trim() || null,
+      selectorType: item.selectorType,
+      selectedOptionLabel: opt.label,
+      fileUrl: url,
+    });
 
     window.open(url, "_blank");
   };

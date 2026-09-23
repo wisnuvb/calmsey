@@ -446,12 +446,20 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
     {
       key: "whereWeWork.actionPlansText",
       label: "Action Plans Text",
-      type: "textarea",
+      type: "html",
       section: "Where We Work",
       defaultValue:
-        "We have **developed action plans for Latin America and Africa**, and **mobilizing grants** for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda.",
+        '<p>We have <strong style="color: #3C62ED;">developed action plans for Latin America and Africa</strong>, and <strong style="color: #3C62ED;">mobilizing grants</strong> for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda.</p>',
       helpText:
-        "Text describing action plans (use **text** for bold formatting)",
+        "Text describing action plans. Use bold and text color (forecolor) to highlight key phrases.",
+      editorOptions: {
+        height: 200,
+        minHeight: 120,
+        menubar: false,
+        resize: true,
+        toolbar:
+          "bold italic underline | forecolor | removeformat",
+      },
     },
     {
       key: "whereWeWork.actionPlansLinkText",
@@ -541,12 +549,20 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
     {
       key: "whereWeWork.explorationText",
       label: "Exploration Phase Text",
-      type: "textarea",
+      type: "html",
       section: "Where We Work",
       defaultValue:
-        "We are also in **the exploration and engagement phase** – Brazil, India, Indonesia, Sri Lanka, Thailand.",
+        "<p>We are also in <strong>the exploration and engagement phase</strong> – Brazil, India, Indonesia, Sri Lanka, Thailand.</p>",
       helpText:
-        "Text describing exploration phase (use **text** for bold formatting)",
+        "Text describing exploration phase. Use bold and text color (forecolor) to highlight key phrases.",
+      editorOptions: {
+        height: 200,
+        minHeight: 120,
+        menubar: false,
+        resize: true,
+        toolbar:
+          "bold italic underline | forecolor | removeformat",
+      },
     },
     {
       key: "whereWeWork.mapImage",
@@ -559,12 +575,20 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
     {
       key: "whereWeWork.partnersText",
       label: "Partners Text",
-      type: "textarea",
+      type: "html",
       section: "Where We Work",
       defaultValue:
-        'Our **"Partners Piloting"** partners were in Bangladesh, Thailand, Indonesia, Honduras, Senegal.',
+        '<p>Our <strong>&quot;Partners Piloting&quot;</strong> partners were in Bangladesh, Thailand, Indonesia, Honduras, Senegal.</p>',
       helpText:
-        "Text describing pilot partners (use **text** for bold formatting)",
+        "Text describing pilot partners. Use bold and text color (forecolor) to highlight key phrases.",
+      editorOptions: {
+        height: 200,
+        minHeight: 120,
+        menubar: false,
+        resize: true,
+        toolbar:
+          "bold italic underline | forecolor | removeformat",
+      },
     },
     {
       key: "whereWeWork.partnersLinkText",

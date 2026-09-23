@@ -8,6 +8,7 @@ import { LanguageVariantPicker } from "@/components/main/LanguageVariantPicker";
 import { SearchableCombobox } from "@/components/ui/searchable-combobox";
 import { resolveCountryOptionFlagImgUrl } from "@/lib/country-flag";
 import { orderDownloadFilesEnglishFirst } from "@/lib/download-language-order";
+import { trackResourceDownload } from "@/lib/track-resource-download";
 
 export type Strategy2030DownloadFile = {
   language: string;
@@ -36,9 +37,8 @@ type Props = {
   title: string;
   subtitle?: string;
   downloadButtonText: string;
-  documentTitle: string;
-  documentItemId: string;
-  /** Untuk kolom `modalSource` di resource_download_submissions. */
+  documentTitle?: string;
+  documentItemId?: string;
   modalSource?: ResourceDownloadModalSource;
   /** Prefix unik untuk `id` input (mis. `goal-strategy-dl`, `strategy-banner-dl`). */
   formFieldIdPrefix: string;
@@ -59,9 +59,9 @@ export function Strategy2030DownloadLeadModal({
   title,
   subtitle,
   downloadButtonText,
-  documentTitle: _documentTitle,
-  documentItemId: _documentItemId,
-  modalSource: _modalSource = "STRATEGY_2030",
+  documentTitle,
+  documentItemId,
+  modalSource = "STRATEGY_2030",
   formFieldIdPrefix,
   headingId,
   files,
@@ -138,6 +138,20 @@ export function Strategy2030DownloadLeadModal({
         : orderedFiles[selectedLangIndex];
     if (!file) return;
     const url = normalizeUrl(file.url);
+    const selectedOptionLabel =
+      fileSelectorType === "country"
+        ? getCountryLabelForValue(file.language) ?? file.language
+        : getLanguageName(file.language);
+
+    trackResourceDownload({
+      modalSource,
+      documentItemId: documentItemId?.trim() || null,
+      documentTitle: documentTitle?.trim() || title.trim() || null,
+      selectorType: fileSelectorType,
+      selectedOptionLabel,
+      fileUrl: url,
+    });
+
     window.open(url, "_blank");
     onClose();
   };

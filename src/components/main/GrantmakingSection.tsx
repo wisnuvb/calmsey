@@ -11,6 +11,7 @@ import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { LanguageVariantPicker } from "@/components/main/LanguageVariantPicker";
 import { orderDownloadFilesEnglishFirst } from "@/lib/download-language-order";
 import { createDownloadLanguageNameResolver } from "@/lib/download-language-labels";
+import { trackResourceDownload } from "@/lib/track-resource-download";
 
 interface PracticeItem {
   id: string;
@@ -242,6 +243,16 @@ function GrantmakingFrameworkDownloadModal({
     const file = orderedFiles[selectedLangIndex];
     if (!file) return;
     const url = normalizeUrl(file.url);
+
+    trackResourceDownload({
+      modalSource: "GRANTMAKING_FRAMEWORK",
+      documentItemId: tabContent.id,
+      documentTitle: tabContent.title?.trim() || null,
+      selectorType: "language",
+      selectedOptionLabel: getLanguageName(file.language),
+      fileUrl: url,
+    });
+
     window.open(url, "_blank");
     onClose();
   };
