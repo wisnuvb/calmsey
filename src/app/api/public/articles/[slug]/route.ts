@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ article });
+    return NextResponse.json({ article }, { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } });
   } catch (error) {
     console.error("Public article API error:", error);
     return NextResponse.json(

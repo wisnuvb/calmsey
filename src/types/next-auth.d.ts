@@ -21,5 +21,9 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     role: string;
+    /** Waktu (ms) terakhir role dibaca ulang dari DB. */
+    roleCheckedAt?: number;
+    /** True bila user sudah tidak ada di DB -> session tidak boleh mengembalikan user. */
+    invalid?: boolean;
   }
 }

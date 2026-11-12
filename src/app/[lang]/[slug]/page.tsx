@@ -1,6 +1,7 @@
 import { SimpleCMS } from "@/lib/services/simple-cms";
 import { SafeImage } from "@/components/common/SafeImage";
 import { notFound } from "next/navigation";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface PageProps {
   params: Promise<{
@@ -51,7 +52,7 @@ export default async function DynamicPage({ params }: PageProps) {
                 return (
                   <div
                     key={key}
-                    dangerouslySetInnerHTML={{ __html: String(content.value) }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(String(content.value ?? "")) }}
                   />
                 );
               }

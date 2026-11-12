@@ -3,6 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { MediaUploadService } from "@/lib/media-upload";
 import { requireAuth, ROLE_AUTHOR } from "@/lib/auth-helpers";
 import { formatFileSize, MEDIA_CONFIG } from "@/lib/media-types";
+import {
+  UploadValidationError,
+  canonicalMime,
+  getUploadAllowedMimes,
+  uploadRateLimitResponse,
+} from "@/lib/upload-validation";
 
 /**
  * POST /api/admin/media/upload
@@ -23,6 +29,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const limited = uploadRateLimitResponse(session.user.id);
+    if (limited) return limited;
+
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
     });
@@ -39,7 +48,7 @@ export async function POST(request: NextRequest) {
     const enableCompression = formData.get("enableImageCompression");
     const compress = enableCompression !== "false";
 
-    if (!file) {
+    if (!file || typeof file === "string") {
       return NextResponse.json(
         { error: "No file provided" },
         { status: 400 }
@@ -55,24 +64,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const allowedTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-      "image/svg+xml",
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.ms-powerpoint",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "text/plain",
-    ];
+    // Allowlist bersama (gambar + dokumen; video/audio tidak diizinkan di endpoint ini)
+    const allowedTypes = getUploadAllowedMimes(false);
 
-    if (!allowedTypes.includes(file.type)) {
+    if (!allowedTypes.includes(canonicalMime(file.type))) {
       return NextResponse.json(
         { error: "Unsupported file type" },
         { status: 400 }
@@ -102,6 +97,9 @@ export async function POST(request: NextRequest) {
       filename: media.filename,
     });
   } catch (error) {
+    if (error instanceof UploadValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     console.error("Media upload error:", error);
     return NextResponse.json(
       { error: "Upload failed" },

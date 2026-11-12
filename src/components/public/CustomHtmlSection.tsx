@@ -2,6 +2,23 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { sanitizeHtml } from "@/lib/sanitize-html";
+
+/**
+ * Quote a value as a CSS string literal (for use inside an attribute selector).
+ * Escapes backslash, double quote and newlines so the value cannot break out of the string.
+ */
+function cssString(value: string): string {
+  return `"${value
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\r?\n|\f/g, "\\a ")}"`;
+}
+
+/** Neutralise anything that could terminate the surrounding <style> element. */
+function neutralizeStyleClose(css: string): string {
+  return css.replace(/<\/(style)/gi, "<\\/$1").replace(/<!--/g, "<\\!--");
+}
 
 interface CustomHtmlSectionProps {
   section: any;
@@ -23,9 +40,14 @@ export default function CustomHtmlSection({
       try {
         // Create a sandboxed execution context
         const script = document.createElement("script");
+        // The id is embedded as a JSON string literal (also a valid JS/CSS string), so a
+        // crafted id cannot break out of the selector or inject script.
+        const selectorLiteral = JSON.stringify(
+          `[data-section-id=${cssString(String(section.id))}]`,
+        );
         script.textContent = `
           (function() {
-            const sectionElement = document.querySelector('[data-section-id="${section.id}"]');
+            const sectionElement = document.querySelector(${selectorLiteral});
             if (sectionElement) {
               ${customJS}
             }
@@ -54,11 +76,11 @@ export default function CustomHtmlSection({
     return (
       <style
         dangerouslySetInnerHTML={{
-          __html: `
-            .custom-html-section[data-section-id="${section.id}"] {
-              ${customCSS}
+          __html: neutralizeStyleClose(`
+            .custom-html-section[data-section-id=${cssString(String(section.id))}] {
+              ${String(customCSS)}
             }
-          `,
+          `),
         }}
       />
     );
@@ -73,9 +95,10 @@ export default function CustomHtmlSection({
         style={style}
         data-section-id={section.id}
         dangerouslySetInnerHTML={{
-          __html:
+          __html: sanitizeHtml(
             translation?.content ||
-            '<div class="text-center text-gray-500 p-8">No custom HTML content</div>',
+              '<div class="text-center text-gray-500 p-8">No custom HTML content</div>',
+          ),
         }}
       />
     </>

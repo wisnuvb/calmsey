@@ -3,6 +3,7 @@ import {
   getCountryLabelForValue,
   isAllowedCountryValue,
 } from "@/lib/countries";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /** Normalizes env if someone pasted a markdown link `[label](url)` by mistake. */
 function normalizeWebhookUrl(raw: string | undefined): string | undefined {
@@ -15,6 +16,18 @@ function normalizeWebhookUrl(raw: string | undefined): string | undefined {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit per IP: 5 submit / jam
+    const ipLimit = rateLimit(`get-involved:${getClientIp(request)}`, {
+      limit: 5,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!ipLimit.ok) {
+      return NextResponse.json(
+        { error: "Too many submissions. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(ipLimit.retryAfter) } }
+      );
+    }
+
     const body = await request.json();
     const {
       fullName,
@@ -24,7 +37,7 @@ export async function POST(request: NextRequest) {
       country,
       partnershipType,
       message,
-    } = body;
+    } = body ?? {};
 
     const entityTypes = ["company", "institute", "organization", "individual"] as const;
 
@@ -41,6 +54,19 @@ export async function POST(request: NextRequest) {
         { error: "All fields are required" },
         { status: 400 }
       );
+    }
+
+    if (
+      typeof fullName !== "string" ||
+      typeof email !== "string" ||
+      typeof partnershipType !== "string" ||
+      typeof message !== "string" ||
+      fullName.length > 200 ||
+      email.length > 254 ||
+      partnershipType.length > 200 ||
+      message.length > 5000
+    ) {
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
     const orgType =
@@ -132,20 +158,10 @@ export async function POST(request: NextRequest) {
       throw new Error("Power Automate webhook returned error");
     }
 
-    const contentType = response.headers.get("content-type") ?? "";
-    let upstreamBody: unknown = null;
-    if (contentType.includes("application/json")) {
-      try {
-        upstreamBody = await response.json();
-      } catch {
-        upstreamBody = null;
-      }
-    }
-
     return NextResponse.json({
       success: true,
       message: "Thank you! Your message has been sent.",
-      data: upstreamBody,
+      data: null,
     });
   } catch (error) {
     console.error("Get Involved form submission error:", error);

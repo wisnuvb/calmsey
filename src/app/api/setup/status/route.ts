@@ -9,7 +9,7 @@ export async function GET() {
     console.error("Setup status error:", error);
     return NextResponse.json(
       {
-        error: "Failed to get setup status",
+        error: "Failed to get setup status", // generik; detail ada di log server
         dbConnected: false,
         adminExists: false,
         settingsConfigured: false,

@@ -7,6 +7,7 @@ import { ArrowRight, Waves, Globe, Zap, Lightbulb } from "lucide-react";
 import { H2, P } from "../ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface FundData {
   id: string;
@@ -206,7 +207,7 @@ export const OurFourFundsSection: React.FC<OurFourFundsSectionProps> = ({
                   </h3>
                   <div
                     className="text-[#060726CC] font-normal leading-relaxed max-w-none [&_p]:mb-3 [&_p:last-child]:mb-0 [&_a]:text-[#3C62ED] [&_a]:font-medium [&_a]:no-underline hover:[&_a]:underline"
-                    dangerouslySetInnerHTML={{ __html: fund.description }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(fund.description) }}
                   />
                 </div>
                 <Link

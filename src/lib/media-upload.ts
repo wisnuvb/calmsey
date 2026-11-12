@@ -1,13 +1,22 @@
 import AWS from "aws-sdk";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
+import {
+  contentDispositionFor,
+  extensionForMime,
+  normalizeBaseUrl,
+  sanitizeOriginalName,
+  validateUpload,
+} from "@/lib/upload-validation";
 
 // Configure DigitalOcean Spaces
+// Catatan: nama env di sini (DO_SPACES_ACCESS_KEY/SECRET_KEY) berbeda dari upload.ts
+// (DO_SPACES_KEY/SECRET); masing-masing fallback ke nama yang lain.
 const spacesEndpoint = new AWS.Endpoint(process.env.DO_SPACES_ENDPOINT!);
 const s3 = new AWS.S3({
   endpoint: spacesEndpoint,
-  accessKeyId: process.env.DO_SPACES_ACCESS_KEY!,
-  secretAccessKey: process.env.DO_SPACES_SECRET_KEY!,
+  accessKeyId: (process.env.DO_SPACES_ACCESS_KEY || process.env.DO_SPACES_KEY)!,
+  secretAccessKey: (process.env.DO_SPACES_SECRET_KEY || process.env.DO_SPACES_SECRET)!,
   region: process.env.DO_SPACES_REGION || "nyc3",
 });
 
@@ -34,7 +43,8 @@ interface UploadResult {
 
 export class MediaUploadService {
   private static bucketName = process.env.DO_SPACES_BUCKET!;
-  private static cdnUrl = process.env.DO_SPACES_CDN_URL;
+  // Normalisasi: tambahkan https:// bila env CDN tanpa skema.
+  private static cdnUrl = normalizeBaseUrl(process.env.DO_SPACES_CDN_URL);
 
   static async uploadFile(
     file: File,
@@ -49,22 +59,25 @@ export class MediaUploadService {
       compress = true,
     } = options;
 
-    // Generate unique filename
-    const fileExtension = file.name.split(".").pop()?.toLowerCase() || "";
-    const uniqueFilename = `${uuidv4()}.${fileExtension}`;
-    const filePath = folder ? `${folder}/${uniqueFilename}` : uniqueFilename;
-
     // Convert File to Buffer
     const arrayBuffer = await file.arrayBuffer();
-    let buffer = Buffer.from(arrayBuffer);
+    const rawBuffer = Buffer.from(arrayBuffer);
+
+    // Validasi: ukuran aktual, allowlist mime, ekstensi vs mime, magic bytes, sanitasi SVG
+    const validated = validateUpload(file, rawBuffer, { allowMedia: true });
+    let buffer = validated.buffer;
     let processedSize = buffer.length;
     let thumbnailUrl: string | undefined;
-    let contentType = file.type;
+    let contentType = validated.mime;
 
-    const isImage = file.type.startsWith("image/");
+    // ID unik; ekstensi final diturunkan dari ContentType akhir (bukan nama file user)
+    const uniqueId = uuidv4();
+    const thumbnailFilename = `thumb_${uniqueId}.jpg`;
+
+    const isImage = validated.mime.startsWith("image/");
 
     // Process image files (only when compress=true)
-    if (compress && isImage && file.type !== "image/svg+xml") {
+    if (compress && isImage && validated.mime !== "image/svg+xml") {
       try {
         // Compress and resize main image
         const processedBuffer = await sharp(buffer)
@@ -89,7 +102,6 @@ export class MediaUploadService {
             .jpeg({ quality: 80 })
             .toBuffer();
 
-          const thumbnailFilename = `thumb_${uniqueFilename}`;
           const thumbnailPath = folder
             ? `${folder}/thumbnails/${thumbnailFilename}`
             : `thumbnails/${thumbnailFilename}`;
@@ -109,11 +121,13 @@ export class MediaUploadService {
     }
 
     // Upload main file to Spaces
+    const uniqueFilename = `${uniqueId}.${extensionForMime(contentType)}`;
+    const filePath = folder ? `${folder}/${uniqueFilename}` : uniqueFilename;
     await this.uploadToSpaces(buffer, filePath, contentType);
 
     return {
       filename: uniqueFilename,
-      originalName: file.name,
+      originalName: sanitizeOriginalName(file.name),
       mimeType: contentType,
       size: processedSize,
       url: this.generatePublicUrl(filePath),
@@ -126,7 +140,7 @@ export class MediaUploadService {
     filePath: string,
     contentType: string
   ): Promise<void> {
-    const uploadParams = {
+    const uploadParams: AWS.S3.PutObjectRequest = {
       Bucket: this.bucketName,
       Key: filePath,
       Body: buffer,
@@ -134,6 +148,8 @@ export class MediaUploadService {
       ACL: "public-read",
       CacheControl: "max-age=31536000", // 1 year cache
     };
+    const disposition = contentDispositionFor(contentType);
+    if (disposition) uploadParams.ContentDisposition = disposition;
 
     try {
       await s3.upload(uploadParams).promise();

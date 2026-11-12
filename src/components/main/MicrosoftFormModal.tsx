@@ -14,10 +14,14 @@ interface MicrosoftFormModalProps {
 export function MicrosoftFormModal({
   open,
   title,
-  formEmbedUrl,
+  formEmbedUrl: formEmbedUrlProp,
   onClose,
   titleId = "microsoft-form-modal-title",
 }: MicrosoftFormModalProps) {
+  // Hanya izinkan http(s); skema lain (mis. javascript:) diganti about:blank.
+  const formEmbedUrl = /^https?:\/\//i.test(String(formEmbedUrlProp ?? "").trim())
+    ? String(formEmbedUrlProp).trim()
+    : "about:blank";
   useEffect(() => {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;

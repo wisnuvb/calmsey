@@ -165,7 +165,9 @@ function getBackgroundStyles(background: any) {
       break;
 
     case "image":
-      styles.backgroundImage = `url(${background.imageUrl})`;
+      styles.backgroundImage = `url(${JSON.stringify(
+        String(background.imageUrl ?? "")
+      )})`;
       styles.backgroundSize = background.size || "cover";
       styles.backgroundPosition = background.position || "center";
       styles.backgroundRepeat = background.repeat ? "repeat" : "no-repeat";

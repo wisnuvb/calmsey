@@ -4,6 +4,7 @@ import Image from "next/image";
 import { P } from "@/components/ui/typography";
 import { cn, getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface GenesisSectionProps {
   title?: string;
@@ -89,9 +90,11 @@ export function GenesisSection({
             <div
               className="p text-[#060726CC]"
               dangerouslySetInnerHTML={{
-                __html: closingParagraph.replace(
-                  /\*\*(.*?)\*\*/g,
-                  "<strong>$1</strong>"
+                __html: sanitizeHtml(
+                  closingParagraph.replace(
+                    /\*\*(.*?)\*\*/g,
+                    "<strong>$1</strong>"
+                  )
                 ),
               }}
             />

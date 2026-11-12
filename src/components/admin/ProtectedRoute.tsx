@@ -25,7 +25,8 @@ export default function ProtectedRoute({
   useEffect(() => {
     if (status === "loading" || isExcludedPath) return;
 
-    if (!session) {
+    // session.user kosong bila akun sudah dihapus (token ditandai invalid)
+    if (!session || !session.user) {
       router.push("/admin/login");
       return;
     }
@@ -48,7 +49,7 @@ export default function ProtectedRoute({
     return <>{children}</>;
   }
 
-  if (!session || !allowedRoles.includes(session.user.role)) {
+  if (!session || !session.user || !allowedRoles.includes(session.user.role)) {
     return null;
   }
 

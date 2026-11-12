@@ -3,6 +3,10 @@ import { ImageUploadService } from "@/lib/upload";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ROLE_AUTHOR } from "@/lib/auth-helpers";
 import { formatFileSize, MEDIA_CONFIG } from "@/lib/media-types";
+import {
+  UploadValidationError,
+  uploadRateLimitResponse,
+} from "@/lib/upload-validation";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,12 +15,15 @@ export async function POST(request: NextRequest) {
 
     const { session } = authResult;
 
+    const limited = uploadRateLimitResponse(session!.user.id);
+    if (limited) return limited;
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const enableCompression = formData.get("enableImageCompression");
     const compress = enableCompression !== "false";
 
-    if (!file) {
+    if (!file || typeof file === "string") {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
@@ -58,6 +65,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    if (error instanceof UploadValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     console.error("Upload error:", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }

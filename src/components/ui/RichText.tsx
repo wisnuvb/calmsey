@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "../public/LanguageProvider";
 import { clientNavigateWithGoogleTranslateSafety } from "@/lib/safe-client-navigation";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface RichTextProps {
   content: string;
@@ -15,6 +16,7 @@ export function RichText({ content, className }: RichTextProps) {
   const router = useRouter();
   const { language } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
+  const safeHtml = useMemo(() => sanitizeHtml(content), [content]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -90,7 +92,7 @@ export function RichText({ content, className }: RichTextProps) {
     <div
       ref={containerRef}
       className={cn("rich-text-content", className)}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: safeHtml }}
     />
   );
 }

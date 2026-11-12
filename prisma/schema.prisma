@@ -138,6 +138,8 @@ model Article {
   categories   ArticleCategory[]
   articleTag   ArticleTag[]
 
+  // Public lists/counts: status = PUBLISHED AND publishedAt NOT NULL ORDER BY publishedAt DESC
+  @@index([status, publishedAt])
   @@map("articles")
 }
 
@@ -359,6 +361,8 @@ model Media {
   uploadedById String
   uploadedBy   User   @relation(fields: [uploadedById], references: [id])
 
+  // Admin media library: ORDER BY createdAt DESC with pagination
+  @@index([createdAt])
   @@map("media")
 }
 
@@ -370,6 +374,12 @@ model ContactSubmission {
   status    SubmissionStatus @default(UNREAD)
   createdAt DateTime         @default(now())
 
+  // Admin list/stats: filter by status, order by createdAt; status counts
+  @@index([status, createdAt])
+  // Admin stats: createdAt range counts / groupBy
+  @@index([createdAt])
+  // Public contact POST rate limit: count WHERE email = ? AND createdAt >= ?
+  @@index([email, createdAt])
   @@map("contact_submissions")
 }
 

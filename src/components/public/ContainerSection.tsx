@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface ContainerSectionProps {
   section: any;
@@ -57,7 +58,7 @@ export default function ContainerSection({
         {translation?.content && (
           <div
             className="prose max-w-none mb-8"
-            dangerouslySetInnerHTML={{ __html: translation.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(translation.content) }}
           />
         )}
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FieldDefinition } from "@/lib/page-content-schema";
 import { Eye, Code2, Maximize2, Minimize2 } from "lucide-react";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface MarkdownFieldProps {
   field: FieldDefinition;
@@ -88,7 +89,7 @@ export function MarkdownField({
     return (
       <div
         className="prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
       />
     );
   };

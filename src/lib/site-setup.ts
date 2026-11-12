@@ -1,6 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "@/lib/prisma";
-import { PageStatus, PageType } from "@prisma/client";
+import { PageStatus, PageType, Prisma } from "@prisma/client";
+import { NextResponse } from "next/server";
+import { requireAuth, ROLE_ADMIN } from "@/lib/auth-helpers";
+
+/** Dilempar saat setup admin dicoba padahal SUPER_ADMIN sudah ada. */
+export class SetupAlreadyCompleteError extends Error {
+  constructor() {
+    super("Setup already completed");
+    this.name = "SetupAlreadyCompleteError";
+  }
+}
+
+/** True bila sudah ada minimal satu SUPER_ADMIN. */
+export async function hasSuperAdmin(): Promise<boolean> {
+  const admin = await prisma.user.findFirst({
+    where: { role: "SUPER_ADMIN" },
+    select: { id: true },
+  });
+  return !!admin;
+}
+
+/**
+ * Guard untuk route /api/setup/* (selain status & articles).
+ * - Belum ada SUPER_ADMIN  => terbuka (first-time wizard).
+ * - Sudah ada SUPER_ADMIN  => wajib sesi ADMIN/SUPER_ADMIN.
+ * Return NextResponse (401/403) bila ditolak, atau null bila boleh lanjut.
+ * Dapat melempar error DB; panggil di dalam try/catch route.
+ */
+export async function guardSetupRoute(): Promise<NextResponse | null> {
+  if (!(await hasSuperAdmin())) return null;
+  const auth = await requireAuth(ROLE_ADMIN);
+  if (!auth.success) return auth.response ?? null;
+  return null;
+}
 
 export interface SiteSetupStatus {
   dbConnected: boolean;
@@ -42,13 +75,15 @@ export async function getSiteSetupStatus(): Promise<SiteSetupStatus> {
       isSetupComplete,
     };
   } catch (error) {
+    console.error("Setup status error:", error);
     return {
       dbConnected: false,
       adminExists: false,
       settingsConfigured: false,
       landingPageExists: false,
       isSetupComplete: false,
-      error: error instanceof Error ? error.message : "Unknown database error",
+      // Jangan bocorkan pesan error DB mentah ke klien; detail hanya di log server.
+      error: "Database unavailable",
     };
   }
 }
@@ -92,18 +127,32 @@ export async function createDefaultAdminUser(userData: {
     const bcrypt = await import("bcryptjs");
     const hashedPassword = await bcrypt.hash(userData.password, 12);
 
-    const admin = await prisma.user.create({
-      data: {
-        name: userData.name,
-        email: userData.email,
-        password: hashedPassword,
-        role: "SUPER_ADMIN",
-        emailVerified: new Date(),
+    // Cek-lalu-buat dalam satu transaksi Serializable agar dua request
+    // bersamaan tidak sama-sama lolos dan membuat dua SUPER_ADMIN.
+    const admin = await prisma.$transaction(
+      async (tx) => {
+        const existing = await tx.user.findFirst({
+          where: { role: "SUPER_ADMIN" },
+          select: { id: true },
+        });
+        if (existing) throw new SetupAlreadyCompleteError();
+
+        return tx.user.create({
+          data: {
+            name: userData.name,
+            email: userData.email,
+            password: hashedPassword,
+            role: "SUPER_ADMIN",
+            emailVerified: new Date(),
+          },
+        });
       },
-    });
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+    );
 
     return admin;
   } catch (error) {
+    if (error instanceof SetupAlreadyCompleteError) throw error;
     throw new Error(
       `Failed to create admin user: ${
         error instanceof Error ? error.message : "Unknown error"

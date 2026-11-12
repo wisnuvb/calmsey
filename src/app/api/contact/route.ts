@@ -1,15 +1,41 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit per IP: 5 submit / jam (selain cek per-email di DB di bawah)
+    const ipLimit = rateLimit(`contact:${getClientIp(request)}`, {
+      limit: 5,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!ipLimit.ok) {
+      return NextResponse.json(
+        { error: "Too many submissions. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(ipLimit.retryAfter) } }
+      );
+    }
+
     const body = await request.json();
-    const { name, email, message } = body;
+    const { name, email, message } = body ?? {};
 
     // Validation
     if (!name || !email || !message) {
       return NextResponse.json(
         { error: "Name, email, and message are required" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      typeof name !== "string" ||
+      typeof email !== "string" ||
+      typeof message !== "string" ||
+      name.length > 200 ||
+      email.length > 254
+    ) {
+      return NextResponse.json(
+        { error: "Invalid name, email, or message" },
         { status: 400 }
       );
     }
@@ -88,43 +114,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// import { NextRequest, NextResponse } from "next/server";
-// import { prisma } from "@/lib/prisma";
-
-// export async function POST(request: NextRequest) {
-//   try {
-//     const body = await request.json();
-//     const { name, email, message } = body;
-
-//     // Validation
-//     if (!name || !email || !message) {
-//       return NextResponse.json(
-//         { error: "All fields are required" },
-//         { status: 400 }
-//       );
-//     }
-
-//     // Save contact submission
-//     const contact = await prisma.contactSubmission.create({
-//       data: {
-//         name: name.trim(),
-//         email: email.trim(),
-//         message: message.trim(),
-//         status: "UNREAD",
-//       },
-//     });
-
-//     return NextResponse.json({
-//       success: true,
-//       message: "Contact submission received",
-//       id: contact.id,
-//     });
-//   } catch (error) {
-//     console.error("Contact submission error:", error);
-//     return NextResponse.json(
-//       { error: "Failed to submit contact form" },
-//       { status: 500 }
-//     );
-//   }
-// }

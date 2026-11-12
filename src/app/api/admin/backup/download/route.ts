@@ -1,44 +1,14 @@
 import { requireAuth, ROLES } from "@/lib/auth-helpers";
 import { NextResponse } from "next/server";
 
+// Sebelumnya mengembalikan file SQL placeholder seolah-olah backup asli.
+// Jangan pernah melakukan itu; lihat catatan di ../route.ts.
 export async function GET() {
-  try {
-    const authResult = await requireAuth([ROLES.SUPER_ADMIN]);
-    if (!authResult.success) return authResult.response;
+  const authResult = await requireAuth([ROLES.SUPER_ADMIN]);
+  if (!authResult.success) return authResult.response;
 
-    // TODO: Implement backup download logic
-    // This would typically involve:
-    // 1. Finding the latest backup file
-    // 2. Streaming it as a download
-
-    console.log("Downloading backup...");
-
-    // Example: Create a simple text backup (replace with actual backup content)
-    const backupContent = `-- CMS Database Backup
-      -- Generated on: ${new Date().toISOString()}
-      -- Version: 1.0.0
-
-      -- This is a placeholder backup file
-      -- In production, this would contain actual database dump
-
-      USE turningtidesfacility;
-
-      -- Add your actual backup content here
-    `;
-
-    return new NextResponse(backupContent, {
-      headers: {
-        "Content-Type": "application/sql",
-        "Content-Disposition": `attachment; filename="backup-${
-          new Date().toISOString().split("T")[0]
-        }.sql"`,
-      },
-    });
-  } catch (error) {
-    console.error("Download backup error:", error);
-    return NextResponse.json(
-      { error: "Failed to download backup" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(
+    { error: "Backup is not implemented" },
+    { status: 501 }
+  );
 }

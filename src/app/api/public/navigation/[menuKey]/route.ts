@@ -12,7 +12,7 @@ export async function GET(
 
     const navigation = await PublicAPI.getNavigationMenu(menuKey, language);
 
-    return NextResponse.json({ navigation });
+    return NextResponse.json({ navigation }, { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } });
   } catch (error) {
     console.error("Public navigation API error:", error);
     return NextResponse.json(

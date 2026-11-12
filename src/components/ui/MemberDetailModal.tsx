@@ -5,6 +5,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { FaLinkedin } from "react-icons/fa";
 import { getImageUrl } from "@/lib/utils";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface MemberData {
   name: string;
@@ -92,7 +93,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
               <div
                 className="text-base text-gray-700 leading-relaxed font-work-sans prose prose-sm max-w-none prose-a:text-[#3C62ED] prose-a:font-medium prose-a:no-underline hover:prose-a:underline"
                 dangerouslySetInnerHTML={{
-                  __html: member.biography,
+                  __html: sanitizeHtml(member.biography),
                 }}
               />
             </div>

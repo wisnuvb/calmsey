@@ -41,12 +41,12 @@ export function VideoHeroSection({
     propVideoUrl ||
     getContentValue(
       "hero.videoUrl",
-      "/assets/video/8248432-hd_1280_720_30fps.mp4"
+      "/assets/video/8248432-hd_1280_720_30fps-web.mp4"
     );
 
   const posterImage =
     propPosterImage ||
-    getContentValue("hero.posterImage", "/assets/demo/bg-video.png");
+    getContentValue("hero.posterImage", "/assets/demo/bg-video.webp");
 
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);

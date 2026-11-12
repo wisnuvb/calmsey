@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState, type MouseEvent } from "react";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 import { createDownloadLanguageNameResolver } from "@/lib/download-language-labels";
 import {
   getMicrosoftFormModalUrl,
@@ -45,6 +46,8 @@ export function RichTextWithEmbeddedModals({
     NonNullable<ReturnType<typeof getRichTextDownloadModalPayload>>
   | null>(null);
 
+  const safeHtml = useMemo(() => sanitizeHtml(html), [html]);
+
   const getLanguageName = useMemo(
     () => createDownloadLanguageNameResolver(activeLanguages),
     [activeLanguages],
@@ -74,7 +77,7 @@ export function RichTextWithEmbeddedModals({
     <>
       <div
         className={className}
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: safeHtml }}
         onClick={handleClick}
       />
 

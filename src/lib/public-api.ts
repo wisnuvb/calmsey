@@ -120,6 +120,21 @@ export async function getActiveLanguagesWithInfo(): Promise<DynamicLanguage[]> {
   return await getActiveLanguages();
 }
 
+/**
+ * Parse an integer query param, falling back to `fallback` on missing/NaN and
+ * clamping the result to [min, max].
+ */
+export function clampIntParam(
+  raw: string | null | undefined,
+  fallback: number,
+  min: number,
+  max: number
+): number {
+  const n = parseInt(raw ?? "", 10);
+  if (Number.isNaN(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+}
+
 // Public API functions
 export class PublicAPI {
   // Get homepage data

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import type { ResourceDownloadModalSource } from "@/lib/track-resource-download";
 
 const MODAL_SOURCES = new Set<ResourceDownloadModalSource>([
@@ -33,6 +34,18 @@ function isSafeFileUrl(url: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit per IP: 60 event / jam (endpoint tracking, jangan terlalu ketat)
+    const ipLimit = rateLimit(`resource-downloads:${getClientIp(request)}`, {
+      limit: 60,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!ipLimit.ok) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(ipLimit.retryAfter) } }
+      );
+    }
+
     const body = await request.json();
     const modalSource =
       typeof body.modalSource === "string" ? body.modalSource.trim() : "";

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { H2 } from "@/components/ui/typography";
 import { getImageUrl } from "@/lib/utils";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface OurVisionSectionProps {
   title?: string;
@@ -74,7 +75,7 @@ export function OurVisionSection({
             {/* Vision Description */}
             <div
               className="text-[#060726CC] p"
-              dangerouslySetInnerHTML={{ __html: content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
             />
           </div>
 

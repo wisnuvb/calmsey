@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { findFooterBrandSafe } from "@/lib/prisma-fetch-footer-brand";
 import { mergeFooterBrand } from "@/lib/footer-brand-defaults";
 
+// Never prerender at build time: data comes from the DB.
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/public/footer
  * Public API: footer link sections + singleton brand column (logos / sponsorship copy)
@@ -22,10 +25,13 @@ export async function GET() {
 
     const brandRow = await findFooterBrandSafe();
 
-    return NextResponse.json({
-      sections,
-      brand: mergeFooterBrand(brandRow ?? undefined),
-    });
+    return NextResponse.json(
+      {
+        sections,
+        brand: mergeFooterBrand(brandRow ?? undefined),
+      },
+      { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+    );
   } catch (error) {
     console.error("Error fetching footer:", error);
     return NextResponse.json(

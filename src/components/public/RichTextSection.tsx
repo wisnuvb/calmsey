@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface RichTextSectionProps {
   section: any;
@@ -45,7 +46,7 @@ export default function RichTextSection({
         {translation?.content && (
           <div
             className="prose prose-lg max-w-none"
-            dangerouslySetInnerHTML={{ __html: translation.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(translation.content) }}
           />
         )}
       </div>

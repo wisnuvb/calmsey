@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, ROLE_ADMIN } from "@/lib/auth-helpers";
+import { revalidateTag } from "next/cache";
 import { clearLanguageCache } from "@/lib/dynamic-languages";
 import {
   GMAIL_PASSWORD_MASK,
@@ -92,6 +93,13 @@ export async function PUT(request: NextRequest) {
 
     if (languages) {
       clearLanguageCache();
+    }
+
+    // Make maintenance-mode toggles take effect immediately (see [lang]/layout.tsx)
+    try {
+      revalidateTag("site-maintenance");
+    } catch (e) {
+      console.error("revalidateTag failed:", e);
     }
 
     return NextResponse.json({

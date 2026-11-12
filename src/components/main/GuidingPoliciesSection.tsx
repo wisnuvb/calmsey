@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Handshake, ChevronDown, ChevronUp } from "lucide-react";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 import { RichTextWithEmbeddedModals } from "./RichTextWithEmbeddedModals";
 
 interface Policy {
@@ -169,7 +170,7 @@ export const GuidingPoliciesSection: React.FC<GuidingPoliciesSectionProps> = ({
             <div className="text-left sm:col-span-8">
               <div
                 className="text-[#010107] p max-w-none [overflow-wrap:anywhere] [&_p]:mb-3 [&_p:last-child]:mb-0 [&_a]:break-all [&_a]:text-[#3C62ED] [&_a]:font-medium [&_a]:no-underline hover:[&_a]:underline"
-                dangerouslySetInnerHTML={{ __html: description }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
               />
             </div>
           </div>

@@ -5,6 +5,7 @@ import { formatDateWithLanguage } from "@/lib/date-utils";
 import Image from "next/image";
 import { ShareButtons } from "./ShareButtons";
 import { getImageUrl } from "@/lib/utils";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface ArticlePageProps {
   article: PublicArticle;
@@ -178,7 +179,7 @@ export function ArticlePage({
         <div className="prose prose-lg max-w-none mb-12">
           <div
             className="article-content"
-            dangerouslySetInnerHTML={{ __html: article.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(article.content) }}
           />
         </div>
 

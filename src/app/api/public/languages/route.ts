@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { normalizeLanguageFlag } from "@/lib/language-variant-flag";
 
+// Never prerender at build time: data comes from the DB.
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     // Get only active languages

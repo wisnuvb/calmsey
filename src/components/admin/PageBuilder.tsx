@@ -32,6 +32,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { getImageUrl } from "@/lib/utils";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 export interface PageSection {
   id: string;
@@ -428,7 +429,9 @@ function PageSectionPreview({ section }: { section: PageSection }) {
             {section.content.image && (
               <div
                 className="absolute inset-0 bg-cover bg-center opacity-50"
-                style={{ backgroundImage: `url(${section.content.image})` }}
+                style={{
+                  backgroundImage: `url(${JSON.stringify(String(section.content.image))})`,
+                }}
               />
             )}
             <div className="relative">
@@ -446,7 +449,7 @@ function PageSectionPreview({ section }: { section: PageSection }) {
             <h2>{section.content.title}</h2>
             <div
               dangerouslySetInnerHTML={{
-                __html: section.content.content || "",
+                __html: sanitizeHtml(section.content.content),
               }}
             />
           </div>

@@ -4,8 +4,23 @@ import { LanguageProvider } from "@/components/public/LanguageProvider";
 import { ScrollToHash } from "@/components/public/ScrollToHash";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import React from "react";
 import Script from "next/script";
+
+// Cached maintenance flag (30s TTL). The admin settings route calls
+// revalidateTag("site-maintenance") on save so toggles apply immediately.
+// Errors are thrown (never cached) and handled by the caller, which fails open.
+const getMaintenanceMode = unstable_cache(
+  async (): Promise<boolean> => {
+    const maintenanceSetting = await prisma.siteSetting.findUnique({
+      where: { key: "maintenance_mode" },
+    });
+    return maintenanceSetting?.value === "true";
+  },
+  ["site-maintenance-mode"],
+  { revalidate: 30, tags: ["site-maintenance"] }
+);
 
 interface LanguageLayoutProps {
   children: React.ReactNode;
@@ -20,11 +35,7 @@ const FrontendLayout = async ({ children, params }: LanguageLayoutProps) => {
   // We only catch database errors, not redirect errors
   let isMaintenanceMode = false;
   try {
-    const maintenanceSetting = await prisma.siteSetting.findUnique({
-      where: { key: "maintenance_mode" },
-    });
-
-    isMaintenanceMode = maintenanceSetting?.value === "true";
+    isMaintenanceMode = await getMaintenanceMode();
   } catch (error) {
     // If error checking maintenance mode, continue normally
     console.error("Error checking maintenance mode:", error);

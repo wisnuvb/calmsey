@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 import Link from "next/link";
 
 interface HeroSectionProps {
@@ -27,7 +28,9 @@ export default function HeroSection({
       {metadata.backgroundImage && (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${metadata.backgroundImage})` }}
+          style={{
+            backgroundImage: `url(${JSON.stringify(String(metadata.backgroundImage))})`,
+          }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         </div>
@@ -50,7 +53,7 @@ export default function HeroSection({
           {translation?.content && (
             <div
               className="mt-6 text-blue-100 max-w-3xl mx-auto"
-              dangerouslySetInnerHTML={{ __html: translation.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(translation.content) }}
             />
           )}
 

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// Never prerender at build time: data comes from the DB.
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     // Fetch layout configuration from site settings
@@ -55,10 +58,13 @@ export async function GET() {
       ? JSON.parse(layoutConfig.value)
       : defaultConfig;
 
-    return NextResponse.json({
-      success: true,
-      data: config,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: config,
+      },
+      { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+    );
   } catch (error) {
     console.error("Public layout config API error:", error);
     return NextResponse.json(

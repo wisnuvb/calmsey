@@ -24,7 +24,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ fund });
+    return NextResponse.json({ fund }, { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } });
   } catch (error) {
     console.error("Public fund API error:", error);
     return NextResponse.json(

@@ -6,7 +6,12 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const language = searchParams.get("lang") || "en";
-    const limit = parseInt(searchParams.get("limit") || "6");
+    // Batasi limit: NaN -> default 6, clamp 1..50
+    const parsedLimit = parseInt(searchParams.get("limit") || "6", 10);
+    const limit = Math.min(
+      50,
+      Math.max(1, Number.isNaN(parsedLimit) ? 6 : parsedLimit)
+    );
     const category = searchParams.get("category");
 
     const where: any = {

@@ -2,15 +2,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PageLayoutConfig } from "@/types/layout-settings";
+import { requireAuth, ROLE_EDITOR } from "@/lib/auth-helpers";
+
+// id halaman (cuid/uuid-like) dipakai sebagai bagian key SiteSetting
+const PAGE_ID_REGEX = /^[A-Za-z0-9_-]{1,64}$/;
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // PUT mengubah konfigurasi layout: wajib login (EDITOR ke atas)
+    const authResult = await requireAuth(ROLE_EDITOR);
+    if (!authResult.success) return authResult.response;
+
     const { id } = await params;
+    if (!PAGE_ID_REGEX.test(id)) {
+      return NextResponse.json({ error: "Invalid page id" }, { status: 400 });
+    }
+
     const body = await request.json();
-    const { layoutConfig }: { layoutConfig: PageLayoutConfig } = body;
+    const { layoutConfig }: { layoutConfig: PageLayoutConfig } = body ?? {};
+
+    if (!isPlainObject(layoutConfig)) {
+      return NextResponse.json(
+        { error: "layoutConfig must be an object" },
+        { status: 400 }
+      );
+    }
 
     // Store layout config as JSON in SiteSetting
     const settingKey = `page_layout_${id}`;
@@ -46,6 +69,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    if (!PAGE_ID_REGEX.test(id)) {
+      return NextResponse.json({ error: "Page not found" }, { status: 404 });
+    }
 
     // Check if page exists
     const page = await prisma.page.findUnique({

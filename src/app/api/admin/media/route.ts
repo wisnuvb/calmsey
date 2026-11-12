@@ -5,6 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { MediaUploadService } from "@/lib/media-upload";
 import { requireAuth, ROLE_AUTHOR } from "@/lib/auth-helpers";
 import { formatFileSize, MEDIA_CONFIG } from "@/lib/media-types";
+import {
+  UploadValidationError,
+  canonicalMime,
+  getUploadAllowedMimes,
+  uploadRateLimitResponse,
+} from "@/lib/upload-validation";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,10 +18,11 @@ export async function GET(request: NextRequest) {
     if (!authResult.success) return authResult.response;
 
     const { searchParams } = new URL(request.url);
-    const search = searchParams.get("search") || "";
+    const search = (searchParams.get("search") || "").slice(0, 200);
     const filter = searchParams.get("filter") || "all"; // all, images, documents, videos, audio
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "50");
+    // Batasi page/limit (cegah NaN, nilai negatif, dan limit tak terbatas)
+    const page = Math.max(1, Math.min(parseInt(searchParams.get("page") || "1") || 1, 100000));
+    const limit = Math.max(1, Math.min(parseInt(searchParams.get("limit") || "50") || 50, 100));
 
     // Build where clause
     const where: any = {};
@@ -154,7 +161,9 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const files = formData.getAll("files") as File[];
+    const files = formData
+      .getAll("files")
+      .filter((f): f is File => typeof f !== "string");
     const enableCompression = formData.get("enableImageCompression");
     const compress = enableCompression !== "false";
 
@@ -170,6 +179,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Rate limit per user (1 hit per file)
+    const limited = uploadRateLimitResponse(user.id, files.length);
+    if (limited) return limited;
+
     const uploadResults = [];
     const errors = [];
 
@@ -181,37 +194,10 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // Validate file type
-        const allowedTypes = [
-          // Images
-          "image/jpeg",
-          "image/jpg",
-          "image/png",
-          "image/gif",
-          "image/webp",
-          "image/svg+xml",
-          // Documents
-          "application/pdf",
-          "application/msword",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "application/vnd.ms-excel",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          "application/vnd.ms-powerpoint",
-          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-          "text/plain",
-          // Videos
-          "video/mp4",
-          "video/webm",
-          "video/avi",
-          "video/quicktime",
-          // Audio
-          "audio/mpeg",
-          "audio/wav",
-          "audio/ogg",
-          "audio/mp4",
-        ];
+        // Validate file type (allowlist bersama; endpoint ini juga mengizinkan video/audio)
+        const allowedTypes = getUploadAllowedMimes(true);
 
-        if (!allowedTypes.includes(file.type)) {
+        if (!allowedTypes.includes(canonicalMime(file.type))) {
           errors.push(`${file.name}: Unsupported file type`);
           continue;
         }
@@ -251,6 +237,8 @@ export async function POST(request: NextRequest) {
           errors.push(
             `${file.name}: Database constraint error - user not found`
           );
+        } else if (error instanceof UploadValidationError) {
+          errors.push(`${file.name}: ${error.message}`);
         } else if (error?.message) {
           errors.push(`${file.name}: ${error.message}`);
         } else {

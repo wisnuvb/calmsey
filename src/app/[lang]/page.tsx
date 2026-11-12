@@ -49,8 +49,8 @@ const HomePage = async ({ params }: HomePageProps) => {
       {/* <VideoHeroSection /> */}
       <HeroSection
         variant="video"
-        posterImage="/assets/demo/bg-video.png"
-        videoUrl="/assets/video/8248432-hd_1280_720_30fps.mp4"
+        posterImage="/assets/demo/bg-video.webp"
+        videoUrl="/assets/video/8248432-hd_1280_720_30fps-web.mp4"
       />
       {/* <WhyTurningTidesSection /> */}
       {/* <WhereWeWorkSection /> */}

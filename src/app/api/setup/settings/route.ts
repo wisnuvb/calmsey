@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { guardSetupRoute } from "@/lib/site-setup";
 
 export async function POST(request: NextRequest) {
   try {
+    // Terbuka hanya selama belum ada SUPER_ADMIN; setelahnya wajib sesi ADMIN.
+    const denied = await guardSetupRoute();
+    if (denied) return denied;
+
     const body = await request.json();
     const {
       siteName,

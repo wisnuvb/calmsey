@@ -80,8 +80,9 @@ export async function PUT(
     const updatedMediaFile = await prisma.media.update({
       where: { id },
       data: {
-        alt: alt || null,
-        caption: caption || null,
+        // Hanya string yang diterima (cegah objek/array masuk ke Prisma -> 500)
+        alt: typeof alt === "string" && alt ? alt : null,
+        caption: typeof caption === "string" && caption ? caption : null,
       },
       include: {
         uploadedBy: {
