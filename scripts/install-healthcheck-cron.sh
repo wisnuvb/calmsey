@@ -18,7 +18,7 @@ fi
 
 echo ""
 echo "Configure email in Admin → Settings → Email (Gmail App Password)"
-echo "  1. npm install --legacy-peer-deps"
+echo "  1. pnpm install"
 echo "  2. Set Gmail + App Password + alert recipients in admin panel, then Save"
-echo "  3. yarn healthcheck:test-email"
+echo "  3. pnpm healthcheck:test-email"
 echo "  4. tail -f $ROOT/logs/healthcheck.log"

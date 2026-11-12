@@ -444,21 +444,28 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       helpText: "Main heading for the section",
     },
     {
-      key: "whereWeWork.actionPlansText",
-      label: "Action Plans Text",
+      key: "whereWeWork.approvedTitle",
+      label: "Card 1 (teal) - Title",
+      type: "text",
+      section: "Where We Work",
+      defaultValue:
+        "Approved action plan & active grantmaking",
+      helpText: "Heading of the first card (teal pins on the map)",
+    },
+    {
+      key: "whereWeWork.approvedText",
+      label: "Card 1 (teal) - Text",
       type: "html",
       section: "Where We Work",
       defaultValue:
-        '<p>We have <strong style="color: #3C62ED;">developed action plans for Latin America and Africa</strong>, and <strong style="color: #3C62ED;">mobilizing grants</strong> for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda.</p>',
-      helpText:
-        "Text describing action plans. Use bold and text color (forecolor) to highlight key phrases.",
+        "Latin America (Brazil, Chile, Columbia, Costa Rica, Honduras, Panama, Regional movement building), Africa (Democratic Republic of Congo, Madagascar, Nigeria, Senegal, South Africa, Uganda, Continent-wide support), South East Asia (Indonesia, Thailand).",
+      helpText: "Regions covered by approved action plans & active grantmaking",
       editorOptions: {
         height: 200,
         minHeight: 120,
         menubar: false,
         resize: true,
-        toolbar:
-          "bold italic underline | forecolor | removeformat",
+        toolbar: "bold italic underline | forecolor | removeformat",
       },
     },
     {
@@ -466,7 +473,7 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       label: "Action Plans Link Text",
       type: "text",
       section: "Where We Work",
-      defaultValue: "See Action Plans",
+      defaultValue: "Action Plans",
       helpText: "Text for the action plans link (clicking opens download modal)",
     },
     {
@@ -547,55 +554,78 @@ export const ABOUT_US_SCHEMA: PageContentSchema = {
       ],
     },
     {
-      key: "whereWeWork.explorationText",
-      label: "Exploration Phase Text",
-      type: "html",
-      section: "Where We Work",
-      defaultValue:
-        "<p>We are also in <strong>the exploration and engagement phase</strong> – Brazil, India, Indonesia, Sri Lanka, Thailand.</p>",
-      helpText:
-        "Text describing exploration phase. Use bold and text color (forecolor) to highlight key phrases.",
-      editorOptions: {
-        height: 200,
-        minHeight: 120,
-        menubar: false,
-        resize: true,
-        toolbar:
-          "bold italic underline | forecolor | removeformat",
-      },
-    },
-    {
       key: "whereWeWork.mapImage",
       label: "Map Image",
       type: "image",
       section: "Where We Work",
-      defaultValue: "/assets/world-map.png",
+      defaultValue: "/assets/world-map-work.webp",
       helpText: "World map image showing work locations",
     },
     {
-      key: "whereWeWork.partnersText",
-      label: "Partners Text",
+      key: "whereWeWork.initialTitle",
+      label: "Card 2 (purple) - Title",
+      type: "text",
+      section: "Where We Work",
+      defaultValue:
+        "Initial engagement through grantmaking",
+      helpText: "Heading of the second card (purple pins on the map)",
+    },
+    {
+      key: "whereWeWork.initialText",
+      label: "Card 2 (purple) - Text",
       type: "html",
       section: "Where We Work",
       defaultValue:
-        '<p>Our <strong>&quot;Partners Piloting&quot;</strong> partners were in Bangladesh, Thailand, Indonesia, Honduras, Senegal.</p>',
-      helpText:
-        "Text describing pilot partners. Use bold and text color (forecolor) to highlight key phrases.",
+        "South Asia (India, Sri Lanka, Bangladesh).",
+      helpText: "Regions with initial engagement through grantmaking",
       editorOptions: {
         height: 200,
         minHeight: 120,
         menubar: false,
         resize: true,
-        toolbar:
-          "bold italic underline | forecolor | removeformat",
+        toolbar: "bold italic underline | forecolor | removeformat",
       },
+    },
+    {
+      key: "whereWeWork.grassrootsTitle",
+      label: "Card 3 (blue) - Title",
+      type: "text",
+      section: "Where We Work",
+      defaultValue:
+        "Regions where we have Grassroots funding",
+      helpText: "Heading of the third card (blue regions on the map)",
+    },
+    {
+      key: "whereWeWork.grassrootsText",
+      label: "Card 3 (blue) - Text",
+      type: "html",
+      section: "Where We Work",
+      defaultValue:
+        "South East Asia (Thailand, Indonesia), South Asia (India, Sri Lanka, Bangladesh), Africa (All the continent), Latin America (All of central America, Colombia, Brazil and Chile)",
+      helpText: "Regions with Grassroots funding",
+      editorOptions: {
+        height: 200,
+        minHeight: 120,
+        menubar: false,
+        resize: true,
+        toolbar: "bold italic underline | forecolor | removeformat",
+      },
+    },
+    {
+      key: "whereWeWork.note",
+      label: "Footnote",
+      type: "textarea",
+      section: "Where We Work",
+      defaultValue:
+        "*Turning Tides also support global movements that work towards advancing tenure security for coastal and shoreline communities across geographies",
+      helpText: "Centered note between the cards and the map. Leave empty to hide.",
     },
     {
       key: "whereWeWork.partnersLinkText",
       label: "Partners Link Text",
       type: "text",
       section: "Where We Work",
-      defaultValue: "View Report",
+      defaultValue: "Piloting Report",
       helpText: "Text for the partners report link (clicking opens download modal)",
     },
     {

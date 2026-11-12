@@ -43,14 +43,14 @@
 2. **Database Setup**
 
    ```bash
-   npm run db:push
-   npm run db:seed
+   pnpm db:push
+   pnpm db:seed
    ```
 
 3. **Build and Deploy**
 
    ```bash
-   npm run build
+   pnpm build
    npm start
    ```
 

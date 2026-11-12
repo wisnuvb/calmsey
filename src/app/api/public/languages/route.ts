@@ -21,13 +21,22 @@ export async function GET() {
       ],
     });
 
-    return NextResponse.json({
-      success: true,
-      data: languages.map((lang) => ({
-        ...lang,
-        flag: normalizeLanguageFlag(lang.id, lang.flag),
-      })),
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: languages.map((lang) => ({
+          ...lang,
+          flag: normalizeLanguageFlag(lang.id, lang.flag),
+        })),
+      },
+      {
+        headers: {
+          // Daftar bahasa jarang berubah; cache agar request tidak selalu ke DB.
+          "Cache-Control":
+            "public, s-maxage=300, stale-while-revalidate=86400",
+        },
+      },
+    );
   } catch (error) {
     console.error("Error fetching active languages:", error);
     return NextResponse.json(

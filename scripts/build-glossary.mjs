@@ -157,7 +157,7 @@ function main() {
 
     const outPath = path.join(OUT_DIR, `${exportBase}.ts`);
     const body = [
-      `/** Auto-generated — do not edit. Run npm run build:glossary */`,
+      `/** Auto-generated — do not edit. Run pnpm build:glossary */`,
       ``,
       `import type { GlossaryEntry } from "../types";`,
       ``,

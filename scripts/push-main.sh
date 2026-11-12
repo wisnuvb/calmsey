@@ -10,7 +10,7 @@ Usage:
   ./scripts/push-main.sh "commit message"
   ./scripts/push-main.sh -m "commit message"
   ./scripts/push-main.sh              # prompt for message
-  yarn push:main -- "commit message"
+  pnpm push:main -- "commit message"
 
 Options:
   -m, --message   Commit message
@@ -23,7 +23,7 @@ Flow:
   2. Commit staged changes
   3. Pull --rebase origin main
   4. Push origin main
-  5. Deploy: yarn deploy:prod (build lokal + upload .next ke server)
+  5. Deploy: pnpm deploy:prod (build lokal + upload .next ke server)
 EOF
 }
 
@@ -92,9 +92,9 @@ if [[ -z "$(git status --porcelain)" ]]; then
 fi
 
 echo "==> Build lokal (must pass before commit & push)"
-yarn lint
-yarn type-check
-yarn build:next
+pnpm lint
+pnpm type-check
+pnpm build:next
 
 echo
 read -r -p "Build OK. Continue with commit and push to origin/main? [y/N] " CONFIRM

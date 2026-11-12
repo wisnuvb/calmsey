@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Download, X } from "lucide-react";
+import { ArrowUpRight, Download, X } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
 import { useState, useMemo } from "react";
 import { usePageContentHelpers } from "@/hooks/usePageContentHelpers";
@@ -13,17 +13,31 @@ import { trackResourceDownload } from "@/lib/track-resource-download";
 import { useActiveLanguages } from "@/hooks/useActiveLanguages";
 import { RichText } from "@/components/ui/RichText";
 
-const DEFAULT_ACTION_PLANS_TEXT =
-  '<p>We have <strong style="color: #3C62ED;">developed action plans for Latin America and Africa</strong>, and <strong style="color: #3C62ED;">mobilizing grants</strong> for work in Chile, Honduras, Panama, Costa Rica, Senegal, Uganda.</p>';
+const DEFAULT_MAP_IMAGE = "/assets/world-map-work.webp";
 
-const DEFAULT_EXPLORATION_TEXT =
-  "<p>We are also in <strong>the exploration and engagement phase</strong> – Brazil, India, Indonesia, Sri Lanka, Thailand.</p>";
+const DEFAULT_APPROVED_TITLE = "Approved action plan & active grantmaking";
+const DEFAULT_APPROVED_TEXT =
+  "Latin America (Brazil, Chile, Columbia, Costa Rica, Honduras, Panama, Regional movement building), Africa (Democratic Republic of Congo, Madagascar, Nigeria, Senegal, South Africa, Uganda, Continent-wide support), South East Asia (Indonesia, Thailand).";
 
-const DEFAULT_PARTNERS_TEXT =
-  '<p>Our <strong>&quot;Partners Piloting&quot;</strong> partners were in Bangladesh, Thailand, Indonesia, Honduras, Senegal.</p>';
+const DEFAULT_INITIAL_TITLE = "Initial engagement through grantmaking";
+const DEFAULT_INITIAL_TEXT = "South Asia (India, Sri Lanka, Bangladesh).";
 
-const WHERE_WE_WORK_TEXT_CLASS =
-  "p min-w-0 text-gray-900 [&_p]:m-0 [&_p:not(:last-child)]:mb-2";
+const DEFAULT_GRASSROOTS_TITLE = "Regions where we have Grassroots funding";
+const DEFAULT_GRASSROOTS_TEXT =
+  "South East Asia (Thailand, Indonesia), South Asia (India, Sri Lanka, Bangladesh), Africa (All the continent), Latin America (All of central America, Colombia, Brazil and Chile)";
+
+const DEFAULT_NOTE =
+  "*Turning Tides also support global movements that work towards advancing tenure security for coastal and shoreline communities across geographies";
+
+const CARD_TEXT_CLASS =
+  "min-w-0 text-sm leading-[1.65] text-[#3d3d56] [&_p]:m-0 [&_p:not(:last-child)]:mb-2";
+
+/** Warna aksen kartu: sesuai warna pin pada gambar map. */
+const CARD_ACCENT = {
+  approved: "bg-[#6BB5B8]",
+  initial: "bg-[#B57BE4]",
+  grassroots: "bg-[#3C62ED]",
+} as const;
 
 function normalizeRichTextContent(content: string): string {
   if (!content.trim()) return content;
@@ -49,13 +63,17 @@ interface DownloadItem {
 
 interface WhereWeWorkSectionProps {
   title?: string;
-  actionPlansText?: string;
+  approvedTitle?: string;
+  approvedText?: string;
+  initialTitle?: string;
+  initialText?: string;
+  grassrootsTitle?: string;
+  grassrootsText?: string;
+  note?: string;
   actionPlansLinkText?: string;
   actionPlansDownloadModalTitle?: string;
   actionPlansDownloadItems?: DownloadItem[];
-  explorationText?: string;
   mapImage?: string;
-  partnersText?: string;
   partnersLinkText?: string;
   partnersDownloadModalTitle?: string;
   partnersDownloadItems?: DownloadItem[];
@@ -99,13 +117,17 @@ function parseDownloadOptions(
 
 export function WhereWeWorkSection({
   title: propTitle,
-  actionPlansText: propActionPlansText,
+  approvedTitle: propApprovedTitle,
+  approvedText: propApprovedText,
+  initialTitle: propInitialTitle,
+  initialText: propInitialText,
+  grassrootsTitle: propGrassrootsTitle,
+  grassrootsText: propGrassrootsText,
+  note: propNote,
   actionPlansLinkText: propActionPlansLinkText,
   actionPlansDownloadModalTitle: propActionPlansModalTitle,
   actionPlansDownloadItems: propActionPlansItems,
-  explorationText: propExplorationText,
   mapImage: propMapImage,
-  partnersText: propPartnersText,
   partnersLinkText: propPartnersLinkText,
   partnersDownloadModalTitle: propPartnersModalTitle,
   partnersDownloadItems: propPartnersItems,
@@ -123,18 +145,10 @@ export function WhereWeWorkSection({
     "Where Does Turning Tides Work?",
   );
 
-  const actionPlansText = normalizeRichTextContent(
-    getValue(
-      "whereWeWork.actionPlansText",
-      propActionPlansText,
-      DEFAULT_ACTION_PLANS_TEXT,
-    ),
-  );
-
   const actionPlansLinkText = getValue(
     "whereWeWork.actionPlansLinkText",
     propActionPlansLinkText,
-    "See Action Plans",
+    "Action Plans",
   );
 
   const actionPlansModalTitle = getValue(
@@ -160,35 +174,53 @@ export function WhereWeWorkSection({
     propActionPlansItems || [],
   );
 
-  const explorationText = normalizeRichTextContent(
-    getValue(
-      "whereWeWork.explorationText",
-      propExplorationText,
-      DEFAULT_EXPLORATION_TEXT,
-    ),
-  );
-
   const mapImage = getValue(
     "whereWeWork.mapImage",
     propMapImage,
-    "/assets/world-map.jpg",
+    DEFAULT_MAP_IMAGE,
   );
 
   // Use getImageUrl with validation built-in
-  const imageUrl = getImageUrl(mapImage, "/assets/world-map.jpg");
+  const imageUrl = getImageUrl(mapImage, DEFAULT_MAP_IMAGE);
 
-  const partnersText = normalizeRichTextContent(
+  const approvedTitle = getValue(
+    "whereWeWork.approvedTitle",
+    propApprovedTitle,
+    DEFAULT_APPROVED_TITLE,
+  );
+  const approvedText = normalizeRichTextContent(
     getValue(
-      "whereWeWork.partnersText",
-      propPartnersText,
-      DEFAULT_PARTNERS_TEXT,
+      "whereWeWork.approvedText",
+      propApprovedText,
+      DEFAULT_APPROVED_TEXT,
     ),
   );
+  const initialTitle = getValue(
+    "whereWeWork.initialTitle",
+    propInitialTitle,
+    DEFAULT_INITIAL_TITLE,
+  );
+  const initialText = normalizeRichTextContent(
+    getValue("whereWeWork.initialText", propInitialText, DEFAULT_INITIAL_TEXT),
+  );
+  const grassrootsTitle = getValue(
+    "whereWeWork.grassrootsTitle",
+    propGrassrootsTitle,
+    DEFAULT_GRASSROOTS_TITLE,
+  );
+  const grassrootsText = normalizeRichTextContent(
+    getValue(
+      "whereWeWork.grassrootsText",
+      propGrassrootsText,
+      DEFAULT_GRASSROOTS_TEXT,
+    ),
+  );
+  const note = getValue("whereWeWork.note", propNote, DEFAULT_NOTE);
 
   const partnersLinkText = getValue(
     "whereWeWork.partnersLinkText",
     propPartnersLinkText,
-    "View Report",
+    "Piloting Report",
   );
 
   const partnersModalTitle = getValue(
@@ -212,94 +244,66 @@ export function WhereWeWorkSection({
           </h2>
         </div>
 
-        {/* Legend Blocks */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 mb-4 lg:mb-8 mx-auto px-3 sm:px-6 lg:px-0">
-          {/* Left column — Action Plans */}
-          <div className="flex items-start gap-4 mx-auto w-full sm:px-1">
-            <div className="w-4 h-4 bg-[#3C62ED] flex-shrink-0 mt-1" />
-            <div className="min-w-0">
-              <RichText
-                content={actionPlansText}
-                className={`mb-2 ${WHERE_WE_WORK_TEXT_CLASS}`}
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  actionPlansDownloadItems.length > 0 &&
-                  setActionPlansModalOpen(true)
-                }
-                className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
-              >
-                <span>{actionPlansLinkText}</span>
-                <Download
-                  className="w-4 h-4 ml-1 group-hover:translate-y-0.5 transition-transform"
-                  aria-hidden
-                />
-              </button>
-            </div>
-          </div>
-
-          {/* Right column — Exploration + Partners */}
-          <div className="flex flex-col gap-6 lg:gap-8 mx-auto w-full sm:px-1">
-            <div className="flex items-start gap-4">
-              <div className="w-4 h-4 bg-[#7db5bb] flex-shrink-0 mt-1" />
-              <RichText
-                content={explorationText}
-                className={WHERE_WE_WORK_TEXT_CLASS}
-              />
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div
-                className="mt-1 box-border h-4 w-4 shrink-0 rounded-full border-[2px] border-[#172554] bg-transparent"
-                aria-hidden
-              />
-              <div className="min-w-0">
-                <RichText
-                  content={partnersText}
-                  className={`mb-2 ${WHERE_WE_WORK_TEXT_CLASS}`}
-                />
-                {!!partnersLinkText && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      partnersDownloadItems.length > 0 &&
-                      setPartnersModalOpen(true)
-                    }
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
-                  >
-                    <span>{partnersLinkText}</span>
-                    <Download
-                      className="w-4 h-4 ml-1 group-hover:translate-y-0.5 transition-transform"
-                      aria-hidden
-                    />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+        {/* Region cards */}
+        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-6 md:grid-cols-3">
+          <RegionCard
+            accentClass={CARD_ACCENT.approved}
+            title={approvedTitle}
+            text={approvedText}
+            linkText={actionPlansLinkText}
+            onLinkClick={
+              actionPlansDownloadItems.length > 0
+                ? () => setActionPlansModalOpen(true)
+                : undefined
+            }
+          />
+          <RegionCard
+            accentClass={CARD_ACCENT.initial}
+            title={initialTitle}
+            text={initialText}
+            linkText={partnersLinkText}
+            onLinkClick={
+              partnersDownloadItems.length > 0
+                ? () => setPartnersModalOpen(true)
+                : undefined
+            }
+          />
+          <RegionCard
+            accentClass={CARD_ACCENT.grassroots}
+            title={grassrootsTitle}
+            text={grassrootsText}
+          />
         </div>
 
-        {/* World Map */}
-        <div className="relative w-full">
-          <div className="relative w-full aspect-[16/9] lg:aspect-[2/1]">
-            {!imageError ? (
-              <Image
-                src={getImageUrl(imageUrl)}
-                alt="World Map showing Turning Tides work locations"
-                fill
-                className="object-contain"
-                priority
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300">
-                <div className="text-center text-gray-500">
-                  <p className="text-sm">Image not available</p>
-                </div>
-              </div>
-            )}
+        {/* Footnote */}
+        {!!note.trim() && (
+          <div className="mx-auto mt-8 flex max-w-[1200px] items-center gap-6 lg:mt-10">
+            <div className="hidden h-px flex-1 bg-[#c9d3e3] md:block" aria-hidden />
+            <p className="max-w-[640px] text-center text-base leading-relaxed text-[#3d3d56]">
+              {note}
+            </p>
+            <div className="hidden h-px flex-1 bg-[#c9d3e3] md:block" aria-hidden />
           </div>
+        )}
+
+        {/* World Map */}
+        <div className="relative mx-auto mt-6 w-full max-w-[1440px] lg:mt-10">
+          {!imageError ? (
+            <Image
+              src={imageUrl}
+              alt="World map highlighting the regions where Turning Tides works"
+              width={1440}
+              height={605}
+              sizes="(min-width: 1440px) 1440px, 100vw"
+              className="h-auto w-full"
+              priority
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="flex aspect-[1440/605] w-full items-center justify-center border-2 border-dashed border-gray-300 bg-gray-100">
+              <p className="text-sm text-gray-500">Image not available</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -327,6 +331,40 @@ export function WhereWeWorkSection({
         />
       )}
     </section>
+  );
+}
+
+function RegionCard({
+  accentClass,
+  title,
+  text,
+  linkText,
+  onLinkClick,
+}: {
+  accentClass: string;
+  title: string;
+  text: string;
+  linkText?: string;
+  onLinkClick?: () => void;
+}) {
+  return (
+    <article className="flex flex-col border border-[#c9d3e3] bg-white p-6 sm:p-8">
+      <div className={`mb-6 h-2 w-[88px] ${accentClass}`} aria-hidden />
+      <h3 className="font-nunito text-xl font-semibold leading-snug text-[#2a2a47]">
+        {title}
+      </h3>
+      <RichText content={text} className={`mt-2 ${CARD_TEXT_CLASS}`} />
+      {!!linkText && !!onLinkClick && (
+        <button
+          type="button"
+          onClick={onLinkClick}
+          className="mt-auto inline-flex min-h-[44px] items-center gap-1.5 self-start pt-6 text-base text-[#3C62ED] transition-colors hover:text-[#2748c9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3C62ED]"
+        >
+          <span>{linkText}</span>
+          <ArrowUpRight className="h-4 w-4" aria-hidden />
+        </button>
+      )}
+    </article>
   );
 }
 

@@ -13,6 +13,7 @@
     "url": "https://github.com/calmsey/calmsey"
   },
   "version": "1.1.5",
+  "packageManager": "pnpm@9.15.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack --port 2039",
@@ -39,7 +40,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "build:glossary": "node scripts/build-glossary.mjs",
-    "release": "git pull && npm install --legacy-peer-deps && yarn build",
+    "release": "git pull && pnpm install --frozen-lockfile && pnpm build",
     "push:main": "bash scripts/push-main.sh"
   },
   "prisma": {

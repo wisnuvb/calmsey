@@ -57,7 +57,7 @@ NEXTAUTH_SECRET="your-secret-key-here-change-this-in-production"
 2. Update `DATABASE_URL` di file `.env` dengan kredensial MySQL Anda
 3. Jalankan migrasi:
    ```bash
-   npx prisma db push
+   pnpm exec prisma db push
    ```
 
 ### 3. NextAuth Setup
@@ -69,21 +69,21 @@ NEXTAUTH_SECRET="your-secret-key-here-change-this-in-production"
 
 ```bash
 # Development
-npm run dev
+pnpm dev
 
 # Build
-npm run build
+pnpm build
 
 # Start production
-npm run start
+pnpm start
 
 # Lint
-npm run lint
+pnpm lint
 
 # Prisma commands
-npx prisma generate
-npx prisma db push
-npx prisma studio
+pnpm exec prisma generate
+pnpm exec prisma db push
+pnpm exec prisma studio
 ```
 
 ## Struktur File

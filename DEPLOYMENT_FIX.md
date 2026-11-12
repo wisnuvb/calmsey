@@ -15,12 +15,12 @@ cd /var/www/html/project/turningtidesfacility
 rm -rf .next
 
 # 3. Generate Prisma Client (jika perlu)
-npx prisma generate
+pnpm exec prisma generate
 
 # 4. Rebuild aplikasi
-npm run build
+pnpm build
 # atau
-yarn build
+pnpm build
 
 # 5. Start PM2 lagi
 pm2 start ecosystem.config.js
@@ -41,20 +41,20 @@ rm -rf node_modules/.cache
 rm -rf .turbo
 
 # 3. Clear npm/yarn cache (optional)
-npm cache clean --force
+pnpm store prune
 # atau
-yarn cache clean
+pnpm store prune
 
 # 4. Reinstall dependencies (jika perlu)
-npm install
+pnpm install
 # atau
-yarn install
+pnpm install
 
 # 5. Generate Prisma Client
-npx prisma generate
+pnpm exec prisma generate
 
 # 6. Rebuild aplikasi
-npm run build
+pnpm build
 
 # 7. Start PM2
 pm2 start ecosystem.config.js
@@ -76,10 +76,10 @@ rm -rf node_modules/.cache
 rm -rf .turbo
 
 echo "Generating Prisma Client..."
-npx prisma generate
+pnpm exec prisma generate
 
 echo "Rebuilding application..."
-npm run build
+pnpm build
 
 echo "Starting PM2..."
 pm2 start ecosystem.config.js
@@ -117,15 +117,15 @@ Untuk mencegah error ini di masa depan:
 
    ```bash
    git pull
-   npm install
-   npm run build
+   pnpm install
+   pnpm build
    pm2 restart turningtidesfacility
    ```
 
 2. **Gunakan script release yang sudah ada:**
 
    ```bash
-   npm run release
+   pnpm release
    ```
 
 3. **Pastikan `.next` folder di-ignore di git** (sudah ada di `.gitignore`)

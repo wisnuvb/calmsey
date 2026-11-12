@@ -7,9 +7,9 @@
 #   3. SSH key ke ubuntu@139.99.125.212 sudah terpasang
 #
 # Usage:
-#   yarn deploy:prod
-#   SKIP_LINT=1 yarn deploy:prod
-#   DEPLOY_SERVER=ubuntu@host DEPLOY_PATH=/path/to/app yarn deploy:prod
+#   pnpm deploy:prod
+#   SKIP_LINT=1 pnpm deploy:prod
+#   DEPLOY_SERVER=ubuntu@host DEPLOY_PATH=/path/to/app pnpm deploy:prod
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -31,7 +31,7 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     REMOTE_SHA="$(git rev-parse --short origin/main)"
     if [[ "$LOCAL_SHA" != "$REMOTE_SHA" ]]; then
       echo "PERINGATAN: HEAD lokal ($LOCAL_SHA) belum sama dengan origin/main ($REMOTE_SHA)."
-      echo "  Push dulu: git push origin main  (atau yarn push:main -- \"message\")"
+      echo "  Push dulu: git push origin main  (atau pnpm push:main -- \"message\")"
       echo "  Server akan git pull — tanpa push, .next bisa tidak match dengan kode server."
     else
       echo "==> Git OK: lokal = origin/main ($LOCAL_SHA)"
@@ -41,16 +41,16 @@ fi
 
 if [[ "${SKIP_LINT:-}" != "1" ]]; then
   echo "==> ESLint (lokal)"
-  yarn lint
+  pnpm lint
 fi
 
 if [[ "${SKIP_TYPECHECK:-}" != "1" ]]; then
   echo "==> TypeScript (lokal)"
-  yarn type-check
+  pnpm type-check
 fi
 
 echo "==> Next.js build (lokal)"
-yarn build:next
+pnpm build:next
 
 if [[ ! -f .next/BUILD_ID ]]; then
   echo "ERROR: .next/BUILD_ID tidak ada — build lokal gagal."
@@ -58,7 +58,7 @@ if [[ ! -f .next/BUILD_ID ]]; then
 fi
 
 echo "==> Git pull + install di server"
-ssh_cmd "cd '$DEPLOY_PATH' && git pull && npm install --legacy-peer-deps && npx prisma generate"
+ssh_cmd "cd '$DEPLOY_PATH' && git pull && pnpm install && pnpm exec prisma generate"
 
 echo "==> Stop PM2 $PM2_APP di server"
 ssh_cmd "pm2 stop '$PM2_APP' 2>/dev/null || true"

@@ -68,7 +68,7 @@ async function quickFix() {
 
   console.log('✅ Quick fix completed!\n');
   console.log('📝 Next steps:');
-  console.log('   1. Run: npm run dev');
+  console.log('   1. Run: pnpm dev');
   console.log('   2. Login with: admin@turningtidesfacility.org / admin123');
   console.log('   3. Test creating new articles/pages');
   console.log('   4. Use /admin/page-content for headless CMS');

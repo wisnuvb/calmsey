@@ -22,7 +22,7 @@ export function LanguageSwitcher({
   variant = "navbar",
 }: LanguageSwitcherProps) {
   const pathname = usePathname();
-  const { languages, loading, error } = useActiveLanguages();
+  const { languages, loading, error, refetch } = useActiveLanguages();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -101,10 +101,27 @@ export function LanguageSwitcher({
   }
 
   if (error) {
+    // Jangan tampilkan teks error ke pengunjung: cukup tampilkan bahasa aktif
+    // dan biarkan klik memicu percobaan ulang memuat daftar bahasa.
     return (
-      <div className="flex items-center space-x-1 text-red-500 px-3 py-2 text-sm font-medium">
-        <span>Error loading languages</span>
-      </div>
+      <button
+        type="button"
+        onClick={refetch}
+        title="Retry loading languages"
+        aria-label={`Language: ${currentLanguage.toUpperCase()}. Retry loading language list`}
+        className={cn(
+          "flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-md notranslate",
+          variant === "drawer" &&
+            "w-full justify-center bg-white text-[#3C62ED] hover:bg-white/90",
+          variant !== "drawer" &&
+            (isDark
+              ? "text-white hover:text-gray-100"
+              : "text-gray-700 hover:text-gray-600"),
+        )}
+        translate="no"
+      >
+        <span className="uppercase">{currentLanguage}</span>
+      </button>
     );
   }
 
