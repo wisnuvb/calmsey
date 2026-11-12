@@ -92,14 +92,21 @@ function readHeader(headers: HeaderLike, name: string): string | null {
 
 /**
  * IP klien di belakang reverse proxy (nginx).
- * Mengambil entri PERTAMA x-forwarded-for; pastikan nginx menimpa header ini
- * (`proxy_set_header X-Forwarded-For $remote_addr;`) agar tidak bisa dipalsukan klien.
+ *
+ * Prioritas:
+ * 1. `x-real-ip` — di production nginx menimpanya dengan `$remote_addr`
+ *    (IP asli via modul realip + CF-Connecting-IP), jadi TIDAK bisa dipalsukan klien.
+ * 2. Entri pertama `x-forwarded-for` — hanya fallback (dev lokal / proxy lain). Dengan
+ *    `proxy_add_x_forwarded_for` header ini ditambahi, bukan ditimpa, sehingga entri
+ *    pertamanya bisa dipalsukan klien; jangan diandalkan di production.
  */
 export function getClientIp(request: Request | HeaderLike): string {
   const headers: HeaderLike =
     typeof Request !== "undefined" && request instanceof Request
       ? request.headers
       : (request as HeaderLike);
+  const realIp = readHeader(headers, "x-real-ip")?.trim();
+  if (realIp) return realIp;
   const xff = readHeader(headers, "x-forwarded-for");
   if (xff) {
     const first = xff.split(",")[0]?.trim();
